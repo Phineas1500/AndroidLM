@@ -397,6 +397,21 @@ def chat(url, system, user, max_tokens, temperature=0.7):
             "gen_tokens": tm.get("predicted_n"), "gen_tps": round(tm.get("predicted_per_second", 0), 2)}
 
 
+# Experimental alternative to the source check: the model revises its own draft with the sources
+# in view, so its knowledge is kept and the sources' corrections are applied (--rewrite).
+REWRITE_SYSTEM = (
+    "You revise a draft answer using numbered sources from an offline copy of Wikipedia and "
+    "Wikivoyage. Write the final answer to the question. Keep everything in the draft that is "
+    "correct or that the sources do not contradict, even if the sources do not mention it. "
+    "Where a source contradicts the draft, use the source's fact. Add specifics from the sources "
+    "that help answer the question. Cite a source like [2] after each statement it supports; "
+    "statements from the draft alone carry no citation or marker at all. Each source is about the subject named "
+    "in its title; do not attach its facts to another subject, and ignore off-topic sources. "
+    "Never mention the draft, the sources' gaps, or your revisions. Address every part of the "
+    "question first, then elaborate. No preamble, no LaTeX. Be concise."
+)
+
+
 # a list marker is a bullet, or one or two digits followed by "." or ")". Anything else that
 # starts with digits is part of the title ("1983 Harrods bombing", "1984 (novel)").
 LIST_MARKER = re.compile(r"^\s*(?:[-*\u2022]\s+|\d{1,2}[.)]\s+)?")
@@ -449,7 +464,11 @@ def answer(corpus, args, question):
     context, used_hits = build_context(hits, args.context_chars)
     rec["sources"] = [f"{h['title']} — {h['section']} ({h['via']})" for h in used_hits]
     rec["sources_dropped"] = len(hits) - len(used_hits)
-    if draft is not None and context:
+    if draft is not None and context and args.rewrite:
+        user = f"Question: {question}\n\nDraft answer:\n{draft['text']}\n\nSources:\n\n{context}"
+        res = chat(args.url, REWRITE_SYSTEM, user, args.max_tokens + 100, temperature=0.0)
+        rec["answer"] = res.pop("text").strip()
+    elif draft is not None and context:
         user = f"Question: {question}\n\nDraft answer:\n{draft['text']}\n\nSources:\n\n{context}"
         res = chat(args.url, VERIFY_SYSTEM, user, 260, temperature=0.0)
         check = clean_check(res.pop("text"))
@@ -483,6 +502,8 @@ def main():
     ap.add_argument("--max-tokens", type=int, default=600)
     ap.add_argument("--route-views", type=int, default=5000,
                     help="auto mode: go retrieval-first when the subject article has fewer monthly views")
+    ap.add_argument("--rewrite", action="store_true",
+                    help="answer-first questions: revise the draft with the sources instead of appending a source check")
     ap.add_argument("--travel-route", action="store_true",
                     help="auto mode: travel questions about a place with a Wikivoyage guide go retrieval-first")
     ap.add_argument("--voyage-db", help="Wikivoyage corpus database; adds travel-guide sections")

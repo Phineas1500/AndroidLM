@@ -30,7 +30,7 @@ for pair in "$@"; do
   done
   if [ -n "${RAG_DB:-}" ]; then
     "$ROOT/venv/bin/python" "$ROOT/scripts/rag.py" --db "$RAG_DB" --mode "${RAG_MODE:-plan}" \
-      ${VOYAGE_DB:+--voyage-db "$VOYAGE_DB"} ${TRAVEL_ROUTE:+--travel-route} \
+      ${VOYAGE_DB:+--voyage-db "$VOYAGE_DB"} ${TRAVEL_ROUTE:+--travel-route} ${REWRITE:+--rewrite} \
       --questions "$QUESTIONS" --url "http://127.0.0.1:$PORT" \
       --out "$ROOT/eval/answers_${tag}_${RAG_MODE:-plan}${RUN_SUFFIX:-}.jsonl"
   else
