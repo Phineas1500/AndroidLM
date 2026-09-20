@@ -1,6 +1,7 @@
 # Third-party material
 
-This project's own code is in `scripts/`. It builds on, downloads, or redistributes the
+This project's own code (`scripts/`, and the additions under `app-android/`) is licensed under
+Apache-2.0 (see `LICENSE`). It builds on, downloads, or redistributes the
 following, each under its own terms.
 
 | Component | Source | License | How it is used |

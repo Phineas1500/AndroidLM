@@ -51,6 +51,8 @@ python scripts/build_redirects.py wiki.db enwiki-latest-redirect.sql.gz \
        enwiki-latest-pages-articles-multistream-index.txt.bz2
 ```
 
-## Licenses and attribution
+## Licence and attribution
 
-See [`NOTICE.md`](NOTICE.md).
+This project's own code is licensed under [Apache-2.0](LICENSE). Third-party components, the
+model and the Wikipedia-derived corpus keep their own terms: see [`NOTICE.md`](NOTICE.md).
+Installing on a phone: [`INSTALL.md`](INSTALL.md).

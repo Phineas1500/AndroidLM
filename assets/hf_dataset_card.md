@@ -9,7 +9,7 @@ size_categories:
 
 # AndroidLM offline corpus
 
-Two SQLite databases used by [AndroidLM](REPLACE_WITH_REPOSITORY_URL), an offline research
+Two SQLite databases used by [AndroidLM](https://github.com/Phineas1500/AndroidLM), an offline research
 assistant for Android. They are ordinary SQLite files (rollback-journal mode, FTS5) and can be
 opened read-only with any SQLite build that includes FTS5.
 

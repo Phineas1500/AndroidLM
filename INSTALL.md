@@ -20,7 +20,7 @@ and the corpus are therefore copied to the phone from a computer.
 ## Steps
 
 ```sh
-git clone <this repository> && cd AndroidLM
+git clone https://github.com/Phineas1500/AndroidLM && cd AndroidLM
 # build the APK (see app-android/README.md) or download it from the releases page, then:
 scripts/install.sh --apk path/to/androidlm.apk
 ```
