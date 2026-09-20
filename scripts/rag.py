@@ -362,10 +362,19 @@ def chat(url, system, user, max_tokens, temperature=0.7):
             "gen_tokens": tm.get("predicted_n"), "gen_tps": round(tm.get("predicted_per_second", 0), 2)}
 
 
+# a list marker is a bullet, or one or two digits followed by "." or ")". Anything else that
+# starts with digits is part of the title ("1983 Harrods bombing", "1984 (novel)").
+LIST_MARKER = re.compile(r"^\s*(?:[-*\u2022]\s+|\d{1,2}[.)]\s+)?")
+
+
+def parse_plan_output(text):
+    titles = [LIST_MARKER.sub("", line).strip().strip('"') for line in text.splitlines()]
+    return [t for t in titles if 1 < len(t) < 80][:4]
+
+
 def plan(url, question):
     res = chat(url, PLAN_SYSTEM, question, max_tokens=60, temperature=0.0)
-    titles = [re.sub(r"^[\s\-\*\d\.\)]+", "", line).strip().strip('"') for line in res["text"].splitlines()]
-    return [t for t in titles if 1 < len(t) < 80][:4], res
+    return parse_plan_output(res["text"]), res
 
 
 def answer(corpus, args, question):
