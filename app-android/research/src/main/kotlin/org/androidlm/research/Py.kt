@@ -92,6 +92,21 @@ internal object Py {
         }
     }
 
+    /**
+     * `re.search(r"\b" + re.escape(literal) + r"\b", s) is not None`: some occurrence of [literal]
+     * with a word boundary on both sides.
+     */
+    fun containsAtBoundaries(literal: String, s: String): Boolean {
+        if (literal.isEmpty()) return countAtBoundary(literal, s, firstOnly = true) > 0
+        var from = 0
+        while (true) {
+            val j = s.indexOf(literal, from)
+            if (j < 0) return false
+            if (isBoundary(s, j) && isBoundary(s, j + literal.length)) return true
+            from = j + 1
+        }
+    }
+
     /** `str.strip()`. */
     fun strip(s: String): String = rstrip(lstrip(s))
 

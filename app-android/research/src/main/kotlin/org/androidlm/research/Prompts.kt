@@ -60,10 +60,14 @@ internal object Lexicon {
         "tell", "me", "explain", "describe", "summarize", "main", "roughly", "show", "reasoning",
     )
 
-    /** rag.py ASPECT_HEADINGS: porter stem -> heading words that answer that aspect. */
+    /**
+     * rag.py ASPECT_HEADINGS: porter stem -> the heading words or PHRASES that answer that aspect
+     * (Python keeps each value as one ", "-separated string). A phrase is matched as a whole, with
+     * word boundaries, so "get around" does not match the "Get in" section.
+     */
     val ASPECT_HEADINGS: Map<String, List<String>> = mapOf(
         "treat" to listOf("treatment", "management", "therapy"),
-        "aid" to listOf("treatment", "management", "first", "aid"),
+        "aid" to listOf("treatment", "management", "first aid"),
         "prevent" to listOf("prevention", "prophylaxis"),
         "avoid" to listOf("prevention"),
         "symptom" to listOf("signs", "symptoms", "presentation"),
@@ -82,11 +86,39 @@ internal object Lexicon {
         "custom" to listOf("respect", "etiquette", "customs"),
         "weather" to listOf("climate"),
         "season" to listOf("climate"),
-        "safeti" to listOf("stay", "safe", "safety"),
-        "safe" to listOf("stay", "safe", "safety"),
+        "safeti" to listOf("stay safe", "safety"),
+        "safe" to listOf("stay safe", "safety"),
         "hike" to listOf("do", "hiking", "trekking"),
         "region" to listOf("regions"),
         "sleep" to listOf("sleep", "accommodation"),
-        "transport" to listOf("get", "around", "get", "in"),
+        "transport" to listOf("get around", "get in"),
+        "scam" to listOf("stay safe", "cope"),
+        "hassl" to listOf("stay safe", "cope"),
+        "danger" to listOf("stay safe"),
+        "fee" to listOf("understand", "get in", "fees", "permits"),
+        "permit" to listOf("understand", "get in", "fees", "permits"),
+        "visa" to listOf("get in"),
+        "guid" to listOf("understand", "get in"),
+        "cold" to listOf("climate"),
+        "car" to listOf("get around"),
+        "around" to listOf("get around"),
+        "move" to listOf("get around", "get in"),
+        "train" to listOf("get in", "get around"),
+        "base" to listOf("sleep", "districts", "cities"),
+        "neighbourhood" to listOf("districts", "sleep", "understand"),
+        "dress" to listOf("respect"),
+        "behaviour" to listOf("respect"),
+        "behavior" to listOf("respect"),
+        "trip" to listOf("go next"),
+        "nearbi" to listOf("go next"),
+        "accommod" to listOf("sleep"),
+        "hostel" to listOf("sleep"),
+    )
+
+    /** rag.py TRAVEL_STEMS: question stems that signal a travel question (the optional travel route). */
+    val TRAVEL_STEMS: Set<String> = setOf(
+        "accommod", "base", "behaviour", "custom", "dress", "eat", "etiquett", "fee", "food",
+        "hassl", "hike", "hostel", "itinerari", "layov", "scam", "see", "sleep", "stay", "travel",
+        "trek", "trip", "try", "visit",
     )
 }

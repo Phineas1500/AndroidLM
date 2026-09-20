@@ -318,6 +318,16 @@ fun SettingsScreen(current: AppSettings, onChange: (AppSettings) -> Unit, onBack
                 ) { onChange(current.copy(thinking = it)) }
             }
 
+            Section("Research") {
+                SwitchRow(
+                    "Travel questions: sources first",
+                    "A travel question about a place that has a Wikivoyage guide is answered from the " +
+                        "sources even when the place is widely read. Needs the Wikivoyage corpus; " +
+                        "takes effect on the next question.",
+                    current.researchTravelRoute,
+                ) { onChange(current.copy(researchTravelRoute = it)) }
+            }
+
             Section("Diagnostics") {
                 SwitchRow(
                     "Metrics CSV",

@@ -17,7 +17,7 @@ data class ArticleRef(val id: Long, val voyage: Boolean = false)
 /**
  * One retrieved passage (rag.py's hit dict). [start] is the chunk's offset in CODE POINTS into
  * the article text, exactly as stored in the corpus; [score] is rounded to two decimals as in
- * Python; [lead] marks an article's lead passage, which [buildContext] never trims.
+ * Python; [lead] marks an article's lead passage, which [buildContext] trims to a longer limit.
  * Equality is structural on all fields, like the Python dict comparison `retrieve` relies on.
  */
 data class Hit(
@@ -117,10 +117,13 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
 
     /**
      * BM25-like score of one chunk inside an already chosen article, normalised to 0..1, with
-     * question terms in the section heading counting double and +0.25 when the heading names
-     * an aspect the question asks about. [start] and [end] are code point offsets.
+     * question terms in the section heading counting double and +[aspectBonus] when the heading
+     * path contains, as whole words, a word or phrase that names an aspect the question asks
+     * about ("get around" does not match "Get in"). [start] and [end] are code point offsets.
      */
-    fun passageScore(text: PyText, start: Int, end: Int, stems: List<Stem>): Double {
+    fun passageScore(
+        text: PyText, start: Int, end: Int, stems: List<Stem>, aspectBonus: Double = DEFAULT_ASPECT_BONUS,
+    ): Double {
         val body = Py.lower(text.slice(start, end))
         val heading = Py.lower(sectionOf(text, start))
         val total = Py.sum(stems.map { it.idf }).let { if (it == 0.0) 1.0 else it }
@@ -131,10 +134,9 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
             score += idf * tf / (tf + 1.5)
         }
         score /= total
-        val words = HashSet<String>()
-        val m = ASCII_WORD.matcher(heading)
-        while (m.find()) words.add(m.group())
-        if (stems.any { (s, _) -> Lexicon.ASPECT_HEADINGS[s].orEmpty().any { it in words } }) score += 0.25
+        if (stems.any { (s, _) -> Lexicon.ASPECT_HEADINGS[s].orEmpty().any { Py.containsAtBoundaries(it, heading) } }) {
+            score += aspectBonus
+        }
         return score
     }
 
@@ -149,7 +151,9 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
     /**
      * Article id for a title the model proposed: exact match (case-insensitive), then the
      * redirects table, then, unless [fuzzy] is false, a title search that prefers the most-read
-     * candidate and allows at most one title word beyond the proposed ones.
+     * candidate and allows at most one title word beyond the proposed ones. A title of fewer than
+     * two words never reaches the title search: a one-word title that is neither an article nor a
+     * redirect is more often a different entity than a near miss ("Ger" -> Ger Canning).
      */
     fun resolveTitle(title: String, fuzzy: Boolean = true): Long? {
         db.query("select id from articles where title = ? collate nocase", title).firstOrNull()
@@ -159,7 +163,7 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
                 ?.let { return it[0] as Long }
         }
         val words = Py.alnumRuns(Py.lower(title))
-        if (words.isEmpty() || !fuzzy) return null
+        if (words.size < 2 || !fuzzy) return null
         val match = "title:(" + words.joinToString(" AND ") { "\"$it\"" } + ")"
         var bestKey = 0.0
         var bestAid: Long? = null
@@ -183,7 +187,9 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
     }
 
     /** Lead chunk plus the [nSections] chunks of the article that best cover the question. */
-    fun articlePassages(aid: Long, stems: List<Stem>, nSections: Int = 2): List<Hit> {
+    fun articlePassages(
+        aid: Long, stems: List<Stem>, nSections: Int = 2, aspectBonus: Double = DEFAULT_ASPECT_BONUS,
+    ): List<Hit> {
         val text = article(aid).text
         val rows = db.query("select start, end from chunks where article_id=? order by id", aid)
             .map { Span((it[0] as Long).toInt(), (it[1] as Long).toInt()) }
@@ -193,7 +199,7 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
         if (text.slice(lead.start, lead.end).startsWith("Key facts:") && rows.size > 1) lead = rows[1]
         // sorted(..., reverse=True) over (score, start, end) tuples
         val scored = rows.filter { it != lead }
-            .map { Scored(passageScore(text, it.start, it.end, stems), it) }
+            .map { Scored(passageScore(text, it.start, it.end, stems, aspectBonus), it) }
             .sortedWith { a, b ->
                 var c = Py.cmp(b.score, a.score)
                 if (c == 0) c = b.span.start.compareTo(a.span.start)
@@ -249,9 +255,13 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
 
     /**
      * Passages for the planned titles first (round-robin so every part of a comparison is
-     * represented), then gated BM25 hits. With [voyage], a travel guide of the same title
-     * (exact or redirect only) competes with the encyclopedia's sections on the same score and
-     * its hits are titled "Wikivoyage: ...".
+     * represented, up to five ranks), then gated BM25 hits. With [voyage], the travel guide for
+     * the same title (resolved like any title, fuzzy included) contributes its sections, scored
+     * with the strong aspect bonus [GUIDE_ASPECT_BONUS] because guide section names are
+     * standardised. After the lead (the encyclopedia's, or the guide's when there is none) the
+     * two section lists ALTERNATE: the list whose best section has the higher (rounded) score
+     * goes first, the encyclopedia's on a tie, and the longer list's leftovers follow. Guide hits
+     * are titled "Wikivoyage: ...".
      */
     fun retrieve(question: String, titles: List<String>, k: Int = 6, voyage: Corpus? = null): List<Hit> {
         val stems = stems(question)
@@ -261,20 +271,32 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
             val aid = resolveTitle(t)
             var passages: List<Hit> = emptyList()
             if (aid != null && seenAid.add(ArticleRef(aid))) passages = articlePassages(aid, stems)
-            val vaid = voyage?.resolveTitle(t, fuzzy = false)
+            val vaid = voyage?.resolveTitle(t)
             if (voyage != null && vaid != null && seenAid.add(ArticleRef(vaid, voyage = true))) {
-                val guide = voyage.articlePassages(vaid, stems).map {
+                val guide = voyage.articlePassages(vaid, stems, aspectBonus = GUIDE_ASPECT_BONUS).map {
                     it.copy(title = "Wikivoyage: " + it.title, aid = ArticleRef(it.aid.id, voyage = true))
                 }
                 val lead = if (passages.isNotEmpty()) passages.take(1) else guide.take(1)
-                val rest = (passages.drop(1) + guide.drop(1)).sortedWith { a, b -> Py.cmp(-a.score, -b.score) }
-                passages = lead + rest.take(3)
+                var ours = passages.drop(1)
+                var theirs = guide.drop(1)
+                if (theirs.isNotEmpty() && (ours.isEmpty() || theirs[0].score > ours[0].score)) {
+                    ours = theirs.also { theirs = ours }
+                }
+                // zip() stops at the shorter list; the other's leftovers are appended
+                val rest = ArrayList<Hit>()
+                for (i in 0 until minOf(ours.size, theirs.size)) {
+                    rest.add(ours[i])
+                    rest.add(theirs[i])
+                }
+                rest.addAll(ours.drop(theirs.size))
+                rest.addAll(theirs.drop(ours.size))
+                passages = lead + rest
             }
             if (passages.isNotEmpty()) perTitle.add(passages)
         }
         val hits = ArrayList<Hit>()
         if (perTitle.isNotEmpty()) hits.addAll(perTitle[0].take(2))
-        for (rank in 0 until 3) {
+        for (rank in 0 until TITLE_RANKS) {
             // a generator feeding extend(): each `not in hits` test sees the items added before it
             for (p in perTitle) if (p.size > rank && p[rank] !in hits) hits.add(p[rank])
         }
@@ -294,10 +316,18 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
         private const val BLOCK_CACHE = 32
         private const val ARTICLE_CACHE = 8
 
+        /** rag.py `aspect_bonus` default. */
+        const val DEFAULT_ASPECT_BONUS = 0.25
+
+        /** rag.py `retrieve`: the aspect bonus for a travel guide's sections. */
+        const val GUIDE_ASPECT_BONUS = 0.5
+
+        /** rag.py `retrieve`: ranks of each title's passages taken by the round-robin. */
+        private const val TITLE_RANKS = 5
+
         // re.compile(r"^(#{1,6})\s+(.*)$", re.M): UNIX_LINES makes ^ $ . treat only \n as a line end
         private val HEADING: Pattern =
             Pattern.compile("^(#{1,6})" + Py.SPACE_CLASS + "+(.*)$", Pattern.MULTILINE or Pattern.UNIX_LINES)
-        private val ASCII_WORD: Pattern = Pattern.compile("[a-z]+")
 
         /** Surface-form prefix for a porter stem (porter turns a final y into i: energy -> energi). */
         fun prefix(stem: String): String =

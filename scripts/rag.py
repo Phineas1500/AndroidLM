@@ -83,21 +83,44 @@ VERIFY_SYSTEM = (
 
 # headings that answer an aspect the question asks about in other words
 ASPECT_HEADINGS = {
-    "treat": "treatment management therapy", "aid": "treatment management first aid",
-    "prevent": "prevention prophylaxis", "avoid": "prevention",
-    "symptom": "signs symptoms presentation", "sign": "signs symptoms presentation",
-    "caus": "cause causes etiology",
+    "treat": "treatment, management, therapy", "aid": "treatment, management, first aid",
+    "prevent": "prevention, prophylaxis", "avoid": "prevention",
+    "symptom": "signs, symptoms, presentation", "sign": "signs, symptoms, presentation",
+    "caus": "cause, causes, etiology",
     # Wikivoyage's standard section names: Understand, Get in, Get around, See, Do, Buy, Eat,
     # Drink, Sleep, Stay safe, Stay healthy, Respect, Go next, Regions, Cities, Climate
-    "see": "see sights attractions landmarks tourism", "visit": "see sights attractions landmarks",
-    "site": "see sights attractions landmarks", "priorit": "see sights districts",
-    "district": "districts understand", "laid": "understand orientation districts",
-    "food": "eat cuisine", "eat": "eat cuisine", "try": "eat cuisine drink",
-    "etiquett": "respect etiquette customs", "custom": "respect etiquette customs",
-    "weather": "climate", "season": "climate", "safeti": "stay safe safety",
-    "safe": "stay safe safety", "hike": "do hiking trekking", "region": "regions",
-    "sleep": "sleep accommodation", "transport": "get around get in",
+    "see": "see, sights, attractions, landmarks, tourism", "visit": "see, sights, attractions, landmarks",
+    "site": "see, sights, attractions, landmarks", "priorit": "see, sights, districts",
+    "district": "districts, understand", "laid": "understand, orientation, districts",
+    "food": "eat, cuisine", "eat": "eat, cuisine", "try": "eat, cuisine, drink",
+    "etiquett": "respect, etiquette, customs", "custom": "respect, etiquette, customs",
+    "weather": "climate", "season": "climate", "safeti": "stay safe, safety",
+    "safe": "stay safe, safety", "hike": "do, hiking, trekking", "region": "regions",
+    "sleep": "sleep, accommodation", "transport": "get around, get in",
+    "scam": "stay safe, cope", "hassl": "stay safe, cope", "danger": "stay safe",
+    "fee": "understand, get in, fees, permits", "permit": "understand, get in, fees, permits",
+    "visa": "get in", "guid": "understand, get in", "cold": "climate", "car": "get around",
+    "around": "get around", "move": "get around, get in", "train": "get in, get around",
+    "base": "sleep, districts, cities", "neighbourhood": "districts, sleep, understand",
+    "dress": "respect", "behaviour": "respect", "behavior": "respect",
+    "trip": "go next", "nearbi": "go next", "accommod": "sleep", "hostel": "sleep",
 }
+
+# question stems that signal a travel question (used by --travel-route)
+TRAVEL_STEMS = {"visit", "see", "eat", "food", "try", "etiquett", "custom", "hike", "trek", "stay",
+                "base", "sleep", "hostel", "accommod", "scam", "hassl", "trip", "travel",
+                "layov", "itinerari", "dress", "behaviour", "fee"}
+
+
+def clean_check(text):
+    """Drop the model's visible second-guessing from a source check: everything from the first
+    line that starts deliberating ("But wait", "Let me re-read", ...) is cut."""
+    kept = []
+    for line in text.strip().splitlines():
+        if re.match(r"\s*(?:[-*]\s*)?(?:But wait|Wait[,. ]|Hmm|Let me|Let's|Actually,|On second thought)", line):
+            break
+        kept.append(line)
+    return "\n".join(kept).strip()
 
 
 def _prefix(stem):
@@ -174,7 +197,7 @@ class Corpus:
         total = sum(idf for _, idf in stems) or 1.0
         return sum(idf for s, idf in stems if re.search(r"\b" + re.escape(_prefix(s)), low)) / total
 
-    def passage_score(self, text, start, end, stems):
+    def passage_score(self, text, start, end, stems, aspect_bonus=0.25):
         """BM25-like score of one chunk inside an already chosen article, normalised to 0..1:
         idf-weighted saturated term frequency, with question terms in the section heading
         counting double (the heading says what the section is about)."""
@@ -189,9 +212,11 @@ class Corpus:
         score /= total
         # "what first aid is appropriate" should find the Treatment section even though every
         # section of the article repeats the topic words
-        words = set(re.findall(r"[a-z]+", heading))
-        if any(w in words for s, _ in stems for w in ASPECT_HEADINGS.get(s, "").split()):
-            score += 0.25
+        # aspect values are comma-separated heading words or phrases ("get around" must not
+        # match the "Get in" section)
+        if any(re.search(r"\b" + re.escape(ph) + r"\b", heading)
+               for s, _ in stems for ph in ASPECT_HEADINGS.get(s, "").split(", ") if ph):
+            score += aspect_bonus
         return score
 
     def _hit(self, aid, start, end, score, via):
@@ -210,7 +235,9 @@ class Corpus:
             if row:
                 return row[0]
         words = re.findall(r"[^\W_]+", title.lower())
-        if not words or not fuzzy:
+        # a one-word title that is neither an article nor a redirect is more often a different
+        # entity than a near miss ("Ger" -> Ger Canning, "Ella" -> Ella Mai), so it stays unresolved
+        if len(words) < 2 or not fuzzy:
             return None
         match = "title:(" + " AND ".join(f'"{w}"' for w in words) + ")"
         best = None
@@ -228,7 +255,7 @@ class Corpus:
                 best = key
         return best[1] if best else None
 
-    def article_passages(self, aid, stems, n_sections=2):
+    def article_passages(self, aid, stems, n_sections=2, aspect_bonus=0.25):
         """Lead chunk plus the `n_sections` chunks of the article that best cover the question."""
         _, _, text = self.article(aid)
         rows = self.db.execute("select start, end from chunks where article_id=? order by id", (aid,)).fetchall()
@@ -238,7 +265,8 @@ class Corpus:
         # the first chunk is often just the infobox facts; the prose lead follows it
         if text[lead[0]:lead[1]].startswith("Key facts:") and len(rows) > 1:
             lead = rows[1]
-        scored = sorted(((self.passage_score(text, s, e, stems), s, e) for s, e in rows if (s, e) != lead),
+        scored = sorted(((self.passage_score(text, s, e, stems, aspect_bonus), s, e)
+                         for s, e in rows if (s, e) != lead),
                         reverse=True)
         picks = [(1.0, *lead)] + [x for x in scored[:n_sections] if x[0] > 0.15]
         hits = [self._hit(aid, s, e, cov, "title") for cov, s, e in picks]
@@ -282,24 +310,30 @@ class Corpus:
             if aid is not None and aid not in seen_aid:
                 seen_aid.add(aid)
                 passages = self.article_passages(aid, stems)
-            # a travel guide for the same place: its See / Eat / Respect / Stay safe sections
-            # compete with the encyclopedia's sections on the same score
-            vaid = voyage.resolve_title(t, fuzzy=False) if voyage else None
+            # A travel guide for the same place. Its section names are standardised (See, Eat,
+            # Respect, Stay safe, Get around, ...), so the question's intent picks the section
+            # (strong aspect bonus), and guide sections alternate with the encyclopedia's instead
+            # of displacing them. Guide titles follow the same fuzzy rule as Wikipedia's.
+            vaid = voyage.resolve_title(t) if voyage else None
             if vaid is not None and ("v", vaid) not in seen_aid:
                 seen_aid.add(("v", vaid))
-                guide = voyage.article_passages(vaid, stems)
+                guide = voyage.article_passages(vaid, stems, aspect_bonus=0.5)
                 for h in guide:
                     h["title"] = "Wikivoyage: " + h["title"]
                     h["aid"] = ("v", h["aid"])
                 lead = passages[:1] or guide[:1]
-                rest = sorted(passages[1:] + guide[1:], key=lambda h: -h["score"])
-                passages = lead + rest[:3]
+                ours, theirs = passages[1:], guide[1:]
+                if theirs and (not ours or theirs[0]["score"] > ours[0]["score"]):
+                    ours, theirs = theirs, ours
+                rest = [h for pair in zip(ours, theirs) for h in pair]
+                rest += ours[len(theirs):] + theirs[len(ours):]
+                passages = lead + rest
             if passages:
                 per_title.append(passages)
         hits = []
         if per_title:
             hits.extend(per_title[0][:2])
-        for rank in range(3):
+        for rank in range(5):
             hits.extend(p[rank] for p in per_title if len(p) > rank and p[rank] not in hits)
         seen = {(h["aid"], h["start"]) for h in hits}
         topic = self.stems(" ".join(titles)) or stems
@@ -310,7 +344,7 @@ class Corpus:
         return hits[:max(k, len(per_title) * 2)]
 
 
-def build_context(hits, budget_chars, passage_chars=650):
+def build_context(hits, budget_chars, passage_chars=650, lead_chars=1000):
     """Pack passages into the prompt budget. Returns (context, used_hits): callers must report
     `used_hits`, not `hits`, as the sources, because whatever does not fit never reaches the
     model (round three lost questions to passages that were listed but silently dropped).
@@ -318,11 +352,12 @@ def build_context(hits, budget_chars, passage_chars=650):
     parts, used, used_hits = [], 0, []
     for h in hits:
         text = h["text"]
-        # an article's lead carries its defining facts; trimming it cost answers in round four,
-        # so only secondary sections are shortened
-        if len(text) > passage_chars and not h.get("lead"):
-            cut = max(text.rfind(". ", 0, passage_chars), text.rfind("\n", 0, passage_chars))
-            text = text[:cut + 1 if cut > passage_chars // 2 else passage_chars].rstrip()
+        # an article's lead carries its defining facts (trimming it to 650 cost answers in round
+        # four), so it gets a longer limit than secondary sections
+        limit = lead_chars if h.get("lead") else passage_chars
+        if len(text) > limit:
+            cut = max(text.rfind(". ", 0, limit), text.rfind("\n", 0, limit))
+            text = text[:cut + 1 if cut > limit // 2 else limit].rstrip()
         head = f"[{len(parts) + 1}] {h['title']}" + (f" — {h['section']}" if h["section"] else "")
         block = f"{head}\n{text}"
         if used + len(block) > budget_chars and parts:
@@ -396,6 +431,10 @@ def answer(corpus, args, question):
         aid = corpus.resolve_title(titles[0]) if titles else None
         views = corpus.db.execute("select views from articles where id=?", (aid,)).fetchone()[0] if aid else None
         mode = "plan" if views is not None and views < args.route_views else "verify"
+        # optional: a travel question about a place that has a travel guide goes retrieval-first
+        if args.travel_route and VOYAGE is not None and titles and VOYAGE.resolve_title(titles[0]) is not None \
+                and any(st in TRAVEL_STEMS for st, _ in corpus.stems(question)):
+            mode = "plan"
         rec.update(route=mode, route_views=views)
     if mode == "verify":
         draft = chat(args.url, CLOSED_SYSTEM, question, args.max_tokens)
@@ -413,9 +452,10 @@ def answer(corpus, args, question):
     if draft is not None and context:
         user = f"Question: {question}\n\nDraft answer:\n{draft['text']}\n\nSources:\n\n{context}"
         res = chat(args.url, VERIFY_SYSTEM, user, 260, temperature=0.0)
-        check = res.pop("text").strip()
+        check = clean_check(res.pop("text"))
         rec["check"] = check
-        rec["answer"] = draft["text"] + f"\n\n**Source check**\n{check}"
+        # a check that was nothing but deliberation cleans to "": show the draft alone
+        rec["answer"] = draft["text"] + (f"\n\n**Source check**\n{check}" if check else "")
     elif draft is not None:
         res = {k: v for k, v in draft.items() if k != "text"}
         rec["answer"] = draft["text"]
@@ -443,6 +483,8 @@ def main():
     ap.add_argument("--max-tokens", type=int, default=600)
     ap.add_argument("--route-views", type=int, default=5000,
                     help="auto mode: go retrieval-first when the subject article has fewer monthly views")
+    ap.add_argument("--travel-route", action="store_true",
+                    help="auto mode: travel questions about a place with a Wikivoyage guide go retrieval-first")
     ap.add_argument("--voyage-db", help="Wikivoyage corpus database; adds travel-guide sections")
     ap.add_argument("--engine-cli", help="path to bmoe-cli: stream the model through BigMoeOnEdge "
                     "session mode instead of calling llama-server")

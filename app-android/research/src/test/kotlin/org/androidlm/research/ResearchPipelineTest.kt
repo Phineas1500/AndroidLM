@@ -171,8 +171,10 @@ class ResearchPipelineTest {
         }
     }
 
-    private fun run(engine: Engine, corpora: CorpusProvider, question: String, rec: Recorder): ResearchResult =
-        runBlocking { withTimeout(60_000) { ResearchPipeline(engine, corpora, corpusThread).run(question, rec) } }
+    private fun run(
+        engine: Engine, corpora: CorpusProvider, question: String, rec: Recorder, config: ResearchConfig = ResearchConfig(),
+    ): ResearchResult =
+        runBlocking { withTimeout(60_000) { ResearchPipeline(engine, corpora, corpusThread, config).run(question, rec) } }
 
     private fun assertCorpusThreadOnly() {
         // (compared by identity: in debug mode coroutines rename the thread they run on)
@@ -312,6 +314,114 @@ class ResearchPipelineTest {
             result.timings.map { it.phase },
         )
         assertCorpusThreadOnly()
+    }
+
+    @Test
+    fun sourceCheckIsCleanedOfDeliberation() {
+        val case = goldenCase("Roughly how many times larger is the population of India")
+        val question = case["question"].asString
+        val draft = "India has about 1.4 billion people."
+        val rawCheck = "\n- Correction: x [1]\n- Addition: y [2]\nBut wait, let me re-read\n- Correction: z\n"
+        val check = "- Correction: x [1]\n- Addition: y [2]"
+        val engine = FakeEngine(listOf("India\nCanada", draft, rawCheck))
+        val rec = Recorder()
+
+        val result = run(engine, sampleProvider(), question, rec)
+
+        // the stream is the engine's, raw; what is reported as the check is cleaned
+        assertEquals(rawCheck, rec.all<ResearchEvent.CheckToken>().joinToString("") { it.text })
+        assertEquals(check, rec.all<ResearchEvent.CheckCompleted>().single().text)
+        assertEquals(check, result.check)
+        assertEquals(draft + "\n\n**Source check**\n" + check, result.text)
+        assertEquals(result, rec.all<ResearchEvent.Completed>().single().result)
+        // the phase's generation keeps the engine's own text
+        assertEquals(rawCheck, result.timings.last().generation!!.text)
+    }
+
+    // ── the optional travel route ──
+
+    private val kyotoQuestion = "I am visiting Kyoto for three days. Which districts and sites should I prioritize, and what " +
+        "etiquette should I know at temples and shrines?"
+
+    @Test
+    fun travelRouteIsOffByDefault() {
+        assertFalse(ResearchConfig().travelRoute)
+        // a travel question, a guide that resolves, a widely read subject: answer first, as before
+        val engine = FakeEngine(listOf("Kyoto", "draft", "check"))
+        val rec = Recorder()
+        val result = run(engine, sampleProvider(), kyotoQuestion, rec)
+        assertEquals(RouteDecision(Route.ANSWER_FIRST, 43328L), result.route)
+        assertFalse(result.route.travel)
+        assertEquals(3, engine.calls.size)
+        assertEquals(Prompts.CLOSED_SYSTEM + "\n\n" + kyotoQuestion, engine.calls[1].prompt)
+    }
+
+    @Test
+    fun travelRouteSendsATravelQuestionWithAGuideRetrievalFirst() {
+        val case = goldenCase("I am visiting Kyoto")
+        assertEquals(kyotoQuestion, case["question"].asString)
+        val plan = case["titles"].asJsonArray.joinToString("\n") { it.asString }
+        val engine = FakeEngine(listOf(plan, "See Fushimi Inari [2]."))
+        val rec = Recorder()
+
+        val result = run(engine, sampleProvider(), kyotoQuestion, rec, ResearchConfig(travelRoute = true))
+
+        // widely read (43,328 monthly views, threshold 5,000), and retrieval first all the same
+        assertEquals(RouteDecision(Route.RETRIEVAL_FIRST, 43328L, travel = true), result.route)
+        assertEquals(result.route, rec.all<ResearchEvent.Routed>().single().decision)
+        assertEquals(2, engine.calls.size)
+        assertEquals(
+            Prompts.ANSWER_SYSTEM + "\n\nSources:\n\n" + case["hits_voyage_context"].asString + "\n\nQuestion: " + kyotoQuestion,
+            engine.calls[1].prompt,
+        )
+        assertNull(result.check)
+        assertEquals(
+            listOf(
+                "phase:PLANNING", "completed:PLANNING", "planned", "routed:RETRIEVAL_FIRST",
+                "phase:SEARCHING", "completed:SEARCHING", "sources",
+                "phase:ANSWERING", "answer-tokens", "completed:ANSWERING", "answer",
+                "result", "phase:DONE",
+            ),
+            rec.shape(),
+        )
+        assertCorpusThreadOnly()
+    }
+
+    @Test
+    fun travelRouteNeedsAGuideCorpus() {
+        val engine = FakeEngine(listOf("Kyoto", "draft", "check"))
+        val result = run(engine, sampleProvider(withVoyage = false), kyotoQuestion, Recorder(), ResearchConfig(travelRoute = true))
+        assertEquals(RouteDecision(Route.ANSWER_FIRST, 43328L), result.route)
+        assertEquals(3, engine.calls.size)
+    }
+
+    @Test
+    fun travelRouteNeedsATravelStem() {
+        // Kyoto has a guide, but nothing in the question is in TRAVEL_STEMS
+        val question = "When did Kyoto stop being the capital of Japan?"
+        val engine = FakeEngine(listOf("Kyoto", "draft", "check"))
+        val result = run(engine, sampleProvider(), question, Recorder(), ResearchConfig(travelRoute = true))
+        assertEquals(RouteDecision(Route.ANSWER_FIRST, 43328L), result.route)
+        assertEquals(3, engine.calls.size)
+    }
+
+    @Test
+    fun travelRouteNeedsTheFirstTitleToHaveAGuide() {
+        // travel stems ("food", "try"), but the sample guide corpus has no "India"; Kyoto comes second
+        val question = "What food should I try in India?"
+        val engine = FakeEngine(listOf("India\nKyoto", "draft", "check"))
+        val result = run(engine, sampleProvider(), question, Recorder(), ResearchConfig(travelRoute = true))
+        assertEquals(RouteDecision(Route.ANSWER_FIRST, 540755L), result.route)
+        assertEquals(3, engine.calls.size)
+    }
+
+    @Test
+    fun travelRouteLeavesTheViewsRuleAlone() {
+        val question = "What happened in the 1983 Harrods bombing, who carried it out, and what warning was given?"
+        val engine = FakeEngine(listOf("1983 Harrods bombing", "answer"))
+        val result = run(engine, sampleProvider(), question, Recorder(), ResearchConfig(travelRoute = true))
+        assertEquals(RouteDecision(Route.RETRIEVAL_FIRST, 2127L), result.route)
+        assertFalse(result.route.travel)
     }
 
     @Test

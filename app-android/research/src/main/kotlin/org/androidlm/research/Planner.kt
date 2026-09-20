@@ -9,7 +9,12 @@ enum class Route {
     ANSWER_FIRST,
 }
 
-data class RouteDecision(val route: Route, val views: Long?)
+/**
+ * [views] is null when the first planned title did not resolve. [travel] is true when the
+ * optional travel route decided (rag.py `--travel-route`): the route is then retrieval-first
+ * whatever [views] says.
+ */
+data class RouteDecision(val route: Route, val views: Long?, val travel: Boolean = false)
 
 object Planner {
     const val PLAN_MAX_TOKENS = 60
@@ -63,11 +68,32 @@ object Planner {
     fun routeFor(views: Long?, routeViews: Long = DEFAULT_ROUTE_VIEWS): Route =
         if (views != null && views < routeViews) Route.RETRIEVAL_FIRST else Route.ANSWER_FIRST
 
-    /** Router decision for planned [titles]: the FIRST title is resolved (fuzzy allowed) and its views decide. */
-    fun route(corpus: Corpus, titles: List<String>, routeViews: Long = DEFAULT_ROUTE_VIEWS): RouteDecision {
+    /**
+     * Router decision for planned [titles]: the FIRST title is resolved (fuzzy allowed) and its views decide.
+     *
+     * With [travelRoute] (rag.py `--travel-route`, off by default) a travel question about a place
+     * that has a travel guide goes retrieval-first regardless of views: [voyage] is present, the
+     * first planned title resolves in it (fuzzy allowed), and one of the [question]'s stems (from
+     * [corpus], as in Python) is in rag.py's TRAVEL_STEMS. Without the flag, [voyage] and
+     * [question] are not looked at.
+     */
+    fun route(
+        corpus: Corpus,
+        titles: List<String>,
+        routeViews: Long = DEFAULT_ROUTE_VIEWS,
+        question: String = "",
+        voyage: Corpus? = null,
+        travelRoute: Boolean = false,
+    ): RouteDecision {
         val aid = titles.firstOrNull()?.let { corpus.resolveTitle(it) }
         // Python tests `if aid`, so article id 0 counts as unresolved too
         val views = if (aid != null && aid != 0L) corpus.views(aid) else null
+        // (the guide lookup tests `is not None`, so a guide with id 0 counts as resolved)
+        if (travelRoute && voyage != null && titles.isNotEmpty() && voyage.resolveTitle(titles[0]) != null &&
+            corpus.stems(question).any { it.stem in Lexicon.TRAVEL_STEMS }
+        ) {
+            return RouteDecision(Route.RETRIEVAL_FIRST, views, travel = true)
+        }
         return RouteDecision(routeFor(views, routeViews), views)
     }
 }

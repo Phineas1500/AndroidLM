@@ -31,6 +31,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.androidlm.research.Engine
 import org.androidlm.research.Generation
+import org.androidlm.research.ResearchConfig
 import org.androidlm.research.ResearchEvent
 import org.androidlm.research.ResearchListener
 import org.androidlm.research.ResearchPhase
@@ -658,7 +659,9 @@ class RunService : Service() {
                 val files = withContext(Dispatchers.IO) { CorpusLocator.find(this@RunService) }
                     ?: throw IllegalStateException("no corpus found (${CorpusLocator.WIKI} in a \"${CorpusLocator.DIR}\" directory)")
                 val open = withContext(corpusDispatcher) { corporaFor(files) }
-                ResearchPipeline(engine, open, corpusDispatcher).run(question, researchListener(runId))
+                // (a preference of the method, not of the session: read per run, never in the argv)
+                val config = ResearchConfig(travelRoute = AppSettings.load(this@RunService).researchTravelRoute)
+                ResearchPipeline(engine, open, corpusDispatcher, config).run(question, researchListener(runId))
             } catch (e: CancellationException) {
                 publishResearch(runId) { if (it.running) it.copy(phase = ResearchPhase.CANCELLED) else it }
                 throw e

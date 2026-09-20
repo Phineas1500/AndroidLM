@@ -164,6 +164,8 @@ private fun routeText(r: ResearchUi): String {
     val threshold = String.format(Locale.US, "%,d", r.routeThreshold)
     val views = d.views?.let { String.format(Locale.US, "%,d", it) }
     return when {
+        d.travel ->
+            "Sources first: a travel question, and $subject has a travel guide."
         d.route == Route.RETRIEVAL_FIRST ->
             "Sources first: $subject is little read ($views monthly views, under $threshold), where the model's memory is unreliable."
         views != null ->

@@ -124,6 +124,10 @@ data class AppSettings(
     // draft + source check) instead of plain chat. On by default; it only takes effect when a
     // corpus is on the device. Not part of the argv, so toggling it never reloads the model.
     val researchMode: Boolean = true,
+    // AndroidLM research, optional travel route (rag.py --travel-route, off by default as there):
+    // a travel question about a place that has a Wikivoyage guide goes sources-first however
+    // widely read the place is. Read at the start of each research run; not part of the argv.
+    val researchTravelRoute: Boolean = false,
 ) {
     /**
      * Build the argv that OPENS a persistent bmoe-cli session (`--session`): everything fixed for
@@ -265,6 +269,7 @@ data class AppSettings(
             .putBoolean("thinking", thinking)
             .putBoolean("metricsCsv", metricsCsv)
             .putBoolean("researchMode", researchMode)
+            .putBoolean("researchTravelRoute", researchTravelRoute)
             .apply()
     }
 
@@ -420,6 +425,7 @@ data class AppSettings(
                 thinking = p.getBoolean("thinking", d.thinking),
                 metricsCsv = p.getBoolean("metricsCsv", d.metricsCsv),
                 researchMode = p.getBoolean("researchMode", d.researchMode),
+                researchTravelRoute = p.getBoolean("researchTravelRoute", d.researchTravelRoute),
             )
         }
 

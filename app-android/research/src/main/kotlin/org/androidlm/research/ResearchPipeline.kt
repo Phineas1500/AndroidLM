@@ -58,6 +58,11 @@ data class ResearchConfig(
     val planTokens: Int = Planner.PLAN_MAX_TOKENS,
     val answerTokens: Int = 600,
     val checkTokens: Int = 260,
+    /**
+     * rag.py `--travel-route` (off by default, as there): a travel question about a place that has
+     * a Wikivoyage guide goes retrieval-first however widely read the subject is.
+     */
+    val travelRoute: Boolean = false,
 )
 
 enum class ResearchPhase { PLANNING, SEARCHING, DRAFTING, ANSWERING, CHECKING, DONE, CANCELLED, FAILED }
@@ -83,7 +88,7 @@ data class ResearchResult(
     val sourcesDropped: Int,
     /** The answer proper: the draft on the answer-first route. */
     val answer: String,
-    /** The source check, when one ran. */
+    /** The source check, when one ran, cleaned of visible deliberation ([cleanCheck]). */
     val check: String?,
     /** rag.py `rec["answer"]`: the answer, followed by the source-check section when there is one. */
     val text: String,
@@ -109,7 +114,11 @@ sealed class ResearchEvent {
 
     data class CheckToken(val text: String) : ResearchEvent()
 
-    /** The source check is complete; [text] (stripped, as in rag.py) replaces what was streamed. */
+    /**
+     * The source check is complete; [text] (rag.py `clean_check`: stripped, and cut at the first
+     * line that starts deliberating) replaces what was streamed. The [CheckToken]s are the raw
+     * stream, so they may carry text that is not in [text].
+     */
     data class CheckCompleted(val text: String) : ResearchEvent()
 
     /** A phase ended normally. */
@@ -136,10 +145,12 @@ fun interface ResearchListener {
  *
  *  1. plan: PLAN_SYSTEM over the question, parsed into article titles;
  *  2. route: the first planned title's monthly views decide (below `routeViews`: retrieval first);
+ *     with `travelRoute`, a travel question about a place with a travel guide is retrieval first;
  *  3. retrieval first: retrieve, pack the context, answer with ANSWER_SYSTEM over the sources
  *     (closed-book with CLOSED_SYSTEM when nothing was retrieved);
  *     answer first: draft with CLOSED_SYSTEM, then retrieve, pack, and check the draft against
- *     the sources with VERIFY_SYSTEM (no check when nothing was retrieved).
+ *     the sources with VERIFY_SYSTEM (no check when nothing was retrieved); the check is cleaned
+ *     of visible deliberation before it is reported.
  *
  * Every Corpus call runs on [corpusDispatcher], which must be backed by ONE thread. Cancelling
  * the coroutine that called [run] stops the run in any phase: a generation through the engine's
@@ -181,7 +192,11 @@ class ResearchPipeline(
             listener.onEvent(ResearchEvent.Planned(titles))
 
             // 2. route (a lookup of a few milliseconds; it has no phase of its own)
-            val decision = withContext(corpusDispatcher) { Planner.route(corpora.wiki(), titles, config.routeViews) }
+            val decision = withContext(corpusDispatcher) {
+                // the guide is only opened for routing when the travel route is on
+                val voyage = if (config.travelRoute) corpora.voyage() else null
+                Planner.route(corpora.wiki(), titles, config.routeViews, question, voyage, config.travelRoute)
+            }
             listener.onEvent(ResearchEvent.Routed(decision, config.routeViews))
 
             // 3. answer first: the draft comes before the search
@@ -205,8 +220,9 @@ class ResearchPipeline(
                         ResearchPhase.CHECKING, Prompts.VERIFY_SYSTEM,
                         Prompts.verifyUser(question, draft, context), config.checkTokens,
                     ) { listener.onEvent(ResearchEvent.CheckToken(it)) }
-                    check = Py.strip(res.text)
-                    listener.onEvent(ResearchEvent.CheckCompleted(check))
+                    // a check that was nothing but deliberation cleans to "": show the draft alone
+                    check = cleanCheck(res.text).ifEmpty { null }
+                    listener.onEvent(ResearchEvent.CheckCompleted(check ?: ""))
                 }
             } else if (context.isNotEmpty()) {
                 answer = answering(ResearchPhase.ANSWERING, Prompts.ANSWER_SYSTEM, Prompts.answerUser(context, question))
