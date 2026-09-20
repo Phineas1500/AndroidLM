@@ -37,6 +37,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.androidlm.research.android.CorpusFiles
+import org.androidlm.research.android.CorpusLocator
 import java.io.File
 import java.util.Locale
 
@@ -108,10 +110,13 @@ private fun Root() {
     var scanning by remember { mutableStateOf(true) }
     var refreshKey by remember { mutableStateOf(0) }
     var modelIdx by remember { mutableStateOf(0) }
+    // AndroidLM: the retrieval corpus research mode needs, looked for along with the models.
+    var corpus by remember { mutableStateOf<CorpusFiles?>(null) }
 
     // Probing gguf headers to keep only MoE models does blocking reads — off the main thread.
     LaunchedEffect(refreshKey) {
         scanning = true
+        corpus = withContext(Dispatchers.IO) { CorpusLocator.find(context) }
         models = withContext(Dispatchers.IO) { ModelManager.listMoeModels(context) }
         if (modelIdx >= models.size) modelIdx = 0
         scanning = false
@@ -128,6 +133,8 @@ private fun Root() {
     } else {
         MainScreen(
             settings = settings,
+            onSettingsChange = { settings = it; it.save(context) },
+            corpus = corpus,
             models = models,
             scanning = scanning,
             modelIdx = modelIdx.coerceIn(0, maxOf(0, models.size - 1)),
@@ -142,6 +149,8 @@ private fun Root() {
 @Composable
 private fun MainScreen(
     settings: AppSettings,
+    onSettingsChange: (AppSettings) -> Unit,
+    corpus: CorpusFiles?,
     models: List<File>,
     scanning: Boolean,
     modelIdx: Int,
@@ -161,7 +170,11 @@ private fun MainScreen(
     // turn also shows while only reasoning has streamed (the thinking phase, before any answer),
     // so a Thinking-on run does not sit on a blank screen while the model reasons.
     val liveShown = ui.answer.isNotEmpty() || ui.reasoning.isNotEmpty()
-    val total = 1 + ui.transcript.size + (if (liveShown) 1 else 0)
+    // AndroidLM: a research run (in progress or finished) is one more item, after the transcript.
+    val research = ui.research
+    val total = 1 + ui.transcript.size + (if (liveShown) 1 else 0) + (if (research != null) 1 else 0)
+    // Research mode is in effect when it is switched on AND there is a corpus to search.
+    val researchOn = settings.researchMode && corpus != null
 
     // Follow the tail only while the user is parked at the bottom. A long answer streams for a
     // long time, and scrolling back to re-read it must not fight a per-token scroll command:
@@ -183,7 +196,8 @@ private fun MainScreen(
     LaunchedEffect(listState) {
         snapshotFlow { listState.isScrollInProgress }.collect { scrolling -> if (!scrolling) followTail = atBottom }
     }
-    LaunchedEffect(total, ui.answer.length, ui.reasoning.length, followTail) {
+    LaunchedEffect(total, ui.answer.length, ui.reasoning.length, followTail,
+        research?.answer?.length, research?.check?.length, research?.phase, research?.sources?.size) {
         // A long answer is taller than the viewport, so aligning the item's top would park the view
         // on its beginning; the large offset pins the list to the newest text instead.
         if (followTail && total > 1) runCatching { listState.scrollToItem(total - 1, Int.MAX_VALUE) }
@@ -247,22 +261,45 @@ private fun MainScreen(
                         minLines = 2,
                     )
 
+                    // AndroidLM: with Research on, Send runs the retrieval pipeline instead of a
+                    // plain chat turn. The corpus hint shares the models' Refresh (both are rescanned).
+                    val corpusHint = remember { CorpusLocator.hint(context) }
+                    ResearchToggle(
+                        corpus = corpus,
+                        scanning = scanning,
+                        checked = settings.researchMode,
+                        enabled = !ui.busy,
+                        sessionCtx = settings.sessionCtx,
+                        hint = corpusHint,
+                        onChange = { onSettingsChange(settings.copy(researchMode = it)) },
+                    )
+                    if (corpus == null && !scanning && models.isNotEmpty()) {
+                        TextButton(onClick = onRefresh, contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)) {
+                            Text("Look for the corpus again", fontSize = 12.sp)
+                        }
+                    }
+
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Button(
                             onClick = {
                                 // Drop focus so the soft keyboard retracts: the answer streams into the
                                 // space it was covering, and there is otherwise no in-app way to dismiss it.
                                 focusManager.clearFocus()
-                                if (models.isNotEmpty()) {
+                                if (models.isNotEmpty() && researchOn && prompt.isNotBlank()) {
+                                    // Each research question stands alone (every generation of the
+                                    // pipeline starts from an empty KV).
+                                    launchResearch(context, models[modelIdx.coerceIn(0, models.size - 1)],
+                                        prompt.trim(), settings, ui.sessionSig)
+                                } else if (models.isNotEmpty() && !researchOn) {
                                     // First message of a conversation clears the KV; a follow-up continues it.
                                     launchPrompt(context, models[modelIdx.coerceIn(0, models.size - 1)],
                                         prompt.ifBlank { "The capital of Japan is" }, settings, ui.sessionSig,
                                         clearKv = ui.transcript.isEmpty())
                                 }
                             },
-                            enabled = !ui.busy && models.isNotEmpty(),
+                            enabled = !ui.busy && models.isNotEmpty() && (!researchOn || prompt.isNotBlank()),
                             modifier = Modifier.weight(1f),
-                        ) { Text(if (ui.transcript.isNotEmpty()) "Send" else if (ui.ready) "Send" else "Run") }
+                        ) { Text(if (researchOn) "Research" else if (ui.transcript.isNotEmpty()) "Send" else if (ui.ready) "Send" else "Run") }
 
                         OutlinedButton(
                             onClick = {
@@ -278,8 +315,8 @@ private fun MainScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         // Start a new conversation: the next Send clears the KV. Keeps the model loaded.
                         TextButton(
-                            onClick = { RunBus.update { it.copy(transcript = emptyList(), answer = "", summary = "", error = null) } },
-                            enabled = ui.transcript.isNotEmpty() && !ui.busy,
+                            onClick = { RunBus.update { it.copy(transcript = emptyList(), answer = "", summary = "", error = null, research = null) } },
+                            enabled = (ui.transcript.isNotEmpty() || research != null) && !ui.busy,
                         ) { Text("New chat") }
 
                         // The session keeps the model resident (and the cache warm) between prompts. Free it
@@ -349,7 +386,8 @@ private fun MainScreen(
                     }
                     // After the model is loaded, the prompt is prefilled before the first token streams
                     // (no BMOE_PROGRESS yet). Signal that phase so a slow prefill does not look stuck.
-                    if (ui.generating && ui.telemetry.step == 0) {
+                    // (A research run says so in its own phase line.)
+                    if (ui.generating && ui.telemetry.step == 0 && research?.running != true) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -371,6 +409,13 @@ private fun MainScreen(
             if (liveShown) {
                 item(key = "live") {
                     TurnView(ChatTurn("assistant", ui.answer, reasoning = ui.reasoning), reasoningExpanded = true)
+                }
+            }
+
+            if (research != null) {
+                item(key = "research") {
+                    ResearchView(research, loading = ui.loading,
+                        prefilling = ui.generating && ui.telemetry.step == 0)
                 }
             }
         }
@@ -685,6 +730,41 @@ private fun launchPrompt(
                 .putExtra(RunService.EXTRA_NPREDICT, settings.nPredict)
                 .putExtra(RunService.EXTRA_THINK, settings.thinking)
                 .putExtra(RunService.EXTRA_CLEAR_KV, true)
+        )
+    }
+}
+
+/**
+ * AndroidLM research mode: hand [question] to the research pipeline in [RunService]. Same two
+ * paths as [launchPrompt]: a warm session for this exact model+settings gets the question at
+ * once; otherwise the session is (re)started and the pipeline runs as soon as it reports ready.
+ * The pipeline sets n_predict and thinking itself (they are part of the method, not preferences).
+ */
+private fun launchResearch(
+    context: android.content.Context,
+    model: File,
+    question: String,
+    settings: AppSettings,
+    currentSig: String?,
+) {
+    RunBus.resetGeneration()
+    val sig = settings.sessionSignature(model.absolutePath)
+    if (currentSig == sig) {
+        context.startService(
+            Intent(context, RunService::class.java)
+                .setAction(RunService.ACTION_RESEARCH)
+                .putExtra(RunService.EXTRA_QUESTION, question)
+        )
+    } else {
+        val csv = if (settings.metricsCsv) AppSettings.newMetricsCsvPath(context) else null
+        val argv = ArrayList(settings.sessionArgv(ModelManager.cliPath(context), model.absolutePath, csv))
+        ContextCompat.startForegroundService(
+            context,
+            Intent(context, RunService::class.java)
+                .putExtra(RunService.EXTRA_MODEL, model.absolutePath)
+                .putStringArrayListExtra(RunService.EXTRA_ARGV, argv)
+                .putExtra(RunService.EXTRA_SIG, sig)
+                .putExtra(RunService.EXTRA_QUESTION, question)
         )
     }
 }

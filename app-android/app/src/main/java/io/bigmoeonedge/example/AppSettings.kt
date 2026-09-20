@@ -120,6 +120,10 @@ data class AppSettings(
     val mtpPMinPct: Int = 0,
     val thinking: Boolean = false,      // reasoning; off passes --no-think (enable_thinking=false)
     val metricsCsv: Boolean = true,     // write the engine's per-token CSV for this session (--csv)
+    // AndroidLM: answer through the research pipeline (plan, search the offline corpus, answer or
+    // draft + source check) instead of plain chat. On by default; it only takes effect when a
+    // corpus is on the device. Not part of the argv, so toggling it never reloads the model.
+    val researchMode: Boolean = true,
 ) {
     /**
      * Build the argv that OPENS a persistent bmoe-cli session (`--session`): everything fixed for
@@ -260,6 +264,7 @@ data class AppSettings(
             .putString("spec", spec).putInt("mtpDraft", mtpDraft).putInt("mtpPMinPct", mtpPMinPct)
             .putBoolean("thinking", thinking)
             .putBoolean("metricsCsv", metricsCsv)
+            .putBoolean("researchMode", researchMode)
             .apply()
     }
 
@@ -414,6 +419,7 @@ data class AppSettings(
                 mtpPMinPct = p.getInt("mtpPMinPct", d.mtpPMinPct),
                 thinking = p.getBoolean("thinking", d.thinking),
                 metricsCsv = p.getBoolean("metricsCsv", d.metricsCsv),
+                researchMode = p.getBoolean("researchMode", d.researchMode),
             )
         }
 

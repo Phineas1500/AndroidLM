@@ -4,6 +4,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import org.androidlm.research.PhaseTiming
+import org.androidlm.research.ResearchPhase
+import org.androidlm.research.ResearchSource
+import org.androidlm.research.RouteDecision
 
 /**
  * Where the engine is in its lifecycle. Unlike the old per-run boolean pair, a session process
@@ -18,6 +22,28 @@ enum class EngineState { IDLE, LOADING, READY, GENERATING, ERROR }
  * above the answer; empty when the model did not reason.
  */
 data class ChatTurn(val role: String, val text: String, val metrics: String = "", val reasoning: String = "")
+
+/**
+ * AndroidLM research mode: what the screen shows of one ResearchPipeline run (plan, route,
+ * sources, answer, source check), filled in by RunService as the pipeline reports events.
+ * The engine state stays GENERATING for the whole run, searches included.
+ */
+data class ResearchUi(
+    val question: String,
+    val runId: Int = 0,                    // RunService's run counter; 0 while the model still loads
+    val phase: ResearchPhase = ResearchPhase.PLANNING,
+    val titles: List<String>? = null,      // null until the plan is in
+    val route: RouteDecision? = null,
+    val routeThreshold: Long = 0,
+    val sources: List<ResearchSource>? = null, // null until the search is done
+    val sourcesDropped: Int = 0,
+    val answer: String = "",
+    val check: String? = null,             // null when no source check has started
+    val timings: List<PhaseTiming> = emptyList(),
+    val error: String? = null,
+) {
+    val running get() = phase != ResearchPhase.DONE && phase != ResearchPhase.CANCELLED && phase != ResearchPhase.FAILED
+}
 
 /** Immutable snapshot of the session + current generation, observed by the Compose UI. */
 data class UiState(
@@ -41,6 +67,8 @@ data class UiState(
     val nExpertUsed: Int? = null,
     val transcript: List<ChatTurn> = emptyList(), // committed turns; the in-flight answer is `answer`
     val streaming: Boolean = true,  // is the loaded session using the MoE streamer (vs mmap baseline)?
+    // AndroidLM research mode: the run in progress or the last one finished; null in plain chat.
+    val research: ResearchUi? = null,
 ) {
     val loading get() = state == EngineState.LOADING
     val generating get() = state == EngineState.GENERATING

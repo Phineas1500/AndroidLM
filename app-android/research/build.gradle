@@ -20,6 +20,10 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
 }
 
 dependencies {
+    // ResearchPipeline is a suspend API (the engine call is cancellable, corpus calls hop to the
+    // caller's single corpus thread). Same version as the app's kotlinx-coroutines-android.
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+
     testFixturesApi 'junit:junit:4.13.2'
     testFixturesApi 'com.google.code.gson:gson:2.11.0'
     // SQLite with FTS5 and zstd for the golden tests (the app will bring its own implementations)

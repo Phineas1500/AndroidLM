@@ -202,9 +202,17 @@ class TelemetryParser {
     private val text = StringBuilder()
     private val reasoning = StringBuilder()
 
+    /**
+     * AndroidLM: the answer text the last parsed line added (its `delta_text`; after a `reset`
+     * line, the whole replacement text). What the research-mode engine adapter streams on.
+     */
+    var lastDeltaText: String = ""
+        private set
+
     /** Clear the per-token state at the start of a new generation. */
     fun reset() {
         current = Telemetry()
+        lastDeltaText = ""
         text.setLength(0)
         reasoning.setLength(0)
     }
@@ -230,7 +238,8 @@ class TelemetryParser {
                 text.setLength(0)
             }
             reasoning.append(o.optString("delta_reasoning"))
-            text.append(o.optString("delta_text"))
+            lastDeltaText = o.optString("delta_text")
+            text.append(lastDeltaText)
             current.reasoning = reasoning.toString()
             current.text = text.toString()
         }.isSuccess

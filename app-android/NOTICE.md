@@ -38,12 +38,34 @@ Per Apache-2.0 section 4(b), the files below were changed from upstream.
   `settings.gradle` root project name is `AndroidLM`.
 - Comments in the manifests, `file_paths.xml` and `MainActivity.kt` that described the downloader.
 
+**Added (AndroidLM's own; not from upstream)**
+
+- The `research/` module (retrieval library and `ResearchPipeline`, a port of `scripts/rag.py`),
+  `app/src/main/java/org/androidlm/research/android/` (SQLite/zstd storage, corpus discovery),
+  `app/src/androidTest/`, and `ResearchScreen.kt` (the research toggle and result view).
+
+**Modified for research mode**
+
+- `RunService.kt`: a research entry point (`ACTION_RESEARCH`, or a question riding the
+  session-start intent) that runs the pipeline in a service coroutine scope; an `Engine` adapter
+  over the existing `--session` line protocol; generations that belong to a research run are kept
+  out of the chat transcript; output of a cancelled research generation is dropped by request id.
+  The plain chat path is otherwise as upstream wrote it.
+- `settings.gradle`, `build.gradle`, `app/build.gradle`: the `:research` module and the Kotlin JVM
+  plugin; requery `sqlite-android` (from JitPack, that one module only) and `zstd-jni` for the
+  corpus storage; the instrumentation-test dependencies.
+- `RunBus.kt`: `UiState.research` and the `ResearchUi` snapshot.
+- `Telemetry.kt`: `TelemetryParser.lastDeltaText`.
+- `AppSettings.kt`: the persisted `researchMode` switch.
+- `MainActivity.kt`: corpus scan, the Research switch by the prompt box, the research result
+  item, `launchResearch`.
+- `README.md`: replaced with a description of this app.
+
 **Unchanged**
 
-The engine foreground service (`RunService`), the `--session` line-protocol handling, chat UI,
-settings, telemetry/metrics screens, GGUF header probing, SAF import, the Gradle wrapper and
-`gradle.properties`. `README.md` is upstream's and still describes the upstream app, including
-features removed here.
+The `--session` line-protocol handling and session lifecycle of the engine foreground service,
+the chat UI, settings, telemetry/metrics screens, GGUF header probing, SAF import, the Gradle
+wrapper and `gradle.properties`.
 
 ## Not in git
 

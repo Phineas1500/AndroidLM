@@ -13,13 +13,41 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import org.androidlm.research.Engine
+import org.androidlm.research.Generation
+import org.androidlm.research.ResearchEvent
+import org.androidlm.research.ResearchListener
+import org.androidlm.research.ResearchPhase
+import org.androidlm.research.ResearchPipeline
+import org.androidlm.research.android.AndroidCorpora
+import org.androidlm.research.android.CorpusFiles
+import org.androidlm.research.android.CorpusLocator
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 
 /**
@@ -31,6 +59,12 @@ import kotlin.concurrent.thread
  * Lifecycle: START_SESSION spawns the process (LOADING → READY); GENERATE sends one prompt
  * (GENERATING → READY); CANCEL interrupts the current generation without unloading; SHUTDOWN (or
  * an idle timeout) closes the process and frees the model.
+ *
+ * AndroidLM adds research mode: RESEARCH (or a question riding START_SESSION) runs a
+ * [ResearchPipeline] in the service's coroutine scope. The pipeline drives the same process
+ * through [engine], an adapter that turns one generate request and its BMOE_* lines into a
+ * suspend call; the state stays GENERATING (wakelock held, no idle unload) for the whole run,
+ * searches included, and its progress is published as [UiState.research].
  */
 class RunService : Service() {
 
@@ -46,7 +80,7 @@ class RunService : Service() {
     // is still current — so an old session being torn down (on a model/settings change) cannot
     // clobber the fresh session that replaced it with a stale IDLE/ERROR or a nulled process.
     @Volatile private var epoch = 0
-    private var nextId = 1
+    private val nextId = AtomicInteger(1) // requests come from the main thread and from the research coroutine
 
     // A prompt supplied with START_SESSION runs as soon as the process reports READY.
     @Volatile private var pending: Req? = null
@@ -65,12 +99,39 @@ class RunService : Service() {
 
     private data class Req(val prompt: String, val nPredict: Int, val think: Boolean, val clearKv: Boolean)
 
+    // ── AndroidLM research mode (see startResearch) ──
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    @Volatile private var researchJob: Job? = null
+    private val researchRuns = AtomicInteger(0)
+
+    // A question supplied with START_SESSION starts its research run at READY (cf. [pending]).
+    @Volatile private var pendingResearch: String? = null
+
+    // The generation the research pipeline is waiting on; null while plain chat owns the process.
+    @Volatile private var inflight: EngineCall? = null
+
+    // Id of a cancelled research generation whose BMOE_DONE has not arrived yet (0 = none).
+    @Volatile private var staleId = 0
+    private val engineLock = Mutex()
+
+    // A Corpus is bound to one connection and one thread: every corpus call, the lazy open and
+    // the close included, runs on this single thread. The databases stay open for the life of
+    // the service, which ends with the session. `corpora`/`corporaFiles`: corpus thread only.
+    private val corpusExecutor: Lazy<ExecutorService> =
+        lazy { Executors.newSingleThreadExecutor { r -> Thread(r, "research-corpus") } }
+    private val corpusDispatcher by lazy { corpusExecutor.value.asCoroutineDispatcher() }
+    private var corpora: AndroidCorpora? = null
+    private var corporaFiles: CorpusFiles? = null
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_GENERATE -> sendGenerate(reqFrom(intent))
-            ACTION_CANCEL -> send("""{"cmd":"cancel"}""")
+            ACTION_RESEARCH -> startResearch(intent.getStringExtra(EXTRA_QUESTION) ?: "")
+            // Cancelling the research coroutine reaches the process through the engine adapter.
+            ACTION_CANCEL -> researchJob?.takeIf { it.isActive }?.cancel() ?: send(CANCEL_JSON)
             ACTION_SHUTDOWN -> shutdownSession()
             else -> startSession(intent)
         }
@@ -87,12 +148,14 @@ class RunService : Service() {
         val argv = intent.getStringArrayListExtra(EXTRA_ARGV) ?: run { fail("no argv"); return }
         val sig = intent.getStringExtra(EXTRA_SIG)
         val req = if (intent.hasExtra(EXTRA_PROMPT)) reqFrom(intent) else null
+        val question = intent.getStringExtra(EXTRA_QUESTION)
 
         // Already running the requested session? Just generate against the warm process.
         if (proc != null && sig == sessionSig && !shuttingDown) {
-            if (req != null) sendGenerate(req)
+            if (question != null) startResearch(question) else if (req != null) sendGenerate(req)
             return
         }
+        researchJob?.cancel() // a run on the session being replaced
         // Different model/settings (or nothing running): tear down and start fresh. A fresh session
         // has an empty KV, so its first turn always clears; and the conversation starts over.
         // Supersede any old session FIRST (bump epoch before detaching its process), so the old
@@ -101,7 +164,9 @@ class RunService : Service() {
         val myEpoch = ++epoch
         val dying = detachProcess()
         shuttingDown = false
-        pending = req?.copy(clearKv = true)
+        pending = if (question == null) req?.copy(clearKv = true) else null
+        pendingResearch = question
+        staleId = 0
         sessionSig = sig
         main.removeCallbacks(idleUnload)
         main.removeCallbacks(forceKill)
@@ -121,7 +186,8 @@ class RunService : Service() {
             // thinkControl is a property of the model being loaded, so it goes the same way — the
             // incoming session reports its own at BMOE_READY.
             it.copy(state = EngineState.LOADING, error = null, sessionSig = sig, answer = "", summary = "",
-                transcript = emptyList(), streaming = streaming, ioMode = null, thinkControl = null)
+                transcript = emptyList(), streaming = streaming, ioMode = null, thinkControl = null,
+                research = question?.let { q -> ResearchUi(q) })
         }
 
         thread(name = "bmoe-session") { runSession(argv, model, myEpoch, dying) }
@@ -189,6 +255,7 @@ class RunService : Service() {
             // touch the shared process handles, the UI state, or the foreground service — the new
             // session owns them now.
             if (epoch == myEpoch) {
+                failInflight("the engine exited mid-generation")
                 releaseWake()
                 procWriter = null
                 proc = null
@@ -205,13 +272,34 @@ class RunService : Service() {
 
     private fun handleLine(line: String) {
         val t = line.trim()
+        val stale = staleId
+        if (stale != 0 && t.startsWith("BMOE_")) {
+            // A cancelled research generation is still running: its output is dropped, up to and
+            // including the line that ends it, so it is never taken for a chat turn or for the
+            // result of the request queued behind it.
+            val id = LINE_ID.find(t)?.groupValues?.get(1)?.toIntOrNull()
+            val isError = t.startsWith("BMOE_ERROR ")
+            when {
+                (t.startsWith("BMOE_DONE ") || isError) && id == stale -> {
+                    staleId = 0
+                    // Only a fatal error still concerns the state machine.
+                    if (!(isError && "\"fatal\":true" in t)) return
+                }
+                // Another generation begins, so the end of the stale one was missed: stop dropping.
+                t.startsWith("BMOE_BEGIN ") && id != stale -> staleId = 0
+                else -> return
+            }
+        }
         when {
             t.startsWith("BMOE_READY ") -> {
                 val ctl = Regex(""""think_ctl":"([a-z_]+)"""").find(t)?.groupValues?.get(1)
                 val topk = Regex(""""n_expert_used":(\d+)""").find(t)?.groupValues?.get(1)?.toIntOrNull()
                 RunBus.update { it.copy(state = EngineState.READY, thinkControl = ctl, nExpertUsed = topk) }
                 main.post { notify("Model ready") }
-                pending?.let { p -> pending = null; sendGenerate(p) } ?: scheduleIdleUnload()
+                val question = pendingResearch
+                pendingResearch = null
+                if (question != null) startResearch(question)
+                else pending?.let { p -> pending = null; sendGenerate(p) } ?: scheduleIdleUnload()
             }
             t.startsWith("BMOE_BEGIN ") -> {
                 telemetry.reset()
@@ -221,13 +309,23 @@ class RunService : Service() {
                     it.copy(state = EngineState.GENERATING, telemetry = telemetry.current.copy(),
                         answer = "", reasoning = "", summary = "", error = null)
                 }
-                main.post { notify("Generating…") }
+                // (a research run words its own notification, per phase)
+                if (inflight == null) main.post { notify("Generating…") }
             }
             telemetry.onLine(t) -> {
                 sampleCpuTemp()
-                RunBus.update {
-                    it.copy(telemetry = telemetry.current.copy(), answer = telemetry.current.text,
-                        reasoning = telemetry.current.reasoning)
+                val call = inflight
+                if (call != null) {
+                    // A research generation: the telemetry panel stays live, but the text belongs
+                    // to the pipeline (a plan is not an answer), which places it through its events.
+                    RunBus.update { it.copy(telemetry = telemetry.current.copy()) }
+                    val delta = telemetry.lastDeltaText
+                    if (!call.abandoned && delta.isNotEmpty()) call.onToken(delta)
+                } else {
+                    RunBus.update {
+                        it.copy(telemetry = telemetry.current.copy(), answer = telemetry.current.text,
+                            reasoning = telemetry.current.reasoning)
+                    }
                 }
             }
             t.startsWith("BMOE_DONE ") -> onDone(t.removePrefix("BMOE_DONE "))
@@ -236,6 +334,9 @@ class RunService : Service() {
     }
 
     private fun onDone(json: String) {
+        // Set when this generation belongs to the research pipeline: it gets the result, and the
+        // chat transcript, the READY state and the idle timer are left alone (the run goes on).
+        val call = inflight
         // A malformed summary must not leave the UI in GENERATING forever with no turn committed
         // and nothing said. The parse is allowed to fail, but the failure has to reach the user and
         // the state machine has to return to READY, which the epilogue below does unconditionally.
@@ -332,6 +433,14 @@ class RunService : Service() {
                 draftedSteps = draftedSteps,
                 mtpDraftSPerTok = mtpDraftSTok, loopOverheadSPerTok = loopOverheadSTok,
             )
+            if (call != null) {
+                RunBus.update { it.copy(telemetry = tel, summary = summary) }
+                val wallS = (System.nanoTime() - call.startNanos) / 1e9
+                // An engine-side cancel (not ours: ours has abandoned the call) ends the run too.
+                if (cancelled && !call.abandoned) call.done.completeExceptionally(CancellationException("generation cancelled"))
+                else call.done.complete(Generation(text.ifEmpty { telemetry.current.text }, tokens, tokS, nPrompt, wallS))
+                return@runCatching
+            }
             RunBus.update {
                 val answer = if (text.isNotEmpty()) text else it.answer
                 // The final BMOE_DONE reasoning may be empty (some models drop it from the summary);
@@ -346,6 +455,11 @@ class RunService : Service() {
                     summary = summary, transcript = transcript)
             }
         }.onFailure { e ->
+            if (call != null) {
+                // Unreadable summary: the streamed text is the result, without figures.
+                call.done.complete(Generation(telemetry.current.text))
+                return@onFailure
+            }
             // Commit whatever was streamed so the answer is not lost, say what happened, and go
             // back to READY. Anything else strands the session in a state only a restart clears.
             RunBus.update {
@@ -359,6 +473,7 @@ class RunService : Service() {
             }
         }
         sampleCpuTemp()
+        if (call != null) return
         releaseWake()
         main.post { notify("Model ready") }
         scheduleIdleUnload()
@@ -420,6 +535,8 @@ class RunService : Service() {
     private fun onError(json: String) {
         val fatal = runCatching { JSONObject(json).optBoolean("fatal", true) }.getOrDefault(true)
         val msg = runCatching { JSONObject(json).optString("msg") }.getOrDefault("engine error")
+        // A research generation fails its run with the engine's message (see startResearch).
+        failInflight(msg)
         releaseWake()
         if (fatal) {
             RunBus.update { it.copy(state = EngineState.ERROR, error = msg) }
@@ -442,20 +559,23 @@ class RunService : Service() {
     )
 
     private fun sendGenerate(req: Req) {
-        val id = nextId++
+        // One generation at a time: while a research run owns the process, plain chat waits.
+        if (researchJob?.isActive == true) return
         // Show the user's turn immediately. clear_kv = "new chat" resets the transcript to this turn.
         RunBus.update {
             val user = ChatTurn("user", req.prompt)
-            it.copy(transcript = if (req.clearKv) listOf(user) else it.transcript + user, answer = "")
+            it.copy(transcript = if (req.clearKv) listOf(user) else it.transcript + user, answer = "",
+                research = null)
         }
-        val json = buildString {
-            append("""{"cmd":"generate","id":""").append(id)
-            append(""","n_predict":""").append(req.nPredict)
-            append(""","think":""").append(req.think)
-            append(""","clear_kv":""").append(req.clearKv)
-            append(""","prompt":"""").append(jsonEscape(req.prompt)).append("\"}")
-        }
-        if (!send(json)) fail("session not ready")
+        if (!send(generateJson(nextId.getAndIncrement(), req))) fail("session not ready")
+    }
+
+    private fun generateJson(id: Int, req: Req): String = buildString {
+        append("""{"cmd":"generate","id":""").append(id)
+        append(""","n_predict":""").append(req.nPredict)
+        append(""","think":""").append(req.think)
+        append(""","clear_kv":""").append(req.clearKv)
+        append(""","prompt":"""").append(jsonEscape(req.prompt)).append("\"}")
     }
 
     private fun send(json: String): Boolean = synchronized(writeLock) {
@@ -467,10 +587,163 @@ class RunService : Service() {
         }
     }
 
+    // ── AndroidLM research mode ──
+
+    /** One generate request of the research pipeline, completed by the BMOE_* lines that answer it. */
+    private class EngineCall(val id: Int, val onToken: (String) -> Unit) {
+        val done = CompletableDeferred<Generation>()
+        val startNanos = System.nanoTime()
+
+        // Set once the caller was cancelled: nothing more is streamed to it, and the BMOE_DONE
+        // that the cancel provokes is awaited only so that it is not taken for a chat turn.
+        @Volatile var abandoned = false
+    }
+
+    /**
+     * The session process as the pipeline's [Engine]: one generate request per call, on a fresh
+     * KV and with reasoning off (as scripts/bmoe_session.py sends them). Completes on BMOE_DONE,
+     * fails on BMOE_ERROR or when the process goes away, streams each `delta_text`, and turns
+     * coroutine cancellation into the protocol's `cancel`. After a cancel it waits (briefly) for
+     * the engine's BMOE_DONE; if that takes too long the generation's id goes into [staleId] and
+     * handleLine drops the rest of its output, so it is never taken for a chat turn or for the
+     * next request's result.
+     */
+    private val engine = object : Engine {
+        override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit): Generation =
+            engineLock.withLock {
+                val call = EngineCall(nextId.getAndIncrement(), onToken)
+                inflight = call
+                try {
+                    if (!send(generateJson(call.id, Req(prompt, nPredict, think = false, clearKv = true)))) {
+                        throw IllegalStateException("the engine session is not running")
+                    }
+                    call.done.await()
+                } catch (e: CancellationException) {
+                    call.abandoned = true
+                    if (!call.done.isCompleted) {
+                        send(CANCEL_JSON)
+                        withContext(NonCancellable) { withTimeoutOrNull(CANCEL_DRAIN_MS) { call.done.join() } }
+                        // Still running (a prefill batch is not interruptible): disown its output.
+                        if (!call.done.isCompleted) staleId = call.id
+                    }
+                    throw e
+                } finally {
+                    inflight = null
+                }
+            }
+    }
+
+    private fun failInflight(msg: String) {
+        inflight?.done?.completeExceptionally(IllegalStateException(msg))
+    }
+
+    /**
+     * Run the research pipeline on [question] against the loaded session. The foreground
+     * service is already up (the session owns it); the wakelock is taken for the whole run and
+     * the idle unload is held off, because the searches between generations are part of it.
+     */
+    private fun startResearch(question: String) {
+        if (researchJob?.isActive == true) return
+        if (procWriter == null) { fail("session not ready"); return }
+        val runId = researchRuns.incrementAndGet()
+        main.removeCallbacks(idleUnload)
+        acquireWake()
+        RunBus.update {
+            // Every research generation clears the KV, so a chat in progress cannot continue.
+            it.copy(state = EngineState.GENERATING, research = ResearchUi(question, runId = runId),
+                transcript = emptyList(), answer = "", reasoning = "", summary = "", error = null)
+        }
+        val job = scope.launch(start = CoroutineStart.LAZY) {
+            try {
+                val files = withContext(Dispatchers.IO) { CorpusLocator.find(this@RunService) }
+                    ?: throw IllegalStateException("no corpus found (${CorpusLocator.WIKI} in a \"${CorpusLocator.DIR}\" directory)")
+                val open = withContext(corpusDispatcher) { corporaFor(files) }
+                ResearchPipeline(engine, open, corpusDispatcher).run(question, researchListener(runId))
+            } catch (e: CancellationException) {
+                publishResearch(runId) { if (it.running) it.copy(phase = ResearchPhase.CANCELLED) else it }
+                throw e
+            } catch (t: Throwable) {
+                val msg = t.message ?: t.toString()
+                RunBus.update {
+                    // (not when another run or session has replaced this one on screen)
+                    val r = it.research
+                    if (r == null || r.runId != runId) it
+                    else it.copy(research = r.copy(phase = ResearchPhase.FAILED, error = msg),
+                        error = it.error ?: "Research failed: $msg")
+                }
+            } finally {
+                onResearchEnded(coroutineContext.job)
+            }
+        }
+        // Lazy, so that the job is on record before its body (and onResearchEnded) can run.
+        researchJob = job
+        job.start()
+    }
+
+    /** Corpus thread only. Reopens when the files on the device are not the ones that are open. */
+    private fun corporaFor(files: CorpusFiles): AndroidCorpora {
+        corpora?.let { if (corporaFiles == files) return it else it.close() }
+        return AndroidCorpora(files).also { corpora = it; corporaFiles = files }
+    }
+
+    private fun onResearchEnded(job: Job) {
+        if (researchJob !== job) return // a newer run (or session) has taken over
+        researchJob = null
+        RunBus.update { if (it.state == EngineState.GENERATING) it.copy(state = EngineState.READY) else it }
+        releaseWake()
+        if (proc != null && !shuttingDown) {
+            main.post { notify("Model ready") }
+            scheduleIdleUnload()
+        }
+    }
+
+    private fun publishResearch(runId: Int, block: (ResearchUi) -> ResearchUi) = RunBus.update {
+        val r = it.research
+        if (r != null && r.runId == runId) it.copy(research = block(r)) else it
+    }
+
+    /**
+     * Pipeline events into [UiState.research]. Token events arrive on the session's reader thread,
+     * right after the telemetry parser took the same line, so the text shown while streaming is
+     * the parser's accumulation: it already honours the protocol's `reset` lines, which a plain
+     * concatenation of deltas would not.
+     */
+    private fun researchListener(runId: Int) = ResearchListener { e ->
+        when (e) {
+            is ResearchEvent.PhaseChanged -> {
+                publishResearch(runId) {
+                    it.copy(phase = e.phase, check = if (e.phase == ResearchPhase.CHECKING) "" else it.check)
+                }
+                researchNotice(e.phase)?.let { text -> main.post { notify(text) } }
+            }
+            is ResearchEvent.Planned -> publishResearch(runId) { it.copy(titles = e.titles) }
+            is ResearchEvent.Routed -> publishResearch(runId) { it.copy(route = e.decision, routeThreshold = e.threshold) }
+            is ResearchEvent.SourcesFound -> publishResearch(runId) { it.copy(sources = e.sources, sourcesDropped = e.dropped) }
+            is ResearchEvent.AnswerToken -> telemetry.current.text.let { text -> publishResearch(runId) { it.copy(answer = text) } }
+            is ResearchEvent.AnswerCompleted -> publishResearch(runId) { it.copy(answer = e.text) }
+            is ResearchEvent.CheckToken -> telemetry.current.text.let { text -> publishResearch(runId) { it.copy(check = text) } }
+            is ResearchEvent.CheckCompleted -> publishResearch(runId) { it.copy(check = e.text) }
+            is ResearchEvent.PhaseCompleted -> publishResearch(runId) { it.copy(timings = it.timings + e.timing) }
+            is ResearchEvent.Completed -> Unit // everything in it has been published piecewise
+            is ResearchEvent.Failed -> Unit    // startResearch reports the failure it rethrows
+        }
+    }
+
+    private fun researchNotice(phase: ResearchPhase): String? = when (phase) {
+        ResearchPhase.PLANNING -> "Research: planning lookups…"
+        ResearchPhase.SEARCHING -> "Research: searching the corpus…"
+        ResearchPhase.DRAFTING -> "Research: drafting an answer…"
+        ResearchPhase.ANSWERING -> "Research: answering from the sources…"
+        ResearchPhase.CHECKING -> "Research: checking the draft against the sources…"
+        else -> null // terminal phases: onResearchEnded says "Model ready"
+    }
+
     // ── teardown ──
 
     private fun shutdownSession() {
         shuttingDown = true
+        researchJob?.cancel()
+        pendingResearch = null
         main.removeCallbacks(idleUnload)
         requestClose()
         main.postDelayed(forceKill, FORCE_KILL_MS)
@@ -485,7 +758,7 @@ class RunService : Service() {
      * Callers back this up with a deadline ([forceKill] or [awaitExit]).
      */
     private fun requestClose() {
-        send("""{"cmd":"cancel"}""")
+        send(CANCEL_JSON)
         send("""{"cmd":"close"}""")
     }
 
@@ -496,6 +769,7 @@ class RunService : Service() {
         }
         runCatching { proc?.destroy() }
         proc = null
+        failInflight("the engine was stopped")
     }
 
     /** Wind the current session down and hand its process off, without waiting, so the caller can
@@ -508,6 +782,8 @@ class RunService : Service() {
         }
         val p = proc
         proc = null
+        // Its remaining output is ignored from here on (the epoch moved), BMOE_DONE included.
+        failInflight("the session was replaced")
         return p
     }
 
@@ -561,8 +837,14 @@ class RunService : Service() {
         shuttingDown = true
         main.removeCallbacks(idleUnload)
         main.removeCallbacks(forceKill)
+        scope.cancel()
         killProcess()
         releaseWake()
+        if (corpusExecutor.isInitialized()) {
+            // Behind whatever search is still running: the corpora close on their own thread.
+            corpusExecutor.value.execute { corpora?.close(); corpora = null }
+            corpusExecutor.value.shutdown()
+        }
         super.onDestroy()
     }
 
@@ -590,6 +872,12 @@ class RunService : Service() {
         const val ACTION_GENERATE = "io.bigmoeonedge.example.GENERATE"
         const val ACTION_CANCEL = "io.bigmoeonedge.example.CANCEL"
         const val ACTION_SHUTDOWN = "io.bigmoeonedge.example.SHUTDOWN"
+
+        /** AndroidLM: run the research pipeline on [EXTRA_QUESTION] against the loaded session. */
+        const val ACTION_RESEARCH = "io.bigmoeonedge.example.RESEARCH"
+
+        /** With [ACTION_RESEARCH], or with START_SESSION to research as soon as the model is ready. */
+        const val EXTRA_QUESTION = "question"
         const val EXTRA_MODEL = "model"
         const val EXTRA_ARGV = "argv"
         const val EXTRA_SIG = "sig"
@@ -598,6 +886,11 @@ class RunService : Service() {
         const val EXTRA_THINK = "think"
         const val EXTRA_CLEAR_KV = "clear_kv"
         private const val CHANNEL = "gen"
+        private val LINE_ID = Regex(""""id":(\d+)""")
+        private const val CANCEL_JSON = """{"cmd":"cancel"}"""
+
+        // How long a cancelled research generation waits for the engine's BMOE_DONE.
+        private const val CANCEL_DRAIN_MS = 5000L
         private const val NOTIF_ID = 1
 
         // Free the model after this long with no generation, so an idle session does not hold
