@@ -1,7 +1,7 @@
 {
   "version": 1,
   "device_root": "/data/local/tmp/bmoe",
-  "note": "sha256 null = not computed yet; url null = not published yet (place the file in the assets directory by hand). scripts/install.sh refuses to push a file whose hash is known and does not match.",
+  "note": "url null = not published yet (place the file in the assets directory by hand). scripts/install.sh refuses to push a file whose hash does not match.",
   "files": [
     {
       "name": "Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
@@ -16,7 +16,7 @@
       "name": "wiki.db",
       "role": "corpus",
       "bytes": 21314895872,
-      "sha256": null,
+      "sha256": "736034e74f139559bc9517991a8572092c17cddbc66967ef66e4df130e4b7bee",
       "url": null,
       "device_path": "corpus/wiki.db",
       "license": "CC BY-SA 4.0 (English Wikipedia via FineWiki, Aug 2025; redirects Sep 2026)"
@@ -25,7 +25,7 @@
       "name": "voyage.db",
       "role": "corpus-optional",
       "bytes": 328810496,
-      "sha256": null,
+      "sha256": "f59a2708b3c9bc3b96e2a9ded7fa082765e7ad1b62f3d302d50d0f75be7f7983",
       "url": null,
       "device_path": "corpus/voyage.db",
       "license": "CC BY-SA 4.0 (English Wikivoyage, Sep 2026)"
