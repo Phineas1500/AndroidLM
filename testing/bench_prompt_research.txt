@@ -1,0 +1,38 @@
+You are an offline research assistant. Answer the question directly and completely, using your own knowledge together with the numbered sources from an offline copy of Wikipedia. Cite a source like [1] where it supports a statement. Ignore sources that are off-topic. If something important is not covered by the sources, still answer it from your own knowledge; never withhold well-known facts or safety advice because a source is missing. If you are unsure of a specific name, date or number, say so instead of guessing. Address every part of the question in the first few lines, then elaborate. No preamble, no restating the question, no LaTeX, no visible deliberation. Be concise.
+
+Sources:
+
+[1] Kyoto
+Kyoto (/ki.ˈoʊ.toʊ/ or /ˈkjoʊ.toʊ/; Japanese: 京都, Kyōto [kʲoꜜː.to] ⓘ), officially Kyoto City (京都市, Kyōto-shi; [kʲoː.toꜜ.ɕi] ⓘ), is the capital city of Kyoto Prefecture in the Kansai region of Japan's largest and most populous island of Honshu. As of 2020, the city had a population of 1.46 million, making it the ninth-most populous city in Japan. More than half (56.8%) of Kyoto Prefecture's population resides in the city. The city is the cultural anchor of the substantially larger Greater Kyoto, a metropolitan statistical area (MSA) home to a census-estimated 3.8 million people. It is also part of the even larger Keihanshin metropolitan area, along with Osaka and Kobe.
+Kyoto is one of the oldest municipalities in Japan, having been chosen in 794 as the new seat of Japan's imperial court by Emperor Kanmu. The original city, named Heian-kyō, was arranged in accordance with traditional Chinese feng shui following the model of the ancient Chinese capitals of Chang'an and Luoyang.
+
+[2] Wikivoyage: Kyoto — See > World Heritage Sites
+In 1994, 17 historic sites were inscribed on the UNESCO World Heritage List under the group designation Historic Monuments of Ancient Kyoto. Fourteen of the listed sites are in Kyoto itself, two are in the neighbouring city of Uji and one is in Ōtsu.
+
+Listed by location, the fourteen World Heritage Sites in the city of Kyoto are:
+- Northern Kyoto: Kinkaku-ji, Ryōan-ji, Ninna-ji, Kōzan-ji, Shimogamo Shrine, Kamigamo Shrine
+- Central Kyoto: Nijō Castle, Nishi Hongan-ji, Tō-ji
+- Eastern Kyoto: Kiyomizu-dera, Ginkaku-ji
+- Western Kyoto: Tenryū-ji, Koke-dera
+- Southern Kyoto: Daigo-ji
+
+[3] Etiquette in Japan
+Etiquette in Japan forms common societal expectations of social behavior practiced throughout the nation of Japan. The etiquette of Japan has changed greatly over the millennia as different civilizations influenced its culture. Modern Japanese etiquette has a strong influence from that of China and the Western world, but retains many of its unique traditional elements.
+
+[4] Shinto shrine
+A Shinto shrine (神社, jinja; archaic: shinsha, meaning: 'kami shrine') is a structure whose main purpose is to house ("enshrine") one or more kami, the deities of the Shinto religion.
+The main hall (本殿, honden) is where a shrine's patron kami is or are enshrined. The honden may be absent in cases where a shrine stands on or near a sacred mountain, tree, or other object which can be worshipped directly or in cases where a shrine possesses either an altar-like structure, called a himorogi, or an object believed to be capable of attracting spirits, called a yorishiro, which can also serve as direct bonds to a kami. There may be a hall of worship (拝殿, haiden) and other structures as well. 
+Although only one word ("shrine") is used in English, in Japanese, Shinto shrines may carry any one of many different, non-equivalent names like gongen, -gū, jinja, jingū, mori, myōjin, -sha, taisha, ubusuna, or yashiro. Miniature shrines (hokora) can occasionally be found on roadsides.
+
+[5] Shinto shrine — Etiquette at shrines
+At shrines there is a relatively standardized system of visit ettiquette that is called Two bows, two claps, one bow.  It goes roughly as follows:
+1. Bow once before entering the torii.[73][74] Walking through the center of the torii is reserved for deities.[74]
+2. Purify the hands and mouth with the chōzuya.[73][74]
+3. Put money in the offering box.[75][76]
+4. Ring the bell 2 to 3 times if present.[77][76]
+5. Bow twice.[73][74][76]
+6. Clap twice.[73][74][76]
+7. Bow once.[73][74] This bow is deeper than the others,[78] at a 90-degree angle.[76]
+8. When exiting the shrine, turn around and bow once at the torii.[79]
+
+Question: I am visiting Kyoto for three days. Which districts and sites should I prioritize, and what etiquette should I know at temples and shrines?
