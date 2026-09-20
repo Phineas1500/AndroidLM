@@ -1,0 +1,449 @@
+{
+ "trv2-01": {
+  "route": "verify",
+  "draft": 5.5,
+  "off": {
+   "final": 6.5,
+   "check_effect": "helped",
+   "reason": "Real fix: invented 'Khorvat Phu Pheng Hill' -> Phou Si; Pak Ou Caves offered in place of invented 'Ban Champi' cruise; Royal Palace museum confirmed. Minus: casts doubt on the real Wat Mai by offering 'Wat Hosian Voravihane'. Nothing on alms etiquette beyond 'at sunrise'.",
+   "retrieval": "partial",
+   "halluc": [
+    "'Phoenix roof' / 'Pha Ngum stupa' at Wat Xieng Thong (invented)",
+    "'Wat Chai'/'Wat Sien' evening meditation (unverifiable)",
+    "'Ban Vat Luang' village, boat-making (invented; Ban Champi flagged by check)"
+   ]
+  },
+  "on": {
+   "final": 6,
+   "check_effect": "helped",
+   "reason": "Wikivoyage See passages add useful specifics (Sai Bat 05:00-06:00 on Sisavangvong Rd, commercialisation caveat; Kuang Si 29 km south, foreigner fee) and flag Ban Champi, but the Wikivoyage passage displaced Wikipedia's Tourism section so the invented 'Khorvat Phu Pheng Hill' is no longer corrected to Phou Si, and the check casts doubt on two real temples (Wat Mai, Wat Visoun). No Respect/etiquette passage.",
+   "retrieval": "good",
+   "halluc": [
+    "'Khorvat Phu Pheng Hill' by tuk-tuk (invented; real viewpoint is Phou Si, on foot) - left uncorrected",
+    "'Phoenix roof' / 'Pha Ngum stupa' (invented)",
+    "'Ban Vat Luang' (invented)"
+   ]
+  },
+  "draft_note": "Etiquette section sound but thin (no kneeling/shoes/keep distance/do not buy from touts). Itinerary mixes real sights (Xieng Thong, Kuang Si + bear sanctuary, night market, Wat Mai, Royal Palace) with invented names; omits Pak Ou and names Phou Si wrongly."
+ },
+ "trv2-02": {
+  "route": "verify",
+  "draft": 6,
+  "off": {
+   "final": 6,
+   "check_effect": "neutral",
+   "reason": "Flags the left/right-bank claim only as 'unsupported' (it is actually wrong: Old Town is on the right bank) and does not fix it; flags correct line names as unsupported; typo fix; additions are metro trivia (1966, ridership).",
+   "retrieval": "partial",
+   "halluc": [
+    "Old Town on the left bank (it is on the right bank)",
+    "Metro fare 0.50 GEL (1 GEL since 2022)",
+    "'Vake' metro station (does not exist)",
+    "'Chitakhevi Forest Park' (invented)",
+    "Dry Bridge Market placed in the Old Town"
+   ]
+  },
+  "on": {
+   "final": 6,
+   "check_effect": "neutral",
+   "reason": "Same as off plus a sensible 'fare not in sources' flag on the outdated 0.50 GEL. Wikivoyage hits were Climate and Visitor information - wrong sections for layout/neighbourhoods/getting around (needed Districts, Get around, Sleep), so nothing of substance added; additions are founding-date trivia, truncated.",
+   "retrieval": "partial",
+   "halluc": [
+    "Old Town on the left bank (it is on the right bank)",
+    "Metro fare 0.50 GEL (outdated; check flags as unsupported)",
+    "'Vake' metro station (does not exist)",
+    "'Chitakhevi Forest Park' (invented)"
+   ]
+  },
+  "draft_note": "Neighbourhood picks and transport modes sensible; wrong river bank, outdated fare, nonexistent Vake station, no buses/cable car/funicular/MetroMoney."
+ },
+ "trv2-03": {
+  "route": "verify",
+  "draft": 6,
+  "off": {
+   "final": 7,
+   "check_effect": "helped",
+   "reason": "Correctly flags 'Santiago Tuxteco' and 'Cueva de la Reina' as unsupported/hallucinated; adds seven moles, quesillo, chocolate. Misses Teotitlan distance/direction and the memela description. No Mitla, village or Wikivoyage passage in either run.",
+   "retrieval": "partial",
+   "halluc": [
+    "Memela described with 'mushroom sauce (manchamanteles)' and goat cheese (invented)",
+    "Teotitlan del Valle '15 km south' (about 30 km east)",
+    "Mezcal variety 'barrano' (garbled)"
+   ]
+  },
+  "on": {
+   "final": 7,
+   "check_effect": "helped",
+   "reason": "Correctly flags 'Santiago Tuxteco' and 'Cueva de la Reina' as unsupported/hallucinated; adds seven moles, quesillo, chocolate. Misses Teotitlan distance/direction and the memela description. No Mitla, village or Wikivoyage passage in either run. Identical to off: no Wikivoyage passage was retrieved.",
+   "retrieval": "partial",
+   "halluc": [
+    "Memela described with 'mushroom sauce (manchamanteles)' and goat cheese (invented)",
+    "Teotitlan del Valle '15 km south' (about 30 km east)",
+    "Mezcal variety 'barrano' (garbled)"
+   ]
+  },
+  "draft_note": "Food list solid (mole, tlayudas, chapulines, mezcal); day trips right in outline (Monte Alban, Mitla, Teotitlan, Coyotepec) but with invented names and a wrong distance; no Hierve el Agua/Tule/tejate."
+ },
+ "trv2-04": {
+  "route": "verify",
+  "draft": 6,
+  "off": {
+   "final": 6.5,
+   "check_effect": "helped",
+   "reason": "Pedantic distance/duration 'corrections' are harmless; useful true addition that stoves are only allowed at refugio/camp locations, O circuit context. Does not touch the accommodation errors (CONAF booking, Refugio Macarena).",
+   "retrieval": "partial",
+   "halluc": [
+    "Side hikes 'ascent of Torre itself' / 'Laguna de los Tres' (that is Fitz Roy, Argentina)",
+    "'Refugio Macarena' (invented)",
+    "Booking via CONAF for camping / EcoCamp for refugios (outdated/wrong: Vertice and Las Torres operate all sites)",
+    "W legs mislabelled (Grey = 'bottom right', French Valley = 'bottom left')"
+   ]
+  },
+  "on": {
+   "final": 6.5,
+   "check_effect": "helped",
+   "reason": "Same stove addition. Wikivoyage Do gives 4-6 days. One confused 'correction' (O circuit 7-10 not 7-9 days) disputes something the draft never said - it is one source against another. Accommodation/booking errors still untouched; Sleep/Fees sections not retrieved.",
+   "retrieval": "partial",
+   "halluc": [
+    "Side hikes 'ascent of Torre itself' / 'Laguna de los Tres' (that is Fitz Roy, Argentina)",
+    "'Refugio Macarena' (invented)",
+    "Booking via CONAF for camping / EcoCamp for refugios (outdated/wrong: Vertice and Las Torres operate all sites)",
+    "W legs mislabelled (Grey = 'bottom right', French Valley = 'bottom left')"
+   ]
+  },
+  "draft_note": "Duration, distance and season correct and well organised; accommodation part has wrong operators/booking channel and an invented refugio; no park ticket, catamaran or Puerto Natales logistics."
+ },
+ "trv2-05": {
+  "route": "verify",
+  "draft": 4,
+  "off": {
+   "final": 3.5,
+   "check_effect": "hurt",
+   "reason": "'No corrections' and explicitly vouches for the wrong Siq facts ('paved, 300m ... consistent with general knowledge supported by the sources'). Only value: Monastery is the largest monument, and a list of things sources do not cover.",
+   "retrieval": "partial",
+   "halluc": [
+    "Siq 'approximately 300 meters', walk '10-15 minutes' (Siq is ~1.2 km; ~2 km / 30-40 min from gate to Treasury)",
+    "Shuttle bus from visitor centre to the entrance included in ticket (invented)",
+    "You can enter the Treasury's ground-floor chamber (not permitted)",
+    "'Street of Corinthian Tombs' (it is the Street of Facades)",
+    "High Place of Sacrifice 'further up from the Monastery' (separate climb near the theatre)",
+    "3-4 hours enough for main sights (a full day is the realistic minimum)",
+    "Monastery called 'Agur'",
+    "Check endorses the 300 m Siq as source-consistent"
+   ]
+  },
+  "on": {
+   "final": 4.5,
+   "check_effect": "helped",
+   "reason": "Wikivoyage See: correctly disputes 'well-lit' Siq, adds that the Monastery climb is 800+ steps and takes over an hour even by donkey (corrects the draft's optimistic timing). Shuttle-bus comment is muddled; Siq length, Treasury entry, High Place location and total time still uncorrected.",
+   "retrieval": "good",
+   "halluc": [
+    "Siq 'approximately 300 meters', walk '10-15 minutes' (Siq is ~1.2 km; ~2 km / 30-40 min from gate to Treasury)",
+    "Shuttle bus from visitor centre to the entrance included in ticket (invented)",
+    "You can enter the Treasury's ground-floor chamber (not permitted)",
+    "'Street of Corinthian Tombs' (it is the Street of Facades)",
+    "High Place of Sacrifice 'further up from the Monastery' (separate climb near the theatre)",
+    "3-4 hours enough for main sights (a full day is the realistic minimum)",
+    "Monastery called 'Agur'"
+   ]
+  },
+  "draft_note": "Sight list mostly right (Treasury, theatre, Royal Tombs, Monastery ~800 steps) but the walk-in description and time budget are badly wrong."
+ },
+ "trv2-06": {
+  "route": "verify",
+  "draft": 7,
+  "off": {
+   "final": 7,
+   "check_effect": "neutral",
+   "reason": "No corrections; additions are population figures and trivia (Imam Bukhari, Al-Biruni, 1991 UNESCO). Misses Mir-i-Arab/Kalan errors. Nothing retrieved on trains/transport; identical in both runs (no Wikivoyage passage).",
+   "retrieval": "partial",
+   "halluc": [
+    "Po-i-Kalyan said to include 'Ulug Beg Madrasa' (it is Mir-i-Arab)",
+    "'Kalan Mosque' in Khiva (Juma Mosque / Kalta Minor)",
+    "Shakhrisabz unfinished project named as Kok Gumbaz (it is Ak-Saray)",
+    "'Hazrat Ishan' complex in Tashkent (Hazrati Imam)"
+   ]
+  },
+  "on": {
+   "final": 7,
+   "check_effect": "neutral",
+   "reason": "No corrections; additions are population figures and trivia (Imam Bukhari, Al-Biruni, 1991 UNESCO). Misses Mir-i-Arab/Kalan errors. Nothing retrieved on trains/transport; identical in both runs (no Wikivoyage passage).",
+   "retrieval": "partial",
+   "halluc": [
+    "Po-i-Kalyan said to include 'Ulug Beg Madrasa' (it is Mir-i-Arab)",
+    "'Kalan Mosque' in Khiva (Juma Mosque / Kalta Minor)",
+    "Shakhrisabz unfinished project named as Kok Gumbaz (it is Ak-Saray)",
+    "'Hazrat Ishan' complex in Tashkent (Hazrati Imam)"
+   ]
+  },
+  "draft_note": "Right three cities plus Tashkent/Shakhrisabz, right headline sights, Afrosiyob and realistic times; a few monument misnamings."
+ },
+ "trv2-07": {
+  "route": "verify",
+  "draft": 7.5,
+  "off": {
+   "final": 8,
+   "check_effect": "helped",
+   "reason": "Adds acetazolamide (Diamox) prophylaxis for rapid ascent above 2,700 m - the one major omission in the draft; confirms 3,524 m.",
+   "retrieval": "good",
+   "halluc": [
+    "Nubra Valley listed at 4,200-4,500 m (valley floor ~3,100 m; the pass is the issue)",
+    "AMS 'affects up to 75% of visitors' (unsupported figure)"
+   ]
+  },
+  "on": {
+   "final": 8,
+   "check_effect": "helped",
+   "reason": "Same Diamox addition; Wikivoyage Ladakh Stay safe contributes only an earthquake/rockfall note (harmless, low value for the question).",
+   "retrieval": "good",
+   "halluc": [
+    "Nubra Valley listed at 4,200-4,500 m (valley floor ~3,100 m; the pass is the issue)",
+    "AMS 'affects up to 75% of visitors' (unsupported figure)"
+   ]
+  },
+  "draft_note": "Strong: rest 48-72 h, hydration, no alcohol/sleeping pills, HAPE/HACE red flags and descend, sun protection, delay Pangong/Nubra. Missing Diamox, permits, hospital/oxygen."
+ },
+ "trv2-08": {
+  "route": "plan",
+  "draft": null,
+  "off": {
+   "final": 4.5,
+   "check_effect": null,
+   "reason": "Transport part is decent (Bygdaleidir blue buses, Strandfaraskip ferries, Smyril to Suduroy, helicopter) but 'Teistin' Sandoy ferry is superseded by the 2023 tunnel and helicopters are called expensive (they are subsidised and cheap). Sights are what the leads happened to contain: Torshavn incl. a football stadium, Sorvagsvatn, Suduroy; no Mulafossur/Gasadalur, Mykines, Saksun, Gjogv, Kalsoy, Kirkjubour; no travel card or free Torshavn buses.",
+   "retrieval": "partial",
+   "halluc": [
+    "Helicopter 'can be expensive' (subsidised, cheap for the distance)",
+    "Teistin ferry Sandoy-Streymoy (replaced by Sandoyartunnilin, Dec 2023)",
+    "Torsvollur stadium presented as a key attraction"
+   ]
+  },
+  "on": {
+   "final": 4,
+   "check_effect": null,
+   "reason": "Only Wikivoyage passage was 'Vagar - Get in > By plane' (wrong place/section). It produced an invented sight: 'Vagar Airport Area ... national park areas surrounding the airport'. Buses now buried under the ferry bullet with the wrong citation; opening line says 'roads, ferries, and helicopters'. Sights thinner than off; generic 'consult Visit Faroe Islands' close.",
+   "retrieval": "partial",
+   "halluc": [
+    "'national park areas surrounding the airport' on Vagar (no such thing)",
+    "Teistin ferry Sandoy-Streymoy (superseded)",
+    "Bus routes cited to the merchant-marine passage"
+   ]
+  }
+ },
+ "trv2-09": {
+  "route": "verify",
+  "draft": 4,
+  "off": {
+   "final": 4.5,
+   "check_effect": "helped",
+   "reason": "Fixes bridge date (1919, not 1897) and adds Horton Plains (World's End, Baker's Falls) as a hill-country stop. But the check itself asserts 'Adam's Peak is the major trek starting from Ella', reinforcing the draft's worst error, and the Demodara comment is muddled. 'Ella' resolved to singer Ella Mai.",
+   "retrieval": "partial",
+   "halluc": [
+    "Adam's Peak ('Pico de Adams') trek starts from Ella (it is reached from Hatton/Dalhousie; Ella's hike is Ella Rock)",
+    "'Nanuwa' is 'a small stop just before Ella' (Nanu Oya is the Nuwara Eliya stop, hours away)",
+    "Route runs to 'Badulla/Matara'; 'Main Line (Southern Line) and Upper Provinces Line'",
+    "Lover's Leap cave at Ravana Falls (Lover's Leap is in Nuwara Eliya)",
+    "'Birkha Tea Estate' (invented)",
+    "Check: 'Adam's Peak is the major trek starting from Ella'"
+   ]
+  },
+  "on": {
+   "final": 4.5,
+   "check_effect": "helped",
+   "reason": "Bridge date fix; Wikivoyage Ella 'Get in > By train' adds journey time 9-10 h from Colombo via Kandy (useful, right) and fares Rs 900/440 (dated, but hedged 'approximately'). Loses the Horton Plains addition; again says both Adam's Peak and Little Adam's Peak 'are hikes from Ella'. Ella See/Do not retrieved; Ella Mai still in the list.",
+   "retrieval": "partial",
+   "halluc": [
+    "Adam's Peak ('Pico de Adams') trek starts from Ella (it is reached from Hatton/Dalhousie; Ella's hike is Ella Rock)",
+    "'Nanuwa' is 'a small stop just before Ella' (Nanu Oya is the Nuwara Eliya stop, hours away)",
+    "Route runs to 'Badulla/Matara'; 'Main Line (Southern Line) and Upper Provinces Line'",
+    "Lover's Leap cave at Ravana Falls (Lover's Leap is in Nuwara Eliya)",
+    "'Birkha Tea Estate' (invented)",
+    "Check: both peaks 'are hikes from Ella'",
+    "Fares Rs 900 / Rs 440 likely outdated"
+   ]
+  },
+  "draft_note": "Right line and the Kandy-Ella highlight, Nine Arch, Little Adam's Peak, Ravana Falls; but stops are poorly chosen/wrong (no Nanu Oya/Nuwara Eliya, Haputale, Ohiya) and Adam's Peak is mislocated."
+ },
+ "trv2-10": {
+  "route": "plan",
+  "draft": null,
+  "off": {
+   "final": 2.5,
+   "check_effect": null,
+   "reason": "Honest but nearly empty: one rule (do not step on the threshold) and a statement that sources contain nothing else. No entering/moving clockwise, accepting food and airag with the right hand, not pointing feet at the hearth, not leaning on posts, gifts, dogs. Title lookup hit 'Ger Canning'; identical in both runs - Wikivoyage Mongolia (Respect) was not retrieved. A closed-book draft would very likely have scored higher than this plan-route answer.",
+   "retrieval": "partial",
+   "halluc": []
+  },
+  "on": {
+   "final": 2.5,
+   "check_effect": null,
+   "reason": "Honest but nearly empty: one rule (do not step on the threshold) and a statement that sources contain nothing else. No entering/moving clockwise, accepting food and airag with the right hand, not pointing feet at the hearth, not leaning on posts, gifts, dogs. Title lookup hit 'Ger Canning'; identical in both runs - Wikivoyage Mongolia (Respect) was not retrieved. A closed-book draft would very likely have scored higher than this plan-route answer.",
+   "retrieval": "partial",
+   "halluc": []
+  }
+ },
+ "trv2-11": {
+  "route": "verify",
+  "draft": 7.5,
+  "off": {
+   "final": 7.5,
+   "check_effect": "neutral",
+   "reason": "No corrections, no additions; a paragraph listing that each source is irrelevant (economy, education, tourism statistics). Harmless noise.",
+   "retrieval": "miss",
+   "halluc": [
+    "Petit taxis described as yellow (Marrakech's are beige/ochre)"
+   ]
+  },
+  "on": {
+   "final": 7.5,
+   "check_effect": "neutral",
+   "reason": "Wikivoyage 'Stay safe > Touts and scams' is exactly the right passage, but the check extracted only colour ('Marrakech, Arnakech', police clean-up since 2016, 'grain of salt') and no concrete scam or tactic the draft lacked (tannery/'road closed' guides, Jemaa el-Fnaa animal handlers, agreed prices in writing). Other Wikivoyage hit (Sleep > Riads) irrelevant.",
+   "retrieval": "good",
+   "halluc": [
+    "Petit taxis described as yellow (Marrakech's are beige/ochre)"
+   ]
+  },
+  "draft_note": "Good practical list: false guides/'it's closed', touts, henna, taxis and meter, photo charges, each with a handling line."
+ },
+ "trv2-12": {
+  "route": "verify",
+  "draft": 7.5,
+  "off": {
+   "final": 7.5,
+   "check_effect": "neutral",
+   "reason": "No corrections; additions are UNESCO 1985, Nevsehir province, Turasan winery in Urgup - true but marginal. Nothing on balloons.",
+   "retrieval": "partial",
+   "halluc": [
+    "'Dark Church (Church of St. Barbara)' - two different churches conflated",
+    "Balloons fly at dawn 'to catch thermal winds' (they fly then because air is calm)"
+   ]
+  },
+  "on": {
+   "final": 7.5,
+   "check_effect": "neutral",
+   "reason": "Wikivoyage See passages give one good addition (sunrise launches because winds are lightest - implicitly fixes 'thermal winds') and pigeon-coop colour, but also a garbled, time-sensitive price claim: Goreme Open-Air Museum as 'the only site included in the EUR 65 Museumpass' (the pass covers several Cappadocia sites; price changes yearly). Nets out.",
+   "retrieval": "good",
+   "halluc": [
+    "'Dark Church (Church of St. Barbara)' - two different churches conflated",
+    "Balloons fly at dawn 'to catch thermal winds' (they fly then because air is calm)",
+    "Check: Open-Air Museum is 'the only site included in the EUR 65 Museumpass' (misread and price-dated)"
+   ]
+  },
+  "draft_note": "Good bases, sights (Open-Air Museum, valleys, underground cities, Uchisar) and balloon logistics (dawn, cancellations, book ahead, layers). No price range or flight length."
+ },
+ "trv2-13": {
+  "route": "verify",
+  "draft": 6.5,
+  "off": {
+   "final": 7,
+   "check_effect": "helped",
+   "reason": "Says 'Corrections: None' but the additions in effect correct the Primitivo length (320 km) and give Portugues 610/227 km and Frances 780 km / at least four weeks. Misses Valladolid/O Cebreiro. Albergue title resolved to generic 'Hostel'; identical in both runs (Wikivoyage's article is titled 'Way of St. James', not matched).",
+   "retrieval": "partial",
+   "halluc": [
+    "Camino Portugues passes through 'Valladolid' and joins the Frances near O Cebreiro (wrong)",
+    "Primitivo 'adds about 115 km' (it is ~320 km; check supplies the right figure)",
+    "Via Podiensis and 'Le Puy Route' listed as two routes (same route)",
+    "Albergues 'often prohibiting alcohol'"
+   ]
+  },
+  "on": {
+   "final": 7,
+   "check_effect": "helped",
+   "reason": "Says 'Corrections: None' but the additions in effect correct the Primitivo length (320 km) and give Portugues 610/227 km and Frances 780 km / at least four weeks. Misses Valladolid/O Cebreiro. Albergue title resolved to generic 'Hostel'; identical in both runs (Wikivoyage's article is titled 'Way of St. James', not matched).",
+   "retrieval": "partial",
+   "halluc": [
+    "Camino Portugues passes through 'Valladolid' and joins the Frances near O Cebreiro (wrong)",
+    "Primitivo 'adds about 115 km' (it is ~320 km; check supplies the right figure)",
+    "Via Podiensis and 'Le Puy Route' listed as two routes (same route)",
+    "Albergues 'often prohibiting alcohol'"
+   ]
+  },
+  "draft_note": "Right route list, 800 km / 28-30 days, credencial and donativo/fee model; several geographic slips; hostel section truncated before curfew/one-night/no-reservation rules."
+ },
+ "trv2-14": {
+  "route": "verify",
+  "draft": 4.5,
+  "off": {
+   "final": 5,
+   "check_effect": "helped",
+   "reason": "Flags invented 'Sunzilver Beach'; adds UNESCO 2000 and the Arab/Persian/Indian/European mix, walkability, daladalas by Darajani Market (silently fixing the spelling). Quibbles about the Old Fort date and 'must' are noise. Nothing on dress; no mention of the slave-market cathedral, Forodhani, Palace Museum.",
+   "retrieval": "partial",
+   "halluc": [
+    "'Mikloni House Museum' (invented)",
+    "'Mchafu Kwae area' (invented)",
+    "'Old Bazaar' as a named sight",
+    "House of Wonders described as an open museum (closed since the 2020 collapse)",
+    "'Great Mosque of Zanzibar' open to visitors (non-Muslims generally cannot enter mosques)",
+    "'Darajami' for Darajani"
+   ]
+  },
+  "on": {
+   "final": 4,
+   "check_effect": "hurt",
+   "reason": "Check output is broken: the first bullet is a long leaked deliberation ('However, since the prompt asks ... But wait ...'), shown to the user; it then lists House of Wonders as 'no source mentions this' alongside the invented Mikloni and Sunzilver, so a real landmark is put on the same footing as hallucinations; Additions section is empty (budget exhausted). Wikivoyage 'Zanzibar - See' contributed nothing visible; no Respect passage.",
+   "retrieval": "partial",
+   "halluc": [
+    "'Mikloni House Museum' (invented)",
+    "'Mchafu Kwae area' (invented)",
+    "'Old Bazaar' as a named sight",
+    "House of Wonders described as an open museum (closed since the 2020 collapse)",
+    "'Great Mosque of Zanzibar' open to visitors (non-Muslims generally cannot enter mosques)",
+    "'Darajami' for Darajani",
+    "'Sunzilver Beach' (invented; flagged)",
+    "Check casts doubt on the real House of Wonders"
+   ]
+  },
+  "draft_note": "Dress/behaviour half is sound; sights half has Old Fort, House of Wonders, Darajani, carved doors right but three invented places and misses the cathedral/slave market, Forodhani, Freddie Mercury house, Prison Island."
+ },
+ "trv2-15": {
+  "route": "plan",
+  "draft": null,
+  "off": {
+   "final": 5,
+   "check_effect": null,
+   "reason": "SDF $100/night (and INR 1,200 for Indians) is right and the key fact; visa-in-advance right. Fee history garbled and the guide rule overstated as fully relaxed. Places section is altitude/distance trivia: no Tiger's Nest, dzongs, Dochula; 'Paro' resolved to the Greek island Paros (the answer at least says so). Identical in both runs - no Wikivoyage passage retrieved.",
+   "retrieval": "partial",
+   "halluc": [
+    "'Prior to June 2022, the fee was $200' (the $200 SDF started Sept 2022; before that a $200-250 package with a $65 SDF)",
+    "Independent travel 'without mandatory guided tours' (guides are still required beyond Thimphu/Paro and for treks)"
+   ]
+  },
+  "on": {
+   "final": 5,
+   "check_effect": null,
+   "reason": "SDF $100/night (and INR 1,200 for Indians) is right and the key fact; visa-in-advance right. Fee history garbled and the guide rule overstated as fully relaxed. Places section is altitude/distance trivia: no Tiger's Nest, dzongs, Dochula; 'Paro' resolved to the Greek island Paros (the answer at least says so). Identical in both runs - no Wikivoyage passage retrieved.",
+   "retrieval": "partial",
+   "halluc": [
+    "'Prior to June 2022, the fee was $200' (the $200 SDF started Sept 2022; before that a $200-250 package with a $65 SDF)",
+    "Independent travel 'without mandatory guided tours' (guides are still required beyond Thimphu/Paro and for treks)"
+   ]
+  }
+ },
+ "trv2-16": {
+  "route": "verify",
+  "draft": 7,
+  "off": {
+   "final": 7,
+   "check_effect": "neutral",
+   "reason": "The 'correction' on temperature simply restates the draft's own detailed figures and attributes them to a source; additions confirm miso ramen, jingisukan, Shiroi Koibito and add the 1972 Olympics. Nothing new for the traveller.",
+   "retrieval": "partial",
+   "halluc": [
+    "Asahiyama Zoo has 'snow monkeys bathing in hot springs' (that is Hakodate/Jigokudani; Asahiyama is known for the penguin walk)",
+    "Otaru Snow Light Path 'usually January' (February)",
+    "'Shiroi Koishi Onsen' (invented)",
+    "'rural areas like Sapporo or Asahikawa'"
+   ]
+  },
+  "on": {
+   "final": 7.5,
+   "check_effect": "helped",
+   "reason": "Three Wikivoyage Eat passages add real food value: dairy (butter/corn ramen, cheese), Santouka from Asahikawa, chanchanyaki, zangi - all correct. Cost: Eat crowded out climate/Do entirely, so the check labels the draft's (correct) temperatures 'unsupported', and activities get nothing.",
+   "retrieval": "partial",
+   "halluc": [
+    "Asahiyama Zoo has 'snow monkeys bathing in hot springs' (that is Hakodate/Jigokudani; Asahiyama is known for the penguin walk)",
+    "Otaru Snow Light Path 'usually January' (February)",
+    "'Shiroi Koishi Onsen' (invented)",
+    "'rural areas like Sapporo or Asahikawa'"
+   ]
+  },
+  "draft_note": "Strong on skiing, festivals, onsen, food and accurate temperature ranges; a few slips (snow monkeys, Otaru month, invented onsen)."
+ }
+}
