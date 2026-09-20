@@ -1,0 +1,1419 @@
+[
+ {
+  "question": "I am visiting Kyoto for three days. Which districts and sites should I prioritize, and what etiquette should I know at temples and shrines?",
+  "titles": [
+   "Kyoto",
+   "Etiquette in Japan",
+   "Shinto shrine"
+  ],
+  "stems": [
+   [
+    "am",
+    13.2133
+   ],
+   [
+    "dai",
+    10.7939
+   ],
+   [
+    "district",
+    11.1147
+   ],
+   [
+    "etiquett",
+    13.9795
+   ],
+   [
+    "kyoto",
+    13.1855
+   ],
+   [
+    "priorit",
+    15.6842
+   ],
+   [
+    "shrine",
+    12.8809
+   ],
+   [
+    "site",
+    11.8702
+   ],
+   [
+    "templ",
+    12.7575
+   ],
+   [
+    "three",
+    10.6322
+   ],
+   [
+    "visit",
+    12.4326
+   ]
+  ],
+  "query_terms": [
+   "priorit",
+   "etiquett",
+   "am",
+   "kyoto",
+   "shrine",
+   "templ",
+   "visit",
+   "site",
+   "district",
+   "dai",
+   "three"
+  ],
+  "resolved": [
+   37652,
+   1965957,
+   1059378
+  ],
+  "resolved_voyage": [
+   18579,
+   null,
+   null
+  ],
+  "hits": [
+   {
+    "title": "Kyoto",
+    "section": "",
+    "start": 821,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Kyoto",
+    "section": "Culture",
+    "start": 42737,
+    "score": 0.26,
+    "via": "title"
+   },
+   {
+    "title": "Etiquette in Japan",
+    "section": "",
+    "start": 21,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Shinto shrine",
+    "section": "",
+    "start": 16,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Shinto shrine",
+    "section": "Etiquette at shrines",
+    "start": 48264,
+    "score": 0.42,
+    "via": "title"
+   },
+   {
+    "title": "Kyoto",
+    "section": "Culture",
+    "start": 43694,
+    "score": 0.25,
+    "via": "title"
+   }
+  ],
+  "hits_used": 5,
+  "hits_context": "[1] Kyoto\nKyoto (/ki.ˈoʊ.toʊ/ or /ˈkjoʊ.toʊ/; Japanese: 京都, Kyōto [kʲoꜜː.to] ⓘ), officially Kyoto City (京都市, Kyōto-shi; [kʲoː.toꜜ.ɕi] ⓘ), is the capital city of Kyoto Prefecture in the Kansai region of Japan's largest and most populous island of Honshu. As of 2020, the city had a population of 1.46 million, making it the ninth-most populous city in Japan. More than half (56.8%) of Kyoto Prefecture's population resides in the city. The city is the cultural anchor of the substantially larger Greater Kyoto, a metropolitan statistical area (MSA) home to a census-estimated 3.8 million people. It is also part of the even larger Keihanshin metropolitan area, along with Osaka and Kobe.\nKyoto is one of the oldest municipalities in Japan, having been chosen in 794 as the new seat of Japan's imperial court by Emperor Kanmu. The original city, named Heian-kyō, was arranged in accordance with traditional Chinese feng shui following the model of the ancient Chinese capitals of Chang'an and Luoyang.\n\n[2] Kyoto — Culture\nThree special sites have connections to the imperial family: the Kyoto Gyoen area including the Kyoto Imperial Palace and Sentō Imperial Palace, homes of the emperors of Japan for many centuries; Katsura Imperial Villa, one of the nation's finest architectural treasures; and Shugakuin Imperial Villa, one of its best Japanese gardens. In addition, the temple of Sennyu-ji houses the tombs of the emperors from Shijō to Kōmei.\nOther sites in Kyoto include Arashiyama, the Gion and Ponto-chō geisha quarters, the Philosopher's Walk, and the canals that line some of the older streets.\n\n[3] Etiquette in Japan\nEtiquette in Japan forms common societal expectations of social behavior practiced throughout the nation of Japan. The etiquette of Japan has changed greatly over the millennia as different civilizations influenced its culture. Modern Japanese etiquette has a strong influence from that of China and the Western world, but retains many of its unique traditional elements.\n\n[4] Shinto shrine\nA Shinto shrine (神社, jinja; archaic: shinsha, meaning: 'kami shrine') is a structure whose main purpose is to house (\"enshrine\") one or more kami, the deities of the Shinto religion.\nThe main hall (本殿, honden) is where a shrine's patron kami is or are enshrined. The honden may be absent in cases where a shrine stands on or near a sacred mountain, tree, or other object which can be worshipped directly or in cases where a shrine possesses either an altar-like structure, called a himorogi, or an object believed to be capable of attracting spirits, called a yorishiro, which can also serve as direct bonds to a kami. There may be a hall of worship (拝殿, haiden) and other structures as well. \nAlthough only one word (\"shrine\") is used in English, in Japanese, Shinto shrines may carry any one of many different, non-equivalent names like gongen, -gū, jinja, jingū, mori, myōjin, -sha, taisha, ubusuna, or yashiro. Miniature shrines (hokora) can occasionally be found on roadsides.\n\n[5] Shinto shrine — Etiquette at shrines\nAt shrines there is a relatively standardized system of visit ettiquette that is called Two bows, two claps, one bow.  It goes roughly as follows:\n1. Bow once before entering the torii.[73][74] Walking through the center of the torii is reserved for deities.[74]\n2. Purify the hands and mouth with the chōzuya.[73][74]\n3. Put money in the offering box.[75][76]\n4. Ring the bell 2 to 3 times if present.[77][76]\n5. Bow twice.[73][74][76]\n6. Clap twice.[73][74][76]\n7. Bow once.[73][74] This bow is deeper than the others,[78] at a 90-degree angle.[76]\n8. When exiting the shrine, turn around and bow once at the torii.[79]",
+  "hits_voyage": [
+   {
+    "title": "Kyoto",
+    "section": "",
+    "start": 821,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Wikivoyage: Kyoto",
+    "section": "See > World Heritage Sites",
+    "start": 26452,
+    "score": 0.48,
+    "via": "title"
+   },
+   {
+    "title": "Etiquette in Japan",
+    "section": "",
+    "start": 21,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Shinto shrine",
+    "section": "",
+    "start": 16,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Shinto shrine",
+    "section": "Etiquette at shrines",
+    "start": 48264,
+    "score": 0.42,
+    "via": "title"
+   },
+   {
+    "title": "Wikivoyage: Kyoto",
+    "section": "Understand",
+    "start": 1167,
+    "score": 0.45,
+    "via": "title"
+   }
+  ],
+  "hits_voyage_used": 5,
+  "hits_voyage_context": "[1] Kyoto\nKyoto (/ki.ˈoʊ.toʊ/ or /ˈkjoʊ.toʊ/; Japanese: 京都, Kyōto [kʲoꜜː.to] ⓘ), officially Kyoto City (京都市, Kyōto-shi; [kʲoː.toꜜ.ɕi] ⓘ), is the capital city of Kyoto Prefecture in the Kansai region of Japan's largest and most populous island of Honshu. As of 2020, the city had a population of 1.46 million, making it the ninth-most populous city in Japan. More than half (56.8%) of Kyoto Prefecture's population resides in the city. The city is the cultural anchor of the substantially larger Greater Kyoto, a metropolitan statistical area (MSA) home to a census-estimated 3.8 million people. It is also part of the even larger Keihanshin metropolitan area, along with Osaka and Kobe.\nKyoto is one of the oldest municipalities in Japan, having been chosen in 794 as the new seat of Japan's imperial court by Emperor Kanmu. The original city, named Heian-kyō, was arranged in accordance with traditional Chinese feng shui following the model of the ancient Chinese capitals of Chang'an and Luoyang.\n\n[2] Wikivoyage: Kyoto — See > World Heritage Sites\nIn 1994, 17 historic sites were inscribed on the UNESCO World Heritage List under the group designation Historic Monuments of Ancient Kyoto. Fourteen of the listed sites are in Kyoto itself, two are in the neighbouring city of Uji and one is in Ōtsu.\n\nListed by location, the fourteen World Heritage Sites in the city of Kyoto are:\n- Northern Kyoto: Kinkaku-ji, Ryōan-ji, Ninna-ji, Kōzan-ji, Shimogamo Shrine, Kamigamo Shrine\n- Central Kyoto: Nijō Castle, Nishi Hongan-ji, Tō-ji\n- Eastern Kyoto: Kiyomizu-dera, Ginkaku-ji\n- Western Kyoto: Tenryū-ji, Koke-dera\n- Southern Kyoto: Daigo-ji\n\n[3] Etiquette in Japan\nEtiquette in Japan forms common societal expectations of social behavior practiced throughout the nation of Japan. The etiquette of Japan has changed greatly over the millennia as different civilizations influenced its culture. Modern Japanese etiquette has a strong influence from that of China and the Western world, but retains many of its unique traditional elements.\n\n[4] Shinto shrine\nA Shinto shrine (神社, jinja; archaic: shinsha, meaning: 'kami shrine') is a structure whose main purpose is to house (\"enshrine\") one or more kami, the deities of the Shinto religion.\nThe main hall (本殿, honden) is where a shrine's patron kami is or are enshrined. The honden may be absent in cases where a shrine stands on or near a sacred mountain, tree, or other object which can be worshipped directly or in cases where a shrine possesses either an altar-like structure, called a himorogi, or an object believed to be capable of attracting spirits, called a yorishiro, which can also serve as direct bonds to a kami. There may be a hall of worship (拝殿, haiden) and other structures as well. \nAlthough only one word (\"shrine\") is used in English, in Japanese, Shinto shrines may carry any one of many different, non-equivalent names like gongen, -gū, jinja, jingū, mori, myōjin, -sha, taisha, ubusuna, or yashiro. Miniature shrines (hokora) can occasionally be found on roadsides.\n\n[5] Shinto shrine — Etiquette at shrines\nAt shrines there is a relatively standardized system of visit ettiquette that is called Two bows, two claps, one bow.  It goes roughly as follows:\n1. Bow once before entering the torii.[73][74] Walking through the center of the torii is reserved for deities.[74]\n2. Purify the hands and mouth with the chōzuya.[73][74]\n3. Put money in the offering box.[75][76]\n4. Ring the bell 2 to 3 times if present.[77][76]\n5. Bow twice.[73][74][76]\n6. Clap twice.[73][74][76]\n7. Bow once.[73][74] This bow is deeper than the others,[78] at a 90-degree angle.[76]\n8. When exiting the shrine, turn around and bow once at the torii.[79]",
+  "route_views": 43328
+ },
+ {
+  "question": "I have a 10-hour layover in Istanbul. What can I realistically see, and how is the old city laid out?",
+  "titles": [
+   "Istanbul",
+   "Hagia Sophia",
+   "Istanbul Airport"
+  ],
+  "stems": [
+   [
+    "10",
+    10.5233
+   ],
+   [
+    "citi",
+    10.4903
+   ],
+   [
+    "have",
+    10.0364
+   ],
+   [
+    "hour",
+    12.364
+   ],
+   [
+    "istanbul",
+    11.4501
+   ],
+   [
+    "laid",
+    13.2565
+   ],
+   [
+    "old",
+    11.5073
+   ],
+   [
+    "out",
+    10.6614
+   ],
+   [
+    "realist",
+    14.8369
+   ],
+   [
+    "see",
+    11.9115
+   ]
+  ],
+  "query_terms": [
+   "realist",
+   "laid",
+   "hour",
+   "see",
+   "old",
+   "istanbul",
+   "out",
+   "10",
+   "citi",
+   "have"
+  ],
+  "resolved": [
+   3391396,
+   42764,
+   38317336
+  ],
+  "resolved_voyage": [
+   15886,
+   null,
+   167948
+  ],
+  "hits": [
+   {
+    "title": "Istanbul",
+    "section": "",
+    "start": 824,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Istanbul",
+    "section": "Cityscape > Districts and neighborhoods > Expansion",
+    "start": 55757,
+    "score": 0.42,
+    "via": "title"
+   },
+   {
+    "title": "Hagia Sophia",
+    "section": "",
+    "start": 817,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Istanbul Airport",
+    "section": "",
+    "start": 832,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Hagia Sophia",
+    "section": "History > Church of Justinian I (current structure)",
+    "start": 18595,
+    "score": 0.16,
+    "via": "title"
+   },
+   {
+    "title": "Istanbul Airport",
+    "section": "Ground transport > Car and taxi",
+    "start": 400698,
+    "score": 0.2,
+    "via": "title"
+   }
+  ],
+  "hits_used": 5,
+  "hits_context": "[1] Istanbul\nIstanbul is the largest city in Turkey, constituting the country's economic, cultural, and historical heart. With a population over 15 million, it is home to 18% of the population of Turkey. Istanbul is among the largest cities in Europe and in the world by population. It is a city on two continents; about two-thirds of its population live in Europe and the rest in Asia. Istanbul straddles the Bosphorus—one of the world's busiest waterways—in northwestern Turkey, between the Sea of Marmara and the Black Sea. Its area of 5,461 square kilometers (2,109 sq mi) is coterminous with Istanbul Province.\nThe city now known as Istanbul developed to become one of the most significant cities in history. Byzantium was founded on the Sarayburnu promontory by Greek colonists, potentially in the seventh century BC.\n\n[2] Istanbul — Cityscape > Districts and neighborhoods > Expansion\nAs a result of Istanbul's exponential growth in the 20th century, a significant portion of the city is composed of gecekondus (literally \"built overnight\"), referring to illegally constructed squatter buildings. At present, some gecekondu areas are being gradually demolished and replaced by modern mass-housing compounds. Moreover, large scale gentrification and urban renewal projects have been taking place, such as the one in Tarlabaşı; some of these projects, like the one in Sulukule, have faced criticism.\n\n[3] Hagia Sophia\nHagia Sophia, officially the Hagia Sophia Grand Mosque, is a mosque and former museum and church serving as a major cultural and historical site in Istanbul, Turkey. The last of three church buildings to be successively erected on the site by the Eastern Roman Empire, it was completed in AD 537, becoming the world's largest interior space and among the first to employ a fully pendentive dome. It is considered the epitome of Byzantine architecture and is said to have \"changed the history of architecture\". From its dedication in 360 until 1453 Hagia Sophia served as the cathedral of Constantinople in the Byzantine liturgical tradition, except for the period 1204–1261 when the Latin Crusaders installed their own hierarchy. After the fall of Constantinople in 1453, it served as a mosque, having its minarets added soon after. The site became a museum in 1935, and was redesignated as a mosque in 2020. In 2024, the upper floor of the mosque began to serve as a museum once again.\n\n[4] Istanbul Airport\nIstanbul Airport (IATA: IST, ICAO: LTFM) is the larger of two international airports serving Istanbul, Turkey. It is located in the Arnavutköy district on the European side of the city. It is the largest airport in Turkey, the largest privately-owned airport in the world, the second busiest airport in Europe as well as the second busiest airport in the Middle East.\nAll scheduled commercial passenger flights were transferred from Atatürk Airport to Istanbul Airport on 6 April 2019, following the closure of Atatürk Airport for scheduled passenger flights. The IATA airport code IST was also transferred to the new airport.\nIt served more than 80 million passengers in 2024, making it second-busiest airport in Europe of 2024, after Heathrow Airport and the second-busiest airport in the Middle East, after Dubai International Airport, it was also the seventh-busiest airport in the world of 2024 in terms of total passenger traffic and, by serving more than 63 million international passengers, the seventh-busiest airport in the world in terms of international passenger traffic according to ACI World traffic values. It serves up to 122 countries and is the hub for Turkish Airlines.\n\n[5] Istanbul Airport — Ground transport > Car and taxi\nThe airport is reachable by car from the  O-7 motorway and/or  D.020 highway. Istanbul city taxis are available 24 hours a day outside the arrival and departure areas of the airport. A trip to Istanbul city centre by taxi takes approximately an hour.",
+  "hits_voyage": [
+   {
+    "title": "Istanbul",
+    "section": "",
+    "start": 824,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Wikivoyage: Istanbul",
+    "section": "See > Sights",
+    "start": 56606,
+    "score": 0.5,
+    "via": "title"
+   },
+   {
+    "title": "Hagia Sophia",
+    "section": "",
+    "start": 817,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Istanbul Airport",
+    "section": "",
+    "start": 832,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Hagia Sophia",
+    "section": "History > Church of Justinian I (current structure)",
+    "start": 18595,
+    "score": 0.16,
+    "via": "title"
+   },
+   {
+    "title": "Wikivoyage: Istanbul Airport",
+    "section": "Understand",
+    "start": 657,
+    "score": 0.34,
+    "via": "title"
+   }
+  ],
+  "hits_voyage_used": 4,
+  "hits_voyage_context": "[1] Istanbul\nIstanbul is the largest city in Turkey, constituting the country's economic, cultural, and historical heart. With a population over 15 million, it is home to 18% of the population of Turkey. Istanbul is among the largest cities in Europe and in the world by population. It is a city on two continents; about two-thirds of its population live in Europe and the rest in Asia. Istanbul straddles the Bosphorus—one of the world's busiest waterways—in northwestern Turkey, between the Sea of Marmara and the Black Sea. Its area of 5,461 square kilometers (2,109 sq mi) is coterminous with Istanbul Province.\nThe city now known as Istanbul developed to become one of the most significant cities in history. Byzantium was founded on the Sarayburnu promontory by Greek colonists, potentially in the seventh century BC.\n\n[2] Wikivoyage: Istanbul — See > Sights\nNorth of Taksim Square is New Istanbul, the main business district of the city. If venturing out to this direction, it's worth checking out the Military Museum, where Ottoman military music concerts (Mehter) are held every afternoon. Most of the skyscrapers of the city are located in the north of this district, around Levent and Maslak, with a totally different skyline from that of the old city. However the southern reaches of the very same district has some fine neo-classical and Art Nouveau buildings from the turn of the 20th century, around the neighbourhoods of Osmanbey, Kurtuluş, and Nişantaşı.\n\n[3] Hagia Sophia\nHagia Sophia, officially the Hagia Sophia Grand Mosque, is a mosque and former museum and church serving as a major cultural and historical site in Istanbul, Turkey. The last of three church buildings to be successively erected on the site by the Eastern Roman Empire, it was completed in AD 537, becoming the world's largest interior space and among the first to employ a fully pendentive dome. It is considered the epitome of Byzantine architecture and is said to have \"changed the history of architecture\". From its dedication in 360 until 1453 Hagia Sophia served as the cathedral of Constantinople in the Byzantine liturgical tradition, except for the period 1204–1261 when the Latin Crusaders installed their own hierarchy. After the fall of Constantinople in 1453, it served as a mosque, having its minarets added soon after. The site became a museum in 1935, and was redesignated as a mosque in 2020. In 2024, the upper floor of the mosque began to serve as a museum once again.\n\n[4] Istanbul Airport\nIstanbul Airport (IATA: IST, ICAO: LTFM) is the larger of two international airports serving Istanbul, Turkey. It is located in the Arnavutköy district on the European side of the city. It is the largest airport in Turkey, the largest privately-owned airport in the world, the second busiest airport in Europe as well as the second busiest airport in the Middle East.\nAll scheduled commercial passenger flights were transferred from Atatürk Airport to Istanbul Airport on 6 April 2019, following the closure of Atatürk Airport for scheduled passenger flights. The IATA airport code IST was also transferred to the new airport.\nIt served more than 80 million passengers in 2024, making it second-busiest airport in Europe of 2024, after Heathrow Airport and the second-busiest airport in the Middle East, after Dubai International Airport, it was also the seventh-busiest airport in the world of 2024 in terms of total passenger traffic and, by serving more than 63 million international passengers, the seventh-busiest airport in the world in terms of international passenger traffic according to ACI World traffic values. It serves up to 122 countries and is the hub for Turkish Airlines.",
+  "route_views": 109112
+ },
+ {
+  "question": "Who was the ruler of the Ottoman Empire when Constantinople fell, and what happened to the Hagia Sophia afterwards and in the 20th and 21st centuries?",
+  "titles": [
+   "Mehmed the Conqueror",
+   "Hagia Sophia"
+  ],
+  "stems": [
+   [
+    "20th",
+    12.5343
+   ],
+   [
+    "21st",
+    14.0748
+   ],
+   [
+    "afterward",
+    13.8925
+   ],
+   [
+    "centuri",
+    11.0942
+   ],
+   [
+    "constantinopl",
+    12.3169
+   ],
+   [
+    "empir",
+    12.0249
+   ],
+   [
+    "fell",
+    13.3816
+   ],
+   [
+    "hagia",
+    12.5932
+   ],
+   [
+    "happen",
+    12.9116
+   ],
+   [
+    "ottoman",
+    12.1433
+   ],
+   [
+    "ruler",
+    13.1855
+   ],
+   [
+    "sophia",
+    12.5415
+   ]
+  ],
+  "query_terms": [
+   "21st",
+   "afterward",
+   "fell",
+   "ruler",
+   "happen",
+   "hagia",
+   "sophia",
+   "20th",
+   "constantinopl",
+   "ottoman",
+   "empir",
+   "centuri"
+  ],
+  "resolved": [
+   19046,
+   42764
+  ],
+  "resolved_voyage": [
+   null,
+   null
+  ],
+  "hits": [
+   {
+    "title": "Mehmed II",
+    "section": "",
+    "start": 128,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Mehmed II",
+    "section": "Conquests > Crimean policy (1475)",
+    "start": 45190,
+    "score": 0.17,
+    "via": "title"
+   },
+   {
+    "title": "Hagia Sophia",
+    "section": "",
+    "start": 817,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Hagia Sophia",
+    "section": "Mosaics > 20th-century restoration",
+    "start": 80178,
+    "score": 0.22,
+    "via": "title"
+   },
+   {
+    "title": "Mehmed II",
+    "section": "Portrayal in popular culture",
+    "start": 71013,
+    "score": 0.15,
+    "via": "title"
+   },
+   {
+    "title": "Hagia Sophia",
+    "section": "History > Mosque (1453–1935) > Renovation of 1847–1849",
+    "start": 43713,
+    "score": 0.22,
+    "via": "title"
+   }
+  ],
+  "hits_used": 5,
+  "hits_context": "[1] Mehmed II\nMehmed II  (Ottoman Turkish: محمد ثانى, romanized: Meḥemmed-i s̱ānī; Turkish: II. Mehmed, pronounced [icinˈdʒi ˈmehmet]; 30 March 1432 – 3 May 1481), commonly known as Mehmed the Conqueror (Ottoman Turkish: ابو الفتح, romanized: Ebū'l-fetḥ, lit. 'the Father of Conquest'; Turkish: Fâtih Sultan Mehmed), was twice the sultan of the Ottoman Empire from August 1444 to September 1446 and then later from February 1451 to May 1481.\nIn Mehmed II's first reign, he defeated the crusade led by John Hunyadi after the Hungarian incursions into his country broke the conditions of the truce per the Treaties of Edirne and Szeged. When Mehmed II ascended the throne again in 1451, he strengthened the Ottoman Navy and made preparations to attack Constantinople. At the age of 21, he conquered Constantinople and brought an end to the Byzantine Empire.\n\n[2] Mehmed II — Conquests > Crimean policy (1475)\nA number of Turkic peoples, collectively known as the Crimean Tatars, had been inhabiting the peninsula since the early Middle Ages. After the destruction of the Golden Horde by Timur earlier in the 15th century, the Crimean Tatars founded an independent Crimean Khanate under Hacı I Giray, a descendant of Genghis Khan.\nThe Crimean Tatars controlled the steppes that stretched from the Kuban to the Dniester River, but they were unable to take control over the commercial Genoese towns called Gazaria (Genoese colonies), which had been under Genoese control since 1357.\n\n[3] Hagia Sophia\nHagia Sophia, officially the Hagia Sophia Grand Mosque, is a mosque and former museum and church serving as a major cultural and historical site in Istanbul, Turkey. The last of three church buildings to be successively erected on the site by the Eastern Roman Empire, it was completed in AD 537, becoming the world's largest interior space and among the first to employ a fully pendentive dome. It is considered the epitome of Byzantine architecture and is said to have \"changed the history of architecture\". From its dedication in 360 until 1453 Hagia Sophia served as the cathedral of Constantinople in the Byzantine liturgical tradition, except for the period 1204–1261 when the Latin Crusaders installed their own hierarchy. After the fall of Constantinople in 1453, it served as a mosque, having its minarets added soon after. The site became a museum in 1935, and was redesignated as a mosque in 2020. In 2024, the upper floor of the mosque began to serve as a museum once again.\n\n[4] Hagia Sophia — Mosaics > 20th-century restoration\nThe deterioration of the Hagia Sophia's walls can be directly attributed to salt crystallization. The crystallization of salt is due to an intrusion of rainwater that causes the Hagia Sophia's deteriorating inner and outer walls. Diverting excess rainwater is the main solution to the deteriorating walls at the Hagia Sophia.\nBuilt between 532 and 537, a subsurface structure under the Hagia Sophia has been under investigation, using LaCoste-Romberg gravimeters to determine the depth of the subsurface structure and to discover other hidden cavities beneath the Hagia Sophia.\n\n[5] Mehmed II — Portrayal in popular culture\n### Citations\n1. ↑  Cihan Yüksel Muslu (2014). The Ottomans and the Mamluks: Imperial Diplomacy and Warfare in the Islamic World. p. 118. Mehmed presented himself to the world as The Sultan of two lands and the Khan of two seas\n2. ↑  Gustav Bayerle (1997). Pashas, Begs, and Effendis: A Historical Dictionary of Titles and Terms in the Ottoman Empire. Isis Press. p. 150.\n3. ↑  The Essential World History, Volume II: Since 1500. Archived 18 February 2018 at the Wayback Machine By William J. Duiker, Jackson J. Spielvogel\n4. ↑  The Rise of Turkey: The Twenty-First Century's First Muslim Power Archived 18 February 2018 at the Wayback Machine.",
+  "hits_voyage": [
+   {
+    "title": "Mehmed II",
+    "section": "",
+    "start": 128,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Mehmed II",
+    "section": "Conquests > Crimean policy (1475)",
+    "start": 45190,
+    "score": 0.17,
+    "via": "title"
+   },
+   {
+    "title": "Hagia Sophia",
+    "section": "",
+    "start": 817,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Hagia Sophia",
+    "section": "Mosaics > 20th-century restoration",
+    "start": 80178,
+    "score": 0.22,
+    "via": "title"
+   },
+   {
+    "title": "Mehmed II",
+    "section": "Portrayal in popular culture",
+    "start": 71013,
+    "score": 0.15,
+    "via": "title"
+   },
+   {
+    "title": "Hagia Sophia",
+    "section": "History > Mosque (1453–1935) > Renovation of 1847–1849",
+    "start": 43713,
+    "score": 0.22,
+    "via": "title"
+   }
+  ],
+  "hits_voyage_used": 5,
+  "hits_voyage_context": "[1] Mehmed II\nMehmed II  (Ottoman Turkish: محمد ثانى, romanized: Meḥemmed-i s̱ānī; Turkish: II. Mehmed, pronounced [icinˈdʒi ˈmehmet]; 30 March 1432 – 3 May 1481), commonly known as Mehmed the Conqueror (Ottoman Turkish: ابو الفتح, romanized: Ebū'l-fetḥ, lit. 'the Father of Conquest'; Turkish: Fâtih Sultan Mehmed), was twice the sultan of the Ottoman Empire from August 1444 to September 1446 and then later from February 1451 to May 1481.\nIn Mehmed II's first reign, he defeated the crusade led by John Hunyadi after the Hungarian incursions into his country broke the conditions of the truce per the Treaties of Edirne and Szeged. When Mehmed II ascended the throne again in 1451, he strengthened the Ottoman Navy and made preparations to attack Constantinople. At the age of 21, he conquered Constantinople and brought an end to the Byzantine Empire.\n\n[2] Mehmed II — Conquests > Crimean policy (1475)\nA number of Turkic peoples, collectively known as the Crimean Tatars, had been inhabiting the peninsula since the early Middle Ages. After the destruction of the Golden Horde by Timur earlier in the 15th century, the Crimean Tatars founded an independent Crimean Khanate under Hacı I Giray, a descendant of Genghis Khan.\nThe Crimean Tatars controlled the steppes that stretched from the Kuban to the Dniester River, but they were unable to take control over the commercial Genoese towns called Gazaria (Genoese colonies), which had been under Genoese control since 1357.\n\n[3] Hagia Sophia\nHagia Sophia, officially the Hagia Sophia Grand Mosque, is a mosque and former museum and church serving as a major cultural and historical site in Istanbul, Turkey. The last of three church buildings to be successively erected on the site by the Eastern Roman Empire, it was completed in AD 537, becoming the world's largest interior space and among the first to employ a fully pendentive dome. It is considered the epitome of Byzantine architecture and is said to have \"changed the history of architecture\". From its dedication in 360 until 1453 Hagia Sophia served as the cathedral of Constantinople in the Byzantine liturgical tradition, except for the period 1204–1261 when the Latin Crusaders installed their own hierarchy. After the fall of Constantinople in 1453, it served as a mosque, having its minarets added soon after. The site became a museum in 1935, and was redesignated as a mosque in 2020. In 2024, the upper floor of the mosque began to serve as a museum once again.\n\n[4] Hagia Sophia — Mosaics > 20th-century restoration\nThe deterioration of the Hagia Sophia's walls can be directly attributed to salt crystallization. The crystallization of salt is due to an intrusion of rainwater that causes the Hagia Sophia's deteriorating inner and outer walls. Diverting excess rainwater is the main solution to the deteriorating walls at the Hagia Sophia.\nBuilt between 532 and 537, a subsurface structure under the Hagia Sophia has been under investigation, using LaCoste-Romberg gravimeters to determine the depth of the subsurface structure and to discover other hidden cavities beneath the Hagia Sophia.\n\n[5] Mehmed II — Portrayal in popular culture\n### Citations\n1. ↑  Cihan Yüksel Muslu (2014). The Ottomans and the Mamluks: Imperial Diplomacy and Warfare in the Islamic World. p. 118. Mehmed presented himself to the world as The Sultan of two lands and the Khan of two seas\n2. ↑  Gustav Bayerle (1997). Pashas, Begs, and Effendis: A Historical Dictionary of Titles and Terms in the Ottoman Empire. Isis Press. p. 150.\n3. ↑  The Essential World History, Volume II: Since 1500. Archived 18 February 2018 at the Wayback Machine By William J. Duiker, Jackson J. Spielvogel\n4. ↑  The Rise of Turkey: The Twenty-First Century's First Muslim Power Archived 18 February 2018 at the Wayback Machine.",
+  "route_views": 63029
+ },
+ {
+  "question": "What are the main arguments for and against rent control, and what does the empirical evidence say?",
+  "titles": [
+   "Rent control",
+   "Housing economics"
+  ],
+  "stems": [
+   [
+    "against",
+    10.9959
+   ],
+   [
+    "argument",
+    13.8651
+   ],
+   [
+    "control",
+    11.6238
+   ],
+   [
+    "empir",
+    12.0249
+   ],
+   [
+    "evid",
+    12.5272
+   ],
+   [
+    "rent",
+    13.5057
+   ],
+   [
+    "sai",
+    12.0824
+   ]
+  ],
+  "query_terms": [
+   "argument",
+   "rent",
+   "evid",
+   "sai",
+   "empir",
+   "control",
+   "against"
+  ],
+  "resolved": [
+   41258426,
+   null
+  ],
+  "resolved_voyage": [
+   null,
+   null
+  ],
+  "hits": [
+   {
+    "title": "Rent regulation",
+    "section": "",
+    "start": 18,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Rent regulation",
+    "section": "By country > United States",
+    "start": 16367,
+    "score": 0.28,
+    "via": "title"
+   },
+   {
+    "title": "Rent regulation",
+    "section": "Effects > On low income renters",
+    "start": 6135,
+    "score": 0.26,
+    "via": "title"
+   },
+   {
+    "title": "Rent regulation",
+    "section": "Effects > On housing supply",
+    "start": 3853,
+    "score": 28.19,
+    "via": "bm25"
+   },
+   {
+    "title": "Rent regulation",
+    "section": "Effects > On housing supply",
+    "start": 2240,
+    "score": 27.39,
+    "via": "bm25"
+   },
+   {
+    "title": "Real estate economics",
+    "section": "Political Economy of Real Estate > Paradigms of Social Welfare Policies Regarding Real Estate Economics",
+    "start": 33003,
+    "score": 15.2,
+    "via": "bm25"
+   }
+  ],
+  "hits_used": 6,
+  "hits_context": "[1] Rent regulation\nRent regulation is a system of laws for the rental market of dwellings, with controversial effects on affordability of housing and tenancies. Generally, a system of rent regulation involves:\n- Price controls, limits on the rent that a landlord may charge, typically called rent control or rent stabilization\n- Eviction controls: codified standards by which a landlord may terminate a tenancy[1]: 1  [2]: 1\n- Obligations on the landlord or tenant regarding adequate maintenance of the property\n- A system of oversight and enforcement by an independent regulator and ombudsman\n\n[2] Rent regulation — By country > United States\nIn 2019 California passed a statewide rent cap for the next 10 years which limits yearly rent increases to 5% plus regional inflation.\nIn 2019 Oregon's legislature passed a bill which made the state the first in the nation to adopt a state-wide rent control policy. This law limits annual rent increases to inflation plus 7 percent, includes vacancy decontrol (market rate between tenancies), exempts new construction for 15 years, and maintains the state ban on local rent control policies (state level preemption).\n: 1 \n: 1\n\n[3] Rent regulation — Effects > On low income renters\nIn a 2013 analysis of the body of economic research on rent control by Peter Tatian at the Urban Institute, he stated that \"The conclusion seems to be that rent stabilization doesn't do a good job of protecting its intended beneficiaries—poor or vulnerable renters—because the targeting of the benefits is very haphazard.\", and concluded that: \"Given the current research, there seems to be little one can say in favor of rent control.\" : 1  : 1  : 1\n\n[4] Rent regulation — Effects > On housing supply\nA 2009 review of the economic literature: 106  by Blair Jenkins through EconLit covering theoretical and empirical research on multiple aspects of the issue, including housing availability, maintenance and housing quality, rental rates, political and administrative costs, and redistribution, for both first generation and second generation rent control systems, found that \"the economics profession has reached a rare consensus: Rent control creates many more problems than it solves\".: 105  : 1  : 1  : 1 .\n\n[5] Rent regulation — Effects > On housing supply\nThere is consensus among economists that rent control reduces the quality and quantity of rental housing units.: 1  However, some economists challenge this consensus and argue that controls do not have a statistically significant impact on quantity and quality of housing units.\nOne historical example of widespread rent control occurred in the US during World War II. Roughly 80% of rental housing was put under rent control in 1941. The observed result was that landlords opted to sell their units at uncontrolled prices rather than renting at controlled prices, leading to an increase in home ownership and a decrease in rental units.\n\n[6] Real estate economics — Political Economy of Real Estate > Paradigms of Social Welfare Policies Regarding Real Estate Economics\nMany government policies in social welfare states view houses as assets – a way for families to hedge their risks against eventual retirement and have a safe form of savings alternative to other pensions. Since the 1980s, these governments have often focused on making the housing market more liquid by broadening the access to financing of houses. Bohle and Seabrooke argue that there are three paradigms of housing:\n1. Social Right - All citizens deserve fair housing. It is the obligation of the state to provide society with the ability to own homes by intervening in the market. (ex.",
+  "hits_voyage": [
+   {
+    "title": "Rent regulation",
+    "section": "",
+    "start": 18,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Rent regulation",
+    "section": "By country > United States",
+    "start": 16367,
+    "score": 0.28,
+    "via": "title"
+   },
+   {
+    "title": "Rent regulation",
+    "section": "Effects > On low income renters",
+    "start": 6135,
+    "score": 0.26,
+    "via": "title"
+   },
+   {
+    "title": "Rent regulation",
+    "section": "Effects > On housing supply",
+    "start": 3853,
+    "score": 28.19,
+    "via": "bm25"
+   },
+   {
+    "title": "Rent regulation",
+    "section": "Effects > On housing supply",
+    "start": 2240,
+    "score": 27.39,
+    "via": "bm25"
+   },
+   {
+    "title": "Real estate economics",
+    "section": "Political Economy of Real Estate > Paradigms of Social Welfare Policies Regarding Real Estate Economics",
+    "start": 33003,
+    "score": 15.2,
+    "via": "bm25"
+   }
+  ],
+  "hits_voyage_used": 6,
+  "hits_voyage_context": "[1] Rent regulation\nRent regulation is a system of laws for the rental market of dwellings, with controversial effects on affordability of housing and tenancies. Generally, a system of rent regulation involves:\n- Price controls, limits on the rent that a landlord may charge, typically called rent control or rent stabilization\n- Eviction controls: codified standards by which a landlord may terminate a tenancy[1]: 1  [2]: 1\n- Obligations on the landlord or tenant regarding adequate maintenance of the property\n- A system of oversight and enforcement by an independent regulator and ombudsman\n\n[2] Rent regulation — By country > United States\nIn 2019 California passed a statewide rent cap for the next 10 years which limits yearly rent increases to 5% plus regional inflation.\nIn 2019 Oregon's legislature passed a bill which made the state the first in the nation to adopt a state-wide rent control policy. This law limits annual rent increases to inflation plus 7 percent, includes vacancy decontrol (market rate between tenancies), exempts new construction for 15 years, and maintains the state ban on local rent control policies (state level preemption).\n: 1 \n: 1\n\n[3] Rent regulation — Effects > On low income renters\nIn a 2013 analysis of the body of economic research on rent control by Peter Tatian at the Urban Institute, he stated that \"The conclusion seems to be that rent stabilization doesn't do a good job of protecting its intended beneficiaries—poor or vulnerable renters—because the targeting of the benefits is very haphazard.\", and concluded that: \"Given the current research, there seems to be little one can say in favor of rent control.\" : 1  : 1  : 1\n\n[4] Rent regulation — Effects > On housing supply\nA 2009 review of the economic literature: 106  by Blair Jenkins through EconLit covering theoretical and empirical research on multiple aspects of the issue, including housing availability, maintenance and housing quality, rental rates, political and administrative costs, and redistribution, for both first generation and second generation rent control systems, found that \"the economics profession has reached a rare consensus: Rent control creates many more problems than it solves\".: 105  : 1  : 1  : 1 .\n\n[5] Rent regulation — Effects > On housing supply\nThere is consensus among economists that rent control reduces the quality and quantity of rental housing units.: 1  However, some economists challenge this consensus and argue that controls do not have a statistically significant impact on quantity and quality of housing units.\nOne historical example of widespread rent control occurred in the US during World War II. Roughly 80% of rental housing was put under rent control in 1941. The observed result was that landlords opted to sell their units at uncontrolled prices rather than renting at controlled prices, leading to an increase in home ownership and a decrease in rental units.\n\n[6] Real estate economics — Political Economy of Real Estate > Paradigms of Social Welfare Policies Regarding Real Estate Economics\nMany government policies in social welfare states view houses as assets – a way for families to hedge their risks against eventual retirement and have a safe form of savings alternative to other pensions. Since the 1980s, these governments have often focused on making the housing market more liquid by broadening the access to financing of houses. Bohle and Seabrooke argue that there are three paradigms of housing:\n1. Social Right - All citizens deserve fair housing. It is the obligation of the state to provide society with the ability to own homes by intervening in the market. (ex.",
+  "route_views": 4148
+ },
+ {
+  "question": "What are the signs of dehydration versus heat stroke, and what first aid is appropriate for each?",
+  "titles": [
+   "Heat stroke",
+   "Dehydration"
+  ],
+  "stems": [
+   [
+    "aid",
+    13.0571
+   ],
+   [
+    "appropri",
+    13.7383
+   ],
+   [
+    "dehydr",
+    14.5315
+   ],
+   [
+    "each",
+    11.5227
+   ],
+   [
+    "first",
+    9.8826
+   ],
+   [
+    "heat",
+    13.0693
+   ],
+   [
+    "sign",
+    11.5625
+   ],
+   [
+    "stroke",
+    13.564
+   ],
+   [
+    "versu",
+    14.2979
+   ]
+  ],
+  "query_terms": [
+   "dehydr",
+   "versu",
+   "appropri",
+   "stroke",
+   "heat",
+   "aid",
+   "sign",
+   "each",
+   "first"
+  ],
+  "resolved": [
+   24999087,
+   155056
+  ],
+  "resolved_voyage": [
+   null,
+   null
+  ],
+  "hits": [
+   {
+    "title": "Heat stroke",
+    "section": "",
+    "start": 817,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Heat stroke",
+    "section": "Signs and symptoms",
+    "start": 2720,
+    "score": 0.48,
+    "via": "title"
+   },
+   {
+    "title": "Dehydration",
+    "section": "",
+    "start": 545,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Dehydration",
+    "section": "Signs and symptoms",
+    "start": 1607,
+    "score": 0.41,
+    "via": "title"
+   },
+   {
+    "title": "Heat stroke",
+    "section": "Treatment",
+    "start": 11462,
+    "score": 0.41,
+    "via": "title"
+   },
+   {
+    "title": "Dehydration",
+    "section": "Treatment",
+    "start": 10467,
+    "score": 0.36,
+    "via": "title"
+   }
+  ],
+  "hits_used": 5,
+  "hits_context": "[1] Heat stroke\nHeat stroke or heatstroke, also known as sun-stroke, is a severe heat illness that results in a body temperature greater than 40.0 °C (104.0 °F), along with red skin, headache, dizziness, and confusion. Sweating is generally present in exertional heatstroke, but not in classic heatstroke. The start of heat stroke can be sudden or gradual. Heatstroke is a life-threatening condition due to the potential for multi-organ dysfunction, with typical complications including seizures, rhabdomyolysis, or kidney failure.\nHeat stroke occurs because of high external temperatures and/or physical exertion. It usually occurs under preventable prolonged exposure to extreme environmental or exertional heat. However, certain health conditions can increase the risk of heat stroke, and patients, especially children, with certain genetic predispositions are vulnerable to heatstroke under relatively mild conditions.\nPreventive measures include drinking sufficient fluids and avoiding excessive heat.\n\n[2] Heat stroke — Signs and symptoms\nHeat stroke generally presents with a hyperthermia of greater than 40.6 °C (105.1 °F) in combination with disorientation.  There is generally a lack of sweating in classic heatstroke, while sweating is generally present in exertional heatstroke.\nEarly symptoms of heat stroke include behavioral changes, confusion, delirium, dizziness, weakness, agitation, combativeness, slurred speech, nausea, and vomiting. In some individuals with exertional heatstroke, seizures and sphincter incontinence have also been reported. Additionally, in exertional heat stroke, the affected person may sweat excessively.\n\n[3] Dehydration\nIn physiology, dehydration is a lack of total body water that disrupts metabolic processes. It occurs when free water loss exceeds intake, often resulting from excessive sweating, health conditions, or inadequate consumption of water. Mild dehydration can also be caused by immersion diuresis, which may increase risk of decompression sickness in divers.\nMost people can tolerate a 3–4% decrease in total body water without difficulty or adverse health effects. A 5–8% decrease can cause fatigue and dizziness. Loss of over 10% of total body water can cause physical and mental deterioration, accompanied by severe thirst. Death occurs with a 15 and 25% loss of body water. Mild dehydration usually resolves with oral rehydration, but severe cases may need intravenous fluids.\nDehydration can cause hypernatremia (high levels of sodium ions in the blood). This is distinct from hypovolemia (loss of blood volume, particularly blood plasma).\nChronic dehydration can cause kidney stones as well as the development of chronic kidney disease.\n\n[4] Dehydration — Signs and symptoms\nThe hallmarks of dehydration include thirst and neurological changes such as headaches, general discomfort, loss of appetite, nausea, decreased urine volume (unless polyuria is the cause of dehydration), confusion, unexplained tiredness, purple fingernails, and seizures. The symptoms of dehydration become increasingly severe with greater total body water loss. A body water loss of 1–2%, considered mild dehydration, is shown to impair cognitive performance. While in people over age 50, the body's thirst sensation diminishes with age, a study found that there was no difference in fluid intake between young and old people.\n\n[5] Dehydration — Treatment\nPure water injected into the veins will cause the breakdown (lysis) of red blood cells (erythrocytes).\nWhen fresh water is unavailable (e.g. at sea or in a desert), seawater or drinks with significant alcohol concentration will worsen dehydration. Urine contains a lower solute concentration than seawater; this requires the kidneys to create more urine to remove the excess salt, causing more water to be lost than was consumed from seawater.",
+  "hits_voyage": [
+   {
+    "title": "Heat stroke",
+    "section": "",
+    "start": 817,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Heat stroke",
+    "section": "Signs and symptoms",
+    "start": 2720,
+    "score": 0.48,
+    "via": "title"
+   },
+   {
+    "title": "Dehydration",
+    "section": "",
+    "start": 545,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Dehydration",
+    "section": "Signs and symptoms",
+    "start": 1607,
+    "score": 0.41,
+    "via": "title"
+   },
+   {
+    "title": "Heat stroke",
+    "section": "Treatment",
+    "start": 11462,
+    "score": 0.41,
+    "via": "title"
+   },
+   {
+    "title": "Dehydration",
+    "section": "Treatment",
+    "start": 10467,
+    "score": 0.36,
+    "via": "title"
+   }
+  ],
+  "hits_voyage_used": 5,
+  "hits_voyage_context": "[1] Heat stroke\nHeat stroke or heatstroke, also known as sun-stroke, is a severe heat illness that results in a body temperature greater than 40.0 °C (104.0 °F), along with red skin, headache, dizziness, and confusion. Sweating is generally present in exertional heatstroke, but not in classic heatstroke. The start of heat stroke can be sudden or gradual. Heatstroke is a life-threatening condition due to the potential for multi-organ dysfunction, with typical complications including seizures, rhabdomyolysis, or kidney failure.\nHeat stroke occurs because of high external temperatures and/or physical exertion. It usually occurs under preventable prolonged exposure to extreme environmental or exertional heat. However, certain health conditions can increase the risk of heat stroke, and patients, especially children, with certain genetic predispositions are vulnerable to heatstroke under relatively mild conditions.\nPreventive measures include drinking sufficient fluids and avoiding excessive heat.\n\n[2] Heat stroke — Signs and symptoms\nHeat stroke generally presents with a hyperthermia of greater than 40.6 °C (105.1 °F) in combination with disorientation.  There is generally a lack of sweating in classic heatstroke, while sweating is generally present in exertional heatstroke.\nEarly symptoms of heat stroke include behavioral changes, confusion, delirium, dizziness, weakness, agitation, combativeness, slurred speech, nausea, and vomiting. In some individuals with exertional heatstroke, seizures and sphincter incontinence have also been reported. Additionally, in exertional heat stroke, the affected person may sweat excessively.\n\n[3] Dehydration\nIn physiology, dehydration is a lack of total body water that disrupts metabolic processes. It occurs when free water loss exceeds intake, often resulting from excessive sweating, health conditions, or inadequate consumption of water. Mild dehydration can also be caused by immersion diuresis, which may increase risk of decompression sickness in divers.\nMost people can tolerate a 3–4% decrease in total body water without difficulty or adverse health effects. A 5–8% decrease can cause fatigue and dizziness. Loss of over 10% of total body water can cause physical and mental deterioration, accompanied by severe thirst. Death occurs with a 15 and 25% loss of body water. Mild dehydration usually resolves with oral rehydration, but severe cases may need intravenous fluids.\nDehydration can cause hypernatremia (high levels of sodium ions in the blood). This is distinct from hypovolemia (loss of blood volume, particularly blood plasma).\nChronic dehydration can cause kidney stones as well as the development of chronic kidney disease.\n\n[4] Dehydration — Signs and symptoms\nThe hallmarks of dehydration include thirst and neurological changes such as headaches, general discomfort, loss of appetite, nausea, decreased urine volume (unless polyuria is the cause of dehydration), confusion, unexplained tiredness, purple fingernails, and seizures. The symptoms of dehydration become increasingly severe with greater total body water loss. A body water loss of 1–2%, considered mild dehydration, is shown to impair cognitive performance. While in people over age 50, the body's thirst sensation diminishes with age, a study found that there was no difference in fluid intake between young and old people.\n\n[5] Dehydration — Treatment\nPure water injected into the veins will cause the breakdown (lysis) of red blood cells (erythrocytes).\nWhen fresh water is unavailable (e.g. at sea or in a desert), seawater or drinks with significant alcohol concentration will worsen dehydration. Urine contains a lower solute concentration than seawater; this requires the kidneys to create more urine to remove the excess salt, causing more water to be lost than was consumed from seawater.",
+  "route_views": 11820
+ },
+ {
+  "question": "Roughly how many times larger is the population of India than that of Canada, and how do their land areas compare?",
+  "titles": [
+   "India",
+   "Canada"
+  ],
+  "stems": [
+   [
+    "area",
+    10.7901
+   ],
+   [
+    "canada",
+    11.7924
+   ],
+   [
+    "compar",
+    12.6638
+   ],
+   [
+    "india",
+    11.5073
+   ],
+   [
+    "land",
+    11.6152
+   ],
+   [
+    "larger",
+    12.9651
+   ],
+   [
+    "mani",
+    10.8348
+   ],
+   [
+    "popul",
+    11.5679
+   ],
+   [
+    "time",
+    9.9911
+   ]
+  ],
+  "query_terms": [
+   "larger",
+   "compar",
+   "canada",
+   "land",
+   "popul",
+   "india",
+   "mani",
+   "area",
+   "time"
+  ],
+  "resolved": [
+   14533,
+   5042916
+  ],
+  "resolved_voyage": [
+   null,
+   null
+  ],
+  "hits": [
+   {
+    "title": "India",
+    "section": "",
+    "start": 821,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "India",
+    "section": "History > Modern India",
+    "start": 16491,
+    "score": 0.28,
+    "via": "title"
+   },
+   {
+    "title": "Canada",
+    "section": "",
+    "start": 822,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Canada",
+    "section": "Demographics > Ethnicity",
+    "start": 48654,
+    "score": 0.23,
+    "via": "title"
+   },
+   {
+    "title": "India",
+    "section": "Demographics, languages, and religion",
+    "start": 44712,
+    "score": 0.26,
+    "via": "title"
+   },
+   {
+    "title": "Canada",
+    "section": "Geography",
+    "start": 21774,
+    "score": 0.23,
+    "via": "title"
+   }
+  ],
+  "hits_used": 6,
+  "hits_context": "[1] India\nIndia, officially the Republic of India, is a country in South Asia.  It is the seventh-largest country by area; the most populous country since 2023; and, since its independence in 1947, the world's most populous democracy. Bounded by the Indian Ocean on the south, the Arabian Sea on the southwest, and the Bay of Bengal on the southeast, it shares land borders with Pakistan to the west; China, Nepal, and Bhutan to the north; and Bangladesh and Myanmar to the east. In the Indian Ocean, India is near Sri Lanka and the Maldives; its Andaman and Nicobar Islands share a maritime border with Myanmar, Thailand, and Indonesia.\nModern humans arrived on the Indian subcontinent from Africa no later than 55,000 years ago. Their long occupation, predominantly in isolation as hunter-gatherers, has made the region highly diverse.\n\n[2] India — History > Modern India\nHistorians consider India's modern age to have begun sometime between 1848 and 1885. The appointment in 1848 of Lord Dalhousie as Governor General of the East India Company set the stage for changes essential to a modern state. These included the consolidation and demarcation of sovereignty, the surveillance of the population, and the education of citizens. Technological changes—among them, railways, canals, and the telegraph—were introduced not long after their introduction in Europe. However, disaffection with the company also grew during this time and set off the Indian Rebellion of 1857.\n\n[3] Canada\nCanada is a country in North America. Its ten provinces and three territories extend from the Atlantic Ocean to the Pacific Ocean and northward into the Arctic Ocean, making it the world's second-largest country by total area, with the world's longest coastline. Its border with the United States is the longest international land border. The country is characterized by a wide range of both meteorologic and geological regions. With a population of over 41 million, it has widely varying population densities, with the majority residing in its urban areas and large areas being sparsely populated. Canada's capital is Ottawa and its three largest metropolitan areas are Toronto, Montreal, and Vancouver.\nIndigenous peoples have continuously inhabited what is now Canada for thousands of years. Beginning in the 16th century, British and French expeditions explored and later settled along the Atlantic coast.\n\n[4] Canada — Demographics > Ethnicity\nIn 1961, about 300,000 people, less than two percent of Canada's population, were members of visible minority groups. The 2021 census indicated that 8.3 million people, or almost one-quarter (23.0 percent) of the population, reported themselves as being or having been a landed immigrant or permanent resident in Canada—above the 1921 census previous record of 22.3 percent. In 2021, India, China, and the Philippines were the top three countries of origin for immigrants moving to Canada.\n\n[5] India — Demographics, languages, and religion\nWith an estimated 1,428,627,663 residents in 2023, India is the world's most populous country. 1,210,193,422 residents were reported in the 2011 provisional census report. Its population grew by 17.64% from 2001 to 2011, compared to 21.54% growth in the previous decade (1991–2001). The human sex ratio, according to the 2011 census, is 940 females per 1,000 males. The median age was 28.7 in 2020. The first post-colonial census, conducted in 1951, counted 361 million people.\n\n[6] Canada — Geography\nBy total area (including its waters), Canada is the second-largest country. By land area alone, Canada ranks fourth, due to having the world's largest area of fresh water lakes. Stretching from the Atlantic Ocean in the east, along the Arctic Ocean to the north, and to the Pacific Ocean in the west, the country encompasses 9,984,670 square kilometres (3,855,100 sq mi) of territory. Canada also has vast maritime terrain, with the world's longest coastline of 243,042 kilometres (151,019 mi).",
+  "hits_voyage": [
+   {
+    "title": "India",
+    "section": "",
+    "start": 821,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "India",
+    "section": "History > Modern India",
+    "start": 16491,
+    "score": 0.28,
+    "via": "title"
+   },
+   {
+    "title": "Canada",
+    "section": "",
+    "start": 822,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Canada",
+    "section": "Demographics > Ethnicity",
+    "start": 48654,
+    "score": 0.23,
+    "via": "title"
+   },
+   {
+    "title": "India",
+    "section": "Demographics, languages, and religion",
+    "start": 44712,
+    "score": 0.26,
+    "via": "title"
+   },
+   {
+    "title": "Canada",
+    "section": "Geography",
+    "start": 21774,
+    "score": 0.23,
+    "via": "title"
+   }
+  ],
+  "hits_voyage_used": 6,
+  "hits_voyage_context": "[1] India\nIndia, officially the Republic of India, is a country in South Asia.  It is the seventh-largest country by area; the most populous country since 2023; and, since its independence in 1947, the world's most populous democracy. Bounded by the Indian Ocean on the south, the Arabian Sea on the southwest, and the Bay of Bengal on the southeast, it shares land borders with Pakistan to the west; China, Nepal, and Bhutan to the north; and Bangladesh and Myanmar to the east. In the Indian Ocean, India is near Sri Lanka and the Maldives; its Andaman and Nicobar Islands share a maritime border with Myanmar, Thailand, and Indonesia.\nModern humans arrived on the Indian subcontinent from Africa no later than 55,000 years ago. Their long occupation, predominantly in isolation as hunter-gatherers, has made the region highly diverse.\n\n[2] India — History > Modern India\nHistorians consider India's modern age to have begun sometime between 1848 and 1885. The appointment in 1848 of Lord Dalhousie as Governor General of the East India Company set the stage for changes essential to a modern state. These included the consolidation and demarcation of sovereignty, the surveillance of the population, and the education of citizens. Technological changes—among them, railways, canals, and the telegraph—were introduced not long after their introduction in Europe. However, disaffection with the company also grew during this time and set off the Indian Rebellion of 1857.\n\n[3] Canada\nCanada is a country in North America. Its ten provinces and three territories extend from the Atlantic Ocean to the Pacific Ocean and northward into the Arctic Ocean, making it the world's second-largest country by total area, with the world's longest coastline. Its border with the United States is the longest international land border. The country is characterized by a wide range of both meteorologic and geological regions. With a population of over 41 million, it has widely varying population densities, with the majority residing in its urban areas and large areas being sparsely populated. Canada's capital is Ottawa and its three largest metropolitan areas are Toronto, Montreal, and Vancouver.\nIndigenous peoples have continuously inhabited what is now Canada for thousands of years. Beginning in the 16th century, British and French expeditions explored and later settled along the Atlantic coast.\n\n[4] Canada — Demographics > Ethnicity\nIn 1961, about 300,000 people, less than two percent of Canada's population, were members of visible minority groups. The 2021 census indicated that 8.3 million people, or almost one-quarter (23.0 percent) of the population, reported themselves as being or having been a landed immigrant or permanent resident in Canada—above the 1921 census previous record of 22.3 percent. In 2021, India, China, and the Philippines were the top three countries of origin for immigrants moving to Canada.\n\n[5] India — Demographics, languages, and religion\nWith an estimated 1,428,627,663 residents in 2023, India is the world's most populous country. 1,210,193,422 residents were reported in the 2011 provisional census report. Its population grew by 17.64% from 2001 to 2011, compared to 21.54% growth in the previous decade (1991–2001). The human sex ratio, according to the 2011 census, is 940 females per 1,000 males. The median age was 28.7 in 2020. The first post-colonial census, conducted in 1951, counted 361 million people.\n\n[6] Canada — Geography\nBy total area (including its waters), Canada is the second-largest country. By land area alone, Canada ranks fourth, due to having the world's largest area of fresh water lakes. Stretching from the Atlantic Ocean in the east, along the Arctic Ocean to the north, and to the Pacific Ocean in the west, the country encompasses 9,984,670 square kilometres (3,855,100 sq mi) of territory. Canada also has vast maritime terrain, with the world's longest coastline of 243,042 kilometres (151,019 mi).",
+  "route_views": 540755
+ },
+ {
+  "question": "What is the difference between type 1 and type 2 diabetes in cause, onset, and treatment?",
+  "titles": [
+   "Type 1 diabetes",
+   "Type 2 diabetes"
+  ],
+  "stems": [
+   [
+    "between",
+    10.5722
+   ],
+   [
+    "caus",
+    11.4076
+   ],
+   [
+    "diabet",
+    12.7398
+   ],
+   [
+    "differ",
+    11.5706
+   ],
+   [
+    "onset",
+    14.042
+   ],
+   [
+    "treatment",
+    12.7846
+   ],
+   [
+    "type",
+    11.1199
+   ]
+  ],
+  "query_terms": [
+   "onset",
+   "treatment",
+   "diabet",
+   "differ",
+   "caus",
+   "type",
+   "between"
+  ],
+  "resolved": [
+   2812725,
+   154502
+  ],
+  "resolved_voyage": [
+   null,
+   null
+  ],
+  "hits": [
+   {
+    "title": "Type 1 diabetes",
+    "section": "",
+    "start": 816,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Type 1 diabetes",
+    "section": "Causes > Environmental",
+    "start": 6042,
+    "score": 0.62,
+    "via": "title"
+   },
+   {
+    "title": "Type 2 diabetes",
+    "section": "",
+    "start": 825,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Type 2 diabetes",
+    "section": "Causes > Genetics",
+    "start": 6835,
+    "score": 0.65,
+    "via": "title"
+   },
+   {
+    "title": "Type 1 diabetes",
+    "section": "Causes > Environmental",
+    "start": 6969,
+    "score": 0.58,
+    "via": "title"
+   },
+   {
+    "title": "Type 2 diabetes",
+    "section": "Causes > Lifestyle",
+    "start": 5479,
+    "score": 0.56,
+    "via": "title"
+   }
+  ],
+  "hits_used": 5,
+  "hits_context": "[1] Type 1 diabetes\nDiabetes mellitus type 1, commonly known as type 1 diabetes (T1D), and formerly known as juvenile diabetes, is an autoimmune disease that occurs when the body's immune system destroys pancreatic cells (beta cells). In healthy persons, beta cells produce insulin. Insulin is a hormone required by the body to store and convert blood sugar into energy. T1D results in high blood sugar levels in the body prior to treatment. Common symptoms include frequent urination, increased thirst, increased hunger, weight loss, and other complications. Additional symptoms may include blurry vision, tiredness, and slow wound healing (owing to impaired blood flow). While some cases take longer, symptoms usually appear within weeks or a few months.\nThe cause of type 1 diabetes is not completely understood, but it is believed to involve a combination of genetic and environmental factors. The underlying mechanism involves an autoimmune destruction of the insulin-producing beta cells in the pancreas.\n\n[2] Type 1 diabetes — Causes > Environmental\nVarious environmental risks have been studied in an attempt to understand what triggers β-cell destroying autoimmunity. Many aspects of environment and life history are associated with slight increases in type 1 diabetes risk; however, the connection between each risk and diabetes often remains unclear. Type 1 diabetes risk is slightly higher for children whose mothers are obese or older than 35, or for children born by caesarean section. Similarly, a child's weight gain in the first year of life, total weight, and BMI are associated with slightly increased type 1 diabetes risk.\n\n[3] Type 2 diabetes\nDiabetes mellitus type 2, commonly known as type 2 diabetes (T2D), and formerly known as adult-onset diabetes, is a form of diabetes mellitus that is characterized by high blood sugar, insulin resistance, and relative lack of insulin. Common symptoms include increased thirst, frequent urination, fatigue and unexplained weight loss. Other symptoms include increased hunger, having a sensation of pins and needles, and sores (wounds) that heal slowly. Symptoms often develop slowly. Long-term complications from high blood sugar include heart disease, stroke, diabetic retinopathy, which can result in blindness, kidney failure, and poor blood flow in the lower limbs, which may lead to amputations. A sudden onset of hyperosmolar hyperglycemic state may occur; however, ketoacidosis is uncommon.\nType 2 diabetes primarily occurs as a result of obesity and lack of exercise. Some people are genetically more at risk than others.\n\n[4] Type 2 diabetes — Causes > Genetics\nMost cases of diabetes involve many genes, with each being a small contributor to an increased probability of becoming a type 2 diabetic. The proportion of diabetes that is inherited is estimated at 72%. More than 36 genes and 80 single nucleotide polymorphisms (SNPs) had been found that contribute to the risk of type 2 diabetes. All of these genes together still only account for 10% of the total heritable component of the disease. The TCF7L2 allele, for example, increases the risk of developing diabetes by 1.5 times and is the greatest risk of the common genetic variants.\n\n[5] Type 1 diabetes — Causes > Environmental\nMany potential environmental triggers have been investigated in large human studies and found to be unassociated with type 1 diabetes risk including duration of breastfeeding, time of introduction of cow milk into the diet, vitamin D consumption, blood levels of active vitamin D, and maternal intake of omega-3 fatty acids.\nA longstanding hypothesis for an environmental trigger is that some viral infection early in life contributes to type 1 diabetes development. Much of this work has focused on enteroviruses, with some studies finding slight associations with type 1 diabetes, and others finding none.",
+  "hits_voyage": [
+   {
+    "title": "Type 1 diabetes",
+    "section": "",
+    "start": 816,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Type 1 diabetes",
+    "section": "Causes > Environmental",
+    "start": 6042,
+    "score": 0.62,
+    "via": "title"
+   },
+   {
+    "title": "Type 2 diabetes",
+    "section": "",
+    "start": 825,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Type 2 diabetes",
+    "section": "Causes > Genetics",
+    "start": 6835,
+    "score": 0.65,
+    "via": "title"
+   },
+   {
+    "title": "Type 1 diabetes",
+    "section": "Causes > Environmental",
+    "start": 6969,
+    "score": 0.58,
+    "via": "title"
+   },
+   {
+    "title": "Type 2 diabetes",
+    "section": "Causes > Lifestyle",
+    "start": 5479,
+    "score": 0.56,
+    "via": "title"
+   }
+  ],
+  "hits_voyage_used": 5,
+  "hits_voyage_context": "[1] Type 1 diabetes\nDiabetes mellitus type 1, commonly known as type 1 diabetes (T1D), and formerly known as juvenile diabetes, is an autoimmune disease that occurs when the body's immune system destroys pancreatic cells (beta cells). In healthy persons, beta cells produce insulin. Insulin is a hormone required by the body to store and convert blood sugar into energy. T1D results in high blood sugar levels in the body prior to treatment. Common symptoms include frequent urination, increased thirst, increased hunger, weight loss, and other complications. Additional symptoms may include blurry vision, tiredness, and slow wound healing (owing to impaired blood flow). While some cases take longer, symptoms usually appear within weeks or a few months.\nThe cause of type 1 diabetes is not completely understood, but it is believed to involve a combination of genetic and environmental factors. The underlying mechanism involves an autoimmune destruction of the insulin-producing beta cells in the pancreas.\n\n[2] Type 1 diabetes — Causes > Environmental\nVarious environmental risks have been studied in an attempt to understand what triggers β-cell destroying autoimmunity. Many aspects of environment and life history are associated with slight increases in type 1 diabetes risk; however, the connection between each risk and diabetes often remains unclear. Type 1 diabetes risk is slightly higher for children whose mothers are obese or older than 35, or for children born by caesarean section. Similarly, a child's weight gain in the first year of life, total weight, and BMI are associated with slightly increased type 1 diabetes risk.\n\n[3] Type 2 diabetes\nDiabetes mellitus type 2, commonly known as type 2 diabetes (T2D), and formerly known as adult-onset diabetes, is a form of diabetes mellitus that is characterized by high blood sugar, insulin resistance, and relative lack of insulin. Common symptoms include increased thirst, frequent urination, fatigue and unexplained weight loss. Other symptoms include increased hunger, having a sensation of pins and needles, and sores (wounds) that heal slowly. Symptoms often develop slowly. Long-term complications from high blood sugar include heart disease, stroke, diabetic retinopathy, which can result in blindness, kidney failure, and poor blood flow in the lower limbs, which may lead to amputations. A sudden onset of hyperosmolar hyperglycemic state may occur; however, ketoacidosis is uncommon.\nType 2 diabetes primarily occurs as a result of obesity and lack of exercise. Some people are genetically more at risk than others.\n\n[4] Type 2 diabetes — Causes > Genetics\nMost cases of diabetes involve many genes, with each being a small contributor to an increased probability of becoming a type 2 diabetic. The proportion of diabetes that is inherited is estimated at 72%. More than 36 genes and 80 single nucleotide polymorphisms (SNPs) had been found that contribute to the risk of type 2 diabetes. All of these genes together still only account for 10% of the total heritable component of the disease. The TCF7L2 allele, for example, increases the risk of developing diabetes by 1.5 times and is the greatest risk of the common genetic variants.\n\n[5] Type 1 diabetes — Causes > Environmental\nMany potential environmental triggers have been investigated in large human studies and found to be unassociated with type 1 diabetes risk including duration of breastfeeding, time of introduction of cow milk into the diet, vitamin D consumption, blood levels of active vitamin D, and maternal intake of omega-3 fatty acids.\nA longstanding hypothesis for an environmental trigger is that some viral infection early in life contributes to type 1 diabetes development. Much of this work has focused on enteroviruses, with some studies finding slight associations with type 1 diabetes, and others finding none.",
+  "route_views": 20642
+ },
+ {
+  "question": "What happened in the 1983 Harrods bombing, who carried it out, and what warning was given?",
+  "titles": [
+   "Harrods bombing",
+   "Provisional Irish Republican Army"
+  ],
+  "stems": [
+   [
+    "1983",
+    12.1677
+   ],
+   [
+    "bomb",
+    12.7486
+   ],
+   [
+    "carri",
+    11.9912
+   ],
+   [
+    "given",
+    11.9788
+   ],
+   [
+    "happen",
+    12.9116
+   ],
+   [
+    "harrod",
+    15.2788
+   ],
+   [
+    "out",
+    10.6614
+   ],
+   [
+    "warn",
+    13.1719
+   ]
+  ],
+  "query_terms": [
+   "harrod",
+   "warn",
+   "happen",
+   "bomb",
+   "1983",
+   "carri",
+   "given",
+   "out"
+  ],
+  "resolved": [
+   8427715,
+   23299
+  ],
+  "resolved_voyage": [
+   null,
+   null
+  ],
+  "hits": [
+   {
+    "title": "1983 Harrods bombing",
+    "section": "",
+    "start": 268,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "1983 Harrods bombing",
+    "section": "Bombing overview",
+    "start": 1671,
+    "score": 0.39,
+    "via": "title"
+   },
+   {
+    "title": "Provisional Irish Republican Army",
+    "section": "",
+    "start": 548,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Provisional Irish Republican Army",
+    "section": "History > The \"Long War\"",
+    "start": 23379,
+    "score": 0.19,
+    "via": "title"
+   },
+   {
+    "title": "1983 Harrods bombing",
+    "section": "Other attacks on Harrods",
+    "start": 906,
+    "score": 0.35,
+    "via": "title"
+   },
+   {
+    "title": "Provisional Irish Republican Army",
+    "section": "Weaponry and operations",
+    "start": 38226,
+    "score": 0.18,
+    "via": "title"
+   }
+  ],
+  "hits_used": 5,
+  "hits_context": "[1] 1983 Harrods bombing\nThe Harrods bombing refers to the car bomb that exploded outside Harrods department store in central London, England, on Saturday 17 December 1983. Members of the Provisional Irish Republican Army planted the time bomb and sent a warning 37 minutes before it exploded, but the area was not evacuated. The blast killed three police officers and three civilians, injured 90 people, and caused much damage. The IRA Army Council said it had not authorised the attack and expressed regret for the civilian casualties. After the bombing, the IRA shifted its emphasis towards attacks on military targets in England.\n\n[2] 1983 Harrods bombing — Bombing overview\nFrom 1973, the Provisional IRA had carried out waves of bombing attacks on commercial targets in London and elsewhere in England as part of its \"economic war\". The goal was to damage the economy and cause disruption, which would put pressure on the British government to withdraw from Northern Ireland. On 10 December 1983, the IRA carried out its first attack in London for some time when a bomb exploded at the Royal Artillery Barracks, injuring three British soldiers.\nOne week later, on the afternoon of 17 December, IRA members parked a car bomb near the side entrance of Harrods, on Hans Crescent.\n\n[3] Provisional Irish Republican Army\nThe Provisional Irish Republican Army (Provisional IRA), officially known as the Irish Republican Army (IRA; Irish: Óglaigh na hÉireann) and informally known as the Provos was an Irish republican paramilitary force that sought to end British rule in Northern Ireland, facilitate Irish reunification and bring about an independent republic encompassing all of Ireland. It was the most active republican paramilitary group during the Troubles. It argued that the all-island Irish Republic continued to exist, and it saw itself as that state's army, the sole legitimate successor to the original IRA from the Irish War of Independence. It was designated a terrorist organisation in the United Kingdom and an unlawful organisation in the Republic of Ireland, both of whose authority it rejected.\nThe Provisional IRA emerged in December 1969, due to a split within the previous incarnation of the IRA and the broader Irish republican movement.\n\n[4] Provisional Irish Republican Army — History > The \"Long War\"\nThe Chelsea Barracks bombing in London in October 1981 killed two civilians and injured twenty-three soldiers; a week later the IRA struck again in London with an assassination attempt on Lieutenant General Steuart Pringle, the Commandant General Royal Marines. Attacks on military targets in England continued with the Hyde Park and Regent's Park bombings in July 1982, which killed eleven soldiers and injured over fifty people including civilians. In October 1984 they carried out the Brighton hotel bombing, an assassination attempt on British prime minister Margaret Thatcher, whom they blamed for the deaths of the ten hunger strikers.\n\n[5] 1983 Harrods bombing — Other attacks on Harrods\nHarrods is a large department store in the affluent Knightsbridge district, near Buckingham Palace. Harrods had been the target of other IRA bombings. On 18 August 1973, two fire bombs exploded causing slight damage. On 21 December 1974, a fire bomb was placed in the north-east corner of the first floor. There was a very short warning and the store was in the process of being cleared when it exploded. The 1974 bomb was the work of the Balcombe Street Gang who also carried out high-profile bombings in Knightsbridge, Piccadilly, Oxford Street, Woolwich, and many other locations in London and Surrey in 1974 and 1975.",
+  "hits_voyage": [
+   {
+    "title": "1983 Harrods bombing",
+    "section": "",
+    "start": 268,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "1983 Harrods bombing",
+    "section": "Bombing overview",
+    "start": 1671,
+    "score": 0.39,
+    "via": "title"
+   },
+   {
+    "title": "Provisional Irish Republican Army",
+    "section": "",
+    "start": 548,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Provisional Irish Republican Army",
+    "section": "History > The \"Long War\"",
+    "start": 23379,
+    "score": 0.19,
+    "via": "title"
+   },
+   {
+    "title": "1983 Harrods bombing",
+    "section": "Other attacks on Harrods",
+    "start": 906,
+    "score": 0.35,
+    "via": "title"
+   },
+   {
+    "title": "Provisional Irish Republican Army",
+    "section": "Weaponry and operations",
+    "start": 38226,
+    "score": 0.18,
+    "via": "title"
+   }
+  ],
+  "hits_voyage_used": 5,
+  "hits_voyage_context": "[1] 1983 Harrods bombing\nThe Harrods bombing refers to the car bomb that exploded outside Harrods department store in central London, England, on Saturday 17 December 1983. Members of the Provisional Irish Republican Army planted the time bomb and sent a warning 37 minutes before it exploded, but the area was not evacuated. The blast killed three police officers and three civilians, injured 90 people, and caused much damage. The IRA Army Council said it had not authorised the attack and expressed regret for the civilian casualties. After the bombing, the IRA shifted its emphasis towards attacks on military targets in England.\n\n[2] 1983 Harrods bombing — Bombing overview\nFrom 1973, the Provisional IRA had carried out waves of bombing attacks on commercial targets in London and elsewhere in England as part of its \"economic war\". The goal was to damage the economy and cause disruption, which would put pressure on the British government to withdraw from Northern Ireland. On 10 December 1983, the IRA carried out its first attack in London for some time when a bomb exploded at the Royal Artillery Barracks, injuring three British soldiers.\nOne week later, on the afternoon of 17 December, IRA members parked a car bomb near the side entrance of Harrods, on Hans Crescent.\n\n[3] Provisional Irish Republican Army\nThe Provisional Irish Republican Army (Provisional IRA), officially known as the Irish Republican Army (IRA; Irish: Óglaigh na hÉireann) and informally known as the Provos was an Irish republican paramilitary force that sought to end British rule in Northern Ireland, facilitate Irish reunification and bring about an independent republic encompassing all of Ireland. It was the most active republican paramilitary group during the Troubles. It argued that the all-island Irish Republic continued to exist, and it saw itself as that state's army, the sole legitimate successor to the original IRA from the Irish War of Independence. It was designated a terrorist organisation in the United Kingdom and an unlawful organisation in the Republic of Ireland, both of whose authority it rejected.\nThe Provisional IRA emerged in December 1969, due to a split within the previous incarnation of the IRA and the broader Irish republican movement.\n\n[4] Provisional Irish Republican Army — History > The \"Long War\"\nThe Chelsea Barracks bombing in London in October 1981 killed two civilians and injured twenty-three soldiers; a week later the IRA struck again in London with an assassination attempt on Lieutenant General Steuart Pringle, the Commandant General Royal Marines. Attacks on military targets in England continued with the Hyde Park and Regent's Park bombings in July 1982, which killed eleven soldiers and injured over fifty people including civilians. In October 1984 they carried out the Brighton hotel bombing, an assassination attempt on British prime minister Margaret Thatcher, whom they blamed for the deaths of the ten hunger strikers.\n\n[5] 1983 Harrods bombing — Other attacks on Harrods\nHarrods is a large department store in the affluent Knightsbridge district, near Buckingham Palace. Harrods had been the target of other IRA bombings. On 18 August 1973, two fire bombs exploded causing slight damage. On 21 December 1974, a fire bomb was placed in the north-east corner of the first floor. There was a very short warning and the store was in the process of being cleared when it exploded. The 1974 bomb was the work of the Balcombe Street Gang who also carried out high-profile bombings in Knightsbridge, Piccadilly, Oxford Street, Woolwich, and many other locations in London and Surrey in 1974 and 1975.",
+  "route_views": 2127
+ },
+ {
+  "question": "What are the main regions of Georgia (the country), what is each known for, and what foods should I try?",
+  "titles": [
+   "Georgia (country)",
+   "Kakheti",
+   "A Title That Does Not Exist"
+  ],
+  "stems": [
+   [
+    "countri",
+    10.5015
+   ],
+   [
+    "each",
+    11.5227
+   ],
+   [
+    "food",
+    12.5343
+   ],
+   [
+    "georgia",
+    12.1727
+   ],
+   [
+    "known",
+    10.6825
+   ],
+   [
+    "region",
+    11.0824
+   ],
+   [
+    "try",
+    12.891
+   ]
+  ],
+  "query_terms": [
+   "try",
+   "food",
+   "georgia",
+   "each",
+   "region",
+   "known",
+   "countri"
+  ],
+  "resolved": [
+   48768,
+   1101599,
+   null
+  ],
+  "resolved_voyage": [
+   12625,
+   16673,
+   null
+  ],
+  "hits": [
+   {
+    "title": "Georgia (country)",
+    "section": "",
+    "start": 833,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Georgia (country)",
+    "section": "Culture > Cuisine",
+    "start": 85749,
+    "score": 0.54,
+    "via": "title"
+   },
+   {
+    "title": "Kakheti",
+    "section": "",
+    "start": 398,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Kakheti",
+    "section": "Winemaking in Kakheti",
+    "start": 28358,
+    "score": 0.21,
+    "via": "title"
+   },
+   {
+    "title": "Georgia (country)",
+    "section": "Geography",
+    "start": 39150,
+    "score": 0.31,
+    "via": "title"
+   },
+   {
+    "title": "Kakheti",
+    "section": "History > 1801–1917: Kakheti within the Russian Empire, uprisings, modernization, Georgian national awakening",
+    "start": 27602,
+    "score": 0.2,
+    "via": "title"
+   }
+  ],
+  "hits_used": 5,
+  "hits_context": "[1] Georgia (country)\nGeorgia is a country in the Caucasus region on the coast of the Black Sea. It is located at the intersection of Eastern Europe and West Asia, and is today generally regarded as part of Europe. It is bordered to the north and northeast by Russia, to the south by Turkey and Armenia, and to the southeast by Azerbaijan. Georgia covers an area of 69,700 square kilometres (26,900 sq mi). It has a population of 3.9 million, of which over a third live in the capital and largest city, Tbilisi. Ethnic Georgians, who are native to the region, constitute a majority of the country's population and are its titular nation.\nGeorgia has been inhabited since prehistory, hosting the world's earliest known sites of winemaking, gold mining, and textiles. The classical era saw the emergence of several kingdoms, such as Colchis and Iberia, that formed the nucleus of the modern Georgian state.\n\n[2] Georgia (country) — Culture > Cuisine\nGeorgian cuisine and wine have evolved through the centuries, adapting traditions in each era. One of the most unusual traditions of dining is supra, or Georgian table, which is also a way of socializing with friends and family. The head of supra is known as tamada. He also conducts the highly philosophical toasts, and makes sure that everyone is enjoying themselves. Various historical regions of Georgia are known for their particular dishes: for example, khinkali (meat dumplings), from eastern mountainous Georgia, and khachapuri, mainly from Imereti, Samegrelo and Adjara.\n\n[3] Kakheti\nKakheti (/kəˈxɛti/; Georgian: კახეთი K’akheti [kʼaχetʰi]) is a region of Georgia. Telavi is its administrative center. The region comprises eight administrative districts: Telavi, Gurjaani, Qvareli, Sagarejo, Dedoplistsqaro, Signagi, Lagodekhi and Akhmeta. \nKakhetians speak the Kakhetian dialect of Georgian. Kakheti is one of the most significant wine producing regions of Georgia, home to a number of Georgian wines. The region is bordered to the west by the Georgian regions of Mtskheta-Mtianeti and Kvemo Kartli, to the north and east by the Russian Federation, and to the southeast by Azerbaijan. Popular tourist attractions in Kakheti include Tusheti, Gremi, Signagi, Kvetera, Bodbe, Lagodekhi Protected Areas and Alaverdi Monastery. \nThe Georgian David Gareji monastery complex is partially located in this province and is subject to a border dispute between Georgian and Azerbaijani authorities.\n\n[4] Kakheti — Winemaking in Kakheti\nThe Kakheti Wine Region is located in the eastern part of Georgia and comprises two river basins, Iori and Alazani. These rivers have a significant influence on the character of Kakhetian wines. Kakheti is bordered on the west by another very important wine region of Georgia - Kartli. Together with the location, the climatic conditions of the region play an essential role in the formation of Kakheti wines. Kakheti vineyards are cultivated at an altitude of 250–800 meters above sea level. Both humid subtropicals, as well as continental climates can be found in the region.\n\n[5] Georgia (country) — Geography\nGeorgia is a mountainous country situated almost entirely in the South Caucasus, while some slivers of the country are situated north of the Caucasus Watershed in the North Caucasus. The country lies between latitudes 41° and 44° N, and longitudes 40° and 47° E, with an area of 67,900 km2 (26,216 sq mi). The Likhi Range divides the country into eastern and western halves. Historically, the western portion of Georgia was known as Colchis while the eastern plateau was called Iberia.\nThe Greater Caucasus Mountain Range forms the northern border of Georgia.",
+  "hits_voyage": [
+   {
+    "title": "Georgia (country)",
+    "section": "",
+    "start": 833,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Wikivoyage: Georgia (country)",
+    "section": "Eat",
+    "start": 43737,
+    "score": 0.55,
+    "via": "title"
+   },
+   {
+    "title": "Kakheti",
+    "section": "",
+    "start": 398,
+    "score": 1.0,
+    "via": "title"
+   },
+   {
+    "title": "Wikivoyage: Kakheti",
+    "section": "Drink",
+    "start": 14889,
+    "score": 0.4,
+    "via": "title"
+   },
+   {
+    "title": "Georgia (country)",
+    "section": "Culture > Cuisine",
+    "start": 85749,
+    "score": 0.54,
+    "via": "title"
+   },
+   {
+    "title": "Wikivoyage: Kakheti",
+    "section": "Eat",
+    "start": 12830,
+    "score": 0.37,
+    "via": "title"
+   }
+  ],
+  "hits_voyage_used": 5,
+  "hits_voyage_context": "[1] Georgia (country)\nGeorgia is a country in the Caucasus region on the coast of the Black Sea. It is located at the intersection of Eastern Europe and West Asia, and is today generally regarded as part of Europe. It is bordered to the north and northeast by Russia, to the south by Turkey and Armenia, and to the southeast by Azerbaijan. Georgia covers an area of 69,700 square kilometres (26,900 sq mi). It has a population of 3.9 million, of which over a third live in the capital and largest city, Tbilisi. Ethnic Georgians, who are native to the region, constitute a majority of the country's population and are its titular nation.\nGeorgia has been inhabited since prehistory, hosting the world's earliest known sites of winemaking, gold mining, and textiles. The classical era saw the emergence of several kingdoms, such as Colchis and Iberia, that formed the nucleus of the modern Georgian state.\n\n[2] Wikivoyage: Georgia (country) — Eat\nIf you can, try to get yourself invited to dinner at someone's home (this is not too difficult in Georgia, owing to their hospitality and general desire to stuff foreign visitors full of all the food they can afford). The food in restaurants is an odd set piece of the same dishes over and over. But Georgian cuisine is far richer, and has an untold number of dishes to try, prepared from scratch with fresh, locally grown products (although supermarkets are now spreading throughout Georgia).\n\nOne special kind of meal in Georgia is the supra, which means a banquet to celebrate something like a wedding or a birthday.\n\n[3] Kakheti\nKakheti (/kəˈxɛti/; Georgian: კახეთი K’akheti [kʼaχetʰi]) is a region of Georgia. Telavi is its administrative center. The region comprises eight administrative districts: Telavi, Gurjaani, Qvareli, Sagarejo, Dedoplistsqaro, Signagi, Lagodekhi and Akhmeta. \nKakhetians speak the Kakhetian dialect of Georgian. Kakheti is one of the most significant wine producing regions of Georgia, home to a number of Georgian wines. The region is bordered to the west by the Georgian regions of Mtskheta-Mtianeti and Kvemo Kartli, to the north and east by the Russian Federation, and to the southeast by Azerbaijan. Popular tourist attractions in Kakheti include Tusheti, Gremi, Signagi, Kvetera, Bodbe, Lagodekhi Protected Areas and Alaverdi Monastery. \nThe Georgian David Gareji monastery complex is partially located in this province and is subject to a border dispute between Georgian and Azerbaijani authorities.\n\n[4] Wikivoyage: Kakheti — Drink\nBut of course the best drinking opportunities are in the homes of the ordinary people of Kakheti. Nearly every household has its own homemade, usually delicious wine. If you are the least outgoing and speak either Georgian or Russian, chances are you will get invited into someone's home for wine and food &ndash; do not pass this up! Your host may also offer you Georgian chacha, an outrageously potent vodka distilled from grapes, which you may indeed want to pass up.\n\n[5] Georgia (country) — Culture > Cuisine\nGeorgian cuisine and wine have evolved through the centuries, adapting traditions in each era. One of the most unusual traditions of dining is supra, or Georgian table, which is also a way of socializing with friends and family. The head of supra is known as tamada. He also conducts the highly philosophical toasts, and makes sure that everyone is enjoying themselves. Various historical regions of Georgia are known for their particular dishes: for example, khinkali (meat dumplings), from eastern mountainous Georgia, and khachapuri, mainly from Imereti, Samegrelo and Adjara.",
+  "route_views": 176957
+ }
+]
