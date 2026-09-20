@@ -308,7 +308,19 @@ def build_context(hits, budget_chars, passage_chars=650):
     return "\n\n".join(parts), used_hits
 
 
+ENGINE = None  # a BmoeSession when --engine-cli is given; otherwise llama-server at --url
+
+
 def chat(url, system, user, max_tokens, temperature=0.7):
+    if ENGINE is not None:
+        # the session protocol takes one user message, so the system text leads the prompt;
+        # sampling is the engine's (greedy)
+        r = ENGINE.generate(f"{system}\n\n{user}", max_tokens)
+        d = r["done"]
+        return {"text": r["text"], "finish": "length" if d.get("tokens", 0) >= max_tokens else "stop",
+                "wall_s": r["wall_s"], "ttft_s": r["ttft_s"], "prompt_tokens": d.get("n_prompt"),
+                "prompt_tps": round((d.get("n_prompt") or 0) / r["ttft_s"], 2) if r["ttft_s"] else 0,
+                "gen_tokens": d.get("tokens"), "gen_tps": round(d.get("tok_s", 0), 2), "engine": d}
     body = {"messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
             "max_tokens": max_tokens, "temperature": temperature, "top_p": 0.8, "top_k": 20,
             "presence_penalty": 1.5 if temperature else 0.0, "seed": 1234}
@@ -396,7 +408,16 @@ def main():
     ap.add_argument("--max-tokens", type=int, default=600)
     ap.add_argument("--route-views", type=int, default=5000,
                     help="auto mode: go retrieval-first when the subject article has fewer monthly views")
+    ap.add_argument("--engine-cli", help="path to bmoe-cli: stream the model through BigMoeOnEdge "
+                    "session mode instead of calling llama-server")
+    ap.add_argument("--engine-model")
+    ap.add_argument("--cache-mb", type=int, default=5000)
     args = ap.parse_args()
+    if args.engine_cli:
+        global ENGINE
+        from bmoe_session import BmoeSession
+        ENGINE = BmoeSession(args.engine_cli, args.engine_model, cache_mb=args.cache_mb)
+        print(f"engine ready in {ENGINE.load_s}s: {ENGINE.ready}", flush=True)
     corpus = Corpus(args.db)
 
     if args.questions:
