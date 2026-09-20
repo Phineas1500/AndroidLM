@@ -56,6 +56,8 @@ android {
         versionCode 39
         versionName '0.24.0'
         buildConfigField 'String', 'GIT_SHA', "\"${gitSha}\""
+        // On-device golden test of the retrieval storage: see research/DEVICE_TESTING.md
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         ndk {
             // The engine ships as prebuilt arm64 binaries staged by build-android.ps1.
             abiFilters 'arm64-v8a'
@@ -126,6 +128,15 @@ android {
 dependencies {
     // Retrieval pipeline (pure JVM; port of scripts/rag.py)
     implementation project(':research')
+    // Storage for it. SQLite with FTS5 + fts5vocab guaranteed (the platform SQLite promises
+    // neither): requery's sqlite-android 3.49.0, JitPack only (see settings.gradle). Its POM asks
+    // for androidx.core 1.15.0, which needs compileSdk 35; it only uses CancellationSignal and
+    // OperationCanceledException from it, so the app's core 1.13.1 (via core-ktx) serves.
+    implementation('com.github.requery:sqlite-android:3.49.0') {
+        exclude group: 'androidx.core', module: 'core'
+    }
+    // zstd for the corpus blocks; the @aar artifact carries the Android native library.
+    implementation 'com.github.luben:zstd-jni:1.5.6-6@aar'
 
     implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.activity:activity-compose:1.9.2'
@@ -136,6 +147,11 @@ dependencies {
 
     // Pure-Kotlin rules get JVM unit tests: ./gradlew testDevDebugUnitTest
     testImplementation 'junit:junit:4.13.2'
+
+    // On-device golden test (DeviceGoldenTest); the comparisons come from research's testFixtures.
+    androidTestImplementation testFixtures(project(':research'))
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test:runner:1.6.2'
 
     def composeBom = platform('androidx.compose:compose-bom:2024.09.02')
     implementation composeBom

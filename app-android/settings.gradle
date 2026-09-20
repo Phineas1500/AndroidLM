@@ -10,6 +10,12 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // requery's sqlite-android (SQLite with FTS5 for the retrieval corpus) is published on
+        // JitPack only. Nothing else may resolve from there.
+        maven {
+            url 'https://jitpack.io'
+            content { includeModule 'com.github.requery', 'sqlite-android' }
+        }
     }
 }
 
