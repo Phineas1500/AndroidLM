@@ -1,0 +1,145 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+// Short git SHA of the build, injected into BuildConfig so the running APK is identifiable
+// (debug installs share a versionCode, so this is the only reliable "which build am I on").
+def gitSha = {
+    try {
+        def out = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', '--short', 'HEAD'
+            standardOutput = out
+            ignoreExitValue = true
+            workingDir = rootDir
+        }
+        def s = out.toString().trim()
+        return s.isEmpty() ? 'unknown' : s
+    } catch (ignored) {
+        return 'unknown'
+    }
+}()
+
+// Signing. The secrets live in keystore.properties (gitignored) next to gradlew; the
+// keystore is a stable key kept off the repo (CI receives it through repository secrets).
+// An APK signed with it installs over the previous one without an uninstall — a debug-signed
+// one forces a reinstall (per-machine debug key) and wipes downloaded models, which is why
+// BOTH build types use the stable key when it is available. When the properties file is
+// absent (fresh clone), builds fall back to debug signing so they still build; only a holder
+// of the keystore produces a distributable, stably-signed APK.
+def keystorePropsFile = rootProject.file('keystore.properties')
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) keystoreProps.load(new FileInputStream(keystorePropsFile))
+
+android {
+    // AndroidLM: namespace (and the Kotlin source package) stay upstream's, so the fork diffs
+    // cleanly against BigMoeOnEdge examples/android; only the applicationId is ours.
+    namespace 'io.bigmoeonedge.example'
+    compileSdk 34
+
+    signingConfigs {
+        if (keystorePropsFile.exists()) {
+            release {
+                storeFile rootProject.file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
+            }
+        }
+    }
+
+    defaultConfig {
+        applicationId 'io.github.phineas1500.androidlm'
+        minSdk 29
+        targetSdk 34
+        versionCode 39
+        versionName '0.24.0'
+        buildConfigField 'String', 'GIT_SHA', "\"${gitSha}\""
+        ndk {
+            // The engine ships as prebuilt arm64 binaries staged by build-android.ps1.
+            abiFilters 'arm64-v8a'
+        }
+    }
+
+    // Two distribution channels differing only in how a model reaches the device.
+    //   dev   sideloaded (GitHub Release). Keeps all-files access, so it can read a gguf
+    //         adb-pushed to /sdcard/Download or /data/local/tmp — the fastest way to get a
+    //         multi-GB model onto a dev device. Declares MANAGE_EXTERNAL_STORAGE via
+    //         src/dev/AndroidManifest.xml.
+    //   play  Play-Store-compliant. No broad storage permission: models arrive only through
+    //         the system file picker (SAF), which copies into the app-internal models dir
+    //         (filesDir) and needs no permission. (AndroidLM removed upstream's URL downloader:
+    //         neither flavor declares INTERNET.)
+    // SHARED_STORAGE gates the storage-permission code paths; no model names or URLs are
+    // ever hardcoded — the scanned directories are the only difference.
+    flavorDimensions += 'distribution'
+    productFlavors {
+        dev {
+            dimension 'distribution'
+            applicationIdSuffix '.dev'
+            versionNameSuffix '-dev'
+            buildConfigField 'boolean', 'SHARED_STORAGE', 'true'
+        }
+        play {
+            dimension 'distribution'
+            buildConfigField 'boolean', 'SHARED_STORAGE', 'false'
+        }
+    }
+
+    // The CLI is a real executable shipped as lib*.so; it must reach the device
+    // uncompressed and extracted into nativeLibraryDir so it can be exec'd.
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            // Stable release key when available; otherwise Gradle leaves the default (debug) signing.
+            if (keystorePropsFile.exists()) signingConfig signingConfigs.release
+        }
+        debug {
+            // Same stable key: a debug APK from any machine (or CI) then updates in place.
+            if (keystorePropsFile.exists()) signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    buildFeatures {
+        compose true
+        buildConfig true
+    }
+    composeOptions {
+        // Matches Kotlin 1.9.24 (see the Compose-Kotlin compatibility map).
+        kotlinCompilerExtensionVersion '1.5.14'
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.activity:activity-compose:1.9.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.8.5'
+    // Upstream got coroutines transitively through WorkManager (its model downloader). That
+    // dependency is gone along with the downloader, so coroutines are declared directly.
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+
+    // Pure-Kotlin rules get JVM unit tests: ./gradlew testDevDebugUnitTest
+    testImplementation 'junit:junit:4.13.2'
+
+    def composeBom = platform('androidx.compose:compose-bom:2024.09.02')
+    implementation composeBom
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-graphics'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.material:material-icons-core'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+}

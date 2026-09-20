@@ -41,6 +41,7 @@ PLAN_SYSTEM = (
     "You plan lookups in an offline copy of English Wikipedia. Given a question, list the exact "
     "titles of up to 4 Wikipedia articles most likely to contain the answer, one per line, most "
     "important first. For comparisons or multi-part questions include an article for each part. "
+    "For travel questions name the place itself (city, region or country) first. "
     "If the question depends on an intermediate fact you know, name the article for the final "
     "subject too. Output only the titles, nothing else."
 )
@@ -85,9 +86,17 @@ ASPECT_HEADINGS = {
     "treat": "treatment management therapy", "aid": "treatment management first aid",
     "prevent": "prevention prophylaxis", "avoid": "prevention",
     "symptom": "signs symptoms presentation", "sign": "signs symptoms presentation",
-    "caus": "cause causes etiology", "see": "attractions landmarks sights tourism",
-    "visit": "attractions landmarks sights tourism", "food": "cuisine", "eat": "cuisine",
-    "etiquett": "etiquette customs", "weather": "climate", "season": "climate",
+    "caus": "cause causes etiology",
+    # Wikivoyage's standard section names: Understand, Get in, Get around, See, Do, Buy, Eat,
+    # Drink, Sleep, Stay safe, Stay healthy, Respect, Go next, Regions, Cities, Climate
+    "see": "see sights attractions landmarks tourism", "visit": "see sights attractions landmarks",
+    "site": "see sights attractions landmarks", "priorit": "see sights districts",
+    "district": "districts understand", "laid": "understand orientation districts",
+    "food": "eat cuisine", "eat": "eat cuisine", "try": "eat cuisine drink",
+    "etiquett": "respect etiquette customs", "custom": "respect etiquette customs",
+    "weather": "climate", "season": "climate", "safeti": "stay safe safety",
+    "safe": "stay safe safety", "hike": "do hiking trekking", "region": "regions",
+    "sleep": "sleep accommodation", "transport": "get around get in",
 }
 
 
@@ -180,7 +189,8 @@ class Corpus:
         score /= total
         # "what first aid is appropriate" should find the Treatment section even though every
         # section of the article repeats the topic words
-        if any(w in heading for s, _ in stems for w in ASPECT_HEADINGS.get(s, "").split()):
+        words = set(re.findall(r"[a-z]+", heading))
+        if any(w in words for s, _ in stems for w in ASPECT_HEADINGS.get(s, "").split()):
             score += 0.25
         return score
 
@@ -189,7 +199,7 @@ class Corpus:
         return {"aid": aid, "start": start, "title": title, "section": self.section_of(text, start),
                 "text": text[start:end].strip(), "score": round(score, 2), "via": via}
 
-    def resolve_title(self, title):
+    def resolve_title(self, title, fuzzy=True):
         """Article id for a title the model proposed: exact match, then Wikipedia's redirects
         (built by build_redirects.py), then a title search ranked by popularity."""
         row = self.db.execute("select id from articles where title = ? collate nocase", (title,)).fetchone()
@@ -200,7 +210,7 @@ class Corpus:
             if row:
                 return row[0]
         words = re.findall(r"[^\W_]+", title.lower())
-        if not words:
+        if not words or not fuzzy:
             return None
         match = "title:(" + " AND ".join(f'"{w}"' for w in words) + ")"
         best = None
@@ -261,16 +271,31 @@ class Corpus:
             hits.append(hit)
         return hits
 
-    def retrieve(self, question, titles, k=6):
+    def retrieve(self, question, titles, k=6, voyage=None):
         """Passages for the planned titles first (round-robin so every part of a comparison is
         represented), then gated BM25 hits."""
         stems = self.stems(question)
         per_title, seen_aid = [], set()
         for t in titles:
             aid = self.resolve_title(t)
+            passages = []
             if aid is not None and aid not in seen_aid:
                 seen_aid.add(aid)
-                per_title.append(self.article_passages(aid, stems))
+                passages = self.article_passages(aid, stems)
+            # a travel guide for the same place: its See / Eat / Respect / Stay safe sections
+            # compete with the encyclopedia's sections on the same score
+            vaid = voyage.resolve_title(t, fuzzy=False) if voyage else None
+            if vaid is not None and ("v", vaid) not in seen_aid:
+                seen_aid.add(("v", vaid))
+                guide = voyage.article_passages(vaid, stems)
+                for h in guide:
+                    h["title"] = "Wikivoyage: " + h["title"]
+                    h["aid"] = ("v", h["aid"])
+                lead = passages[:1] or guide[:1]
+                rest = sorted(passages[1:] + guide[1:], key=lambda h: -h["score"])
+                passages = lead + rest[:3]
+            if passages:
+                per_title.append(passages)
         hits = []
         if per_title:
             hits.extend(per_title[0][:2])
@@ -308,6 +333,7 @@ def build_context(hits, budget_chars, passage_chars=650):
     return "\n\n".join(parts), used_hits
 
 
+VOYAGE = None  # optional second Corpus built from Wikivoyage (--voyage-db)
 ENGINE = None  # a BmoeSession when --engine-cli is given; otherwise llama-server at --url
 
 
@@ -368,7 +394,7 @@ def answer(corpus, args, question):
                    draft_finish=draft["finish"])
     t0 = time.time()
     if mode in ("plan", "verify"):
-        hits = corpus.retrieve(question, titles, k=args.k)
+        hits = corpus.retrieve(question, titles, k=args.k, voyage=VOYAGE)
     elif mode == "bm25":
         hits = corpus.bm25(corpus.stems(question))[:args.k]
     rec["search_ms"] = round((time.time() - t0) * 1000)
@@ -408,6 +434,7 @@ def main():
     ap.add_argument("--max-tokens", type=int, default=600)
     ap.add_argument("--route-views", type=int, default=5000,
                     help="auto mode: go retrieval-first when the subject article has fewer monthly views")
+    ap.add_argument("--voyage-db", help="Wikivoyage corpus database; adds travel-guide sections")
     ap.add_argument("--engine-cli", help="path to bmoe-cli: stream the model through BigMoeOnEdge "
                     "session mode instead of calling llama-server")
     ap.add_argument("--engine-model")
@@ -419,6 +446,9 @@ def main():
         ENGINE = BmoeSession(args.engine_cli, args.engine_model, cache_mb=args.cache_mb)
         print(f"engine ready in {ENGINE.load_s}s: {ENGINE.ready}", flush=True)
     corpus = Corpus(args.db)
+    if args.voyage_db:
+        global VOYAGE
+        VOYAGE = Corpus(args.voyage_db)
 
     if args.questions:
         done = set()
@@ -439,7 +469,7 @@ def main():
         planned = args.mode in ("plan", "verify", "auto")
         titles, _ = plan(args.url, args.question) if planned else ([], None)
         t0 = time.time()
-        hits = (corpus.retrieve(args.question, titles, k=args.k) if planned
+        hits = (corpus.retrieve(args.question, titles, k=args.k, voyage=VOYAGE) if planned
                 else corpus.bm25(corpus.stems(args.question))[:args.k])
         print(f"plan: {titles}\nsearch: {(time.time() - t0) * 1000:.0f} ms")
         for h in hits:

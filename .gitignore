@@ -20,3 +20,6 @@ build/
 local.properties
 *.keystore
 keystore.properties
+
+# engine binaries are built by scripts/build-android-engine.sh, never committed
+*.so

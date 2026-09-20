@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The UI is drawn by Compose (MaterialTheme). This app/window theme only needs to
+         be a valid no-action-bar theme; using a framework theme avoids a dependency on
+         the Material Components XML library. -->
+    <style name="Theme.BigMoeOnEdge" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

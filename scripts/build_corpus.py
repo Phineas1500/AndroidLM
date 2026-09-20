@@ -42,6 +42,8 @@ ap.add_argument("--max-chunk-chars", type=int, default=1500)
 ap.add_argument("--block-kb", type=int, default=256)
 ap.add_argument("--zlevel", type=int, default=12)
 ap.add_argument("--min-chars", type=int, default=200, help="skip articles shorter than this")
+ap.add_argument("--redirects-tsv", help="from_title<TAB>to_title lines to store as the redirects table "
+                "(Wikivoyage; for Wikipedia use build_redirects.py)")
 args = ap.parse_args()
 
 HEADING = re.compile(r"^(#{1,6})\s+(.*)$")
@@ -236,6 +238,13 @@ print("optimizing fts...", flush=True)
 db.execute("INSERT INTO fts(fts) VALUES('optimize')")
 db.execute("CREATE INDEX chunks_article ON chunks(article_id)")
 db.execute("CREATE INDEX articles_title ON articles(title COLLATE NOCASE)")
+if args.redirects_tsv:
+    db.execute("CREATE TABLE redirects(title TEXT COLLATE NOCASE PRIMARY KEY, article_id INTEGER NOT NULL) WITHOUT ROWID")
+    for line in open(args.redirects_tsv):
+        src, _, dst = line.rstrip("\n").partition("\t")
+        row = db.execute("SELECT id FROM articles WHERE title = ? COLLATE NOCASE", (dst,)).fetchone()
+        if row:
+            db.execute("INSERT OR IGNORE INTO redirects VALUES(?,?)", (src, row[0]))
 db.commit()
 db.close()
 print(f"done: {n_art} articles ({n_full} full), {n_chunk} chunks ({n_indexed} indexed), "

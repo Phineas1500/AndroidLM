@@ -1,0 +1,8 @@
+# Engine binaries are staged on the build machine, never committed.
+app/src/main/jniLibs/**/*.so
+.gradle/
+build/
+local.properties
+keystore.properties
+*.keystore
+*.apk
