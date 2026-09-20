@@ -1,0 +1,517 @@
+{
+ "exp-01": {
+  "q2kxl_none": {
+   "score": 8.5,
+   "halluc": [],
+   "note": "Endorheic basin, 34% salinity, Jordan diversion, potash evaporation ponds, ~1 m/yr fall, sinkholes as consequence, Red-Dead project. Cleaner than round one. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 6.5,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Right article (lead, climate, lake salinity) but again not the 'recession and environmental concerns' section. Correct but only two short paragraphs: Jordan diversion yes; no potash works, no rate of fall, no sinkholes. All cited to [1]."
+  }
+ },
+ "exp-02": {
+  "q2kxl_none": {
+   "score": 8,
+   "halluc": [],
+   "note": "Correct: moves ambient heat, compressor/refrigerant cycle, Q_out = W + Q_env, COP>1, first law. No typical COP figure (3-4) and no resistive-heater contrast, so a notch below round one. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 7,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Ideal titles (Heat pump, COP, First law). Correct and grounded but one paragraph: no cycle description, no COP numbers even though the COP article was in hand. Under-uses good retrieval."
+  }
+ },
+ "exp-03": {
+  "q2kxl_none": {
+   "score": 7.5,
+   "halluc": [
+    "Names the drought the '3.7-kiloyear BP aridification event' (no such event; the LBA drought is c. 3.2 kyr BP)",
+    "Claims records from Ugarit and Hatti of attacks by their own subjects before foreign invasions (overstated/unsupported)"
+   ],
+   "note": "Sea Peoples as symptom, drought, palace-economy fragility, trade disruption, earthquake storm all covered with sensible weighting; cut off at item 5 (systems collapse was already flagged in the intro). Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 6.5,
+   "halluc": [
+    "Says Sea Peoples' movements were driven by 'drought in the Nile Valley' (garbled: Nile failures weakened Egypt, they did not drive the migrations)"
+   ],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Right articles (LBA collapse lead, Migratory invasions, Sea Peoples) but only one of the 'Possible causes' subsections; Evidence>Cyprus/Levant add little. Covers Sea Peoples, systems collapse, palace economies; misses earthquakes, ironworking/warfare, and treats drought only in passing. Odd Urnfield/Hallstatt aside lifted from source."
+  }
+ },
+ "exp-04": {
+  "q2kxl_none": {
+   "score": 8,
+   "halluc": [],
+   "note": "Accurate mechanism and four-point comparison (antigen made in-cell vs pre-formed, speed, T-cell response, cold chain). No lipid nanoparticle delivery or adjuvant/booster point; avoids round one's 'no genetic material' error. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 6.5,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": false,
+   "note": "Planner chose 'Messenger RNA' and 'Vaccine' rather than 'mRNA vaccine'. Answer spends a paragraph on transcription/splicing/introns/tRNA (irrelevant to a synthetic vaccine) and attributes vaccine-specific claims to [1], the generic mRNA article, which cannot support them. Inactivated side well grounded. Core contrast correct; no LNP, storage, speed."
+  }
+ },
+ "exp-05": {
+  "q2kxl_none": {
+   "score": 8.5,
+   "halluc": [
+    "Expands HACE as 'High Altitude Syndrome' (it is High Altitude Cerebral Edema)",
+    "Lists shortness of breath as an early/mild AMS symptom (it is a HAPE warning sign)"
+   ],
+   "note": "Complete within budget this time: danger, symptoms, stop/rest/descend 500-1000 m, acetazolamide, oxygen, HAPE/HACE red flags, ascent-rate prevention rule."
+  },
+  "q2kxl_plan": {
+   "score": 7.5,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Still no treatment/prevention section and two decompression-sickness passages, but the model now gives a clearly labelled own-knowledge fallback: stop ascending, rest, descend if worse, with HAPE/HACE red flags. Big fix over round one's refusal (4). Lacks descent distance, acetazolamide, ascent-rate rule."
+  }
+ },
+ "cmp-01": {
+  "q2kxl_none": {
+   "score": 7,
+   "halluc": [
+    "Dates the convening of the Estates-General to 1788 (it met in May 1789)"
+   ],
+   "note": "Balanced causes for both and reaches outcomes (Terror, Napoleon; Provisional Government, October) before cutoff in long-term consequences. Better budget use than round one. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 2.5,
+   "halluc": [
+    "Gives the French Revolutionary Wars as 1792-1815 (they ended 1802; 1815 closes the Napoleonic Wars)"
+   ],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "'Russian Revolution of 1917' title did not resolve; BM25 did fetch the Russian Revolution lead and two October Revolution passages (ranks 4-6), yet the model asserts the sources contain nothing on Russia and refuses the comparison. Remainder is a French-only summary padded with War of the First Coalition detail. Late-ranked-passage blindness plus no fallback."
+  }
+ },
+ "cmp-02": {
+  "q2kxl_none": {
+   "score": 7.5,
+   "halluc": [
+    "States PoS security simply as 'no entity controls more than 50% of stake' (BFT-style PoS needs <1/3 for safety / 2/3 for finality)"
+   ],
+   "note": "Covers energy, hardware, finality, 51% hash vs stake, slashing and equivocation; complete within budget. 'Proof-of-State' typo; no nothing-at-stake / long-range attacks. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 6,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Both articles retrieved. Grounded but lopsided: leans almost entirely on the 'Asymmetric Economic Security' critique and a DPoS aside; no finality, slashing, nothing-at-stake or 1/3-2/3 thresholds, and few practical differences beyond energy. DPoS cited as [4] but that passage is source 6."
+  }
+ },
+ "cmp-03": {
+  "q2kxl_none": {
+   "score": 8,
+   "halluc": [],
+   "note": "Accurate on agents, vectors, symptoms, prevention (ITN/IRS/IPTp vs source reduction, Dengvaxia seropositive-only caveat), ACT and IV artesunate. Cut off before dengue treatment (supportive care, avoid NSAIDs) and omits traveller chemoprophylaxis. Fixes round one's Aedes/Anopheles contradiction. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 5,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Both leads retrieved (dengue lead twice) plus severe-malaria treatment and dengue diagnosis; no prevention sections, no dengue treatment. Symptoms/transmission well grounded, but 'Prevention: sources do not detail' and 'dengue treatment: no information' with no own-knowledge fallback leave half the question unanswered. Malaria treatment covers only severe cases."
+  }
+ },
+ "cmp-04": {
+  "q2kxl_none": {
+   "score": 8,
+   "halluc": [
+    "Says Federal Council decisions are made 'by consensus, not majority vote' (it votes by majority and then defends decisions collegially)"
+   ],
+   "note": "Both halves reached: cantons, direct democracy, Federal Council, PAP dominance/GRCs; then Swiss sector specialisation, cantonal tax competition, SNB vs Singapore state-led capitalism (Temasek, GIC). Cut off in Singapore list only. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 7,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Planned 'Political system of ...' titles did not resolve (real titles are 'Politics of ...'), so only the two Economy articles were shown. Politics section is short, unlabelled own knowledge (no Federal Council, no GRCs) but correct; economics is well grounded (Global Innovation Index, dirigisme, Temasek, FDI, low tax). Complete and coherent - large gain over round one (4)."
+  }
+ },
+ "cmp-05": {
+  "q2kxl_none": {
+   "score": 8,
+   "halluc": [
+    "Calls helium the fusion 'fuel' and non-radioactive (helium is the product; tritium fuel is radioactive)"
+   ],
+   "note": "All four headings covered compactly and correctly: chain reaction vs Coulomb barrier, ~10% of world electricity, NIF scientific breakeven, activation waste vs actinides, no-runaway safety, proliferation. 'National Ign Facility' typo. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 7,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Leads of both articles (each twice) plus two peripheral physics sections; nothing from Fusion power / Nuclear power / radioactive waste, so feasibility, waste and safety are mostly uncited own knowledge - but correct. Physics thin (no binding energy or Coulomb barrier), no NIF/ITER."
+  }
+ },
+ "syn-01": {
+  "q2kxl_none": {
+   "score": 8.5,
+   "halluc": [],
+   "note": "Mobility/horse archers, adopted siegecraft, decimal meritocratic army, terror, divided enemies; then succession, ulus system, assimilation (Yuan, Ilkhanate conversion), overextension, Toluid civil war. Essentially complete before cutoff. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 7.5,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Right three articles including 'Division of the Mongol Empire'. Fragmentation half is specific and well grounded (Mongke's death 1259, Toluid civil war, Berke-Hulagu, Kaidu-Kublai, four khanates). Expansion half is one generic sentence - no decimal system, Yam, siegecraft or divided enemies."
+  }
+ },
+ "syn-02": {
+  "q2kxl_none": {
+   "score": 7,
+   "halluc": [
+    "Attributes to a 'seminal study by Edward Glaeser' a finding that strict rent-control cities had slower population growth and construction (no such study; Glaeser & Luttmer 2003 is about misallocation)"
+   ],
+   "note": "Arguments both ways are solid and the evidence section reaches SF/NYC rent effects, supply reduction via conversions, spillover onto uncontrolled rents - the real Diamond et al. findings, though unnamed. Cut off in welfare effects. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 4,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Title lookup for 'Rent control' resolved to 'Rent control in Massachusetts' and 'Housing economics' to 'Journal of Housing Economics'. The one relevant passage (Rent regulation > Effects on housing supply, BM25 rank 6) is never used. Result is a parochial Cambridge anecdote plus a muddled 'against' list ('fuels gentrification'); no general evidence. Worse than round one's labelled fallback (6.5)."
+  }
+ },
+ "syn-03": {
+  "q2kxl_none": {
+   "score": 7,
+   "halluc": [
+    "Appends a fabricated bibliography (e.g. 'Harhoff, J. (2018) The Impact of Containerization on Global Trade Patterns', 'Cullinane & Song (2003) A Dynamic Comparative Advantage Model...')",
+    "Cites New York's Hudson Yards as a redeveloped port waterfront (it is a rail-yard development)",
+    "Says shipping costs fell 'by over 90%' and that break-bulk ships took 'weeks' to load (both exaggerated)"
+   ],
+   "note": "Content still good (McLean 1956, break-bulk, deep-water relocation, Docklands, inland intermodal hubs) but ~100 tokens are spent on an invented reference list, which is a trust problem."
+  },
+  "q2kxl_plan": {
+   "score": 3,
+   "halluc": [
+    "Presents Port City Colombo (a 2010s land-reclamation financial district) as a consequence of containerization"
+   ],
+   "retrieval": "partial",
+   "grounded": false,
+   "note": "'Shipping container' lead and intermodal section are on-topic, but 'Port city' fuzzy-matched to 'Port City Colombo' and Globalization>Movement of information is noise; no Containerization article. Model forces the Colombo passage into the narrative, producing a false causal story for the geography half. Trade half is two generic sentences."
+  }
+ },
+ "syn-04": {
+  "q2kxl_none": {
+   "score": 7.5,
+   "halluc": [
+    "Claims the strait carries 'nearly half of the world's foreign tonnage' (garbled; unsupported)"
+   ],
+   "note": "Chokepoint between Indian and Pacific oceans, ~25% of trade, Middle East energy flows; China, Japan, South Korea, plus India/Taiwan; Sunda/Lombok alternatives. Complete this time; no narrowest-width or 'Malacca dilemma'. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 5,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Strait lead and 'Economic importance' (twice) are right, but the planner also spent four slots on country articles (Singapore, China, Japan, 'China > Biodiversity'). Answer is thin: says dependency statistics are 'not detailed in the sources' though the Economic importance section (used well in round one: 25% of traded goods, oil to China/Japan/Korea) was shown; Japan and Korea omitted. Malaccamax cited to [4] (Japan lead) instead of [5]."
+  }
+ },
+ "syn-05": {
+  "q2kxl_none": {
+   "score": 8.5,
+   "halluc": [],
+   "note": "Drought (lake sediments, speleothems), deforestation for plaster/fields, warfare and loss of divine-king legitimacy; then an explicit certainty section (strong drought correlation, debated mechanisms, northern survival, not a disappearance). Both halves answered. Ends with a reference list (Demarest 2004, Hodell 1995 - real works) that was unnecessary."
+  },
+  "q2kxl_plan": {
+   "score": 5.5,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Classic Maya collapse lead plus 'Drought theory' and 'Collapse of trade routes' sections - right article. Yet the answer says drought 'is not explicitly listed ... in the provided text' despite source [4] being the drought-theory section, and gives most space to the Teotihuacan trade hypothesis. Warfare, overpopulation, deforestation absent. Certainty half ('unsolved mystery', hypotheses not settled) is fine. Says 'the prompt explicitly states'."
+  }
+ },
+ "hop-01": {
+  "q2kxl_none": {
+   "score": 9,
+   "halluc": [],
+   "note": "Egypt -> Cairo -> Nile; hieroglyphs; 1799 Rashid, three scripts, Champollion. Correct and concise."
+  },
+  "q2kxl_plan": {
+   "score": 9,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Planner jumped straight to the answer articles (Nile, Egyptian hieroglyphs > Decipherment). Correct, cited, concise; chain stated explicitly."
+  }
+ },
+ "hop-02": {
+  "q2kxl_none": {
+   "score": 7.5,
+   "halluc": [
+    "Dates the reconversion to a decree of 28 May 2020 'upheld by the Council of State' (the Council of State annulled the 1934 decree on 10 July 2020 and the presidential decree followed the same day)"
+   ],
+   "note": "Mehmed II, mosque conversion with minarets/plastered mosaics, museum opening 1 Feb 1935 all correct; the 2020 date and sequence are wrong. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 8.5,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Mehmed II and Hagia Sophia leads did the work (section picks were poor: 1847 renovation, Crimean policy). Correct and grounded: waqf conversion, 1935 museum, 2020 mosque, 2024 upper gallery reopened as museum - more current than closed-book. Short; no exact 2020 date. Round one scored 3 here."
+  }
+ },
+ "hop-03": {
+  "q2kxl_none": {
+   "score": 8.5,
+   "halluc": [],
+   "note": "Fleming 1928; Florey and Chain at Oxford isolated/purified, proved efficacy, ran first clinical trials. Correct; does not separate Chain's biochemical role from Florey's leadership, no Heatley. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 8.5,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Penicillin and Howard Florey (Development, Recognition) retrieved; 'Ernst Boris Chain' title did not resolve. Accurate and cited (P. rubens, 1940 purification, animal tests, first trials). Same limitation: Chain not individually characterised."
+  }
+ },
+ "hop-04": {
+  "q2kxl_none": {
+   "score": 8.5,
+   "halluc": [],
+   "note": "Peru -> Huascaran -> Cordillera Blanca, Andes. Correct and concise; no elevation. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 8.5,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Planner resolved the hop itself (Peru, Andes). Correct with 6,768 m and Cordillera Blanca. Hedges that Peru holds 'a significant portion' of the lake instead of confirming the larger share. Round one was 1 (wrong country, visible chain-of-thought)."
+  }
+ },
+ "hop-05": {
+  "q2kxl_none": {
+   "score": 6.5,
+   "halluc": [
+    "Opens by saying the Treaty of Paris of 30 May 1814 ended the war that included Waterloo (Waterloo was fought a year later)",
+    "Invents that the 1814 treaty was 'finalized in June 1814'"
+   ],
+   "note": "Self-corrects further down to the Second Treaty of Paris (20 Nov 1815) and gives Concert of Europe / balance of power correctly, but the first paragraph is wrong and confusing."
+  },
+  "q2kxl_plan": {
+   "score": 7,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Exactly the right two articles. Correct (Second Treaty of Paris; balance among the great powers) but only two sentences - never names the Concert of Europe, legitimacy/restoration, or the date. Under-uses perfect retrieval."
+  }
+ },
+ "trv-01": {
+  "q2kxl_none": {
+   "score": 7.5,
+   "halluc": [
+    "Invents the term 'goza-meiki (power spots)' for Yasaka Shrine",
+    "Advises tossing coins into the offering box 'loudly' (etiquette is to drop them gently)"
+   ],
+   "note": "Sensible Higashiyama / Arashiyama-Kinkakuji-Nijo / Fushimi-Gion-Nishiki plan and, unlike round one, a full etiquette section (temizu, two bows-two claps at shrines, no clapping at temples, photography, quiet). Fushimi Inari again labelled 'central'; no shoe-removal note."
+  },
+  "q2kxl_plan": {
+   "score": 5.5,
+   "halluc": [
+    "Says Kozan-ji is 'known for its connection to the Ii family' (it is known for Myoe and the Choju-giga scrolls)",
+    "Calls the purification basin a 'tsukusha' (it is chozuya/temizuya)"
+   ],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Kyoto, Arashiyama, Fushimi Inari, Gion retrieved, but no etiquette source and 'Fox gallery'/'Festivals' sections are filler. Itinerary is driven by whatever was retrieved: recommends Kozan-ji and Kamigamo/Shimogamo over Kinkaku-ji, Nijo, Gion (retrieved but unused). Etiquette is labelled own knowledge and cut off at the prayer step because budget went to UNESCO boilerplate. Still far better than round one's Indonesian etiquette (2)."
+  }
+ },
+ "trv-02": {
+  "q2kxl_none": {
+   "score": 6,
+   "halluc": [
+    "Names parks 'Queulemu' (garbled Queulat) and places Puyehue-Cordon Caulle in the Aysen region (it is in Los Rios/Los Lagos)",
+    "Gives the Torres del Paine O Circuit as 4-6 days (normally 7-9)",
+    "Refers to 'Mount Perito Moreno' in Los Glaciares (Perito Moreno is the glacier)"
+   ],
+   "note": "Weather/wind and season guidance is good and practical; parks section has several garbled facts; dedicated safety section lost to truncation though the intro summarises it. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 5,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": false,
+   "note": "'Patagonian Andes' and 'Mount Fitz Roy' did not resolve; park leads are right but sections are Flora/Ecology/Hydrology. No trek names, distances, El Chalten, bookings. Weather/season paragraph is own knowledge cited to [3] (a flora passage); 'safety' section pads with fescue and cushion-plant species. Generic safety tips are sound. Better than round one (2) but below closed-book."
+  }
+ },
+ "trv-03": {
+  "q2kxl_none": {
+   "score": 3.5,
+   "halluc": [
+    "Claims Georgia is 'traditionally divided into three main regions: Kartli, Kakheti and Samckhe-Samcilo' (invented scheme and name)",
+    "'Kakhetian khachapuri' with raw egg and a 'Tbilisi-style khachapuri' (the egg-topped boat is Adjarian; these variants do not exist)",
+    "'Upskhvi fortress' (garbled Uplistsikhe, a cave town)",
+    "Lists chakapuli as an Adjarian dish (it is Kakhetian/eastern)",
+    "Churchkhela made with chestnuts (walnuts or hazelnuts)"
+   ],
+   "note": "Kakheti wine, Tbilisi/Mtskheta, Batumi and Adjarian khachapuri are right, but the regional framework and several food attributions are fabricated; misses Svaneti, Imereti, Kazbegi. Same failure mode as round one."
+  },
+  "q2kxl_plan": {
+   "score": 4.5,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Georgia lead/Geography, Kakheti (+winemaking), Kartli retrieved; 'Mtskheta-Mtianets' misspelled so unresolved; no Georgian cuisine article; 'Kartli > Etymology' is filler. Nothing false: region list (Adjara listed twice), Kakheti wine/Alaverdi/Signagi/Tusheti, Kartli/Tbilisi, then a labelled fallback naming khachapuri, khinkali, dolma. Honest but thin - two regions described, three dishes."
+  }
+ },
+ "trv-04": {
+  "q2kxl_none": {
+   "score": 6,
+   "halluc": [
+    "Says the Grand Bazaar is a walk 'east' from Hagia Sophia (it is to the west)",
+    "Havaist line numbers 'HV-1 or HV-3' to Sultanahmet (not real route codes)"
+   ],
+   "note": "Realistic 6-7 h budget, Sultanahmet cluster with sensible timings, 2-hour return buffer, IST vs SAW. Old-city layout section reached only in its first line; no M11 metro."
+  },
+  "q2kxl_plan": {
+   "score": 6.5,
+   "halluc": [
+    "Directs travellers to take the 'Havalitrain (M11) to Yenikoy, then transfer to M2' (M11 connects to M2 at Gayrettepe; no 'Havalitrain' brand)"
+   ],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "'Sultanahmet' fuzzy-matched to 'Sultanahmet Jail'; Historic Areas, Basilica Cistern, Hagia Sophia are right; only 4 passages, all leads. Layout (Fatih peninsula, Golden Horn N, Marmara S) is delivered in the first paragraph; sights are grounded and current (2024 upper-gallery museum). Transit line garbled; no return-time buffer; truncated in layout list."
+  }
+ },
+ "med-01": {
+  "q2kxl_none": {
+   "score": 8.5,
+   "halluc": [],
+   "note": "Accurate and complete on cause, onset (incl. LADA, rising youth T2D), treatment (insulin vs lifestyle/metformin/eventual insulin). No GLP-1/SGLT2 mention. Every line tagged [1] with no source."
+  },
+  "q2kxl_plan": {
+   "score": 7,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Both leads retrieved (twice each) - and this time the model uses both (round one: 3). Grounded and correct, 72% heritability detail. But says specific T2D drugs 'are not listed in the sources' and does not supply metformin from own knowledge; content is stated twice (paragraph then bullets)."
+  }
+ },
+ "med-02": {
+  "q2kxl_none": {
+   "score": 8.5,
+   "halluc": [],
+   "note": "Signs graded mild/severe, classic vs exertional heat stroke, key discriminator (altered mental status, >40 C), dehydration first aid, and heat-stroke first aid reaches call EMS, rapid cooling (ice packs, immersion), no fluids if confused. 'Avoid sugary drinks' sits oddly beside recommending sports drinks. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 4.5,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Right two articles but once more no Heat stroke > Treatment section. Signs are well grounded (40 C, sweating classic vs exertional, 5-8%/10% water loss), but for first aid it says 'sources do not detail acute cooling techniques' and offers prevention tips - no 'cool rapidly, call for help'. The labelled fallback that worked in exp-05 did not fire on the most safety-critical item."
+  }
+ },
+ "med-03": {
+  "q2kxl_none": {
+   "score": 8,
+   "halluc": [],
+   "note": "Concise and correct: ORS first, loperamide only without fever/blood, azithromycin first-line with fluoroquinolone caveat, clear red-flag list, vulnerable groups, persistent diarrhoea -> parasites. No bismuth or diet tips. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 5,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "'Traveler's diarrhea' missed by title (article is 'Travelers' diarrhea'), so the planned route filled three slots with Dysentery; the right TD Treatment/Rifaximin passages came via BM25. Answer blends dysentery antibiotic policy (cipro/TMP-SMX for high-risk groups) into TD advice, never mentions loperamide or azithromycin, and red flags are implicit. No contamination from unrelated drugs this time (round one: 4)."
+  }
+ },
+ "num-01": {
+  "q2kxl_none": {
+   "score": 6,
+   "halluc": [
+    "Opening line states India's population is '16 to 17 times' Canada's and Canada is 'roughly 30% larger' in area (both wrong; self-corrected later to ~35x and ~3x)"
+   ],
+   "note": "Final figures correct (1.43 B / 41 M ~ 35x; 9.98 vs 3.29 M km2 ~ 3x) but the answer leads with wrong numbers and shows visible 'Wait, let me re-calculate' reasoning. A reader who stops at the first sentence is misinformed."
+  },
+  "q2kxl_plan": {
+   "score": 6.5,
+   "halluc": [
+    "Opening line says Canada is 'approximately 4.5 times the size of India' and later '3 to 4.5 times' (9.98/3.29 is ~3.0x on any measure)"
+   ],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "India and Canada leads give sourced populations (1.428 B, 41 M) -> ~35x, correct and cited. Areas are from own knowledge and correct, but the stated ratio is wrong in the headline and hedged in the body."
+  }
+ },
+ "num-02": {
+  "q2kxl_none": {
+   "score": 8,
+   "halluc": [
+    "Says Neptune's orbit is 'highly elliptical' with light time varying 3 h 40 - 4 h 25 (eccentricity ~0.009; range is about 4 h 08 - 4 h 13)"
+   ],
+   "note": "Headline answer correct up front (8 min 20 s; 4 h 10 min), with d/c reasoning: 149.6 M km -> 499 s; 4.495 B km -> ~15,000 s. Cut off only in the redundant summary. Carries phantom [n] citation markers although no sources were shown."
+  },
+  "q2kxl_plan": {
+   "score": 6.5,
+   "halluc": [],
+   "retrieval": "partial",
+   "grounded": true,
+   "note": "Title match for 'Neptune' returned 'NEPTUNE' (the ocean observatory) - a case-insensitive title collision. Model noticed, fell back to labelled own knowledge for Neptune (4.5 B km / 300,000 km/s -> 4 h 10) correctly. Earth leg is just the sourced '8 light-minutes' with no calculation despite 'show the reasoning'."
+  }
+ },
+ "num-03": {
+  "q2kxl_none": {
+   "score": 5,
+   "halluc": [
+    "Gives the boiling point at 3,600 m / 65% pressure as 82-84 C (actual ~88 C)"
+   ],
+   "note": "Explanation of vapour pressure vs ambient pressure is correct, but the number is ~5 C low - worse than round one's 85-86."
+  },
+  "q2kxl_plan": {
+   "score": 5,
+   "halluc": [
+    "Gives the boiling point at 3,600 m as 82-83 C (actual ~88 C)"
+   ],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Right articles again, and it quotes a sourced anchor (93.4 C at 1,905 m) - which by linear extrapolation gives ~87.5 C - but then asserts 82-83 C 'from general scientific knowledge'. Round one used the sourced 1 C/274 m rule and scored 9; here good retrieval was overridden by a wrong prior."
+  }
+ },
+ "abs-01": {
+  "q2kxl_none": {
+   "score": 9,
+   "halluc": [],
+   "note": "Abstains cleanly, explains why, points to Bolivian news outlets and municipal channels. Odd aside about its knowledge cutoff."
+  },
+  "q2kxl_plan": {
+   "score": 9,
+   "halluc": [],
+   "retrieval": "good",
+   "grounded": true,
+   "note": "Abstains; says the sources have no such speech, adds only safe sourced context (Tarija is a departmental capital; mayors are elected). No invented content."
+  }
+ },
+ "abs-02": {
+  "q2kxl_none": {
+   "score": 7.5,
+   "halluc": [
+    "Suggests 'The Cartographer Wasps by Junot Diaz' (the story is by E. Lily Yu) and 'The Mapmaker's Daughter by Kate Furnivall' (not her book) as possible intended titles",
+    "Asserts there is 'no record ... in Wikipedia' though it has no access to check"
+   ],
+   "note": "Abstains correctly on the trap, but then invents author attributions for look-alike titles - a small hallucination inside a refusal."
+  },
+  "q2kxl_plan": {
+   "score": 8.5,
+   "halluc": [],
+   "retrieval": "miss",
+   "grounded": true,
+   "note": "Only BM25 keyword coincidences (van de Velde maps). Model says the novel/author are not found, explains the passages are about a Dutch cartographer, and stops - tighter than round one. 'Does not exist' is stated a little too categorically."
+  }
+ }
+}

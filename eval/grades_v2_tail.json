@@ -1,0 +1,498 @@
+{
+ "tail-01": {
+  "draft": {
+   "score": 2,
+   "key_facts_hit": "1/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 7,
+   "key_facts_hit": "5/5",
+   "check_effect": "helped",
+   "reason": "Replaced invented members (Lacy, John Africa) with King/Woodfox/Wallace, fixed 40+ years and King 29 years/2001; invented guard names and Wallace 2011 release left standing",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 9,
+   "key_facts_hit": "5/5",
+   "fabricated": false,
+   "retrieved_right_article": true
+  }
+ },
+ "tail-02": {
+  "draft": {
+   "score": 4,
+   "key_facts_hit": "2/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 4,
+   "key_facts_hit": "1/5",
+   "check_effect": "neutral",
+   "reason": "Rightly flags the invented style categories as unsupported but wrongly \"corrects\" the true Confucianism claim and adds none of the three styles; Tattooing in China was only hits 5-6 and probably fell outside the 3200-char context",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 3,
+   "key_facts_hit": "1/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Honest that styles are not in its sources; right article listed but likely dropped from context"
+  }
+ },
+ "tail-03": {
+  "draft": {
+   "score": 1,
+   "key_facts_hit": "0/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 4,
+   "key_facts_hit": "1/5",
+   "check_effect": "helped",
+   "reason": "Replaced the invented 1992 Landau/Uelzen story with the real 1911 M6.1 Albstadt quake; never finds 1943/1978 or the costliest answer; check truncated at 300 tokens",
+   "retrieved_right_article": false
+  },
+  "plan": {
+   "score": 3,
+   "key_facts_hit": "1/5",
+   "fabricated": false,
+   "retrieved_right_article": false,
+   "note": "Misreads strongest (1756 Dueren) as costliest; Albstadt article never requested or retrieved"
+  }
+ },
+ "tail-04": {
+  "draft": {
+   "score": 3,
+   "key_facts_hit": "0/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 7,
+   "key_facts_hit": "4/5",
+   "check_effect": "helped",
+   "reason": "Fixed founding date (8 April 1946), 1999 monopoly end, SA on 19 Nov 2004, Nov 2005 float; RTE bullet muddled, truncated, no Marcel Paul/85%",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 8,
+   "key_facts_hit": "4/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Says generation monopoly (gold: distribution); no Marcel Paul"
+  }
+ },
+ "tail-05": {
+  "draft": {
+   "score": 4,
+   "key_facts_hit": "1/5",
+   "fabricated": false
+  },
+  "verified": {
+   "score": 7,
+   "key_facts_hit": "4/5",
+   "check_effect": "helped",
+   "reason": "Added Nisaean plain, c.430 BCE, ten sacred horses, robust head; said \"No corrections\" although the extinction claim is wrong (1204 not retrieved)",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 7,
+   "key_facts_hit": "4/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Honest that extinction date is not in the retrieved passages"
+  }
+ },
+ "tail-06": {
+  "draft": {
+   "score": 0,
+   "key_facts_hit": "0/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 8,
+   "key_facts_hit": "5/5",
+   "check_effect": "helped",
+   "reason": "Overturned an entirely fabricated bankruptcy/founder story: Kaneshige, insurance fraud, FSA revocation, Itochu/WECARS, Sompo",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 9,
+   "key_facts_hit": "4/5",
+   "fabricated": false,
+   "retrieved_right_article": true
+  }
+ },
+ "tail-07": {
+  "draft": {
+   "score": 9,
+   "key_facts_hit": "5/5",
+   "fabricated": false
+  },
+  "verified": {
+   "score": 9,
+   "key_facts_hit": "5/5",
+   "check_effect": "neutral",
+   "reason": "Draft already complete; no corrections, three correct but peripheral additions (padding)",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 6,
+   "key_facts_hit": "3/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Structure right, but bias condition vague (no e/C) and temperature only from general knowledge"
+  }
+ },
+ "tail-08": {
+  "draft": {
+   "score": 4,
+   "key_facts_hit": "3/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 8,
+   "key_facts_hit": "5/5",
+   "check_effect": "helped",
+   "reason": "Replaced invented Berkshire x \"British Mule\" origin with the Devon/Cornwall + Essex/Suffolk/Kent merger and added the Howitt Report; second bullet rambles, truncated",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 9,
+   "key_facts_hit": "5/5",
+   "fabricated": false,
+   "retrieved_right_article": true
+  }
+ },
+ "tail-09": {
+  "draft": {
+   "score": 0,
+   "key_facts_hit": "0/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 8,
+   "key_facts_hit": "4/5",
+   "check_effect": "helped",
+   "reason": "Draft was wholly invented (November date, lift shaft, one death); check supplies 17 Dec car bomb, 3 police + 3 civilians, 37-minute warning, Army Council disavowal; misses 90 injured and shift to military targets",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 10,
+   "key_facts_hit": "5/5",
+   "fabricated": false,
+   "retrieved_right_article": true
+  }
+ },
+ "tail-10": {
+  "draft": {
+   "score": 0,
+   "key_facts_hit": "0/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 8,
+   "key_facts_hit": "5/5",
+   "check_effect": "helped",
+   "reason": "Draft invented an anti-Islam speech and Article 142; check supplies the real charge (using religion as a political tool), Eyup, Quran/hadith, primitive-socialist thesis, only communist so charged",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 10,
+   "key_facts_hit": "5/5",
+   "fabricated": false,
+   "retrieved_right_article": true
+  }
+ },
+ "tail-11": {
+  "draft": {
+   "score": 2,
+   "key_facts_hit": "1/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 5,
+   "key_facts_hit": "2/5",
+   "check_effect": "helped",
+   "reason": "Replaced a fabricated doublage definition with the residence obligation and gave 1953, but wrongly disputes the roughly right 1938 date and never gives 1852-54 decrees/1945; truncated",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 5,
+   "key_facts_hit": "2/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Writes Napoleon I for Napoleon III; doublage only partly explained; no 1938/1945; only one section of the right article retrieved (via bm25)"
+  }
+ },
+ "tail-12": {
+  "draft": {
+   "score": 2,
+   "key_facts_hit": "1/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 8,
+   "key_facts_hit": "5/5",
+   "check_effect": "helped",
+   "reason": "Replaced Amanda Gorman/Roger Waters fabrication with Red Viburnum anthem, Khlyvnyuk of BoomBox, 8 April 2022, relief fund; one addition duplicates a correction",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 9,
+   "key_facts_hit": "4/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "No release date"
+  }
+ },
+ "tail-13": {
+  "draft": {
+   "score": 0,
+   "key_facts_hit": "0/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 6,
+   "key_facts_hit": "3/5",
+   "check_effect": "helped",
+   "reason": "Fixed killer, Legazpi, counter-protest context and 26 years, but left the wrong date (18 April 2007) uncorrected; no sentence breakdown or compensation",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 8,
+   "key_facts_hit": "4/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Sentence breakdown/compensation section not retrieved"
+  }
+ },
+ "tail-14": {
+  "draft": {
+   "score": 2,
+   "key_facts_hit": "1/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 6,
+   "key_facts_hit": "3/5",
+   "check_effect": "helped",
+   "reason": "Fixed dates/places (Curenna Christmas 1943, Alto Epiphany 1944) and added Garibaldi anthem, but hedges that \"historical records do credit Pajetta\" instead of naming Cascione as author; \"Italy Calvino\"",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 6,
+   "key_facts_hit": "2/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Never names Cascione or Sibilla, so \"how it came to be written\" is unanswered"
+  }
+ },
+ "tail-15": {
+  "draft": {
+   "score": 6,
+   "key_facts_hit": "3/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 5,
+   "key_facts_hit": "3/5",
+   "check_effect": "hurt",
+   "reason": "Da Zhidu Lun article not retrieved; check says \"No corrections\" over real errors (200 fascicles, 8,000-line sutra, Indo-Saka) and pads with a misleading \"multiple Nagarjunas\" explanation for the dispute",
+   "retrieved_right_article": false
+  },
+  "plan": {
+   "score": 2,
+   "key_facts_hit": "1/5",
+   "fabricated": true,
+   "retrieved_right_article": false,
+   "note": "Names Kumaralata as translator, copied from its own wrong plan title; invented reasoning"
+  }
+ },
+ "tail-16": {
+  "draft": {
+   "score": 2,
+   "key_facts_hit": "1/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 8,
+   "key_facts_hit": "5/5",
+   "check_effect": "helped",
+   "reason": "Corrected all three asked-for facts: 61st-97th Streets, 9 Nov 1982, neo-Italian Renaissance + Art Deco",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 9,
+   "key_facts_hit": "4/5",
+   "fabricated": false,
+   "retrieved_right_article": true
+  }
+ },
+ "tail-17": {
+  "draft": {
+   "score": 2,
+   "key_facts_hit": "1/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 5,
+   "key_facts_hit": "2/5",
+   "check_effect": "helped",
+   "reason": "Fixed composer (Shostakovich, not Prokofiev) and date (28 Jan) and added Zaslavsky, but never answers the Fourth Symphony part; plan titles chased Prokofiev",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 6,
+   "key_facts_hit": "3/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Honest that symphony consequences are not in sources; did not use own knowledge of the Fourth Symphony withdrawal"
+  }
+ },
+ "tail-18": {
+  "draft": {
+   "score": 8,
+   "key_facts_hit": "4/5",
+   "fabricated": false
+  },
+  "verified": {
+   "score": 8,
+   "key_facts_hit": "4/5",
+   "check_effect": "neutral",
+   "reason": "Draft already good; small correct additions (constipation, drainage, worst when sitting); staph/MRSA trend still missing",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 7,
+   "key_facts_hit": "4/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Says specific bacteria not in sources; misses E. coli, mentions MRSA from the generic Abscess article"
+  }
+ },
+ "tail-19": {
+  "draft": {
+   "score": 1,
+   "key_facts_hit": "1/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 6,
+   "key_facts_hit": "2/5",
+   "check_effect": "helped",
+   "reason": "Overturned the draft denial of any failure: fire reports, removal from lineup, Feb 2020 release; flags founders as unsupported but cannot supply Johnny Hou/Guardian, no Gamers Nexus or dates",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 6,
+   "key_facts_hit": "2/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Fire, Gamers Nexus and removal dates right; no founding history because the NZXT lead was never retrieved (title not resolved, bm25 sections only)"
+  }
+ },
+ "tail-20": {
+  "draft": {
+   "score": 3,
+   "key_facts_hit": "2/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 6,
+   "key_facts_hit": "3/5",
+   "check_effect": "helped",
+   "reason": "Replaced invented proposers (Needham as French Jesuit, \"Otto von Simmelstern\") with Terrien de Lacouperie and named Huntington/Bishop/Ho; truncated before additions so later responses are not explained",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 10,
+   "key_facts_hit": "5/5",
+   "fabricated": false,
+   "retrieved_right_article": true
+  }
+ },
+ "tail-21": {
+  "draft": {
+   "score": 2,
+   "key_facts_hit": "1/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 8,
+   "key_facts_hit": "4/5",
+   "check_effect": "helped",
+   "reason": "Replaced invented posts with ICMR DG/Secretary 2015-17, WHO DDG Programmes Oct 2017-Mar 2019, Chief Scientist to 2022, and added HIV; one redundant addition",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 9,
+   "key_facts_hit": "4/5",
+   "fabricated": false,
+   "retrieved_right_article": true
+  }
+ },
+ "tail-22": {
+  "draft": {
+   "score": 1,
+   "key_facts_hit": "0/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 6,
+   "key_facts_hit": "3/5",
+   "check_effect": "helped",
+   "reason": "Replaced invented Mandel Industries/Crown Zellerbach with Premier Automotive Supply (1940, brothers Jack and Joe); flags invented institutes; gives Bezalel rather than Negev centre/$22.5M humanities centre; truncated",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 7,
+   "key_facts_hit": "3/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Cites correct but different gifts (Bezalel $25M, $5.25M Brandeis chair); gold Negev/Humanities facts not in retrieved chunks"
+  }
+ },
+ "tail-23": {
+  "draft": {
+   "score": 1,
+   "key_facts_hit": "0/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 7,
+   "key_facts_hit": "3/5",
+   "check_effect": "helped",
+   "reason": "Replaced Il-76 cargo fabrication with flag carrier, Dash 8 Q400, A320neo lease plan and the EU ban on all Kyrgyz airlines; fleet count/routes missing",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 7,
+   "key_facts_hit": "3/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "One Dash 8 rather than two; no Paris/Berlin/London"
+  }
+ },
+ "tail-24": {
+  "draft": {
+   "score": 2,
+   "key_facts_hit": "1/5",
+   "fabricated": true
+  },
+  "verified": {
+   "score": 4,
+   "key_facts_hit": "1/5",
+   "check_effect": "helped",
+   "reason": "Removes the invented 2019 ordinance/UGC milestones (2021 Act, 2023 start) but supplies no reason and none of the 2005/3 Sept 2021/5 March 2023/330.17 crore milestones although the History section is listed",
+   "retrieved_right_article": true
+  },
+  "plan": {
+   "score": 3,
+   "key_facts_hit": "1/5",
+   "fabricated": false,
+   "retrieved_right_article": true,
+   "note": "Honest \"sources do not say\"; History section listed in sources but unused or cut"
+  }
+ }
+}

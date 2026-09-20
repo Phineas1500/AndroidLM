@@ -1,0 +1,199 @@
+{
+ "tail-01": {
+  "route": "plan",
+  "final": 7,
+  "key_facts_hit": "3/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Names all three, 1972 indictment/1974 conviction for killing a guard, 40+ years each; never names Louisiana State Penitentiary/Angola or Brent Miller and drops King's 29 years/2001 release that r3 plan had (shorter lead passage)"
+ },
+ "tail-02": {
+  "route": "verify",
+  "final": 8,
+  "key_facts_hit": "5/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "check_effect": "helped: Tattooing in China lead now reached the context ([5]) and the single correction is exactly right; it no longer wrongly disputes the Confucianism claim",
+  "reason": "Draft has Confucianism/filial piety and punitive criminal marking right but invents Xiangyang/Jianghu/modern style categories; check replaces them with brush painting, realistic painting and watercolor splash ink plus national colours. User still reads a long fabricated style section (and an invented proverb) before the fix; draft truncated"
+ },
+ "tail-03": {
+  "route": "verify",
+  "final": 1,
+  "key_facts_hit": "0/5",
+  "fabricated": true,
+  "retrieved_right_article": false,
+  "check_effect": "neutral: weakly disputes the Landau claim but supplies nothing correct and adds a 2021 quake mislabelled as 20th century; planner never asked for Albstadt and only the list lead/'Other'/1756 sections were retrieved",
+  "reason": "Draft denies any major Albstadt quake and invents a 1992 Landau quake as Germany's costliest (2 billion DM). Check only says sources do not support Landau, points to 1756 Dueren as strongest, and offers a March 2021 M3.9 event as 'the only 20th-century' quake near Albstadt. No 1911/1943/1978, no 275 million DM; the denial stays uncorrected"
+ },
+ "tail-04": {
+  "route": "verify",
+  "final": 4,
+  "key_facts_hit": "1/5",
+  "fabricated": true,
+  "retrieved_right_article": true,
+  "check_effect": "helped (slightly): one correct date fix, but the second correction is muddled and the check ignored the 'Status of EDF' and Energy in France passages that held the 2004/2005 facts; r3 check found four of them",
+  "reason": "Check fixes founding date to 8 April 1946 (nationalisation right in draft). Everything else the question asks is missing or wrong: no 1999 end of monopoly, no societe anonyme on 19 Nov 2004, no Nov 2005 float/85%, no Marcel Paul; invented '1997 transition to private-law enterprise' and 'July 10, 2000' law left standing or only muddily disputed via RTE/NOME 2010"
+ },
+ "tail-05": {
+  "route": "plan",
+  "final": 6,
+  "key_facts_hit": "2/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Right on Nisaean plain in Media, unusual size, prized mount of Persian nobility, colours; honest that extinction date is not in its sources. Loses c.430 BCE first reference, ten sacred horses and robust warhorse head that r3 had; no 1204"
+ },
+ "tail-06": {
+  "route": "plan",
+  "final": 9,
+  "key_facts_hit": "4/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Systematic insurance fraud, Kaneshige resignation, FSA revoked registration, sold to Itochu/WECARS, founded 1976 as Kaneshige Auto Center; no Iwakuni, no Sompo Japan"
+ },
+ "tail-07": {
+  "route": "plan",
+  "final": 9,
+  "key_facts_hit": "5/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Island between two tunnel junctions, capacitively coupled gate, Coulomb blockade, V < e/C, thermal energy low relative to charging energy (no explicit e^2/2C formula). Clear gain over r3 plan, which lacked the bias condition"
+ },
+ "tail-08": {
+  "route": "plan",
+  "final": 7,
+  "key_facts_hit": "3/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Late 19th-century merger of Devon/Cornwall with Essex/Suffolk/Kent blacks, not suited to intensive farming, post-WWII decline, correct extras (Chinese/French influence, 1949 NPBA merger); no Howitt Report, and neither 'almost extinct by the 1960s' nor still-endangered is stated"
+ },
+ "tail-09": {
+  "route": "plan",
+  "final": 10,
+  "key_facts_hit": "5/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "17 Dec 1983 car bomb, 37-minute warning, not evacuated, 3 police + 3 civilians, 90 injured, Army Council unauthorised/regret, shift to military targets"
+ },
+ "tail-10": {
+  "route": "plan",
+  "final": 6,
+  "key_facts_hit": "3/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "History Thesis, 'historical revolution', primitive socialist early Muslims, Rashidun/tribal elites, Eyup, 1957 Vatan Partisi campaign all right, but never states the actual charge (using religion as a political tool, only communist so charged) nor that he used Quran verses and hadith, so the 'why prosecuted' half is unanswered; r3 plan had both"
+ },
+ "tail-11": {
+  "route": "plan",
+  "final": 5,
+  "key_facts_hit": "2/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Gives 1852 and the 1854 law, doublage as released convicts forced to reside in Guiana (not 'for a period equal to the sentence'), and 1953 presented as abolition rather than last releases; no 1853, 1938 or 1945. Toulon 1873 correct. Planner title 'Bagnes' resolved to the Swiss municipality; right article came only via bm25 and only its sentence-categories section (twice), never the lead with the dates"
+ },
+ "tail-12": {
+  "route": "plan",
+  "final": 9,
+  "key_facts_hit": "4/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Red Viburnum 1914 anthem, Khlyvnyuk of BoomBox, support for Ukraine during invasion, proceeds to humanitarian relief; no 8 April 2022 date, Gilmour not named"
+ },
+ "tail-13": {
+  "route": "plan",
+  "final": 8,
+  "key_facts_hit": "4/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "11 Nov 2007, Legazpi, Josue Estebanez (soldier), counter-protest to neo-Nazi rally, 26 years, first use of ideological-hatred aggravator; no 19+7 breakdown, compensation or Supreme Court confirmation"
+ },
+ "tail-14": {
+  "route": "plan",
+  "final": 6,
+  "key_facts_hit": "2/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Late 1943, Katyusha melody, Curenna at Christmas 1943, Alto on Epiphany 1944; still never names Cascione or Sibilla so 'how it came to be written' is unanswered; no Garibaldi brigades"
+ },
+ "tail-15": {
+  "route": "verify",
+  "final": 3,
+  "key_facts_hit": "2/5",
+  "fabricated": true,
+  "retrieved_right_article": false,
+  "check_effect": "hurt: turns a correct key fact into a wrong one and leaves the real errors untouched; worse than r3's 'No corrections'",
+  "reason": "Draft is right on Kumarajiva, 402-406 and the disputed Nagarjuna attribution, wrong on 8,000-line sutra, 200 fascicles, Indo-Saka. The only check item 'corrects' the true translator to Kumaralata, a name lifted from the planner's wrong title; user ends up told the translator was Kumaralata. Da Zhidu Lun article never retrieved (planner spelled it 'Da Zhidulun')"
+ },
+ "tail-16": {
+  "route": "plan",
+  "final": 5,
+  "key_facts_hit": "3/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "61st-97th Streets, Upper West Side, 9 Nov 1982, the Dakota right; says styles are not in its sources and then rambles about Gothic revival/Beaux-Arts with a hedged wrong guess that the Dakota is Beaux-Arts. One of three asked parts unanswered; r3 plan had neo-Italian Renaissance/Art Deco (2 passages dropped, shorter lead lost the style sentence)"
+ },
+ "tail-17": {
+  "route": "plan",
+  "final": 4,
+  "key_facts_hit": "3/5",
+  "fabricated": true,
+  "retrieved_right_article": true,
+  "reason": "Editorial part good (unsigned, 28 Jan 1936, Shostakovich's Lady Macbeth, Stalin approved but did not write). Symphony part is wrong: ties the editorial to Prokofiev's Fifth (1944) and invents Shostakovich dates (Fifth 'published 1934', Sixth 1936, Seventh 1942), contradicting the gold's Fifth in Nov 1937; no Fourth Symphony withdrawal. Planner again chased Prokofiev and half the context was Prokofiev passages"
+ },
+ "tail-18": {
+  "route": "plan",
+  "final": 8,
+  "key_facts_hit": "4/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Full symptom list incl. worst when sitting/before bowel movement, constipation, drainage, fever, mass; E. coli/gut bacteria; testing identifies pathogen to guide treatment. No staphylococcus/MRSA trend (the actual reason), no Crohn's"
+ },
+ "tail-19": {
+  "route": "verify",
+  "final": 5,
+  "key_facts_hit": "2/5",
+  "fabricated": true,
+  "retrieved_right_article": true,
+  "check_effect": "helped: fixes the central wrong claim and adds the Gamers Nexus date, but leaves the fabricated founders and release year uncorrected",
+  "reason": "Draft flatly denies any failure or recall, invents founders 'Jeroen van den Bosch and Ben Ku' and a 2019 launch. Check overturns the denial: fire reports, removed from lineup, Gamers Nexus 30 Nov 2020. Invented founders and 2019 date left standing (r3 check at least flagged the founders); no Johnny Hou, Guardian, Feb 2020, 2 Feb 2021. NZXT title still unresolved, bm25 sections only"
+ },
+ "tail-20": {
+  "route": "plan",
+  "final": 8,
+  "key_facts_hit": "3/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Claim, Terrien de Lacouperie with migration, rejection (Schlegel and linguistic objections - correct extra), Huntington/Bishop hyperdiffusionism; stops before Ping-ti Ho and Mallory/Mair/Tarim mummies that r3 plan had"
+ },
+ "tail-21": {
+  "route": "plan",
+  "final": 7,
+  "key_facts_hit": "3/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "ICMR DG/Secretary 2015-17, WHO DDG Programmes Oct 2017-Mar 2019, TB and HIV right; then claims sources do not cover 2019-2022 and treats the 'Chief Scientist' title as a conflict instead of stating it; no NIRT Chennai"
+ },
+ "tail-22": {
+  "route": "plan",
+  "final": 6,
+  "key_facts_hit": "3/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Premier Automotive Supply 1940 with Jack and Joe, industrial/electronic distributor; Israel gifts are real but not the gold ones (Bezalel $25M, Be'er-Sheva museum, Mandel Leadership Institute 1992); says nothing on Brandeis is in its sources, so that part is unanswered (r3 at least had the $5.25M chair). Context slots spent on Brandeis founding history, Philanthropy section duplicated"
+ },
+ "tail-23": {
+  "route": "plan",
+  "final": 8,
+  "key_facts_hit": "4/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Flag carrier, Manas/Bishkek, two aircraft of Dash 8 Q400 type, A320neo lease plan, EU ban on all Kyrgyz airlines; no Paris/Berlin/London, no two on order/80 seats"
+ },
+ "tail-24": {
+  "route": "plan",
+  "final": 8,
+  "key_facts_hit": "4/5",
+  "fabricated": false,
+  "retrieved_right_article": true,
+  "reason": "Now uses the History section: no nodal agency because colleges sat under general universities, 2005 expert committee by-laws, Bill passed 3 Sept 2021, active from 5 March 2023 (tied to first VC rather than Sishu Bhawan Square); no Rs 330.17 crore"
+ }
+}

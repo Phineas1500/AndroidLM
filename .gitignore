@@ -1,0 +1,22 @@
+# large artifacts live on the build machines, never in git
+*.gguf
+*.db
+*.parquet
+*.bz2
+*.gz
+*.apk
+corpus/
+models/
+logs/
+
+__pycache__/
+*.pyc
+venv/
+.DS_Store
+
+# Android
+.gradle/
+build/
+local.properties
+*.keystore
+keystore.properties

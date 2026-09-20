@@ -1,0 +1,673 @@
+{
+ "exp-01": {
+  "draft": {
+   "score": 8,
+   "halluc": [
+    "Lists Palestine among the states extracting potash/bromine (only Israel and Jordan operate Dead Sea works)",
+    "Says extreme salinity prevents microbial life (halophilic archaea/bacteria live there)"
+   ]
+  },
+  "verified": {
+   "score": 7.5,
+   "check_effect": "hurt",
+   "reason": "No real correction or addition: a 170-word paragraph of commentary on what the sources lack, only restating 34.2%/9.6x and adding depth/elevation trivia. Pure padding after a good draft.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 6.5,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Right article (lead, climate, lake salinity) but again not the 'recession and environmental concerns' section. Correct but only two short paragraphs: Jordan diversion yes; no potash works, no rate of fall, no sinkholes. All cited to [1]."
+  }
+ },
+ "exp-02": {
+  "draft": {
+   "score": 8.5,
+   "halluc": []
+  },
+  "verified": {
+   "score": 8.5,
+   "check_effect": "neutral",
+   "reason": "Both 'additions' (heat from air/ground/water; COP 3 = 3 units per unit) repeat sentences already in the draft verbatim. Harmless but zero value.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 7,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Ideal titles (Heat pump, COP, First law). Correct and grounded but one paragraph: no cycle description, no COP numbers even though the COP article was in hand. Under-uses good retrieval."
+  }
+ },
+ "exp-03": {
+  "draft": {
+   "score": 8,
+   "halluc": [
+    "Implies Sea Peoples' movements contributed to the destruction of Hattusa (inland Hittite capital; usually attributed to Kaska/abandonment)"
+   ]
+  },
+  "verified": {
+   "score": 8,
+   "check_effect": "neutral",
+   "reason": "The 'correction' only says the drought dates are not in the sources, casting doubt on a claim that is right. Additions (de Rouge/Maspero origin of the hypothesis, Sea Peoples as symptom, Assyria/Egypt survived weakened) are accurate and mildly useful; Lukka/Weshesh is trivia. Nets out; does not complete the truncated earthquake item.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 6.5,
+   "retrieval": "partial",
+   "halluc": [
+    "Says Sea Peoples' movements were driven by 'drought in the Nile Valley' (garbled: Nile failures weakened Egypt, they did not drive the migrations)"
+   ],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Right articles (LBA collapse lead, Migratory invasions, Sea Peoples) but only one of the 'Possible causes' subsections; Evidence>Cyprus/Levant add little. Covers Sea Peoples, systems collapse, palace economies; misses earthquakes, ironworking/warfare, and treats drought only in passing. Odd Urnfield/Hallstatt aside lifted from source."
+  }
+ },
+ "exp-04": {
+  "draft": {
+   "score": 8.5,
+   "halluc": []
+  },
+  "verified": {
+   "score": 7.5,
+   "check_effect": "hurt",
+   "reason": "Addition 1 says vaccine mRNA 'had introns removed through RNA splicing' - lifted from the generic mRNA article; vaccine mRNA is synthesized in vitro and never spliced. Addition 2 (cholera/plague/Salk history) is off-question; addition 3 repeats the draft.",
+   "check_halluc": [
+    "States mRNA-vaccine strands are mature mRNA that had introns removed by splicing (they are in-vitro transcribed; no splicing)"
+   ]
+  },
+  "plan": {
+   "score": 6.5,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Planner chose 'Messenger RNA' and 'Vaccine' rather than 'mRNA vaccine'. Answer spends a paragraph on transcription/splicing/introns/tRNA (irrelevant to a synthetic vaccine) and attributes vaccine-specific claims to [1], the generic mRNA article, which cannot support them. Inactivated side well grounded. Core contrast correct; no LNP, storage, speed."
+  }
+ },
+ "exp-05": {
+  "draft": {
+   "score": 8,
+   "halluc": [
+    "Expands HACE as 'High Altitude Brain Swelling' (High Altitude Cerebral Edema)",
+    "Lists shortness of breath on exertion as an early AMS symptom (it is a HAPE warning sign)"
+   ]
+  },
+  "verified": {
+   "score": 8.5,
+   "check_effect": "helped",
+   "reason": "Three short, accurate, relevant additions: onset within ~10 h and resolution in ~2 days, fitness does not protect, threshold ~2,500 m.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 7.5,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Still no treatment/prevention section and two decompression-sickness passages, but the model now gives a clearly labelled own-knowledge fallback: stop ascending, rest, descend if worse, with HAPE/HACE red flags. Big fix over round one's refusal (4). Lacks descent distance, acetazolamide, ascent-rate rule."
+  }
+ },
+ "cmp-01": {
+  "draft": {
+   "score": 7.5,
+   "halluc": [
+    "Calls the 1917 ideology 'Marxist-Leninist' (anachronistic; minor)"
+   ]
+  },
+  "verified": {
+   "score": 8,
+   "check_effect": "helped",
+   "reason": "Adds Declaration of the Rights of Man, state control of the Church, and the concrete February 1917 triggers (bread shortages, army mutiny). Accurate and relevant; framed as 'the draft lacks...' commentary, and does not finish the truncated Russian long-term outcomes.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 6,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Redirect fixed round two's failure: 'Russian Revolution of 1917' now resolves, both leads plus Russian Background shown, and the model compares both (round two: 2.5 refusal). Grounded and error-free but thin: never names Lenin, the Bolsheviks or the October Revolution, no Terror/Napoleon beyond 18 Brumaire, no USSR, and no actual comparison of similarities/differences."
+  }
+ },
+ "cmp-02": {
+  "draft": {
+   "score": 7.5,
+   "halluc": [
+    "States PoS security as needing >51% of stake (BFT-style PoS: 1/3 to halt finality, 2/3 to finalize)",
+    "'Proof-of-Step' typo for Proof-of-Stake"
+   ]
+  },
+  "verified": {
+   "score": 7.5,
+   "check_effect": "neutral",
+   "reason": "Addition 1 repeats the draft; asymmetric-economic-security point is relevant to security assumptions; DPoS round-robin is peripheral. Did not catch the 51%-of-stake simplification.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 6,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Both articles retrieved. Grounded but lopsided: leans almost entirely on the 'Asymmetric Economic Security' critique and a DPoS aside; no finality, slashing, nothing-at-stake or 1/3-2/3 thresholds, and few practical differences beyond energy. DPoS cited as [4] but that passage is source 6."
+  }
+ },
+ "cmp-03": {
+  "draft": {
+   "score": 7,
+   "halluc": [
+    "Says dengue 'cannot be transmitted through blood transfusion in most standard protocols' (transfusion transmission is documented)",
+    "Names a dengue vaccine 'TIKVAK' (no such product; TAK-003 is Qdenga itself)"
+   ]
+  },
+  "verified": {
+   "score": 7.5,
+   "check_effect": "helped",
+   "reason": "Draft was truncated before any treatment; the check supplies severe-malaria treatment (artemisinin derivatives, quinine, rectal artesunate), incubation periods for both, and ADE. Still no dengue treatment, and missed the transfusion/TIKVAK errors.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 5,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Both leads retrieved (dengue lead twice) plus severe-malaria treatment and dengue diagnosis; no prevention sections, no dengue treatment. Symptoms/transmission well grounded, but 'Prevention: sources do not detail' and 'dengue treatment: no information' with no own-knowledge fallback leave half the question unanswered. Malaria treatment covers only severe cases."
+  }
+ },
+ "cmp-04": {
+  "draft": {
+   "score": 8.5,
+   "halluc": []
+  },
+  "verified": {
+   "score": 8,
+   "check_effect": "hurt",
+   "reason": "Temasek/dirigisme and Global Innovation Index additions are good, but addition 3 attributes Swiss history to Singapore ('Singapore's early economic development was driven by ... city-cantons like Zurich, Geneva and Basel'). A confident, visible error appended to a clean draft.",
+   "check_halluc": [
+    "Attributes Swiss city-canton/hydraulic-power industrialisation to Singapore"
+   ]
+  },
+  "plan": {
+   "score": 7,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Planned 'Political system of ...' titles did not resolve (real titles are 'Politics of ...'), so only the two Economy articles were shown. Politics section is short, unlabelled own knowledge (no Federal Council, no GRCs) but correct; economics is well grounded (Global Innovation Index, dirigisme, Temasek, FDI, low tax). Complete and coherent - large gain over round one (4)."
+  }
+ },
+ "cmp-05": {
+  "draft": {
+   "score": 8,
+   "halluc": [
+    "Defines ITER's Q>=10 goal as 'scientific breakeven' (breakeven is Q=1) and omits NIF's 2022 ignition result"
+   ]
+  },
+  "verified": {
+   "score": 6.5,
+   "check_effect": "hurt",
+   "reason": "Worst check in the set: three long 'corrections', none of a real error. Misreads the draft as claiming fusion has achieved breakeven (it says the opposite), spends lines on 'sources do not confirm ITER', quibbles about neutron capture vs fission, and is cut off mid-sentence at the token limit.",
+   "check_halluc": [
+    "Says the draft claims fusion reactors have achieved breakeven (the draft says none has)"
+   ]
+  },
+  "plan": {
+   "score": 7,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Leads of both articles (each twice) plus two peripheral physics sections; nothing from Fusion power / Nuclear power / radioactive waste, so feasibility, waste and safety are mostly uncited own knowledge - but correct. Physics thin (no binding energy or Coulomb barrier), no NIF/ITER."
+  }
+ },
+ "syn-01": {
+  "draft": {
+   "score": 8,
+   "halluc": [
+    "Says the empire was divided among Genghis's four sons 'creating' the Golden Horde, Chagatai, Ilkhanate and Yuan (the latter two arose under his grandsons after 1259)"
+   ]
+  },
+  "verified": {
+   "score": 8.5,
+   "check_effect": "helped",
+   "reason": "Supplies exactly what the draft blurred: Mongke's death 1259, Toluid Civil War, Berke-Hulagu war, and that the four khanates became functionally independent with no further military cooperation. Implicitly fixes the four-sons conflation.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 7.5,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Right three articles including 'Division of the Mongol Empire'. Fragmentation half is specific and well grounded (Mongke's death 1259, Toluid civil war, Berke-Hulagu, Kaidu-Kublai, four khanates). Expansion half is one generic sentence - no decimal system, Yam, siegecraft or divided enemies."
+  }
+ },
+ "syn-02": {
+  "draft": {
+   "score": 6.5,
+   "halluc": [
+    "Attributes to Harvard's Joint Center for Housing Studies a finding that moderate rent control has minimal supply impact (no such study)",
+    "Contrasts San Francisco's 'strict' control with New York's 'more moderate' system (SF has vacancy decontrol; framing invented)",
+    "'10-25% reduction in housing supply' for SF (Diamond et al.: ~15% among treated landlords, ~6% citywide)"
+   ]
+  },
+  "verified": {
+   "score": 7,
+   "check_effect": "helped",
+   "reason": "Correctly flags the Harvard JCHS and SF 10-25% claims as unsupported and adds real named evidence (Urban Institute 2013, NYU Furman 2016, Columbia 2021). Third 'correction' is a non sequitur (maintenance obligations in law 'contradict' maintenance criticism), and the housing-supply passage that was retrieved is not used.",
+   "check_halluc": [
+    "Claims the existence of landlord maintenance obligations contradicts criticism of maintenance under NYC rent regulation"
+   ]
+  },
+  "plan": {
+   "score": 7,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Redirect fixed it: 'Rent control' -> 'Rent regulation' (round two fell to 'Rent control in Massachusetts', score 4). Well-grounded for/against with named studies (Tatian/Urban 2013, Furman 2016, Columbia 2021) and current Oregon/California/St Paul caps. Weakness: the retrieved 'Effects > On housing supply' passage is again unused, so the core supply evidence (SF/Diamond) is only gestured at; 'against' precedes 'for'."
+  }
+ },
+ "syn-03": {
+  "draft": {
+   "score": 6.5,
+   "halluc": [
+    "Gives the ISO standard container as '53 feet long' (ISO standards are 20 and 40 ft; 53 ft is a US domestic size)",
+    "Cites Boston's North End and Chicago's Near South Side as gentrified former container-era port districts",
+    "Shipping cost 'roughly 90%' lower and turnaround 'from months to days' (exaggerated)"
+   ]
+  },
+  "verified": {
+   "score": 6.5,
+   "check_effect": "neutral",
+   "reason": "Opens with commentary ('sources do not provide specific details contradicting...'); additions (70% of trade by value, Asian mega-ports, definition of intermodal container) are accurate but peripheral. Missed the 53-ft error although the intermodal-container passage was in hand.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 4.5,
+   "retrieval": "partial",
+   "halluc": [
+    "Coins 'containerization-induced suburbanization' as a 'well-known' term",
+    "Says containers reinforced ports as 'densely populated settlements providing labor' (containerization slashed dock labour and moved ports away from dense cores)"
+   ],
+   "note": "Redirect half-fixed it: 'Port city' -> 'Port' instead of 'Port City Colombo' (round two: 3), so the false Colombo story is gone. Still no Containerization article, and Globalization > Movement of information is noise. Answer is a single paragraph; trade half generic, geography half admits the sources lack it and then draws a backwards conclusion from the Port lead."
+  }
+ },
+ "syn-04": {
+  "draft": {
+   "score": 7.5,
+   "halluc": [
+    "Gives the narrowest width as 19 km (strait narrows to ~65 km; the Phillips Channel choke is ~2.8 km)",
+    "Lists Australia among the most dependent countries (weak; omits Taiwan/Singapore)"
+   ]
+  },
+  "verified": {
+   "score": 7.5,
+   "check_effect": "neutral",
+   "reason": "Additions are good (Andaman Sea-South China Sea, 900 km long, 65-250 km wide - which quietly fixes the 19 km claim - Malaccamax and the Lombok/Makassar detour). But both 'corrections' are just 'sources do not contain this', undermining a correct ~25% trade figure and the Japan point. Cancels out.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 5,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Strait lead and 'Economic importance' (twice) are right, but the planner also spent four slots on country articles (Singapore, China, Japan, 'China > Biodiversity'). Answer is thin: says dependency statistics are 'not detailed in the sources' though the Economic importance section (used well in round one: 25% of traded goods, oil to China/Japan/Korea) was shown; Japan and Korea omitted. Malaccamax cited to [4] (Japan lead) instead of [5]."
+  }
+ },
+ "syn-05": {
+  "draft": {
+   "score": 8.5,
+   "halluc": []
+  },
+  "verified": {
+   "score": 8.5,
+   "check_effect": "neutral",
+   "reason": "Accurate additions (Palenque/Copan/Tikal/Calakmul, not all city-states collapsed, Teotihuacan trade hypothesis with its dating caveat) but marginal to an already complete draft; does not finish the truncated uncertainty bullet.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 5.5,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Classic Maya collapse lead plus 'Drought theory' and 'Collapse of trade routes' sections - right article. Yet the answer says drought 'is not explicitly listed ... in the provided text' despite source [4] being the drought-theory section, and gives most space to the Teotihuacan trade hypothesis. Warfare, overpopulation, deforestation absent. Certainty half ('unsolved mystery', hypotheses not settled) is fine. Says 'the prompt explicitly states'."
+  }
+ },
+ "hop-01": {
+  "draft": {
+   "score": 9,
+   "halluc": []
+  },
+  "verified": {
+   "score": 9,
+   "check_effect": "neutral",
+   "reason": "'Additions' restate two sentences already in the draft (196 BC three scripts; Champollion 1820s). Redundant, harmless.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 9,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Planner jumped straight to the answer articles (Nile, Egyptian hieroglyphs > Decipherment). Correct, cited, concise; chain stated explicitly."
+  }
+ },
+ "hop-02": {
+  "draft": {
+   "score": 8,
+   "halluc": [
+    "Says Mehmed II installed four minarets (he added one; the others came under Bayezid II and Selim II/Murad III)"
+   ]
+  },
+  "verified": {
+   "score": 8.5,
+   "check_effect": "helped",
+   "reason": "Catches the four-minarets error and adds the 2024 upper-gallery museum status and the imam/creed detail. But dates the later minarets to the 17th-18th centuries (they are 15th-16th) and 'corrects' 1934 to 1935 though the draft's 1934 decree date is right (opened 1935).",
+   "check_halluc": [
+    "Says the four minarets were added in the 17th and 18th centuries (late 15th-16th century)",
+    "Treats the 1934 museum decree date as an error (decree Nov 1934, opened Feb 1935)"
+   ]
+  },
+  "plan": {
+   "score": 8.5,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Mehmed II and Hagia Sophia leads did the work (section picks were poor: 1847 renovation, Crimean policy). Correct and grounded: waqf conversion, 1935 museum, 2020 mosque, 2024 upper gallery reopened as museum - more current than closed-book. Short; no exact 2020 date. Round one scored 3 here."
+  }
+ },
+ "hop-03": {
+  "draft": {
+   "score": 8.5,
+   "halluc": [
+    "Credits Chain with showing penicillin is bactericidal and 'establishing the chemical structure' (structure was Hodgkin 1945; Chain/Abraham proposed beta-lactam)"
+   ]
+  },
+  "verified": {
+   "score": 9,
+   "check_effect": "helped",
+   "reason": "Accurate, relevant specifics: animal tests before trials, the 1941 police-constable case, 1940 isolation at Oxford, Paine's 1930 first therapeutic use.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 9,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Redirect fixed 'Ernst Boris Chain' -> 'Ernst Chain' (unresolved in round two), so Chain is now individually characterised (biochemical purification/analysis). Accurate, cited, complete; Paine aside is a nice touch. No Heatley."
+  }
+ },
+ "hop-04": {
+  "draft": {
+   "score": 1.5,
+   "halluc": [
+    "Opens with 'The highest mountain is Ojos del Salado' (Chile/Argentina)",
+    "Says Bolivia holds ~56% of Lake Titicaca (Peru holds ~56%)",
+    "Final answer Nevado Sajama / Cordillera Occidental (correct answer: Huascaran, Cordillera Blanca, Peru)"
+   ]
+  },
+  "verified": {
+   "score": 1.5,
+   "check_effect": "neutral",
+   "reason": "Biggest miss: the planner itself fetched 'Peru' and 'Peru > Geography', yet the checker only 'corrects' Ojos del Salado to Sajama - which the draft already concluded - and cites the Peru geography passage as support for Bolivia/Sajama. Wrong answer stands, now with a false citation. Draft also shows raw 'Wait, let's re-evaluate' reasoning.",
+   "check_halluc": [
+    "Cites source [3] (Peru > Geography) as confirming Nevado Sajama / Bolivia as the answer"
+   ]
+  },
+  "plan": {
+   "score": 8.5,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Planner resolved the hop itself (Peru, Andes). Correct with 6,768 m and Cordillera Blanca. Hedges that Peru holds 'a significant portion' of the lake instead of confirming the larger share. Round one was 1 (wrong country, visible chain-of-thought)."
+  }
+ },
+ "hop-05": {
+  "draft": {
+   "score": 8.5,
+   "halluc": []
+  },
+  "verified": {
+   "score": 9,
+   "check_effect": "helped",
+   "reason": "Adds concrete treaty terms (700 million francs indemnity, 1790 borders, up to 150,000 occupation troops) and Metternich's chairmanship/resizing of powers. Accurate and on-question.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 7,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Exactly the right two articles. Correct (Second Treaty of Paris; balance among the great powers) but only two sentences - never names the Concert of Europe, legitimacy/restoration, or the date. Under-uses perfect retrieval."
+  }
+ },
+ "trv-01": {
+  "draft": {
+   "score": 7,
+   "halluc": [
+    "'Hanzonzaka' slope (Ninenzaka) and 'Yoshimizu Shrine' near Kodai-ji (no such shrine there; Yasaka Shrine)",
+    "Calls Arashiyama 'northern' Kyoto and Fushimi Inari 'central' (west and south-east)",
+    "Shrine prayer ends with 'bow twice more' (it is one final bow)"
+   ]
+  },
+  "verified": {
+   "score": 7.5,
+   "check_effect": "helped",
+   "reason": "Real correction: Arashiyama is on the western outskirts. UNESCO 14-site note is fine. '10,000 torii, not just thousands' is pedantry, and the Inari addition is garbled ('trails spanning 4 km up the mountain to 32,000 sub-shrines throughout Japan'). Truncated etiquette not completed.",
+   "check_halluc": [
+    "Garbles Fushimi Inari facts into '4 km trails up the mountain to 32,000 sub-shrines throughout Japan'"
+   ]
+  },
+  "plan": {
+   "score": 5.5,
+   "retrieval": "partial",
+   "halluc": [
+    "Says Kozan-ji is 'known for its connection to the Ii family' (it is known for Myoe and the Choju-giga scrolls)",
+    "Calls the purification basin a 'tsukusha' (it is chozuya/temizuya)"
+   ],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Kyoto, Arashiyama, Fushimi Inari, Gion retrieved, but no etiquette source and 'Fox gallery'/'Festivals' sections are filler. Itinerary is driven by whatever was retrieved: recommends Kozan-ji and Kamigamo/Shimogamo over Kinkaku-ji, Nijo, Gion (retrieved but unused). Etiquette is labelled own knowledge and cut off at the prayer step because budget went to UNESCO boilerplate. Still far better than round one's Indonesian etiquette (2)."
+  }
+ },
+ "trv-02": {
+  "draft": {
+   "score": 7,
+   "halluc": [
+    "Says bears are 'rare but present' (no bears in Patagonia; the relevant predator is the puma)",
+    "Names a 'Circuit of Mount Fitz Roy' multi-day trek (not a standard route; Huemul Circuit / day hikes from El Chalten)",
+    "Winds 'consistently' 80-100 km/h (those are gusts)"
+   ]
+  },
+  "verified": {
+   "score": 7,
+   "check_effect": "neutral",
+   "reason": "Additions are park trivia (areas, 1959 founding, glacier snout elevation) of no use to a hiker; accurate, so no harm. Missed the bears claim.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 5.5,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Redirect resolved 'Mount Fitz Roy' -> 'Fitz Roy'; 'Patagonian Andes' still unresolved and section picks are again Flora/Ecology/Hydrology. Better than round two (5): no fescue padding, sensible safety points drawn from sources (technical peaks, remoteness). Still no trek names (W/O, Laguna de los Tres), El Chalten, bookings, wind; weather/season paragraph is unlabelled own knowledge."
+  }
+ },
+ "trv-03": {
+  "draft": {
+   "score": 4,
+   "halluc": [
+    "'Adjarian Khinkali: a large dough cup ... with butter' (confuses Adjarian khachapuri with khinkali)",
+    "Invented dishes 'Tobekvi', 'Tavadi', 'Kakheti-style khinkali'; khachapuri listed as seafood",
+    "Places Alaverdi Monastery 'in Signagi' and invents 'Telavi Winery' and 'Ajara Cascade'",
+    "Chkmeruli described as lemon-marinated grill from Tbilisi (Shkmeruli is a Rachan garlic-milk chicken)",
+    "Arbitrary 'five main regions' scheme omitting Imereti, Svaneti as such, Kazbegi/Mtskheta-Mtianeti"
+   ]
+  },
+  "verified": {
+   "score": 4,
+   "check_effect": "neutral",
+   "reason": "'No corrections' on the most error-laden draft in the set - sources had no cuisine article, so nothing could be checked, but the stamp reads as endorsement. Additions are administrative trivia, one garbled ('Kartli served as the capital of the Kingdom of Kartli').",
+   "check_halluc": [
+    "Says Kartli 'served as the capital' of the Kingdom of Kartli (it is the region, not a capital)"
+   ]
+  },
+  "plan": {
+   "score": 4.5,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Georgia lead/Geography, Kakheti (+winemaking), Kartli retrieved; 'Mtskheta-Mtianets' misspelled so unresolved; no Georgian cuisine article; 'Kartli > Etymology' is filler. Nothing false: region list (Adjara listed twice), Kakheti wine/Alaverdi/Signagi/Tusheti, Kartli/Tbilisi, then a labelled fallback naming khachapuri, khinkali, dolma. Honest but thin - two regions described, three dishes."
+  }
+ },
+ "trv-04": {
+  "draft": {
+   "score": 6,
+   "halluc": [
+    "Directs to Topkapi by walking 'east along Divan Yolu' (Divan Yolu runs west; Topkapi is north-east behind Hagia Sophia)",
+    "Places the Sea of Marmara to the north of Sultanahmet (it is to the south)",
+    "Advises buying Blue Mosque tickets online (entry is free)"
+   ]
+  },
+  "verified": {
+   "score": 6.5,
+   "check_effect": "helped",
+   "reason": "Short and accurate: UNESCO 1985, Basilica Cistern 150 m SW of Hagia Sophia (fixes draft's 'south'), and the 2020 mosque / 2024 upper-floor-museum status that matters to visitors. Cannot fix the layout errors or the truncation.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 6.5,
+   "retrieval": "partial",
+   "halluc": [
+    "Directs travellers to take the 'Havalitrain (M11) to Yenikoy, then transfer to M2' (M11 connects to M2 at Gayrettepe; no 'Havalitrain' brand)"
+   ],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. 'Sultanahmet' fuzzy-matched to 'Sultanahmet Jail'; Historic Areas, Basilica Cistern, Hagia Sophia are right; only 4 passages, all leads. Layout (Fatih peninsula, Golden Horn N, Marmara S) is delivered in the first paragraph; sights are grounded and current (2024 upper-gallery museum). Transit line garbled; no return-time buffer; truncated in layout list."
+  }
+ },
+ "med-01": {
+  "draft": {
+   "score": 9,
+   "halluc": []
+  },
+  "verified": {
+   "score": 9,
+   "check_effect": "neutral",
+   "reason": "Former names and 72% heritability/TCF7L2 are accurate but peripheral to an already complete answer.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 7,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Both leads retrieved (twice each) - and this time the model uses both (round one: 3). Grounded and correct, 72% heritability detail. But says specific T2D drugs 'are not listed in the sources' and does not supply metformin from own knowledge; content is stated twice (paragraph then bullets)."
+  }
+ },
+ "med-02": {
+  "draft": {
+   "score": 9,
+   "halluc": []
+  },
+  "verified": {
+   "score": 9,
+   "check_effect": "neutral",
+   "reason": "Accurate extras (rhabdomyolysis/kidney failure, % body-water-loss thresholds, older adults) - relevant but the draft was already complete; the last bullet is slightly garbled.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 4.5,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Right two articles but once more no Heat stroke > Treatment section. Signs are well grounded (40 C, sweating classic vs exertional, 5-8%/10% water loss), but for first aid it says 'sources do not detail acute cooling techniques' and offers prevention tips - no 'cool rapidly, call for help'. The labelled fallback that worked in exp-05 did not fire on the most safety-critical item."
+  }
+ },
+ "med-03": {
+  "draft": {
+   "score": 8.5,
+   "halluc": []
+  },
+  "verified": {
+   "score": 9,
+   "check_effect": "helped",
+   "reason": "Adds destination-dependent resistance, TMP-SMX/doxycycline no longer recommended, rifaximin for ETEC, and work-up for Giardia if diarrhoea persists after antibiotics. The 24-48 h 'correction' is a reasonable nuance (most recover in 3-4 days) while keeping the severe/persistent caveat.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 6,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Redirect fixed the title (Traveler's -> Travelers' diarrhea; round two missed it, score 5) and the dysentery contamination is gone. Antibiotic guidance now accurate and specific (azithromycin, rifaximin, TMP-SMX/doxy dropped, severity threshold). But the planner still spent half the slots on Dysentery and only the Antibiotics subsection was fetched, so the answer never mentions oral rehydration or loperamide - the first-line self-care the question asks for - and red flags are thin."
+  }
+ },
+ "num-01": {
+  "draft": {
+   "score": 6,
+   "halluc": [
+    "Headline says India's population is '13 to 14 times' Canada's and Canada is 'twice as large' (self-corrected below to ~35x and ~3x)"
+   ]
+  },
+  "verified": {
+   "score": 6,
+   "check_effect": "neutral",
+   "reason": "'No corrections' although the first sentence contradicts the draft's own final figures and the sources had both populations. Additions are trivia. Visible 'Wait, let me re-calculate' remains.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 6.5,
+   "retrieval": "good",
+   "halluc": [
+    "Opening line says Canada is 'approximately 4.5 times the size of India' and later '3 to 4.5 times' (9.98/3.29 is ~3.0x on any measure)"
+   ],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. India and Canada leads give sourced populations (1.428 B, 41 M) -> ~35x, correct and cited. Areas are from own knowledge and correct, but the stated ratio is wrong in the headline and hedged in the body."
+  }
+ },
+ "num-02": {
+  "draft": {
+   "score": 8.5,
+   "halluc": [
+    "Headline gives Neptune as 4 h 07 min while its own calculation gives 4 h 10 min"
+   ]
+  },
+  "verified": {
+   "score": 8.5,
+   "check_effect": "neutral",
+   "reason": "Single addition (1 AU = 1.496e8 km = ~8 light-minutes) repeats the draft. Neptune title again resolved to the NEPTUNE observatory, so nothing to check the second leg against.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 6.5,
+   "retrieval": "partial",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Title match for 'Neptune' returned 'NEPTUNE' (the ocean observatory) - a case-insensitive title collision. Model noticed, fell back to labelled own knowledge for Neptune (4.5 B km / 300,000 km/s -> 4 h 10) correctly. Earth leg is just the sourced '8 light-minutes' with no calculation despite 'show the reasoning'."
+  }
+ },
+ "num-03": {
+  "draft": {
+   "score": 5,
+   "halluc": [
+    "Concludes water boils at 84-85 C at 65% pressure (actual ~88 C) after correctly deriving 88 C by rule of thumb and discarding it",
+    "Says 85 kPa is roughly 65% of 101.3 kPa (it is 84%; 65% is ~66 kPa) and that water boils at 84-85 C at 85 kPa (~95 C)"
+   ]
+  },
+  "verified": {
+   "score": 5,
+   "check_effect": "neutral",
+   "reason": "Checker had the anchor that settles it (93.4 C at 1,905 m -> ~88 C at 3,600 m) and merely listed it as an 'addition' without noticing it contradicts the draft's 84-85 C. '99.97 C not 100 C' is pedantry.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 5,
+   "retrieval": "good",
+   "halluc": [
+    "Gives the boiling point at 3,600 m as 82-83 C (actual ~88 C)"
+   ],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Right articles again, and it quotes a sourced anchor (93.4 C at 1,905 m) - which by linear extrapolation gives ~87.5 C - but then asserts 82-83 C 'from general scientific knowledge'. Round one used the sourced 1 C/274 m rule and scored 9; here good retrieval was overridden by a wrong prior."
+  }
+ },
+ "abs-01": {
+  "draft": {
+   "score": 8.5,
+   "halluc": []
+  },
+  "verified": {
+   "score": 8.5,
+   "check_effect": "neutral",
+   "reason": "'No corrections / No additions' - exactly right for an abstention; no invented content.",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 9,
+   "retrieval": "good",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Abstains; says the sources have no such speech, adds only safe sourced context (Tarija is a departmental capital; mayors are elected). No invented content."
+  }
+ },
+ "abs-02": {
+  "draft": {
+   "score": 9,
+   "halluc": []
+  },
+  "verified": {
+   "score": 9,
+   "check_effect": "neutral",
+   "reason": "'No corrections / No additions'; ignored the irrelevant van de Velde BM25 hits. Draft no longer invents look-alike titles (round two did).",
+   "check_halluc": []
+  },
+  "plan": {
+   "score": 8.5,
+   "retrieval": "miss",
+   "halluc": [],
+   "note": "Answer and sources byte-identical to round two; round-two grade carried over. Only BM25 keyword coincidences (van de Velde maps). Model says the novel/author are not found, explains the passages are about a Dutch cartographer, and stops - tighter than round one. 'Does not exist' is stated a little too categorically."
+  }
+ }
+}

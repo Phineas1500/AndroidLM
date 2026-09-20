@@ -1,0 +1,340 @@
+{
+ "exp-01": {
+  "route": "verify",
+  "final": 8,
+  "draft": 8,
+  "check_effect": "neutral",
+  "reason": "'Sources agree' one-liner. Draft's two minor errors (Palestine extracting potash, no microbial life) are not addressed, but the retrieved passages (lead, climate, lake salinity) barely bear on them. Better than round three's 170-word padding (7.5).",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "exp-02": {
+  "route": "verify",
+  "final": 8.5,
+  "draft": 8.5,
+  "check_effect": "neutral",
+  "reason": "'Sources agree' on a clean draft; correct verdict, no redundant restatement this time.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "exp-03": {
+  "route": "verify",
+  "final": 8,
+  "draft": 8,
+  "check_effect": "neutral",
+  "reason": "Content is accurate and relevant nuance (Cypriot/Mycenaean pottery trade ended 1300/1250 BC, Kition and Paphos flourished after 1200) but it is framed as correcting a claim the draft never made - the draft does not mention pottery at all. True facts, false framing; nets out. Hattusa/Sea Peoples slip untouched.",
+  "check_halluc": [
+   "Attributes to the draft a claim that Cypriot and Mycenaean pottery trade ended c.1200 BC (draft never mentions pottery)"
+  ],
+  "retrieval": null,
+  "halluc": []
+ },
+ "exp-04": {
+  "route": "verify",
+  "final": 8.5,
+  "draft": 8.5,
+  "check_effect": "neutral",
+  "reason": "'Sources agree' on a clean draft. Round three's splicing error and off-topic vaccine history are gone (was 7.5 hurt).",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "exp-05": {
+  "route": "verify",
+  "final": 8,
+  "draft": 8,
+  "check_effect": "neutral",
+  "reason": "'Sources agree' - but the Altitude sickness lead spells out 'high-altitude cerebral edema', so the draft's 'High Altitude Brain Swelling' expansion was catchable. Minor. Also loses round three's three useful additions (onset ~10 h, fitness no protection, 2,500 m).",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "cmp-01": {
+  "route": "verify",
+  "final": 7.5,
+  "draft": 7.5,
+  "check_effect": "neutral",
+  "reason": "1905 Revolution addition is accurate and relevant to causes. The 'correction' is a non-correction: 18 Brumaire IS Napoleon's rise to power, so it flags a correct sentence as wrong while only adding a date. One small gain, one spurious flag.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "cmp-02": {
+  "route": "verify",
+  "final": 7.5,
+  "draft": 7.5,
+  "check_effect": "neutral",
+  "reason": "Catches the 'Proof-of-Step' typo (real but trivial). Second correction is pedantry - the draft itself says '>99% reduction'. Still misses the 51%-of-stake simplification with the PoS description passage in hand.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "cmp-03": {
+  "route": "verify",
+  "final": 7,
+  "draft": 7,
+  "check_effect": "neutral",
+  "reason": "Does reach the right conclusion on a real medical error ('dengue *can* be transmitted via transfusion') but as one 200-word run-on of visible deliberation that leaks the prompt ('strictly adhering to the prompt', 'the prompt says never attach them...') and is cut off mid-word. Factual gain cancelled by the mess; TIKVAK missed; round three's treatment/incubation additions lost (was 7.5).",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "cmp-04": {
+  "route": "verify",
+  "final": 8,
+  "draft": 8.5,
+  "check_effect": "hurt",
+  "reason": "A 'Correction' that quotes the draft and then the source saying the identical thing, drifts into 'aligns with source' commentary and 'third richest landlocked country' trivia, and is cut off at the token limit. No factual error introduced, but ~170 words of confusing noise labelled as a correction on a clean draft.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "cmp-05": {
+  "route": "verify",
+  "final": 6.5,
+  "draft": 8,
+  "check_effect": "hurt",
+  "reason": "Attacks a correct draft claim (fusion yields more energy per unit mass) and asserts the opposite; then shows raw reasoning ('Let's look for a clearer contradiction') and truncates. Same failure shape as round three. Breakeven/Q=10 slip untouched.",
+  "check_halluc": [
+   "States that fusion of light elements releases less energy per nucleon than fission (D-T fusion ~3.5 MeV/nucleon vs fission ~0.85 MeV/nucleon; the draft was right)"
+  ],
+  "retrieval": null,
+  "halluc": []
+ },
+ "syn-01": {
+  "route": "verify",
+  "final": 8.5,
+  "draft": 8,
+  "check_effect": "helped",
+  "reason": "One concise, correct correction of the draft's real error: fragmentation dates from Mongke's death in 1259 and the Toluid Civil War, not from Genghis's four sons. Less detail than round three (no Berke-Hulagu) but cleaner.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "syn-02": {
+  "route": "plan",
+  "final": 6.5,
+  "draft": null,
+  "check_effect": null,
+  "reason": "Rent regulation lead/US/low-income renters/housing supply plus Costa-Hawkins. Grounded and accurate (Jenkins 2009 'rare consensus', Tatian 2013, Oregon 7%+CPI, California 5%+CPI, Costa-Hawkins) and the housing-supply passage is now used. But lopsided and thin on evidence: 'for' side is two generic bullets, no Diamond/SF study, no Furman/Columbia findings that round three's plan had, 'Legal restrictions' is not empirical evidence. Below round-three verified (7).",
+  "check_halluc": [],
+  "retrieval": "good",
+  "halluc": []
+ },
+ "syn-03": {
+  "route": "plan",
+  "final": 5,
+  "draft": null,
+  "check_effect": null,
+  "reason": "'Shipping container' article now retrieved (round three had none) but still no 'Containerization'; Globalization > Movement of information is noise. Two generic paragraphs: no McLean/1956, no cost figures, no move of ports to deep-water sites or decline of old docklands, no dock-labour collapse. Nothing false beyond loosely crediting containers for ports' multicultural character. The draft (6.5, with errors) was still more useful.",
+  "check_halluc": [],
+  "retrieval": "partial",
+  "halluc": [
+   "Implies containerization drove port cities' multi-ethnic/multicultural change (source says that of ports generally)"
+  ]
+ },
+ "syn-04": {
+  "route": "verify",
+  "final": 7.5,
+  "draft": 7.5,
+  "check_effect": "neutral",
+  "reason": "'Sources agree' - yet the Strait of Malacca lead gives 65-250 km width, which contradicts the draft's '19 km' narrowest width; round three surfaced that figure. No doubt cast on the correct 25% trade share this time, so same net score.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "syn-05": {
+  "route": "plan",
+  "final": 6.5,
+  "draft": null,
+  "check_effect": null,
+  "reason": "Now has and uses the Drought theory section (megadroughts, first implicated 1931) plus trade-route collapse with its dating caveat, and states uncertainty well. But only two theories: no warfare, overpopulation/deforestation, disease, or elite-competition models, no Terminal Classic dates. Better than round-three plan (5.5), well short of the 8.5 closed-book draft.",
+  "check_halluc": [],
+  "retrieval": "good",
+  "halluc": []
+ },
+ "hop-01": {
+  "route": "verify",
+  "final": 9,
+  "draft": 9,
+  "check_effect": "neutral",
+  "reason": "'Sources agree' on a correct draft; no redundant restatement.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "hop-02": {
+  "route": "verify",
+  "final": 8,
+  "draft": 8,
+  "check_effect": "neutral",
+  "reason": "'Sources agree' over the draft's four-minarets-by-Mehmed-II error, which round three's check caught from the same Hagia Sophia lead. Also loses the 2024 upper-gallery note. On the other hand round three's wrong 17th-18th-century dating and spurious 1934->1935 correction are gone.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "hop-03": {
+  "route": "verify",
+  "final": 8.5,
+  "draft": 8.5,
+  "check_effect": "neutral",
+  "reason": "P. notatum -> P. rubens is a taxonomic reclassification (Fleming's strain was long called notatum), so this is a defensible nuance framed as an error. Misses the Chain 'established the chemical structure' slip and drops round three's good additions (constable case, Paine 1930).",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "hop-04": {
+  "route": "verify",
+  "final": 1,
+  "draft": 1.5,
+  "check_effect": "hurt",
+  "reason": "Peru and Peru > Geography were sources [1][2], yet the check never says Peru or Huascaran. Two rambling, truncated 'corrections' accept Bolivia as the premise, tell the user Sajama is wrongly identified as Bolivia's highest mountain (it is the highest), and wander through Aconcagua/Ojos del Salado. Wrong answer stands with added confusion.",
+  "check_halluc": [
+   "Says the draft 'incorrectly identifies the highest mountain in Bolivia as Nevado Sajama' (Sajama is Bolivia's highest peak)",
+   "Accepts Bolivia as the country with Titicaca's largest share (Peru)"
+  ],
+  "retrieval": null,
+  "halluc": []
+ },
+ "hop-05": {
+  "route": "plan",
+  "final": 7.5,
+  "draft": null,
+  "check_effect": null,
+  "reason": "Exactly the right two articles. Correct: Second Treaty of Paris (1815); Congress of Vienna -> Concert of Europe, balance of power, until 1914. Names the order this time (round-three plan 7) but still two sentences: does not name the war (Napoleonic Wars / Seventh Coalition), no treaty terms, no legitimacy/restoration. Round-three verified was 9.",
+  "check_halluc": [],
+  "retrieval": "good",
+  "halluc": []
+ },
+ "trv-01": {
+  "route": "verify",
+  "final": 7.5,
+  "draft": 7,
+  "check_effect": "helped",
+  "reason": "Real correction: Arashiyama is on the western outskirts, not north. Gion/Yasaka addition is fine. The Kinkaku-ji 'correction' only says the sources are silent, casting doubt on a correct description. No garbled Inari stats this time. Etiquette truncation and Hanzonzaka/Yoshimizu errors remain.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "trv-02": {
+  "route": "verify",
+  "final": 6.5,
+  "draft": 7,
+  "check_effect": "hurt",
+  "reason": "Wrong correction: uses Torres del Paine rainfall data (July-October drier) to dispute the draft's correct advice that winter closes most routes to snow and ice - dangerous direction for a hiker. Windiest months Nov-Jan is a genuinely useful addition; 1937/1981 founding dates are trivia. Bears claim missed again.",
+  "check_halluc": [
+   "Argues that drier winter months contradict winter snow/ice inaccessibility of trekking routes (precipitation is not the constraint; winter closures are real)"
+  ],
+  "retrieval": null,
+  "halluc": []
+ },
+ "trv-03": {
+  "route": "verify",
+  "final": 4.5,
+  "draft": 4,
+  "check_effect": "helped",
+  "reason": "Cuisine section now retrieved. Correctly notes Imereti is missing from the region list and ties it to khachapuri. But with the cuisine passage in hand it misses the Adjarian 'khinkali'/khachapuri confusion and the invented dishes, and the last addition speculates about 'Javakheti cheese or local stews' not in the source before truncating.",
+  "check_halluc": [
+   "Suggests Samtskhe-Javakheti is associated with 'Javakheti cheese or local stews' while citing a source that does not say so"
+  ],
+  "retrieval": null,
+  "halluc": []
+ },
+ "trv-04": {
+  "route": "plan",
+  "final": 6.5,
+  "draft": null,
+  "check_effect": null,
+  "reason": "'Sultanahmet' again resolved to 'Sultanahmet Jail'; other three are right; only four lead passages. Layout now correct and clear (Fatih peninsula, Golden Horn north, Marmara south, Cistern 150 m SW of Hagia Sophia), sensible prioritisation, no 'Havalitrain' invention. But transit budget is self-contradictory ('1-2 hours total' vs 60-90 min each way, and far too low for a layover), places the Walls on the southern edge, no tram/metro, Grand Bazaar, visa, or Hagia Sophia's current tourist-entry arrangement.",
+  "check_halluc": [],
+  "retrieval": "partial",
+  "halluc": [
+   "Says the Walls of Constantinople 'run along the southern edge of the peninsula' (the main land walls are on the west)",
+   "Allows '1-2 hours total' for immigration, security and airport transfers (each leg alone is 60-90 min)"
+  ]
+ },
+ "med-01": {
+  "route": "verify",
+  "final": 9,
+  "draft": 9,
+  "check_effect": "neutral",
+  "reason": "'Sources agree' on a correct, complete draft.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "med-02": {
+  "route": "verify",
+  "final": 8.5,
+  "draft": 9,
+  "check_effect": "hurt",
+  "reason": "Flags the draft's correct >40 C (104 F) heat-stroke threshold as an error in favour of 40.6 C from the Signs section; the standard definition (and the Heat stroke lead, source [1]) is >40 C. Addition (22% of American water intake from food) is useless trivia. Treatment sections were finally retrieved and not used.",
+  "check_halluc": [
+   "'Corrects' the heat-stroke threshold from >40 C to >40.6 C (standard definition, and the article lead, is >40 C)"
+  ],
+  "retrieval": null,
+  "halluc": []
+ },
+ "med-03": {
+  "route": "verify",
+  "final": 8.5,
+  "draft": 8.5,
+  "check_effect": "neutral",
+  "reason": "'Sources agree' on a correct draft. Fine as a verdict, but the Antibiotics/Treatment passages held the additions that made round three a 9 (resistance by destination, TMP-SMX/doxycycline dropped, rifaximin, Giardia work-up).",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "num-01": {
+  "route": "verify",
+  "final": 6,
+  "draft": 6,
+  "check_effect": "neutral",
+  "reason": "Re-derives the ratio from sourced figures (1.4286 B / 41 M = 34.8) - fine but it is a quibble over 35 vs 35-36. Still does not flag the draft's headline '13 to 14 times' / 'twice as large' contradiction or the visible 'Wait, let me re-calculate'. Rank additions are trivia.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "num-02": {
+  "route": "verify",
+  "final": 8.5,
+  "draft": 8.5,
+  "check_effect": "neutral",
+  "reason": "Honestly notes the 'NEPTUNE' hit is the ocean observatory, but labels that a 'Correction', which casts doubt on a correct Neptune figure. 8 min 20 s addition repeats the draft. Title collision still unfixed; 4 h 07 vs 4 h 10 inconsistency untouched.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "num-03": {
+  "route": "verify",
+  "final": 5,
+  "draft": 5,
+  "check_effect": "neutral",
+  "reason": "Worst 'Sources agree': the Boiling point passage [1] it cites carries the 93.4 C at 1,905 m anchor (round three quoted it), which extrapolates to ~88 C and contradicts the draft's 84-85 C; the draft's '85 kPa is ~65% of 101.3' is also plain arithmetic error. The stamp now reads as endorsement of a wrong number.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ },
+ "abs-01": {
+  "route": "plan",
+  "final": 8.5,
+  "draft": null,
+  "check_effect": null,
+  "reason": "Tarija and Bolivia articles; correctly abstains, invents nothing, cites only safe context (Tarija is a departmental capital; governors elected). Second paragraph is 'As an AI...' boilerplate with a muddled training-cutoff clause. Same as round-three verified (8.5).",
+  "check_halluc": [],
+  "retrieval": "good",
+  "halluc": []
+ },
+ "abs-02": {
+  "route": "verify",
+  "final": 9,
+  "draft": 9,
+  "check_effect": "neutral",
+  "reason": "Draft abstains correctly; check adds nothing false. Slightly odd to cite three irrelevant van de Velde BM25 hits as 'agreeing', but harmless.",
+  "check_halluc": [],
+  "retrieval": null,
+  "halluc": []
+ }
+}
