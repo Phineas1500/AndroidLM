@@ -23,3 +23,6 @@ keystore.properties
 
 # engine binaries are built by scripts/build-android-engine.sh, never committed
 *.so
+
+# large downloaded assets used by scripts/install.sh
+assets-cache/

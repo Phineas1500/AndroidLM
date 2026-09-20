@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "device_root": "/data/local/tmp/bmoe",
+  "note": "sha256 null = not computed yet; url null = not published yet (place the file in the assets directory by hand). scripts/install.sh refuses to push a file whose hash is known and does not match.",
+  "files": [
+    {
+      "name": "Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
+      "role": "model",
+      "bytes": 12290628576,
+      "sha256": "96b9c0af5c77a4ecaabe3983175112b5ece763261c1ece12b2494b692a70dad7",
+      "url": "https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
+      "device_path": "Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "wiki.db",
+      "role": "corpus",
+      "bytes": 21314895872,
+      "sha256": null,
+      "url": null,
+      "device_path": "corpus/wiki.db",
+      "license": "CC BY-SA 4.0 (English Wikipedia via FineWiki, Aug 2025; redirects Sep 2026)"
+    },
+    {
+      "name": "voyage.db",
+      "role": "corpus-optional",
+      "bytes": 328810496,
+      "sha256": null,
+      "url": null,
+      "device_path": "corpus/voyage.db",
+      "license": "CC BY-SA 4.0 (English Wikivoyage, Sep 2026)"
+    }
+  ]
+}
