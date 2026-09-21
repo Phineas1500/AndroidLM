@@ -1,0 +1,791 @@
+{
+ "exp-01": {
+  "draft": 8,
+  "A": 8.5,
+  "B": 8.5,
+  "B_lost": [
+   "'dropped more than 30 m since the 1960s' replaced by 'dropped significantly'",
+   "'up to 90%' inflow reduction (replaced by sourced 2% figure - fair trade)"
+  ],
+  "B_fixed": [
+   "Dropped the claim that Palestine extracts Dead Sea minerals"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 2,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "Both add 34.2% and Lower Jordan at 2% of historic flow. 'No microbial life' stays in both. Near-identical value; B integrates, A appends."
+ },
+ "exp-02": {
+  "draft": 8.5,
+  "A": 8.5,
+  "B": 9,
+  "B_lost": [],
+  "B_fixed": [],
+  "B_new_errors": [],
+  "A_halluc_count": 0,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "Clean draft. B weaves in first-law statement and why COP>1 without bloat; A's additions say the same in a slightly padded paragraph."
+ },
+ "exp-03": {
+  "draft": 8,
+  "A": 8,
+  "B": 6,
+  "B_lost": [
+   "Earthquake-storm theory (section explicitly 'omitted' because sources lack it)",
+   "Systems-collapse / trade-interdependence explanation with tin/copper detail",
+   "Internal revolt / palace-economy instability explanation",
+   "Paleoclimate evidence for a region-wide drought (pollen, sediment cores)",
+   "Ugarit destruction, Sea Peoples as refugees nuance"
+  ],
+  "B_fixed": [
+   "Hattusa-destroyed-by-Sea-Peoples slip gone (by deletion)"
+  ],
+  "B_new_errors": [
+   "Garbled causality: Sea Peoples' movements 'driven by drought in the Nile Valley' led to famine in Egypt"
+  ],
+  "A_halluc_count": 0,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "Worst pattern of the rewrite: model treats 'not in sources' as grounds to delete own correct knowledge, and talks to the user about 'the draft' they never see ('While the draft mentions...', 'this section is omitted'). Five explanations shrink to two and a half. A's additions (de Rouge/Maspero, Assyria and Egypt survived) are accurate."
+ },
+ "exp-04": {
+  "draft": 8.5,
+  "A": 8,
+  "B": 8.5,
+  "B_lost": [],
+  "B_fixed": [],
+  "B_new_errors": [],
+  "A_halluc_count": 0,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "A: ~170 words of 'No corrections/Additions: None' restating that every point is supported - noise. B: draft kept, source sentences appended per paragraph (some redundancy, adds cellular+humoral, reactogenicity, cannot revert). B_truncated but content complete through point 4."
+ },
+ "exp-05": {
+  "draft": 8,
+  "A": 8.5,
+  "B": 8.5,
+  "B_lost": [],
+  "B_fixed": [
+   "'High Altitude Brain Swelling' -> High Altitude Cerebral Edema"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "A adds 2,500 m threshold, onset within ~10 h, dexamethasone vs acetazolamide roles. B fixes HACE name, adds antacids note and 'confusion' (source-listed, though really a late sign); citation on every bullet is clutter. Different gains, same value."
+ },
+ "cmp-01": {
+  "draft": 7.5,
+  "A": 8,
+  "B": 8,
+  "B_lost": [],
+  "B_fixed": [],
+  "B_new_errors": [],
+  "A_halluc_count": 0,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "A adds 1905 Revolution/St Petersburg Soviet/Duma and bread-shortage mutiny. B adds Declaration of Rights, abolition of feudalism, and gets further into Russia long-term outcomes before cut-off; misses 1905. 'rising to power under Napoleon' garble stays in both. Truncation costs B only the tail of the Russia paragraph."
+ },
+ "cmp-02": {
+  "draft": 7.5,
+  "A": 7.5,
+  "B": 8,
+  "B_lost": [],
+  "B_fixed": [
+   "'Proof-of-Step' typo fixed in place"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 0,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "A's second 'correction' wrongly frames the 51% hash-power statement as an error. B integrates asymmetric security/security budget and DPoS as additions, not corrections. Cut mid-sentence in the last bullet; nothing material lost."
+ },
+ "cmp-03": {
+  "draft": 7,
+  "A": 6,
+  "B": 6.5,
+  "B_lost": [
+   "Malaria vaccines RTS,S and R21",
+   "Bed nets / indoor residual spraying",
+   "Dengvaxia/Qdenga and ADE caveat",
+   "Retro-orbital headache, 'breakbone' pain, critical phase day 2-7, higher risk on second serotype",
+   "Cyclical paroxysm description, hypnozoites in P. vivax/ovale, cerebral malaria"
+  ],
+  "B_fixed": [
+   "Garbled 'TIKVAK' vaccine name gone (by deletion)"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "A: check leaks prompt text ('the prompt asks', 'the instruction is') and 'corrects' the draft to 'malaria is spread exclusively through mosquito bites' - a wrong correction of a right statement (transfusion/congenital are real). B: completes all four headings (draft was cut in Prevention) and adds incubation periods, 80% asymptomatic, but symptoms/prevention are rewritten from the lead passages and lose the draft's clinically useful detail; Treatment is two empty sentences (no ACT, no fluids/avoid NSAIDs). Dengue-transfusion error stays in B."
+ },
+ "cmp-05": {
+  "draft": 8,
+  "A": 7.5,
+  "B": 7.5,
+  "B_lost": [
+   "~440 reactors / ~10% of world electricity",
+   "ITER, Q>=10 target, 2050s commercial timeline",
+   "D-T fuel, Coulomb barrier, tokamak vs inertial confinement",
+   "'Fusion releases more energy per unit mass than fission'",
+   "U-235/Pu-239 neutron-induced chain reaction wording"
+  ],
+  "B_fixed": [
+   "Breakeven/'Q>=10' conflation gone (by deletion)"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "A: no corrections but ~200 words of padding that ends by doubting the (reasonable) 50-100 year activation-waste figure. B: Physics and Feasibility rewritten from article leads - gains discoverers, NIF/EAST, triple product; loses the numbers a traveller would quote. B completes the Safety sentence the draft cut off. Net equal."
+ },
+ "syn-01": {
+  "draft": 8,
+  "A": 8,
+  "B": 8.5,
+  "B_lost": [],
+  "B_fixed": [
+   "Adds that the split dates from Mongke's death in 1259 and the Toluid Civil War (the wrong 'divided among his four sons -> four khanates' sentence is still there just before it)"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "A says 'No corrections' and only hints at Mongke in its justification; adds grass-foraging cavalry, Berke-Hulagu, Kaidu-Kublai. B puts the same facts where they belong. Truncated in item 3; draft itself ended at an empty item 4."
+ },
+ "syn-04": {
+  "draft": 7.5,
+  "A": 7.5,
+  "B": 7,
+  "B_lost": [
+   "25-30% of global maritime trade",
+   "Chokepoint vulnerability (piracy, blockade) and leverage",
+   "China's crude imports / Japan-Korea energy dependence detail",
+   "Australia",
+   "Singapore as transshipment/bunkering hub"
+  ],
+  "B_fixed": [
+   "'19 km at its narrowest' replaced by sourced 900 km long, 65-250 km wide"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "B fixes the width but hollows out the 'why strategic' half into article-lead sentences; dependency section becomes a list of 11 linked economies. A is padded and misses the width contradiction."
+ },
+ "hop-01": {
+  "draft": 9,
+  "A": 9,
+  "B": 9,
+  "B_lost": [
+   "'decree issued at Memphis'"
+  ],
+  "B_fixed": [],
+  "B_new_errors": [],
+  "A_halluc_count": 0,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "Both correct. B adds Bouchard/July 1799 inline; A's additions mostly repeat the draft."
+ },
+ "hop-02": {
+  "draft": 8,
+  "A": 8,
+  "B": 7.5,
+  "B_lost": [
+   "Ataturk-era secularisation context",
+   "Erdogan decree, July 2020",
+   "Mihrab/minbar, removal of Christian iconography",
+   "~500 years as imperial mosque"
+  ],
+  "B_fixed": [
+   "'Four minarets installed by Mehmed II' -> minarets added soon after the fall",
+   "2024 upper-gallery museum arrangement added"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "B is correct on every part but reduced to five sentences; reads like a stub. A keeps the fuller draft, adds the 2024 upper floor, but misses the minaret error and asserts '1935 not 1934' (decree 1934, opened 1935 - pedantic)."
+ },
+ "hop-03": {
+  "draft": 8.5,
+  "A": 9,
+  "B": 8.5,
+  "B_lost": [],
+  "B_fixed": [
+   "P. notatum -> P. rubens (reclassification, nuance)"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "A adds 1940 isolation and the 1941 police-constable trial - real value. B is the draft with citations stapled to each sentence (several decorative: the Penicillin lead does not say Chain showed bactericidal action). Chain 'established the chemical structure' slip stays in both."
+ },
+ "hop-04": {
+  "draft": 1.5,
+  "A": 1.5,
+  "B": 1.5,
+  "B_lost": [],
+  "B_fixed": [],
+  "B_new_errors": [
+   "Attributes 'Bolivia holds ~56%' to source [1], which is the Peru article - false grounding of the wrong premise"
+  ],
+  "A_halluc_count": 2,
+  "B_halluc_count": 2,
+  "citations_ok": false,
+  "note": "Correct answer is Peru -> Huascaran (Cordillera Blanca, Andes). A: rambling check that endorses Bolivia/Sajama, uses a '[Draft]' marker, though it does kill the opening 'Ojos del Salado' line. B: a tidy, confident, cited wrong answer - shorter but more persuasive. Only 'Andes' is right in either. Neither path used the Peru passages it was handed."
+ },
+ "trv-01": {
+  "draft": 7,
+  "A": 7.5,
+  "B": 8,
+  "B_lost": [
+   "Kodai-ji Temple (real) removed together with the invented Yoshimizu Shrine"
+  ],
+  "B_fixed": [
+   "Arashiyama north -> west",
+   "Fushimi Inari central -> south",
+   "Kinkaku-ji placed in northern Kyoto",
+   "Invented 'Yoshimizu Shrine' removed",
+   "'bow twice more' lost to truncation"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 3,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "Same four geography fixes in both, but B applies them in the itinerary itself (Day 2 'Western Kyoto', Day 3 'Central & Southern') instead of asking the reader to re-map. B adds geiko, 4 km/2 h Inari trails. 'Hanzonzaka' remains. B cut at etiquette step 2, one step earlier than the draft - loses nothing useful. A also uses a '[Draft]' marker."
+ },
+ "trv-02": {
+  "draft": 7,
+  "A": 7.5,
+  "B": 5.5,
+  "B_lost": [
+   "Temperature range and 80-100 km/h winds",
+   "Season-by-season breakdown incl. winter routes inaccessible/only for mountaineers",
+   "W and O circuits, Fitz Roy, Perito Moreno",
+   "Book campsites/refugios months ahead",
+   "Layering system, boots, river-crossing advice",
+   "PLB/satellite communicator (reduced to a meta remark)",
+   "Altitude note"
+  ],
+  "B_fixed": [
+   "'Bears are rare but present' gone (by deletion)"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "Second-worst rewrite. Practical hiking advice replaced by encyclopedia lead sentences (ecoregions, largest park, 47 glaciers); three bullets are meta-talk about 'the draft' and what 'the sources do not contain'; Wildlife and Terrain bullets are empty. A keeps the useful draft and adds windiest months Nov-Jan and May-Sep registration."
+ },
+ "trv-03": {
+  "draft": 4,
+  "A": 4,
+  "B": 4,
+  "B_lost": [
+   "Narikala Fortress"
+  ],
+  "B_fixed": [
+   "'Telavi Winery' removed",
+   "Khachapuri no longer listed as seafood",
+   "Adds Tusheti, Gremi, David Gareji, Telavi as admin centre"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 8,
+  "B_halluc_count": 5,
+  "citations_ok": false,
+  "note": "B tags ten sentences '[Draft]' - a fake citation shown to the user - and keeps 'Adjarian Khinkali', Tobekvi, Tavadi, Alaverdi 'in Signagi', 'Ajara Cascade'. A: one right correction (Kartli not a region) offset by invented 'Samegrelo-Mtsvane Zghava' and doubt on the true Muslim-influence remark. Wikivoyage Eat passage unused by both. Both truncated in region 4; no Imereti/Svaneti/khachapuri."
+ },
+ "trv-04": {
+  "draft": 5.5,
+  "A": 6,
+  "B": 6,
+  "B_lost": [],
+  "B_fixed": [],
+  "B_new_errors": [],
+  "A_halluc_count": 4,
+  "B_halluc_count": 4,
+  "citations_ok": true,
+  "note": "B is the draft verbatim plus one correct Geography bullet (Marmara south, Golden Horn north) that contradicts the 'North (Sea of Marmara)' bullet two lines above it; truncated mid-sentence. A delivers the same correct frame as an addition under 'No corrections'. Neither fixes Divan Yolu direction, Blue Mosque 'tickets', or the 7-hours-on-the-ground arithmetic."
+ },
+ "med-01": {
+  "draft": 9,
+  "A": 9,
+  "B": 6,
+  "B_lost": [
+   "Age/onset pattern for both types (childhood/young adult vs adults >45, rising in youth)",
+   "DKA as consequence of untreated type 1",
+   "Insulin regimen: injections/pump, glucose monitoring, carb counting",
+   "Type 2 treatment ladder: lifestyle, metformin, GLP-1 agonists, eventual insulin",
+   "Compensatory hyperinsulinaemia -> beta-cell decline mechanism"
+  ],
+  "B_fixed": [],
+  "B_new_errors": [],
+  "A_halluc_count": 0,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "Severe content loss. Cause section bloats with HLA alleles, TCF7L2, caesarean-birth risk; Onset shrinks to two sentences and Treatment to 'requires insulin' / 'management addresses insulin resistance'. The question asked cause, onset AND treatment. A leaves the excellent draft intact and appends the same genetics as optional detail."
+ },
+ "med-02": {
+  "draft": 9,
+  "A": 9,
+  "B": 8.5,
+  "B_lost": [
+   "Dark yellow urine as a sign",
+   "Avoid alcohol/caffeine when rehydrating",
+   "Closing 'key distinction' summary and end of CPR line (truncation)"
+  ],
+  "B_fixed": [],
+  "B_new_errors": [],
+  "A_halluc_count": 0,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "B is accurate and richer (1-2%/5-8%/>10% water-loss bands, sweating in exertional vs classic) but denser, shows both >40 C and >40.6 C thresholds, and is cut in the last first-aid step. A: clean draft plus three good additions and no false 40.6 'correction' this round."
+ },
+ "med-03": {
+  "draft": 8.5,
+  "A": 9,
+  "B": 9,
+  "B_lost": [
+   "'Boil it, cook it, peel it' prevention line (truncation; not asked)"
+  ],
+  "B_fixed": [],
+  "B_new_errors": [],
+  "A_halluc_count": 0,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "Both add the loperamide <=2 days limit and the 3-loose-stools-in-8-hours definition of severe. A also adds ETEC/Campylobacter; B integrates in place. Truncation hits only the antibiotics tail."
+ },
+ "num-01": {
+  "draft": 6,
+  "A": 7,
+  "B": 8.5,
+  "B_lost": [],
+  "B_fixed": [
+   "Wrong headline '13-14 times' / 'twice as large' removed",
+   "Visible 'Wait, let me re-calculate' self-talk removed"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 0,
+  "B_halluc_count": 0,
+  "citations_ok": false,
+  "note": "Best case for the rewrite: B is a clean 35x / 3x answer with sourced population figures; A still opens with the wrong headline, then the draft's self-correction, then the check repeating it. B uses a '[Draft]' marker for the area figures."
+ },
+ "num-02": {
+  "draft": 8.5,
+  "A": 8.5,
+  "B": 8,
+  "B_lost": [
+   "Worked Sun-Earth calculation (149.6e6 km / 3e5 km/s = 498.7 s) replaced by a citation - the question said 'show the reasoning'"
+  ],
+  "B_fixed": [
+   "Completes the precise Neptune calculation the draft cut off (15,027 s = 4 h 10.5 min)"
+  ],
+  "B_new_errors": [
+   "Defends the inconsistent headline: 'The draft's estimate of 4 hours and 7 minutes is a reasonable approximation' (mentions 'the draft' to the user; its own maths gives 4 h 10)"
+  ],
+  "A_halluc_count": 0,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "A's check correctly says 4 h 10 min, not 4 h 07, though it rambles and is cut off. B finishes the arithmetic but leaves 4 h 07 in the first line and rationalises it."
+ },
+ "num-03": {
+  "draft": 5,
+  "A": 4,
+  "B": 5,
+  "B_lost": [
+   "Explicit rule-of-thumb working (12 C drop -> 88 C) compressed to a clause"
+  ],
+  "B_fixed": [],
+  "B_new_errors": [
+   "Cites source [1] for the 84-85 C figure, which that passage (93.4 C at 1,905 m) does not support"
+  ],
+  "A_halluc_count": 3,
+  "B_halluc_count": 2,
+  "citations_ok": false,
+  "note": "Correct answer is ~88 C (65% of 101.3 kPa = 65.8 kPa). Draft computes 88 C then talks itself into 84-85 C via '85 kPa is 65%'. A's check computes 65.8 kPa, has the 93.4 C anchor, and still concludes 88 C is wrong - as visible 'Actually... No...' deliberation with an empty Additions header. B is the same wrong answer stated cleanly."
+ },
+ "abs-02": {
+  "draft": 9,
+  "A": 9,
+  "B": 9,
+  "B_lost": [],
+  "B_fixed": [],
+  "B_new_errors": [],
+  "A_halluc_count": 0,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "B returns the abstention unchanged with no citations - ideal. A appends a harmless but odd paragraph about Van de Velde surnames."
+ },
+ "tail-02": {
+  "draft": 5,
+  "A": 8,
+  "B": 8,
+  "B_lost": [
+   "Confucianism / filial piety as the root of the stigma (gold key fact 1)",
+   "Mo Xing penal tattooing in Qin/Han",
+   "Triad/underworld association (loosely present in draft)"
+  ],
+  "B_fixed": [
+   "Invented Xiangyang / Jianghu / Modern style categories replaced by brush painting, realistic painting, watercolor splash ink",
+   "Invented proverb removed"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "A: 5/5 key facts but the user reads ~250 words of fabricated styles first. B: 4/5, short and entirely clean, but throws away the draft's correct Confucian explanation because the retrieved passage only mentioned criminal marking. Equal by different routes."
+ },
+ "tail-03": {
+  "draft": 1,
+  "A": 5.5,
+  "B": 4,
+  "B_lost": [],
+  "B_fixed": [
+   "Denial of any Albstadt earthquake replaced by 1978 (Ms 5.7, 6,850 buildings, no deaths) and 1911 (Ms 6.1)",
+   "Invented Uelzen quake removed"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 2,
+  "citations_ok": false,
+  "note": "Gold: 1911, 1943, 1978; 1978 costliest at DM 275 m. A's check (Albstadt History now retrieved) overturns the draft and says Landau was NOT the costliest, pointing at 1978 - no 1943, no DM figure, truncated. B gets the first half right, then re-asserts the fabricated '1992 Landau earthquake, 2 billion DM' as Germany's costliest with three '[Draft]' markers. Rewrite instruction 'keep your own knowledge' preserved the hallucination that the check path killed."
+ },
+ "tail-04": {
+  "draft": 2.5,
+  "A": 6.5,
+  "B": 8,
+  "B_lost": [],
+  "B_fixed": [
+   "Founding date 28 Dec -> 8 April 1946",
+   "Invented '1997 transition to private law' replaced by societe anonyme on 19 Nov 2004",
+   "Monopoly end moved to 1999 EU directive (20% opened)",
+   "'Law of July 10, 2000' narrative replaced by RTE set up July 2000",
+   "Nov 2005 partial float added"
+  ],
+  "B_new_errors": [
+   "Says EDF 'held a monopoly on electricity generation' (gold: distribution, not production)"
+  ],
+  "A_halluc_count": 1,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "Check finally uses the Status/Energy-in-France passages: A reaches ~3.5/5 key facts but after a wholly wrong draft. B is a clean 4/5 timeline (no Marcel Paul, 'majority' instead of ~85%). Clear rewrite win."
+ },
+ "tail-15": {
+  "draft": 5.5,
+  "A": 6,
+  "B": 7,
+  "B_lost": [],
+  "B_fixed": [
+   "'200 fascicles' removed",
+   "'Indo-Saka monk' removed",
+   "Adds Lamotte/Demieville Sarvastivadin-author theory, Hikata, Chou/Sengrui, survives only in Chinese"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 4,
+  "B_halluc_count": 2,
+  "citations_ok": false,
+  "note": "Both keep Kumarajiva, 402-406, disputed Nagarjuna attribution and add Lamotte (3/5). Both keep the wrong 8,000-line sutra (gold: 25,000 lines) and invented 'general Zhisheng'; B cites these to [1] (the Nagarjuna lead), which cannot contain them. Neither gives 100 scrolls/34 in full although Da Zhidu Lun History was retrieved."
+ },
+ "tail-19": {
+  "draft": 1.5,
+  "A": 4.5,
+  "B": 6,
+  "B_lost": [],
+  "B_fixed": [
+   "'No catastrophic failure or recall' replaced by fire reports (Gamers Nexus, 30 Nov 2020), removal on 2 Feb 2021",
+   "Launch 2019 -> February 2020"
+  ],
+  "B_new_errors": [
+   "Tells the user the fabricated founders 'Jeroen van den Bosch and Ben Ku' are 'not contradicted by the provided sources and remain part of the historical context'"
+  ],
+  "A_halluc_count": 2,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "B leads with the right story and hits 3/5 key facts, then spends half its length arguing with 'the draft' in front of the user and re-endorsing invented founders. A fixes the central claim only (no Gamers Nexus date this round) beneath 400 words of confident fiction. No Johnny Hou/Guardian in either."
+ },
+ "tail-23": {
+  "draft": 1,
+  "A": 4,
+  "B": 9,
+  "B_lost": [],
+  "B_fixed": [
+   "Cargo airline with Il-76/An-124 -> flag carrier with two DHC-8-400",
+   "Obstacle: invented EASA type-certificate story -> EU ban on all Kyrgyz airlines",
+   "Adds Manas base, A320neo lease plan, Paris/Berlin/London, 11 domestic airports"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 2,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "Largest gap in the set. A's check corrects type and fleet but states 'It is not banned from Europe' - the opposite of the key fact - leaving the draft's fabricated certification narrative as the answer to part three. B discards the draft entirely and is 5/5 bar '80 seats, two on order'."
+ },
+ "trv2-01": {
+  "draft": 5.5,
+  "A": 7,
+  "B": 6.5,
+  "B_lost": [
+   "Alms etiquette: cover shoulders/knees, remove hat/sunglasses",
+   "Do not touch monks; keep silent; no flash",
+   "Offer food only, not money",
+   "Photography discretion",
+   "Kuang Si bear rescue centre"
+  ],
+  "B_fixed": [
+   "Invented 'Khorvat Phu Pheng Hill' -> Phou Si (on foot)",
+   "Invented 'Phoenix roof'/'Pha Ngum stupa', 'Wat Chai/Wat Sien', 'Ban Champi/Ban Vat Luang' removed",
+   "Pak Ou Caves, Kuang Si 29 km / 60,000 kip / transport added"
+  ],
+  "B_new_errors": [
+   "Pak Ou Caves placed 'near the confluence of the Nam Khan and Mekong' (they are ~25 km upriver at the Nam Ou)"
+  ],
+  "A_halluc_count": 4,
+  "B_halluc_count": 2,
+  "citations_ok": true,
+  "note": "B's sights are far cleaner, but the etiquette half - which the draft answered sensibly - is replaced by timing, 'ask your guesthouse' and a commercialisation caveat; almost no actual do/don't rules remain. A keeps the etiquette and fixes the two worst inventions, but doubts the real bear sanctuary and is truncated."
+ },
+ "trv2-02": {
+  "draft": 6,
+  "A": 6,
+  "B": 5.5,
+  "B_lost": [],
+  "B_fixed": [
+   "Yandex.Traffic -> Yandex.Taxi"
+  ],
+  "B_new_errors": [
+   "Cites source [1] for 'Old Town on the left bank' (wrong, and the Tbilisi lead does not say it)"
+  ],
+  "A_halluc_count": 5,
+  "B_halluc_count": 5,
+  "citations_ok": false,
+  "note": "B is the draft with '[Draft]' appended to 23 sentences - unreadable and a fake citation - plus metro length/stations. No error fixed (left bank, 0.50 GEL, Vake station, Chitakhevi, Dry Bridge). A's check is weak too (flags correct line names as unsupported) but at least hints Vake has no metro."
+ },
+ "trv2-03": {
+  "draft": 6,
+  "A": 6.5,
+  "B": 6,
+  "B_lost": [
+   "Descriptions of mole negro, tlayudas, chapulines; memelas; fruit juices; named mezcal agaves",
+   "Monte Alban practical tips (site museum, arrive early)",
+   "Mitla detail and mezcal distilleries",
+   "Teotitlan Sunday market"
+  ],
+  "B_fixed": [
+   "Invented 'Santiago Tuxteco' and 'Cueva de la Reina' removed",
+   "Memela 'mushroom sauce/goat cheese' invention removed",
+   "Teotitlan '15 km south' removed",
+   "Monte Alban distance 13 -> 9 km"
+  ],
+  "B_new_errors": [
+   "Monte Alban placed 'east of Oaxaca City' (it is west; the source says the city lies east of the site)"
+  ],
+  "A_halluc_count": 5,
+  "B_halluc_count": 1,
+  "citations_ok": false,
+  "note": "B is clean but half the length of the draft and reads as a summary; three '[Draft]' markers. A keeps the richer draft with its inventions unflagged ('No corrections') and adds seven moles, quesillo, chocolate, 9 km."
+ },
+ "trv2-04": {
+  "draft": 6,
+  "A": 7,
+  "B": 6.5,
+  "B_lost": [
+   "Distance 72-80 km",
+   "Warning that 3 days is rushed; 6 days relaxed",
+   "Description of the three legs (though mislabelled)"
+  ],
+  "B_fixed": [
+   "4-5 -> 4-6 days",
+   "Fitz Roy side-hike confusion ('Laguna de los Tres', 'ascent of Torre') removed",
+   "Mislabelled W legs removed",
+   "Correct operator split added (Las Torres/FantasticoSur: Torres, Chileno, Cuernos; Vertice: Paine Grande, Grey, Dickson)"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 4,
+  "B_halluc_count": 3,
+  "citations_ok": true,
+  "note": "Same Wikivoyage win in both. A states plainly that the CONAF/EcoCamp booking advice is wrong. B appends the right operators AFTER leaving 'reserve through CONAF (camping) or EcoCamp (refugios)' and 'Refugio Macarena' in place, so the answer contradicts itself; also says 'While the draft mentions 4-5 days...' to the user. Dated 'charged two weeks before arrival' policy in both."
+ },
+ "trv2-05": {
+  "draft": 4,
+  "A": 4,
+  "B": 4,
+  "B_lost": [],
+  "B_fixed": [
+   "Monastery name 'Agur' -> Ad Deir"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 7,
+  "B_halluc_count": 6,
+  "citations_ok": true,
+  "note": "Rewrite changed nothing that matters: 300 m Siq, 10-15 min walk, shuttle bus, enter the Treasury, 3-4 hours, High Place 'above the Monastery' all survive, although Wikivoyage See ('at least one full day') was in view. Both add the 800+ steps/over an hour note."
+ },
+ "trv2-06": {
+  "draft": 7,
+  "A": 7,
+  "B": 6,
+  "B_lost": [
+   "Samarkand as Timur's capital with 14th-15th c. monuments",
+   "Registan's three madrasas named",
+   "Train times (Tashkent-Samarkand ~2 h, Samarkand-Bukhara 3-4 h, Bukhara-Khiva 6-8 h)",
+   "Shakhrisabz and the Tashkent sights (truncation)"
+  ],
+  "B_fixed": [
+   "'Ulug Beg Madrasa' in Po-i-Kalyan removed",
+   "'Hazrat Ishan' and 'Kok Gumbaz unfinished' cut off by truncation"
+  ],
+  "B_new_errors": [
+   "Khiva as birthplace of Al-Biruni (born in Kath; source-derived but wrong)",
+   "'Known for: being a district-level city of 93,000' - trivia presented as the attraction"
+  ],
+  "A_halluc_count": 4,
+  "B_halluc_count": 2,
+  "citations_ok": true,
+  "note": "'What is each known for' becomes encyclopedia-lead filler (Paleolithic activity, Achaemenid satrapy, seventh-largest city) and the transport specifics vanish. Truncation then removes the remaining stops. A leaves the useful draft alone; its additions are population trivia."
+ },
+ "trv2-07": {
+  "draft": 7.5,
+  "A": 8,
+  "B": 7.5,
+  "B_lost": [
+   "HAPE red flags: breathlessness at rest, cough with pink froth, gurgling",
+   "HACE red flags: loss of coordination, severe headache",
+   "3-4 litres of water, carbohydrate-rich meals, elevated pillow",
+   "SPF 50/lip balm specifics",
+   "Named higher destinations to postpone (Pangong Tso, Nubra), Shanti Stupa"
+  ],
+  "B_fixed": [
+   "'Affects up to 75% of visitors' removed",
+   "Nubra '4,200-4,500 m' removed",
+   "Leh altitude 3,524 m"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 2,
+  "B_halluc_count": 0,
+  "citations_ok": true,
+  "note": "B adds Diamox with dose (125 mg twice daily), the 2,500 m threshold and rockfall note, and finishes Day 3, but replaces the draft's specific danger signs with 'HAPE presents as shortness of breath. HACE involves associated confusion' - a real safety loss. A keeps the signs and adds Diamox."
+ },
+ "trv2-09": {
+  "draft": 4,
+  "A": 5,
+  "B": 5.5,
+  "B_lost": [
+   "Hatton tea-factory remark (minor)"
+  ],
+  "B_fixed": [
+   "Nine Arch Bridge 1897 -> 1919",
+   "'Badulla/Matara', 'Main Line (Southern Line)/Upper Provinces Line' removed",
+   "'Nanuwa' -> Nanu Oya (name only)",
+   "Adds 9-10 h from Colombo and the Cyclone Ditwah service disruption (trains from Ella/Badulla only to Nanu Oya as of Feb 2026) - highly relevant"
+  ],
+  "B_new_errors": [
+   "Fares Rs 900/440 stamped 'as of 2026'"
+  ],
+  "A_halluc_count": 6,
+  "B_halluc_count": 4,
+  "citations_ok": false,
+  "note": "B uses the Wikivoyage disruption notice correctly where A's check mangled it into 'the route ends at Nanu Oya, not Badulla'. But B keeps 'Adam's Peak - Ella is the main starting point', Nanu Oya as 'a small stop just before Ella', Lover's Leap at Ravana Falls and invented 'Birkha Tea Estate', each now carrying a [1] citation it cannot have. A at least softly flags Adam's Peak."
+ },
+ "trv2-11": {
+  "draft": 7.5,
+  "A": 7.5,
+  "B": 8,
+  "B_lost": [],
+  "B_fixed": [],
+  "B_new_errors": [],
+  "A_halluc_count": 1,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "B = draft + forged Ministry of Tourism badges + 'a stranger saying it is closed is very likely a scam', and completes the photography advice the draft cut off. A adds the same badge fact plus idiom/police colour. 'Yellow' petit taxis in both."
+ },
+ "trv2-12": {
+  "draft": 7.5,
+  "A": 6.5,
+  "B": 6,
+  "B_lost": [
+   "Bases: Ortahisar, Avanos, Mustafapasa; Uchisar as a place to stay",
+   "Dark/Apple/Snake churches, Pasabag, Love Valley, Ihlara Valley, Uchisar Castle sunrise",
+   "Balloon logistics: 4-5 am pick-up, 5:30-7:00 flights, refund/reschedule on cancellation, keep a spare morning, warm layers",
+   "Best seasons; ATV/dolmus/taxi advice"
+  ],
+  "B_fixed": [
+   "'thermal winds' -> winds are lightest",
+   "Dark Church/St Barbara conflation removed",
+   "Adds Urgup as base, Pigeon Valley, Kaymakli/Derinkuyu location, Museumpass EUR 65 (2024)"
+  ],
+  "B_new_errors": [
+   "'Balloon launches occur at sunrise and sunset' (commercial flights are dawn only)"
+  ],
+  "A_halluc_count": 3,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "A: nine true recommendations listed under 'Corrections' as 'not mentioned in the sources' - misleading wall, truncated. B: acts on the same impulse and deletes them, leaving a generic, source-bound answer with 'While specific operator names are not detailed in the sources...'. Both damage a good draft; B loses more substance, A loses more trust."
+ },
+ "trv2-13": {
+  "draft": 6.5,
+  "A": 6,
+  "B": 5.5,
+  "B_lost": [
+   "Route descriptions and lengths for Norte (~825 km), Portugues (Lisbon ~620 / Porto ~240 km), Primitivo (from Oviedo), Ingles (Ferrol/A Coruna)",
+   "French feeder routes (Le Puy)",
+   "Daily stage length 25-30 km, fast-walker range",
+   "Donativo/fee and credencial requirement stated as fact"
+  ],
+  "B_fixed": [
+   "Portugues via 'Valladolid'/joining at O Cebreiro removed",
+   "Primitivo 'adds 115 km' removed",
+   "Frances 780 km, 'at least four weeks'"
+  ],
+  "B_new_errors": [
+   "Casts doubt on the credencial requirement for albergues ('sources ... do not specify')"
+  ],
+  "A_halluc_count": 5,
+  "B_halluc_count": 1,
+  "citations_ok": true,
+  "note": "B shrinks to two paragraphs: the five routes are only named, and the hostel paragraph is generic Hostel-article text plus a sentence debating 'the draft'. A keeps the content but its check calls 28-30 days 'incorrect' vs 'at least four weeks' and also doubts the credencial."
+ },
+ "trv2-14": {
+  "draft": 4.5,
+  "A": 5,
+  "B": 6,
+  "B_lost": [
+   "Men's dress guidance; swimwear only at beach/pool",
+   "What Darajani market sells / spice tours",
+   "Carved-door detail"
+  ],
+  "B_fixed": [
+   "Old Fort 18th -> 17th century",
+   "Invented 'Mikloni House Museum', 'Sunzilver Beach', 'Mchafu Kwae', 'Old Bazaar' removed",
+   "'Darajami' -> Darajani",
+   "House of Wonders no longer described as an open museum",
+   "'Great Mosque of Zanzibar' visit removed",
+   "Palace Museum (Beit el-Sahel) and Old Fort courtyard shows added"
+  ],
+  "B_new_errors": [],
+  "A_halluc_count": 5,
+  "B_halluc_count": 0,
+  "citations_ok": false,
+  "note": "Clear rewrite win on accuracy: zero invented places, UNESCO/on-foot framing. Costs: sights list still thin (no slave-market cathedral, Forodhani), dress section compressed and tagged '[Draft]' three times. A flags only two of the inventions and the fort date."
+ },
+ "trv2-16": {
+  "draft": 7,
+  "A": 7,
+  "B": 6.5,
+  "B_lost": [
+   "Sapporo winter temperatures (highs -1 to 3 C, lows -5 to -10 C) - the direct answer to 'how cold does it get'",
+   "Headline temperature range"
+  ],
+  "B_fixed": [
+   "'rural areas like Sapporo or Asahikawa' removed",
+   "Ski season Dec-Apr, Aji no Tokeidai, Nijo Ichiba added"
+  ],
+  "B_new_errors": [
+   "Equates 'Sapporo Central Market' with Nijo Ichiba (different markets)"
+  ],
+  "A_halluc_count": 4,
+  "B_halluc_count": 4,
+  "citations_ok": true,
+  "note": "B deletes the draft's correct Sapporo figures - apparently because the climate passages had no numbers - and substitutes 'continental climate' and 1,600 mm precipitation; Asahikawa range survives. Snow monkeys at Asahiyama, Otaru 'January', 'Shiroi Koishi Onsen' untouched in both. A's 'correction' merely restates the draft's numbers."
+ }
+}
