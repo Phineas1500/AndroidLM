@@ -53,7 +53,6 @@ What is missing, so you know what you would be signing up for:
 
 - The app builds but has not been run on a phone yet; we are waiting on our own test device and
   will fix first-run problems before asking anyone else to hit them.
-- The Wikipedia/Wikivoyage corpus (21.6GB) is not published for download yet.
 - Installing needs a computer with `adb` and about 35GB free: the app has no network permission
   by design, so everything is copied over USB. See [`INSTALL.md`](INSTALL.md).
 

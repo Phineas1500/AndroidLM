@@ -59,6 +59,5 @@ adb shell rm -r /data/local/tmp/bmoe
 ## Status
 
 The install flow has been written and its error paths tested, but it has not yet been run
-against a real phone. Known gaps: the corpus files do not have published download URLs or
-checksums yet, there is no signed release APK, and there is no in-app import for the corpus
+against a real phone. Known gaps: there is no signed release APK, and there is no in-app import for the corpus
 (the model can be imported with the file picker; the corpus currently needs adb).

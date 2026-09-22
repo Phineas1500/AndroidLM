@@ -34,6 +34,10 @@ yet; all numbers so far come from a 4-core ARM server under a phone-sized memory
 | `eval/` | Question sets, model answers and grades for each eval round |
 | `notes/` | Dated write-ups of benchmarks and eval rounds |
 
+The built corpus is published at
+[rammingaway/androidlm-corpus](https://huggingface.co/datasets/rammingaway/androidlm-corpus)
+(CC BY-SA 4.0); `scripts/install.sh` downloads it.
+
 ## Reproducing the corpus
 
 Needs about 80GB of free disk, Python 3.10+, `pyarrow` and `zstandard`.
