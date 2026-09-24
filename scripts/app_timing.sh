@@ -12,7 +12,8 @@ while IFS= read -r -u 3 q; do
   adb logcat -s AndroidLM:I </dev/null > /tmp/androidlm_run.log 2>&1 &
   cap=$!
   start=$(date +%s)
-  adb shell "am start -S -n $PKG/io.bigmoeonedge.example.MainActivity --es research_question '$q'" </dev/null >/dev/null
+  q_sh=${q//\'/\'\\\'\'}   # quote for the phone's shell: ' becomes '\''
+  adb shell "am start -S -n $PKG/io.bigmoeonedge.example.MainActivity --es research_question '$q_sh'" </dev/null >/dev/null
   until grep -qE "completed|failed" /tmp/androidlm_run.log; do
     [ $(( $(date +%s) - start )) -gt 1500 ] && { echo "TIMEOUT"; break; }
     sleep 5
