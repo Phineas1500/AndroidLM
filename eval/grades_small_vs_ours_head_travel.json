@@ -1,0 +1,619 @@
+{
+  "exp-01": {
+    "small": 4,
+    "ours": 8,
+    "small_errors": [
+      "Says 34% salinity is higher than any other body of water on Earth (Lake Assal, Don Juan Pond, Gaet'ale are saltier)",
+      "Says the Dead Sea does not receive fresh water from rivers or groundwater (the Jordan River and springs feed it)"
+    ],
+    "ours_errors": [
+      "Lists Palestine among the states extracting potash/bromine (Israeli and Jordanian works)",
+      "Says the salinity prevents microbial life (halophilic archaea and algae live there)"
+    ],
+    "small_broken": false,
+    "note": "Small has the enclosed-basin/evaporation idea but never names the human cause (Jordan diversion, mineral works) and contradicts itself on inflow; ours explains both halves with figures (34.2%, Jordan at 2% of historic flow, -30 m, sinkholes)."
+  },
+  "exp-02": {
+    "small": 6,
+    "ours": 8.5,
+    "small_errors": [],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Both correct. Small is fuzzy (never states Q_out = Q_in + W, 'releases the heated air'); ours gives the energy balance, cycle steps and COP cleanly."
+  },
+  "exp-03": {
+    "small": 3.5,
+    "ours": 8,
+    "small_errors": [
+      "'Babylonian' trade system (invented)",
+      "Names the Mycenaeans and 'later the Greeks' as the invaders (Mycenaean palaces were among the victims; the Sea Peoples are never mentioned)"
+    ],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Small's four generic headings are partly right (drought, trade) but its invasion theory is backwards and omits the Sea Peoples; ours covers drought, Sea Peoples, systems collapse and internal revolt, and the check adds the de Rouge/Maspero origin and Egypt/Assyria survival."
+  },
+  "exp-04": {
+    "small": 5,
+    "ours": 8.5,
+    "small_errors": [
+      "mRNA vaccines given 'via intravenous injection or nasal administration' (they are intramuscular)"
+    ],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Small's core mechanism is right but the delivery route is wrong and the comparison thin; ours covers lipid nanoparticles, T cells, production speed and safety correctly."
+  },
+  "exp-05": {
+    "small": 6.5,
+    "ours": 8.5,
+    "small_errors": [],
+    "ours_errors": [
+      "Expands HACE as 'High Altitude Brain Swelling' (cerebral edema)"
+    ],
+    "small_broken": false,
+    "note": "Small is short and correct (HACE, early symptoms, descend) but omits HAPE and 'stop ascending'; ours adds HAPE, a staged action plan, 500-1,000 m descent, and dexamethasone vs acetazolamide."
+  },
+  "cmp-01": {
+    "small": 5,
+    "ours": 8,
+    "small_errors": [
+      "Presents the Russian Revolution as the start of the Cold War (it began after 1945)"
+    ],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Small omits World War I as the Russian trigger and stretches outcomes to the Cold War and Great Purge; ours gives a structured shared/divergent analysis, and the check adds 1905, the Soviet/Duma and bread-shortage mutiny."
+  },
+  "cmp-02": {
+    "small": 4,
+    "ours": 7.5,
+    "small_errors": [
+      "Says PoW is less resistant to 51% attacks 'because an attacker needs to perform a large number of computations' (self-contradictory)",
+      "States flatly that PoS is more decentralized and more 51%-resistant (contested; stake concentrates in pools and exchanges)"
+    ],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Small's security section is confused and one-sided; ours covers hash vs stake majority, slashing, finality and centralisation pressures, and the check fixes 'Proof-of-Step' (its second 'correction' is pedantry)."
+  },
+  "cmp-03": {
+    "small": 6.5,
+    "ours": 6,
+    "small_errors": [],
+    "ours_errors": [
+      "Check 'corrects' the draft to say malaria is spread exclusively through mosquito bites (transfusion, shared needles and congenital transmission are real)",
+      "'TIKVAK' dengue vaccine (invented)",
+      "Says dengue 'cannot be transmitted through blood transfusion in most standard protocols' (transfusion transmission is documented)"
+    ],
+    "small_broken": false,
+    "note": "Small wins: it covers all four parts plainly and correctly. Ours is richer (hypnozoites, RTS,S/R21, Dengvaxia, Qdenga) but is cut off before treatment, and its check makes a false medical correction while leaking prompt deliberation."
+  },
+  "cmp-04": {
+    "small": 4.5,
+    "ours": 7,
+    "small_errors": [
+      "Calls Switzerland a federal parliamentary democracy and omits direct democracy (it is a directorial system run by referendums and initiatives)"
+    ],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Small misses Swiss direct democracy and labels Singapore flatly 'authoritarian'; ours gets both constitutions right (Federal Council, referendums, Westminster model) with sourced economic facts, but its Swiss 'why' is thin and it omits PAP dominance."
+  },
+  "cmp-05": {
+    "small": 3.5,
+    "ours": 8,
+    "small_errors": [
+      "Fusion of 'hydrogen-1 and helium-4' (D-T; helium-4 is the product)",
+      "Blames a 'lack of stable fusion fuels'",
+      "Fusion produces 'helium-3 waste' (products are helium-4 and neutron-activated structures)",
+      "Says fusion involves no radioactive materials (tritium fuel and activated components are radioactive)"
+    ],
+    "ours_errors": [
+      "Calls ITER's Q>=10 goal 'scientific breakeven' (breakeven is Q=1)"
+    ],
+    "small_broken": false,
+    "note": "Small gets the split/fuse framing and feasibility right but its fusion physics, waste and safety sections are wrong; ours is accurate and detailed (440 reactors, activation waste decaying in 50-100 years, proliferation) until truncation."
+  },
+  "syn-01": {
+    "small": 3.5,
+    "ours": 8,
+    "small_errors": [
+      "Names the Jin and Yuan as rising regional powers that fragmented the empire (Jin was destroyed by the Mongols in 1234; Yuan was itself a Mongol khanate)",
+      "Says there was a 'lack of strong rival states' (Jin, Xi Xia, Khwarazm and Song were major powers)"
+    ],
+    "ours_errors": [
+      "Dates the split to Genghis dividing the empire among his four sons into the Golden Horde, Chagatai, Ilkhanate and Yuan (it followed Mongke's death in 1259; the Ilkhanate and Yuan were Toluid)"
+    ],
+    "small_broken": false,
+    "note": "Small's expansion half is generic and its fragmentation half is wrong. Ours gives decimal organisation, intelligence, siege engineers, succession and assimilation; the check adds Berke-Hulagu and Kaidu-Kublai but leaves the four-sons error in place."
+  },
+  "syn-02": {
+    "small": 5.5,
+    "ours": 6,
+    "small_errors": [],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Both are balanced and error-free. Small's one-paragraph summary (tenants gain, supply falls) matches the literature well; ours adds Tatian 2013 and the Oregon/California caps, but its 'against' section drifts into gentrification and it lacks the supply-effect studies."
+  },
+  "syn-03": {
+    "small": 4.5,
+    "ours": 5,
+    "small_errors": [],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Both are generic. Small has the 1950s and deep-water terminals; ours has intermodality, 17 million boxes and the rise of Asian hubs. Neither mentions McLean, the move of ports out of old city docklands, or dock-labour collapse."
+  },
+  "syn-04": {
+    "small": 2.5,
+    "ours": 7.5,
+    "small_errors": [
+      "Places the strait 'between Asia and Australia' (it lies between the Malay Peninsula and Sumatra)",
+      "Lists the Netherlands as a main dependent 'for its maritime trade and naval operations'"
+    ],
+    "ours_errors": [],
+    "small_broken": true,
+    "note": "Small names the littoral states plus the Netherlands and misses China, Japan and Korea, the actual dependents. Ours names them, explains the energy chokepoint and the littoral roles; its 19 km narrowest-width figure is questionable."
+  },
+  "syn-05": {
+    "small": 5.5,
+    "ours": 6.5,
+    "small_errors": [],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Small correctly lists drought, deforestation, warfare and disease with honest uncertainty, but no specifics. Ours is sourced (megadroughts, Teotihuacan trade collapse, named city-states, 'greatest unsolved mystery') but covers fewer theories."
+  },
+  "hop-01": {
+    "small": 8,
+    "ours": 9,
+    "small_errors": [],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Both correct (Nile, hieroglyphs); ours adds Cairo, the 1799 find, the three scripts and Champollion."
+  },
+  "hop-02": {
+    "small": 4,
+    "ours": 8,
+    "small_errors": [
+      "Says the Hagia Sophia 'became the headquarters of the Ottoman Empire' (invented)",
+      "Says it is a museum today (it was reconverted to a mosque in 2020)"
+    ],
+    "ours_errors": [
+      "Says Mehmed II installed four minarets (he added one; Bayezid II and Selim II added the rest)"
+    ],
+    "small_broken": false,
+    "note": "Small gets Mehmed II, the mosque and the 20th-century museum right, but the 21st-century status wrong. Ours has the 1934/35 museum, the 2020 reconversion and the 2024 upper-gallery museum."
+  },
+  "hop-03": {
+    "small": 0.5,
+    "ours": 8.5,
+    "small_errors": [
+      "Co-laureates named as 'Carl Henning Wieland and Frederick Twyford' (Ernst Chain and Howard Florey)",
+      "Credits the invented Wieland with first isolating penicillin and discovering its antibacterial action"
+    ],
+    "ours_errors": [],
+    "small_broken": true,
+    "note": "Small fabricates both co-laureates and their contributions; ours gives Chain and Florey with correct roles, plus the 1940 isolation and 1941 constable case."
+  },
+  "hop-04": {
+    "small": 0.5,
+    "ours": 1,
+    "small_errors": [
+      "Answers Aconcagua and places it in Chile (it is in Argentina, which is not a Titicaca country)",
+      "Calls Titicaca the largest lake in the world by volume (largest in South America)"
+    ],
+    "ours_errors": [
+      "Says Bolivia holds ~56% of Lake Titicaca (Peru has the larger share, so the answer is Huascaran, Cordillera Blanca)",
+      "Opening line answers Ojos del Salado (Chile-Argentina border)"
+    ],
+    "small_broken": true,
+    "note": "Both wrong. Small picks a mountain in neither country; ours picks the wrong country (Bolivia/Sajama) with visible 'Wait, let's re-evaluate' reasoning, and its first line names Ojos del Salado."
+  },
+  "hop-05": {
+    "small": 3.5,
+    "ours": 7.5,
+    "small_errors": [
+      "Says the 'Treaty of Vienna' ended the war (the Second Treaty of Paris, Nov 1815; the Vienna Final Act predates Waterloo)",
+      "Calls it the War of the First Coalition (Waterloo was the Seventh Coalition, 1815)"
+    ],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Small gets both the treaty and the war wrong, though its Congress description (balance of power, restoration, anti-revolution) is good. Ours is correct but only two sentences."
+  },
+  "trv-01": {
+    "small": 3.5,
+    "ours": 7.5,
+    "small_errors": [
+      "'Nakahara' as a Kyoto district to prioritise (no such sightseeing district)",
+      "'Fushimi Inari Shijo' (garbled name for Fushimi Inari Taisha)",
+      "Toshodai-ji listed as a Kyoto site (it is in Nara)"
+    ],
+    "ours_errors": [
+      "'Hanzonzaka' slope (Ninenzaka)",
+      "'Yoshimizu Shrine' beside Kodai-ji (not there)",
+      "Shrine prayer ends with 'bow twice more' (once)"
+    ],
+    "small_broken": false,
+    "note": "Small half-right (Gion, Arashiyama, Kinkaku-ji, Ginkaku-ji), with one invented district, one Nara temple and generic etiquette. Ours gives a clustered 3-day plan, purification/bow/clap etiquette, and the check fixes the geography."
+  },
+  "trv-02": {
+    "small": 2.5,
+    "ours": 7.5,
+    "small_errors": [
+      "Hiking season 'late spring (April to June) to early autumn (September to October)' (austral autumn/winter; the season is roughly Oct/Nov to Mar/Apr)",
+      "'Los Glaciarillos' (Los Glaciares)"
+    ],
+    "ours_errors": [
+      "Bears 'rare but present' (there are no bears in Patagonia; pumas are the concern)"
+    ],
+    "small_broken": true,
+    "note": "Small gets the seasons backwards for the southern hemisphere, which would send a hiker in winter, and garbles Los Glaciares. Ours gives correct seasons, parks, winds, gear and permits, and the check adds Nov-Jan winds and May-Sep registration."
+  },
+  "trv-03": {
+    "small": 0.5,
+    "ours": 4,
+    "small_errors": [
+      "Invented regions 'Racha-Lagodek' (with a 'Red Sea coastline') and 'Kheviu Valley'",
+      "'Mtskheta-Tusheti National Park' and 'Gakhari' village (invented)",
+      "Svaneti said to be 'home to the city of Shida Kartli, a UNESCO site' (Shida Kartli is a separate region)",
+      "Invented dishes 'saklari', 'kharsheni', 'mashrusha', 'dzghitiani'; no khachapuri or khinkali"
+    ],
+    "ours_errors": [
+      "'Adjarian Khinkali' described as the boat-shaped dish (that is Adjarian khachapuri)",
+      "'Tobekvi' and 'Tavadi' (invented dishes)",
+      "Alaverdi Monastery 'in Signagi' (near Telavi); 'Telavi Winery'",
+      "Khachapuri listed as seafood",
+      "'Ajara Cascade' (invented)",
+      "Check invents 'Samegrelo-Mtsvane Zghava' and says Samegrelo-Zemo Svaneti is not a single region",
+      "Check calls Adjara Muslim-majority (Orthodox Christians are the majority)"
+    ],
+    "small_broken": true,
+    "note": "Small is almost entirely fabricated: regions, parks and every dish. Ours has real regions (Kakheti wine/qvevri, Adjara/Batumi, Mtskheta) but a garbled food section and a partly wrong check."
+  },
+  "trv-04": {
+    "small": 3.5,
+    "ours": 6,
+    "small_errors": [
+      "Old city described as 'laid out in a grid-like pattern' (its street plan is irregular)"
+    ],
+    "ours_errors": [
+      "Sea of Marmara placed north of Sultanahmet (it is south)",
+      "Topkapi reached by walking 'east along Divan Yolu' (Divan Yolu runs west; the palace is north-east behind Hagia Sophia)",
+      "Buy Blue Mosque tickets online (entry is free)",
+      "'~7 hours on the ground' from a 10 h layover (contradicts its own 3 h pre-departure rule)",
+      "Core area called a 'dense grid'"
+    ],
+    "small_broken": false,
+    "note": "Small names three real, nearby sights but has no transit or time budget and a wrong 'grid' layout. Ours has transit times, dress code and prioritisation, but its layout is wrong until the check's Marmara-south/Golden-Horn-north addition."
+  },
+  "med-01": {
+    "small": 7,
+    "ours": 9,
+    "small_errors": [],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Both correct. Small is concise and complete at a basic level; ours adds beta-cell dysfunction, DKA, metformin/GLP-1 and HLA genetics."
+  },
+  "med-02": {
+    "small": 6.5,
+    "ours": 9,
+    "small_errors": [],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Small is correct but light (no 40 C threshold, no aggressive cooling or immersion, no 'nothing by mouth if confused'); ours is a complete first-aid protocol, and this time the check leaves the correct threshold alone."
+  },
+  "med-03": {
+    "small": 5,
+    "ours": 8.5,
+    "small_errors": [],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Small is safe but misses ORS, loperamide and antibiotics, and its 7-day threshold is loose. Ours gives ORS, loperamide cautions, bismuth, red flags and standby azithromycin, and the check adds the ETEC/Campylobacter split."
+  },
+  "num-01": {
+    "small": 0,
+    "ours": 6.5,
+    "small_errors": [
+      "India's population '1.3 times' Canada's (~35 times)",
+      "India 'about twice as large as Canada' in area (Canada is ~3 times larger)"
+    ],
+    "ours_errors": [
+      "Headline says 13-14 times and Canada twice India's area (retracted in the body and corrected by the check)"
+    ],
+    "small_broken": true,
+    "note": "Small gets both numbers wrong by an order of magnitude or in direction. Ours reaches 35-36x and ~3x after a wrong headline and visible 'Wait, let me re-calculate'; this time the check explicitly corrects the headline."
+  },
+  "num-02": {
+    "small": 1.5,
+    "ours": 8.5,
+    "small_errors": [
+      "Computes 150e6 km / 3e5 km/s as 300 s, then blames a 'curved path' for the gap to 8 min 20 s (it is ~500 s)",
+      "Sun-Neptune light time 'about 35 minutes' (~4 h 10 min); 146,666 s and 2,444 min both miscalculated"
+    ],
+    "ours_errors": [],
+    "small_broken": true,
+    "note": "Small's shown reasoning is arithmetic nonsense and its Neptune answer is off by ~7x. Ours has correct reasoning (8 min 19 s; 15,000 s = 4 h 10 min); its 4 h 07 headline slip is caught by a rambling, truncated check."
+  },
+  "num-03": {
+    "small": 3,
+    "ours": 4,
+    "small_errors": [
+      "Water boils at '90 C at sea level' (100 C)",
+      "Boiling point at 65% pressure 'around 85 C' (~88 C)"
+    ],
+    "ours_errors": [
+      "Final estimate 84-85 C (at ~66 kPa water boils at ~88 C)",
+      "Treats 85 kPa as '~65% of 101.3 kPa' (it is 84%)",
+      "Check calls the correct 88 C estimate wrong and endorses 84-85 C"
+    ],
+    "small_broken": false,
+    "note": "Both land about 3 C too low. Small also misstates the sea-level boiling point; ours explains vapour pressure properly and derives the right 88 C, then overrides it with a pressure mistake, and the check endorses the wrong number."
+  },
+  "abs-01": {
+    "small": 7,
+    "ours": 8,
+    "small_errors": [],
+    "ours_errors": [],
+    "small_broken": false,
+    "note": "Both correctly decline to invent a speech. Small's phrasing is awkward ('the mayor did not provide specific details'); ours is clear but adds AI-cutoff boilerplate."
+  },
+  "abs-02": {
+    "small": 0,
+    "ours": 9,
+    "small_errors": [
+      "Invents a plot, genre and critical reception for a non-existent novel"
+    ],
+    "ours_errors": [],
+    "small_broken": true,
+    "note": "Small confidently summarises a fictional book. Ours correctly says it cannot find the book and invents nothing."
+  },
+  "trv2-01": {
+    "small": 1,
+    "ours": 7,
+    "small_errors": [
+      "'Floating Markets' and 'Temple of the Dawn' as Luang Prabang sights (both are Bangkok)",
+      "Says monks distribute food to devotees (devotees give alms to the monks)"
+    ],
+    "ours_errors": [
+      "'Phoenix roof' / 'Pha Ngum stupa' at Wat Xieng Thong (invented)",
+      "'Wat Chai'/'Wat Sien' evening meditation (unverifiable)",
+      "'Ban Vat Luang' village, boat-making (invented)",
+      "Check casts doubt on the real Kuang Si bear rescue centre"
+    ],
+    "small_broken": true,
+    "note": "Small imports Bangkok sights and gets the alms ceremony backwards. Ours has a real 4-day plan (Wat Xieng Thong, Kuang Si, night market, Royal Palace), good etiquette, and the check fixes Phou Si and Pak Ou and adds the Sai Bat time and fee."
+  },
+  "trv2-02": {
+    "small": 1,
+    "ours": 6,
+    "small_errors": [
+      "Invented neighbourhoods 'Gogaladze' and 'Sakhtar' and a 'Tsarateba Garden'",
+      "Sioni given as a neighbourhood housing the National Museum (Sioni is a cathedral; the museum is on Rustaveli Avenue)",
+      "Borjomi listed as a Tbilisi neighbourhood (it is a spa town ~150 km west)"
+    ],
+    "ours_errors": [
+      "Old Town on the left bank (it is on the right bank); check only calls it unsupported",
+      "Metro fare 0.50 GEL (1 GEL since 2022)",
+      "'Vake' metro station (does not exist)",
+      "'Chitakhevi Forest Park' (invented)",
+      "Dry Bridge Market placed in the Old Town"
+    ],
+    "small_broken": true,
+    "note": "Every neighbourhood in the small answer is invented or misplaced. Ours has the real ones (Old Town, Vake, Mtatsminda, Saburtalo), the metro and Bolt, with several factual slips."
+  },
+  "trv2-03": {
+    "small": 1,
+    "ours": 6.5,
+    "small_errors": [
+      "'Teotlalpan' as an archaeological site near Oaxaca",
+      "La Venta as a nearby site (Olmec site in Tabasco, ~500 km away)",
+      "San Miguel de Allende as a day trip (Guanajuato, ~700 km)",
+      "'El Tovar' and 'Sierra de los Angeles' (not Oaxaca places)"
+    ],
+    "ours_errors": [
+      "'Santiago Tuxteco' pottery village (invented)",
+      "'Cueva de la Reina' near Mitla (invented)",
+      "Memela with 'mushroom sauce (manchamanteles)' and goat cheese (invented)",
+      "Teotitlan del Valle '15 km south' (about 30 km east)",
+      "Mezcal variety 'barrano' (garbled)"
+    ],
+    "small_broken": true,
+    "note": "Beyond Monte Alban and mole, the small answer's sites and day trips are hundreds of km away or invented. Ours has mole negro, tlayudas, chapulines, Monte Alban, Teotitlan, Mitla and Coyotepec, with some invented names."
+  },
+  "trv2-04": {
+    "small": 2.5,
+    "ours": 7,
+    "small_errors": [
+      "W trek 'approximately 12-14 km over two days' (~70-80 km, usually 4-5 days)"
+    ],
+    "ours_errors": [
+      "Side hikes 'ascent of Torre itself' / 'Laguna de los Tres' (that is Fitz Roy, Argentina)",
+      "'Refugio Macarena' (invented)",
+      "W legs mislabelled (Grey = 'bottom right', French Valley = 'bottom left')",
+      "Check: payment taken two weeks before arrival with free cancellation (dated policy)"
+    ],
+    "small_broken": true,
+    "note": "Small's length and duration are wildly wrong and its accommodation advice is generic. Ours has 4-5 days, the Oct-Apr season, and the check supplies the real refugio operator split (Las Torres vs Vertice)."
+  },
+  "trv2-05": {
+    "small": 2,
+    "ours": 4,
+    "small_errors": [
+      "'Royal Palace (Al-Bab)', 'Great Temple (Al-Walid)', 'Al-Faradda' (invented names)",
+      "Entrance to Treasury 'approximately 15 minutes' (~2 km, 30-40 min)"
+    ],
+    "ours_errors": [
+      "Siq 'approximately 300 meters', walk '10-15 minutes' (Siq ~1.2 km; ~2 km / 30-40 min gate to Treasury)",
+      "Shuttle bus from visitor centre included in ticket (invented)",
+      "You can enter the Treasury's ground-floor chamber (not permitted)",
+      "'Street of Corinthian Tombs' (Street of Facades)",
+      "High Place of Sacrifice 'further up from the Monastery' (separate climb near the theatre)",
+      "3-4 hours enough for main sights (a full day is the realistic minimum)",
+      "Monastery called 'Agur'"
+    ],
+    "small_broken": true,
+    "note": "Small never answers how much time is needed and invents site names. Ours has the right sight list (Theatre, Royal Tombs, Monastery 800 steps) but badly underestimates the walk and the time, and adds an invented shuttle."
+  },
+  "trv2-06": {
+    "small": 2.5,
+    "ours": 7,
+    "small_errors": [
+      "Merv listed as an Uzbek city (it is in Turkmenistan)",
+      "Merv 'known for its ancient Roman ruins' (no Roman presence)"
+    ],
+    "ours_errors": [
+      "Po-i-Kalyan said to include 'Ulug Beg Madrasa' (it is Mir-i-Arab)",
+      "'Kalan Mosque' in Khiva (Juma Mosque / Kalta Minor)",
+      "Shakhrisabz unfinished project named as Kok Gumbaz (it is Ak-Saray)",
+      "'Hazrat Ishan' complex in Tashkent (Hazrati Imam)"
+    ],
+    "small_broken": false,
+    "note": "Small's city list is mostly right but says nothing specific about any city and adds Merv from Turkmenistan. Ours has Registan, Gur-e-Amir, Ark, Itchan Kala, Afrosiyob timings and a sensible route, with some monument mix-ups."
+  },
+  "trv2-07": {
+    "small": 2.5,
+    "ours": 8,
+    "small_errors": [
+      "'Tiger's Nest Monastery' as a Leh attraction (it is in Paro, Bhutan)",
+      "Advises starting with Pangong Lake and Khardung La in the first days (4,300-5,300 m; the opposite of acclimatisation advice)"
+    ],
+    "ours_errors": [
+      "Nubra Valley listed at 4,200-4,500 m (valley floor ~3,100 m)",
+      "AMS 'affects up to 75% of visitors' (unsupported figure)"
+    ],
+    "small_broken": true,
+    "note": "Small's first-days plan sends a newly arrived visitor to 5,000 m passes, which is dangerous. Ours gives a proper 48-72 h rest plan, AMS/HAPE/HACE signs and descent rules, and the check adds Diamox above 2,700 m."
+  },
+  "trv2-08": {
+    "small": 2,
+    "ours": 5.5,
+    "small_errors": [
+      "'Ruins of St. John's, the capital' (the capital is Torshavn; the medieval ruin is St Magnus Cathedral at Kirkjubour)"
+    ],
+    "ours_errors": [
+      "Teistin ferry Sandoy-Streymoy (replaced by the Sandoyartunnilin tunnel, Dec 2023)"
+    ],
+    "small_broken": true,
+    "note": "Small is generic transport plus garbled sights with nothing actionable. Ours gives Strandfaraskip ferries, Bygdaleidir buses, free red Torshavn buses and the Vagar airport walk, but no Mykines, Saksun or Gjogv and some GDP trivia."
+  },
+  "trv2-09": {
+    "small": 0.5,
+    "ours": 5,
+    "small_errors": [
+      "Route 'begins in Colombo and ends in Kandy' (the scenic Main Line continues through Ella to Badulla)",
+      "'Ella Fort' (16th century) and 'Ella Museum' (invented)",
+      "'Kandy National Park' near Ella (invented)"
+    ],
+    "ours_errors": [
+      "'Nanuwa' is 'a small stop just before Ella' (Nanu Oya is the Nuwara Eliya stop, hours away)",
+      "Route runs to 'Badulla/Matara'; 'Main Line (Southern Line) and Upper Provinces Line'",
+      "Lover's Leap cave at Ravana Falls (Lover's Leap is in Nuwara Eliya)",
+      "'Birkha Tea Estate' (invented)",
+      "Adam's Peak trek 'starts from Ella' (draft; only softly flagged)",
+      "Check: train route 'ends at Nanu Oya, not Badulla' (it ends at Badulla)",
+      "Check: fares Rs 900 / Rs 440 stated as current (outdated)"
+    ],
+    "small_broken": true,
+    "note": "Small misses Nine Arch Bridge and Little Adam's Peak and invents a fort, museum and national park. Ours has the real Ella highlights (Nine Arch, Little Adam's Peak, Ravana Falls) plus the seat tip, but many route errors."
+  },
+  "trv2-10": {
+    "small": 2,
+    "ours": 5,
+    "small_errors": [
+      "Says not to use the ger as a sleeping area for yourself (guests sleep in the family ger or a guest ger)"
+    ],
+    "ours_errors": [
+      "Altar shelf 'to the left of the entrance' (it is at the north/back, opposite the door)",
+      "Chopstick taboos presented as Mongolian ger etiquette (East Asian, not nomad practice)"
+    ],
+    "small_broken": true,
+    "note": "Small's rules are generic politeness plus one wrong rule, with no ger-specific custom. Ours has the threshold taboo, south door, honoured north seat, accepting food with the right hand, and asking before photos, with two errors."
+  },
+  "trv2-11": {
+    "small": 4,
+    "ours": 7.5,
+    "small_errors": [],
+    "ours_errors": [
+      "Petit taxis described as yellow (Marrakech's are beige/ochre)"
+    ],
+    "small_broken": false,
+    "note": "Small is generic but accurate (taxis, touts, fake info). Ours names the specific tricks (closed-road false guides, henna, meters, photo charges, 'La, shukran') and the check adds forged guide badges."
+  },
+  "trv2-12": {
+    "small": 0.5,
+    "ours": 6.5,
+    "small_errors": [
+      "Trabzon and Kirsehir as Cappadocia bases (Trabzon is on the Black Sea, ~600 km away)",
+      "Pozanti, 'Tavli Fortress', 'Otomano Castle', 'Oya Castle', Beysehir Castle and Marmaris Beach as Cappadocia sights (invented or hundreds of km away)",
+      "Balloon rides 'from Trabzon or Kirsehir' (flights launch around Goreme)"
+    ],
+    "ours_errors": [
+      "'Dark Church (Church of St. Barbara)' (two different churches conflated)",
+      "Balloons fly at dawn 'to catch thermal winds' (they fly then because the air is calm)",
+      "Check lists nine real towns and sights under 'Corrections' as unsupported"
+    ],
+    "small_broken": true,
+    "note": "Apart from Ihlara Valley, the small answer's bases and sights are invented or far away; it would send a traveller to the Black Sea. Ours has the right bases, sights and balloon logistics, but the check wrongly casts doubt on nine correct items."
+  },
+  "trv2-13": {
+    "small": 1,
+    "ours": 6,
+    "small_errors": [
+      "Camino Frances 'runs from Spain to France' (from Saint-Jean-Pied-de-Port in France west across Spain)",
+      "Invented route segments 'Norteno, Oesteno, Surio'",
+      "Hostels called 'caseros' (albergues)",
+      "Frances takes '40 to 60 days' (typically 30-35)"
+    ],
+    "ours_errors": [
+      "Camino Portugues passes through 'Valladolid' and joins the Frances near O Cebreiro (wrong)",
+      "Primitivo 'adds about 115 km' (~320 km)",
+      "Via Podiensis and 'Le Puy Route' listed as two routes (same route)",
+      "Check calls 28-30 days 'incorrect' against 'at least four weeks' (false correction)",
+      "Check casts doubt on the credencial requirement for albergues (it is required)"
+    ],
+    "small_broken": true,
+    "note": "Small gets the direction, route names, duration and hostel name wrong. Ours names the real routes, 800 km in 28-30 days, albergues and the credencial, though its check casts doubt on correct points."
+  },
+  "trv2-14": {
+    "small": 3.5,
+    "ours": 5,
+    "small_errors": [
+      "'Mount Umbuli' (invented)"
+    ],
+    "ours_errors": [
+      "'Mchafu Kwae area' (invented)",
+      "'Old Bazaar' as a named sight",
+      "House of Wonders described as an open museum (closed since the 2020 collapse)",
+      "'Great Mosque of Zanzibar' open to visitors (non-Muslims generally cannot enter mosques)",
+      "'Darajami' for Darajani"
+    ],
+    "small_broken": false,
+    "note": "Small's dress advice is right but its sights are vague plus one invented mountain. Ours names the Old Fort, Darajani and carved doors and gives fuller dress/photo guidance, but invents several places; the check flags two of them."
+  },
+  "trv2-15": {
+    "small": 2,
+    "ours": 5.5,
+    "small_errors": [
+      "Daily fee 'USD 25-30' covering transport and meals (the SDF is USD 100/night since Sept 2023 and covers no services)",
+      "Guides 'not mandatory' (licensed guides are required outside Thimphu/Paro and on treks)",
+      "'Punakawan Village' (Punakha)"
+    ],
+    "ours_errors": [
+      "Guide requirement presented as relaxed for anyone self-booking (guides still required beyond Thimphu/Paro and on treks)"
+    ],
+    "small_broken": true,
+    "note": "Small's fee is off by 4x and it misstates the guide rule, the two things the question hinges on. Ours has the correct SDF ($100, INR 1,200) and advance visa but overstates the guide relaxation and omits Tiger's Nest."
+  },
+  "trv2-16": {
+    "small": 1.5,
+    "ours": 7,
+    "small_errors": [
+      "Mount Fuji as a Hokkaido winter sight (it is on Honshu)",
+      "'Kurokawa Snow Festival' (Kurokawa is a Kyushu onsen town; the event is the Sapporo Snow Festival)",
+      "Kaiseki and mochi given as Hokkaido foods (not regional specialities)"
+    ],
+    "ours_errors": [
+      "Asahiyama Zoo has 'snow monkeys bathing in hot springs' (known for the penguin walk; the monkeys are in Hakodate)",
+      "Otaru Snow Light Path 'usually January' (February)",
+      "'Shiroi Koishi Onsen' (invented)",
+      "'rural areas like Sapporo or Asahikawa'"
+    ],
+    "small_broken": true,
+    "note": "Small puts Mount Fuji in Hokkaido and misses the Sapporo Snow Festival and every local dish; only its temperature line is usable. Ours has Niseko, the Snow Festival, soup curry, miso ramen, jingisukan, kaisen-don and realistic temperatures."
+  }
+}

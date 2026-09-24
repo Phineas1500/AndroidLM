@@ -1,24 +1,62 @@
 # AndroidLM: an offline research assistant for Android
 
-Work in progress toward the [poidh bounty "Build the Best Offline AI Research App for
-Android"](https://poidh.xyz/mainnet/bounty/31): a casual lookup and research tool that runs with
-no network on a 12GB phone, within 50GB of storage.
+An Android app that answers research questions with no network, on a 12GB phone, within 50GB of
+storage. Built for the poidh bounty ["Build the Best Offline AI Research App for
+Android"](https://poidh.xyz/mainnet/bounty/31).
 
 ## Approach
 
 - **Model:** Qwen3.6-35B-A3B (35B parameters, 3B active per token) at 2-bit
-  (`unsloth/Qwen3.6-35B-A3B-GGUF`, `UD-Q2_K_XL`, 12.3GB). Routed experts are streamed from flash
-  with an in-RAM expert cache by [BigMoeOnEdge](https://github.com/Helldez/BigMoeOnEdge), which is
-  built on llama.cpp.
+  (`unsloth/Qwen3.6-35B-A3B-GGUF`, `UD-Q2_K_XL`, 12.3GB). The model file is larger than the
+  memory the app uses: routed experts are streamed from flash into an in-RAM expert cache by
+  [BigMoeOnEdge](https://github.com/Helldez/BigMoeOnEdge), which is built on llama.cpp. Two
+  engine patches of ours (`patches/`) keep one pinned thread pool per session and let a
+  follow-up turn reuse the conversation instead of re-reading it.
 - **Corpus:** English Wikipedia (FineWiki, August 2025) in one 21GB SQLite file: the 2M most-read
   articles in full, lead sections for the rest, a BM25 full-text index, Wikipedia's redirect
-  table, and monthly pageviews per article.
+  table, and monthly pageviews per article. Optional Wikivoyage (0.3GB) for travel questions.
 - **Pipeline:** the model names the Wikipedia articles it wants; titles are resolved through
-  redirects; a router sends little-read subjects retrieval-first and everything else
-  answer-first with a source check that cites passages.
+  redirects; a router sends little-read subjects retrieval-first (the model's memory of them is
+  unreliable) and everything else answer-first, followed by a source check that cites passages.
+- **Offline by construction:** the APK declares no `INTERNET` permission and has no Google Play
+  Services dependency.
 
-Status, measurements and decisions are in [`notes/`](notes/). Nothing here has run on a phone
-yet; all numbers so far come from a 4-core ARM server under a phone-sized memory cap.
+## Status
+
+Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that phone:
+
+| | |
+|---|---|
+| Storage | 33.9GB (model 12.3GB, Wikipedia 21.3GB, Wikivoyage 0.3GB) plus the 72MB APK |
+| Memory during a research question | about 4.9GB (engine 2.7GB, pinned dense weights 2.05GB, app 0.15GB) |
+| Generation speed | 3-4.4 tokens/s (lower when the phone is hot) |
+| Model load | about 28 s on app start |
+| Answer-first question | first words after 30-35 s; answer plus cited source check in 5.5-7 min |
+| Retrieval-first question | first words after 2-2.5 min; cited answer done in 2.5-3.2 min |
+
+Against Qwen3-1.7B answering the same 72 questions from memory, graded 0-10 by Claude with one
+rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-model-comparison.md)):
+
+| Questions | Qwen3-1.7B | AndroidLM |
+|---|---|---|
+| General research (28) | 4.2 | 7.4 |
+| Travel (20) | 2.0 | 6.2 |
+| Obscure subjects (24) | 1.3 | 7.2 |
+| All (72) | 2.6 | 7.0 |
+
+AndroidLM's answers in this table were produced on an ARM server with the same model and
+pipeline as the app.
+
+Measurements, eval rounds and decisions are in [`notes/`](notes/); the Pixel findings are in
+[`notes/2026-09-23-pixel-first-day.md`](notes/2026-09-23-pixel-first-day.md). Known gaps: no
+signed release APK yet, the corpus is installed with adb (no in-app import), and search takes
+about 20 s on the phone.
+
+## Install
+
+[`INSTALL.md`](INSTALL.md): `scripts/install.sh` downloads the model and corpus on a computer,
+checks their SHA-256, pushes them to the phone over USB and installs the APK. Building the app:
+[`app-android/README.md`](app-android/README.md). Testing it: [`TESTING.md`](TESTING.md).
 
 ## Layout
 
@@ -30,7 +68,11 @@ yet; all numbers so far come from a 4-core ARM server under a phone-sized memory
 | `scripts/rag.py` | The retrieval and answering pipeline (prototype of the on-device logic) |
 | `scripts/eval_models.sh`, `run_eval.py` | Run an eval set against a memory-capped llama-server |
 | `scripts/bench.sh`, `sbx.sh` | Benchmarks under a cgroup memory cap; sandbox for third-party code |
-| `scripts/build-android-engine.sh` | Cross-compiles the BigMoeOnEdge engine for Android arm64 |
+| `app-android/` | The Android app (a fork of BigMoeOnEdge's demo) and the `research/` pipeline module |
+| `patches/` | Our patches to the BigMoeOnEdge engine, applied by the engine build script |
+| `scripts/build-android-engine.sh` | Cross-compiles the patched engine for Android arm64 |
+| `scripts/install.sh` | Downloads, verifies and pushes the model and corpus; installs the APK |
+| `scripts/app_timing.sh` | Times research questions in the app over adb (dev build only) |
 | `eval/` | Question sets, model answers and grades for each eval round |
 | `notes/` | Dated write-ups of benchmarks and eval rounds |
 
@@ -59,4 +101,3 @@ python scripts/build_redirects.py wiki.db enwiki-latest-redirect.sql.gz \
 
 This project's own code is licensed under [Apache-2.0](LICENSE). Third-party components, the
 model and the Wikipedia-derived corpus keep their own terms: see [`NOTICE.md`](NOTICE.md).
-Installing on a phone: [`INSTALL.md`](INSTALL.md).

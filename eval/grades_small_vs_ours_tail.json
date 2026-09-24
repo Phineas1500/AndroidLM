@@ -1,0 +1,218 @@
+{
+ "tail-01": {
+  "small": 1,
+  "ours": 9,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "4/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents Black Panther members Elaine De Leon/James Ware/Mark Clark, 'conspiracy to commit murder and rape', 12 years; ours names King/Woodfox/Wallace, Angola, 1972 indictment/1974 conviction for killing a guard, 40+ years, King 29 years (no Brent Miller, no 2001 release)"
+ },
+ "tail-02": {
+  "small": 3,
+  "ours": 8,
+  "small_key_facts": "1/5",
+  "ours_key_facts": "5/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small has Confucian/filial-piety gist only, no criminal marking, and invents generic Traditional/Modern/Regional categories; ours' draft invents Xiangyang/Jianghu styles but the check replaces them with brush painting, realistic painting and watercolor splash ink (user still reads the invented section first)"
+ },
+ "tail-03": {
+  "small": 1,
+  "ours": 4,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "2/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents a 1945 quake with loss of life as costliest; ours' draft denies any Albstadt quake and invents a 1992 Landau quake (2 billion DM), check corrects to 1911 Ms 6.1 and 1978 Ms 5.7 with 6,850 buildings and no deaths but never names 1978 as costliest; no 1943, no 275 million DM"
+ },
+ "tail-04": {
+  "small": 2,
+  "ours": 7,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "4/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small gives 1947 and a vague liberalisation story with no 1999/2004/2005 milestones; ours' draft has wrong dates (28 Dec 1946, 1997, 'July 10, 2000' law) but check fixes to 8 April 1946, 1999 monopoly end, societe anonyme 2004, Nov 2005 float; no Marcel Paul or 85%"
+ },
+ "tail-05": {
+  "small": 1,
+  "ours": 5,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "2/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents an Aegean island of Nisaea, shaggy coat and extinction by Herodotus' time; ours right on Nisaean plain in Media and tall/prized, honest that extinction date is not in sources; no 430 BCE, sacred horses, warhorse head or 1204"
+ },
+ "tail-06": {
+  "small": 0,
+  "ours": 10,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "5/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents founding 1984 by 'Tetsuya Mihara' and an acquisition by Toyota Motor Sales USA; ours has fraud, Kaneshige 1976 Kaneshige Auto Center in Iwakuni, FSA revocation, Itochu/WECARS and Sompo Japan"
+ },
+ "tail-07": {
+  "small": 2,
+  "ours": 9,
+  "small_key_facts": "1/5",
+  "ours_key_facts": "5/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small describes a capacitor-on-electrode structure, names only 'quantum tunneling', and invents a 10-100 mV bias range; ours has island between two tunnel junctions, capacitive gate, Coulomb blockade, V < e/C, thermal energy below charging energy (no e^2/2C formula)"
+ },
+ "tail-08": {
+  "small": 3,
+  "ours": 10,
+  "small_key_facts": "1/5",
+  "ours_key_facts": "5/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small places origin in Yorkshire in the early 20th century, generic 'unsuited to industrial farming' decline, no Howitt Report; ours has late-19th-century Devon/Cornwall + Essex/Suffolk/Kent merger, 1955 Howitt Report, extensive vs intensive farming, still endangered, plus correct Chinese/French influence"
+ },
+ "tail-09": {
+  "small": 0,
+  "ours": 10,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "5/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents 12 Dec, a 'Marks & Spencer store in Harrods', 10 dead/150 injured and an IRA peace statement; ours has 17 Dec car bomb, 37-minute warning, not evacuated, 3 police + 3 civilians, 90 injured, Army Council unauthorised/regret, shift to military targets"
+ },
+ "tail-10": {
+  "small": 1,
+  "ours": 6,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "3/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents a prosecution for advocating legal communism and a generic 'justice' view of Islam; ours has Eyup, 1957 Vatan Partisi, History Thesis, historical revolution/primitive socialism, Rashidun elites, but never states the charge (religion as a political tool) or the Quran/hadith use"
+ },
+ "tail-11": {
+  "small": 0,
+  "ours": 5,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "2/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents 1897-1959 and a doublage rule requiring a civilian companion; ours has 1852 (plus May 1854 law) and doublage as released convicts forced to reside in Guiana (no 'equal to sentence'), 1953 given as abolition; no 1853/1938/1945"
+ },
+ "tail-12": {
+  "small": 0,
+  "ours": 9,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "4/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents an American Revolution satire featuring John Mulaney; ours has Red Viburnum 1914 anthem, Khlyvnyuk of BoomBox, support for Ukraine during the invasion, proceeds to Ukraine Humanitarian Relief Fund; no 8 April 2022 date, Gilmour not named"
+ },
+ "tail-13": {
+  "small": 0,
+  "ours": 8,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "4/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents a 16-year-old killer 'Pablo Escudero', an attack on a woman and life imprisonment; ours has 11 Nov 2007, Legazpi, Josue Estebanez (soldier), counter-protest against a neo-Nazi rally, 26 years with ideological aggravator; no 19+7 breakdown, compensation or Supreme Court"
+ },
+ "tail-14": {
+  "small": 0,
+  "ours": 6,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "2/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small credits Enrico Caruso, a 'traditional folk melody' and a 1944 Rome rally; ours has late 1943, Katyusha, Curenna Christmas 1943, Alto Epiphany 1944, but never names Cascione or Sibilla so 'how it came to be written' is unanswered; no Garibaldi brigades"
+ },
+ "tail-15": {
+  "small": 0,
+  "ours": 5,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "3/5",
+  "small_fabricated": true,
+  "ours_fabricated": true,
+  "note": "Small invents a Xuanzang 657 CE translation and author 'Dignasakha (Devadatta)'; ours right on Kumarajiva, 402-406 and disputed Nagarjuna attribution, check adds Lamotte/Demieville and Sengrui theories, but draft's 8,000-line sutra and 200 fascicles (gold: 25,000 lines, 100 scrolls) stand, check says 'No corrections'"
+ },
+ "tail-16": {
+  "small": 2,
+  "ours": 9,
+  "small_key_facts": "1/5",
+  "ours_key_facts": "4/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small gives 59th-96th Streets, right year 1982, and invents Federal/Greek Revival/Victorian styles with a 'Belvedere Room' and 'St. John's Church'; ours has 61st-97th Upper West Side, 9 Nov 1982, neo-Italian Renaissance majority, Art Deco, late 19th c. to early 1940s; no Dakota"
+ },
+ "tail-17": {
+  "small": 1,
+  "ours": 6,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "3/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small says the editorial attacked Symphony No. 1 and invents a Symphony No. 2 (1937) premiered 1942; ours has unsigned editorial, Lady Macbeth as formalist/bourgeois, Stalin approved but likely did not write it (no 28 Jan date), then honestly says symphony consequences are not in sources with an irrelevant Prokofiev digression"
+ },
+ "tail-18": {
+  "small": 5,
+  "ours": 8,
+  "small_key_facts": "2/5",
+  "ours_key_facts": "4/5",
+  "small_fabricated": false,
+  "ours_fabricated": false,
+  "note": "Small generic symptoms (no worst-when-sitting), names Staph aureus/Strep pyogenes not gut bacteria, but gives the right reason for testing (identify pathogen, guide antibiotics); ours has full symptom list incl. sitting/bowel movement, constipation, drainage, fever, mass; E. coli; testing identifies bacteria. No staph/MRSA trend or Crohn's"
+ },
+ "tail-19": {
+  "small": 1,
+  "ours": 4,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "2/5",
+  "small_fabricated": true,
+  "ours_fabricated": true,
+  "note": "Small invents a 2016 dust-flaw recall; ours' draft denies any failure, invents founders 'Jeroen van den Bosch and Ben Ku' and a 2019 launch, check restores fire reports late 2020 and Feb 2021 removal from lineup; invented founders/2019 left standing, no Johnny Hou, Guardian or Gamers Nexus"
+ },
+ "tail-20": {
+  "small": 2,
+  "ours": 8,
+  "small_key_facts": "1/5",
+  "ours_key_facts": "3/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small reverses the claim (China influencing Babylon) and invents proposer 'Ernst Friedrich von Brunn'; ours has the third-millennium claim, Terrien de Lacouperie with migration, rejection (Schlegel), Huntington/Bishop hyperdiffusionism, Lattimore; no Ping-ti Ho or Mallory/Mair/Tarim mummies"
+ },
+ "tail-21": {
+  "small": 2,
+  "ours": 9,
+  "small_key_facts": "1/5",
+  "ours_key_facts": "4/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small says ICMR 2015-2022 and invents 'Director-General of the WHO 2017-2022', research on child/maternal health; ours has ICMR DG/Secretary 2015-17, WHO DDG Programmes Oct 2017-Mar 2019, Chief Scientist to 2022, TB and HIV; no NIRT Chennai"
+ },
+ "tail-22": {
+  "small": 2,
+  "ours": 6,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "3/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents a real-estate fortune and a 1950 foundation, vague Brandeis humanities nod; ours has Premier Automotive Supply 1940 with Jack and Joe, parts/electronics distributor, real but non-gold Israel gifts (Bezalel, Be'er-Sheva museum, Leadership Institute), says nothing on Brandeis is in its sources"
+ },
+ "tail-23": {
+  "small": 0,
+  "ours": 4,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "3/5",
+  "small_fabricated": true,
+  "ours_fabricated": true,
+  "note": "Small makes it a Kazakh airline in Astana flying an 'Antonov An-225 Embraer'; ours' draft invents an Il-76 cargo operator blocked by EASA certification, check corrects to passenger airline with DHC-8-400s, A320neo lease, Paris/Berlin/London, but wrongly states it is 'not banned from Europe' (gold: EU ban on all Kyrgyz airlines)"
+ },
+ "tail-24": {
+  "small": 1,
+  "ours": 8,
+  "small_key_facts": "0/5",
+  "ours_key_facts": "4/5",
+  "small_fabricated": true,
+  "ours_fabricated": false,
+  "note": "Small invents a 2005 private-university founding and a 2007-2023 timeline (15th anniversary in 2021); ours has no nodal agency/general universities reason, 2005 expert committee by-laws, 3 Sept 2021 bill, 5 March 2023 start (tied to first VC); no Sishu Bhawan Square or Rs 330.17 crore"
+ }
+}

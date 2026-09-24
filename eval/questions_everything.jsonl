@@ -1,0 +1,72 @@
+{"id": "exp-01", "cat": "explain", "q": "Why does the Dead Sea have such high salinity, and why is its water level falling?"}
+{"id": "exp-02", "cat": "explain", "q": "How does a heat pump deliver more heat energy than the electrical energy it consumes without violating conservation of energy?"}
+{"id": "exp-03", "cat": "explain", "q": "Why did the Bronze Age civilizations of the eastern Mediterranean collapse around 1200 BC? Summarize the main competing explanations."}
+{"id": "exp-04", "cat": "explain", "q": "How do mRNA vaccines work, and how do they differ from traditional inactivated-virus vaccines?"}
+{"id": "exp-05", "cat": "explain", "q": "Why is altitude sickness dangerous, what are its early symptoms, and what should a trekker do if they appear?"}
+{"id": "cmp-01", "cat": "compare", "q": "Compare the causes and outcomes of the French Revolution and the Russian Revolution of 1917."}
+{"id": "cmp-02", "cat": "compare", "q": "What are the practical differences between proof-of-work and proof-of-stake consensus, including their security assumptions?"}
+{"id": "cmp-03", "cat": "compare", "q": "Compare malaria and dengue fever: transmission, symptoms, prevention, and treatment."}
+{"id": "cmp-04", "cat": "compare", "q": "How do the political systems of Switzerland and Singapore differ, and what explains each country's economic success?"}
+{"id": "cmp-05", "cat": "compare", "q": "Compare nuclear fission and nuclear fusion as energy sources: physics, current feasibility, waste, and safety."}
+{"id": "syn-01", "cat": "synthesis", "q": "What factors allowed the Mongol Empire to expand so quickly, and why did it fragment within a few generations?"}
+{"id": "syn-02", "cat": "synthesis", "q": "What are the main arguments for and against rent control, and what does the empirical evidence say?"}
+{"id": "syn-03", "cat": "synthesis", "q": "How did the invention of the shipping container change global trade and the geography of port cities?"}
+{"id": "syn-04", "cat": "synthesis", "q": "Why is the Strait of Malacca strategically important, and which countries depend on it most?"}
+{"id": "syn-05", "cat": "synthesis", "q": "What is known about the causes of the decline of the Maya civilization, and how certain is that knowledge?"}
+{"id": "hop-01", "cat": "multihop", "q": "Which river flows through the capital of the country where the Rosetta Stone was discovered, and what ancient script did the stone help decipher?"}
+{"id": "hop-02", "cat": "multihop", "q": "Who was the ruler of the Ottoman Empire when Constantinople fell, and what happened to the Hagia Sophia afterwards and in the 20th and 21st centuries?"}
+{"id": "hop-03", "cat": "multihop", "q": "The scientist who discovered penicillin shared a Nobel Prize with two others. Who were they and what did each contribute?"}
+{"id": "hop-04", "cat": "multihop", "q": "What is the highest mountain in the country that contains Lake Titicaca's largest share, and which mountain range is it part of?"}
+{"id": "hop-05", "cat": "multihop", "q": "Which treaty ended the war in which the Battle of Waterloo was fought, and what political order did the subsequent congress establish in Europe?"}
+{"id": "trv-01", "cat": "travel", "q": "I'm visiting Kyoto for three days. Which districts and sites should I prioritize, and what etiquette should I know at temples and shrines?"}
+{"id": "trv-02", "cat": "travel", "q": "What should I know before hiking in the Patagonian Andes: weather, seasons, main parks, and safety?"}
+{"id": "trv-03", "cat": "travel", "q": "What are the main regions of Georgia (the country), what is each known for, and what foods should I try?"}
+{"id": "trv-04", "cat": "travel", "q": "I have a 10-hour layover in Istanbul. What can I realistically see, and how is the old city laid out?"}
+{"id": "med-01", "cat": "medical", "q": "What is the difference between type 1 and type 2 diabetes in cause, onset, and treatment?"}
+{"id": "med-02", "cat": "medical", "q": "What are the signs of dehydration versus heat stroke, and what first aid is appropriate for each?"}
+{"id": "med-03", "cat": "medical", "q": "How should a traveler treat a suspected case of traveler's diarrhea, and when does it require medical attention?"}
+{"id": "num-01", "cat": "numeric", "q": "Roughly how many times larger is the population of India than that of Canada, and how do their land areas compare?"}
+{"id": "num-02", "cat": "numeric", "q": "How long does light take to travel from the Sun to Earth and from the Sun to Neptune? Show the reasoning."}
+{"id": "num-03", "cat": "numeric", "q": "If a city at 3,600 m elevation has about 65% of sea-level air pressure, why does water boil at a lower temperature there and roughly what temperature?"}
+{"id": "abs-01", "cat": "abstain", "q": "What did the mayor of Tarija, Bolivia say in his speech last week?"}
+{"id": "abs-02", "cat": "abstain", "q": "Summarize the plot of the novel 'The Glass Cartographer of Veld' by Imre Solvang."}
+{"id": "tail-01", "cat": "tail", "q": "Who were the Angola Three, what crime were two of them convicted of in the early 1970s, and how long did they spend in solitary confinement?"}
+{"id": "tail-02", "cat": "tail", "q": "Why has tattooing traditionally been looked down upon in China, and what are the three main style categories of Chinese tattoo design?"}
+{"id": "tail-03", "cat": "tail", "q": "What major earthquakes have struck the German town of Albstadt in the 20th century, and which of them was the costliest in German history?"}
+{"id": "tail-04", "cat": "tail", "q": "How and when was Électricité de France (EDF) created, and how did its legal status and monopoly change from the late 1990s to the mid-2000s?"}
+{"id": "tail-05", "cat": "tail", "q": "What was the Nisean horse of the ancient world, where did it come from according to Herodotus, and when did the breed become extinct?"}
+{"id": "tail-06", "cat": "tail", "q": "What happened to the Japanese used-car dealer Big Motor in 2023, who founded it, and what became of the company afterwards?"}
+{"id": "tail-07", "cat": "tail", "q": "How is a single-electron transistor structured, what physical effect does it rely on, and what conditions on bias voltage and temperature are needed for that effect to occur?"}
+{"id": "tail-08", "cat": "tail", "q": "How did the Large Black pig breed originate in Britain, and why did it come close to extinction by the 1960s?"}
+{"id": "tail-09", "cat": "tail", "q": "What happened in the Harrods bombing in London in December 1983, how many people were killed, and how did the IRA leadership respond afterwards?"}
+{"id": "tail-10", "cat": "tail", "q": "Why was the Turkish communist Hikmet Kıvılcımlı prosecuted after a speech he gave during the 1957 election campaign, and what view of early Islam lay behind that speech?"}
+{"id": "tail-11", "cat": "tail", "q": "When were the French colonial penal colonies known as bagnes established and abolished, and what was the 'doublage' rule applied to convicts in French Guiana?"}
+{"id": "tail-12", "cat": "tail", "q": "What is Pink Floyd's 2022 song 'Hey, Hey, Rise Up!' based on, who sings on it, and what was the purpose of its release?"}
+{"id": "tail-13", "cat": "tail", "q": "In the case of the 2007 murder of Carlos Palomino in Madrid, what were the circumstances of the killing and what sentence did the killer receive?"}
+{"id": "tail-14", "cat": "tail", "q": "How did the Italian partisan song 'Fischia il vento' come to be written, what melody does it use, and when was it first sung in public?"}
+{"id": "tail-15", "cat": "tail", "q": "What is the Buddhist text known as the Da Zhidu Lun, who translated it into Chinese and when, and why is its traditional authorship disputed?"}
+{"id": "tail-16", "cat": "tail", "q": "What stretch of Manhattan does the Central Park West Historic District cover, when was it listed on the National Register of Historic Places, and what architectural styles characterise it?"}
+{"id": "tail-17", "cat": "tail", "q": "What was the 1936 Pravda editorial 'Muddle Instead of Music', which work did it attack, and what consequences did it have for the composer's next symphony?"}
+{"id": "tail-18", "cat": "tail", "q": "What are the typical symptoms of an anorectal abscess, which bacteria usually cause it, and why is the drained material sent for laboratory testing?"}
+{"id": "tail-19", "cat": "tail", "q": "What went wrong with NZXT's H1 compact PC case, and how does that episode fit into the company's history since its founding?"}
+{"id": "tail-20", "cat": "tail", "q": "What did the theory of Sino-Babylonianism claim, who first proposed it, and how have later scholars responded to it?"}
+{"id": "tail-21", "cat": "tail", "q": "What senior positions did the Indian paediatrician Soumya Swaminathan hold in India and at the World Health Organization between 2015 and 2022, and what is her research known for?"}
+{"id": "tail-22", "cat": "tail", "q": "How did the American philanthropist Morton Mandel make his fortune, and what were some of the major initiatives funded by the Mandel Foundation in Israel and at Brandeis University?"}
+{"id": "tail-23", "cat": "tail", "q": "What is Asman Airlines of Kyrgyzstan, what aircraft does it operate, and what obstacle stands in the way of its plans to fly to Europe?"}
+{"id": "tail-24", "cat": "tail", "q": "Why was the Odisha University of Health Sciences set up, and what were the key milestones in its establishment between 2005 and 2023?"}
+{"id":"trv2-01","cat":"travel","q":"I'm going to Luang Prabang for four days. What are the main things to see and do, and what etiquette applies at the morning alms-giving ceremony?"}
+{"id":"trv2-02","cat":"travel","q":"How is Tbilisi laid out for a visitor, which neighbourhoods are worth staying in, and how do I get around the city?"}
+{"id":"trv2-03","cat":"travel","q":"What should I eat in Oaxaca, and which nearby archaeological sites and villages make good day trips?"}
+{"id":"trv2-04","cat":"travel","q":"What do I need to know before hiking the W trek in Torres del Paine: how long it takes, when to go, and how accommodation along the route works?"}
+{"id":"trv2-05","cat":"travel","q":"I'm visiting Petra. How much time do I need, what are the main sights inside the site, and what is the walk from the entrance like?"}
+{"id":"trv2-06","cat":"travel","q":"What are the main Silk Road cities to visit in Uzbekistan, what is each known for, and how do travellers usually move between them?"}
+{"id":"trv2-07","cat":"travel","q":"What should I know about staying safe and healthy at altitude when travelling to Leh in Ladakh, and how should I plan my first days there?"}
+{"id":"trv2-08","cat":"travel","q":"How do I get around the Faroe Islands without a car, and what are the main sights worth the effort?"}
+{"id":"trv2-09","cat":"travel","q":"What is the scenic train journey through Sri Lanka's hill country, which stops are worth getting off at, and what is there to do around Ella?"}
+{"id":"trv2-10","cat":"travel","q":"What etiquette should I follow when staying in a ger with a nomadic family in Mongolia?"}
+{"id":"trv2-11","cat":"travel","q":"What are the common scams and hassles for visitors in the Marrakech medina, and how should I handle them?"}
+{"id":"trv2-12","cat":"travel","q":"I want to visit Cappadocia. Which towns make a good base, what are the main sights, and what should I know about the balloon flights?"}
+{"id":"trv2-13","cat":"travel","q":"What are the main routes of the Camino de Santiago, how long does the Camino Francés take, and how do pilgrim hostels work?"}
+{"id":"trv2-14","cat":"travel","q":"What is there to see in Stone Town, Zanzibar, and what should visitors know about dress and behaviour there?"}
+{"id":"trv2-15","cat":"travel","q":"How does visiting Bhutan work for an independent traveller: the daily fee, guides, and the main places on a first trip?"}
+{"id":"trv2-16","cat":"travel","q":"I'm going to Hokkaido in winter. What are the main things to do, what should I eat, and how cold does it get?"}

@@ -58,6 +58,9 @@ adb shell rm -r /data/local/tmp/bmoe
 
 ## Status
 
-The install flow has been written and its error paths tested, but it has not yet been run
-against a real phone. Known gaps: there is no signed release APK, and there is no in-app import for the corpus
-(the model can be imported with the file picker; the corpus currently needs adb).
+The install flow has been run end to end on a Pixel 8 Pro (Android 16): download, checksum
+verification, `adb push` of all three files and the APK install, followed by research questions in
+the app. The app has no network permission (`aapt2 dump permissions` lists no
+`android.permission.INTERNET`), so it cannot reach the network even with Wi-Fi on. Known gaps: there
+is no signed release APK yet (build the dev debug APK, see `app-android/README.md`), and the corpus
+can only be installed with adb (the model can also be imported with the in-app file picker).
