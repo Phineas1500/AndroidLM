@@ -14,6 +14,18 @@ BUILD=${3:-build-android}
 ARM_ARCH=${ARM_ARCH:-armv8.2-a+dotprod+fp16}
 API=29
 
+# Our patches to the engine (see patches/*.patch); applying is idempotent.
+for patch in "$(dirname "$0")"/../patches/*.patch; do
+  [ -f "$patch" ] || continue
+  if git -C "$ROOT" apply --check "$patch" 2>/dev/null; then
+    git -C "$ROOT" apply "$patch" && echo "applied $(basename "$patch")"
+  elif git -C "$ROOT" apply --reverse --check "$patch" 2>/dev/null; then
+    echo "already applied: $(basename "$patch")"
+  else
+    echo "patch does not apply: $patch" >&2; exit 1
+  fi
+done
+
 NDK=$(ls -d "$ANDROID_HOME"/ndk/* | sort -V | tail -1)
 CMAKE_DIR=$(ls -d "$ANDROID_HOME"/cmake/* | sort -V | tail -1)/bin
 HOST_TAG=$(ls "$NDK/toolchains/llvm/prebuilt" | head -1)

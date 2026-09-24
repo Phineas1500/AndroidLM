@@ -1,0 +1,54 @@
+diff --git a/core/src/engine/session.cpp b/core/src/engine/session.cpp
+index f484ca9..7c55eb6 100644
+--- a/core/src/engine/session.cpp
++++ b/core/src/engine/session.cpp
+@@ -10,6 +10,8 @@
+ #include "../moe/expert_stream_source.h"
+ #include "../moe/gguf_offsets.h"
+ #include "../io/platform_io.h"
++#include "ggml-cpu.h"
++#include <cstdlib>
+ #include "../io/mapping_release.h"
+ 
+ #include "llama.h"
+@@ -271,6 +273,12 @@ struct Session::Impl {
+     // file and its buffers back the rebound expert tensors, so it must be shut down before
+     // the context and model are freed. The destructor does that explicitly.
+     std::unique_ptr<llama_model, void (*)(llama_model *)> model{nullptr, llama_model_free};
++    // One persistent ggml thread pool shared by every graph compute of this session. Without it
++    // ggml builds a disposable pool (thread create + join) per compute, and the eval callback
++    // splits each token into many computes; on Android that churn dominated decode (Pixel 8 Pro:
++    // 0.8 tok/s, 60% of cycles in the compute-thread spin, hundreds of short-lived worker
++    // threads per token). Declared before ctx so that it is destroyed after it.
++    std::unique_ptr<ggml_threadpool, void (*)(ggml_threadpool *)> tpool{nullptr, ggml_threadpool_free};
+     std::unique_ptr<llama_context, void (*)(llama_context *)> ctx{nullptr, llama_free};
+     std::unique_ptr<RouterHook> hook; // heap: its address is baked into cparams.cb_eval_user_data
+     ExpertStreamSource source;
+@@ -726,6 +734,19 @@ std::unique_ptr<Session> Session::open(const SessionConfig & cfg,
+     if (!ctx) return fail("failed to create context");
+     im.ctx.reset(ctx);
+     llama_set_n_threads(ctx, cfg.n_threads, cfg.n_threads);
++    {
++        ggml_threadpool_params tpp = ggml_threadpool_params_default(cfg.n_threads);
++        // BMOE_CPUMASK=<hex> pins the compute threads to those cpus (f0 = cpus 4-7, the big cores
++        // of a big.LITTLE phone); the I/O lanes are unaffected. Experimental.
++        if (const char * m = std::getenv("BMOE_CPUMASK")) {
++            const unsigned long long mask = std::strtoull(m, nullptr, 16);
++            for (int i = 0; i < 64 && i < GGML_MAX_N_THREADS; ++i) tpp.cpumask[i] = ((mask >> i) & 1ULL) != 0;
++            tpp.strict_cpu = true;
++        }
++        im.tpool.reset(ggml_threadpool_new(&tpp));
++        if (!im.tpool) return fail("failed to create the compute thread pool");
++        llama_attach_threadpool(ctx, im.tpool.get(), nullptr);
++    }
+ 
+     // The MTP draft context: same model, same eval callback, but ctx_type = MTP so llama.cpp builds
+     // the nextn graph. It keeps its own (single-position) KV, hence n_rs_seq = 0 — nothing is ever
+@@ -750,6 +771,7 @@ std::unique_ptr<Session> Session::open(const SessionConfig & cfg,
+         if (!ctx_dft) return fail("failed to create the MTP draft context");
+         im.ctx_dft.reset(ctx_dft);
+         llama_set_n_threads(ctx_dft, cfg.n_threads, cfg.n_threads);
++        llama_attach_threadpool(ctx_dft, im.tpool.get(), nullptr); // never computed concurrently with ctx
+     }
+ 
+     // Opt-in sampling. temp <= 0 leaves smpl null and the decode loop on argmax — the deterministic
