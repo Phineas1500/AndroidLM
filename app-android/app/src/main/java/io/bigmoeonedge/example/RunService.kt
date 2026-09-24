@@ -616,12 +616,14 @@ class RunService : Service() {
      * next request's result.
      */
     private val engine = object : Engine {
-        override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit): Generation =
+        override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean): Generation =
             engineLock.withLock {
                 val call = EngineCall(nextId.getAndIncrement(), onToken)
                 inflight = call
                 try {
-                    if (!send(generateJson(call.id, Req(prompt, nPredict, think = false, clearKv = true)))) {
+                    // clear_kv=false continues the engine-held conversation: it re-renders the chat
+                    // template over the whole history and prefills only what is new
+                    if (!send(generateJson(call.id, Req(prompt, nPredict, think = false, clearKv = !continueChat)))) {
                         throw IllegalStateException("the engine session is not running")
                     }
                     call.done.await()
@@ -666,7 +668,8 @@ class RunService : Service() {
                     ?: throw IllegalStateException("no corpus found (${CorpusLocator.WIKI} in a \"${CorpusLocator.DIR}\" directory)")
                 val open = withContext(corpusDispatcher) { corporaFor(files) }
                 // (a preference of the method, not of the session: read per run, never in the argv)
-                val config = ResearchConfig(travelRoute = AppSettings.load(this@RunService).researchTravelRoute)
+                val prefs = AppSettings.load(this@RunService)
+                val config = ResearchConfig(travelRoute = prefs.researchTravelRoute, checkContinue = prefs.researchCheckContinue)
                 ResearchPipeline(engine, open, corpusDispatcher, config).run(question, researchListener(runId))
             } catch (e: CancellationException) {
                 publishResearch(runId) { if (it.running) it.copy(phase = ResearchPhase.CANCELLED) else it }

@@ -128,6 +128,9 @@ data class AppSettings(
     // a travel question about a place that has a Wikivoyage guide goes sources-first however
     // widely read the place is. Read at the start of each research run; not part of the argv.
     val researchTravelRoute: Boolean = false,
+    // The source check continues the draft's conversation, so the engine does not re-read the draft
+    // (about 60 s per answer-first question on a Pixel 8 Pro).
+    val researchCheckContinue: Boolean = true,
 ) {
     /**
      * Build the argv that OPENS a persistent bmoe-cli session (`--session`): everything fixed for
@@ -278,6 +281,7 @@ data class AppSettings(
             .putBoolean("metricsCsv", metricsCsv)
             .putBoolean("researchMode", researchMode)
             .putBoolean("researchTravelRoute", researchTravelRoute)
+            .putBoolean("researchCheckContinue", researchCheckContinue)
             .apply()
     }
 
@@ -435,6 +439,7 @@ data class AppSettings(
                 metricsCsv = p.getBoolean("metricsCsv", d.metricsCsv),
                 researchMode = p.getBoolean("researchMode", d.researchMode),
                 researchTravelRoute = p.getBoolean("researchTravelRoute", d.researchTravelRoute),
+                researchCheckContinue = p.getBoolean("researchCheckContinue", d.researchCheckContinue),
             )
         }
 

@@ -28,7 +28,12 @@ data class Generation(
  * `generate` then throws CancellationException.
  */
 interface Engine {
-    suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit): Generation
+    /**
+     * One generation. [continueChat] = false starts a new conversation (the engine drops its KV);
+     * true sends [prompt] as the next user turn of the current conversation, so the engine keeps
+     * the earlier turns in its KV cache and reads only the new text.
+     */
+    suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean = false): Generation
 }
 
 /**
@@ -63,6 +68,12 @@ data class ResearchConfig(
      * a Wikivoyage guide goes retrieval-first however widely read the subject is.
      */
     val travelRoute: Boolean = false,
+    /**
+     * rag.py `--check-continue`: ask for the source check as a follow-up turn of the draft's own
+     * conversation (Prompts.CHECK_FOLLOWUP) instead of a fresh prompt that repeats the draft, so the
+     * engine reads only the sources. Off by default, as in rag.py; the app turns it on.
+     */
+    val checkContinue: Boolean = false,
 )
 
 enum class ResearchPhase { PLANNING, SEARCHING, DRAFTING, ANSWERING, CHECKING, DONE, CANCELLED, FAILED }
@@ -216,10 +227,16 @@ class ResearchPipeline(
             if (draft != null) {
                 answer = draft
                 if (context.isNotEmpty()) {
-                    val res = generating(
-                        ResearchPhase.CHECKING, Prompts.VERIFY_SYSTEM,
-                        Prompts.verifyUser(question, draft, context), config.checkTokens,
-                    ) { listener.onEvent(ResearchEvent.CheckToken(it)) }
+                    val onCheckToken: (String) -> Unit = { listener.onEvent(ResearchEvent.CheckToken(it)) }
+                    val res = if (config.checkContinue) {
+                        // the draft was the engine's last generation, so its conversation is still loaded
+                        continuing(ResearchPhase.CHECKING, Prompts.checkFollowupUser(context), config.checkTokens, onCheckToken)
+                    } else {
+                        generating(
+                            ResearchPhase.CHECKING, Prompts.VERIFY_SYSTEM,
+                            Prompts.verifyUser(question, draft, context), config.checkTokens, onCheckToken,
+                        )
+                    }
                     // a check that was nothing but deliberation cleans to "": show the draft alone
                     check = cleanCheck(res.text).ifEmpty { null }
                     listener.onEvent(ResearchEvent.CheckCompleted(check ?: ""))
@@ -255,6 +272,17 @@ class ResearchPipeline(
             enter(phase)
             val start = System.nanoTime()
             val res = engine.generate(system + "\n\n" + user, nPredict, onToken)
+            completed(start, res)
+            return res
+        }
+
+        /** rag.py `chat_messages()` follow-up: the next user turn of the engine's current conversation. */
+        private suspend fun continuing(
+            phase: ResearchPhase, user: String, nPredict: Int, onToken: (String) -> Unit,
+        ): Generation {
+            enter(phase)
+            val start = System.nanoTime()
+            val res = engine.generate(user, nPredict, onToken, continueChat = true)
             completed(start, res)
             return res
         }

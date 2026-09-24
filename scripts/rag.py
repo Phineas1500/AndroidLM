@@ -81,6 +81,26 @@ VERIFY_SYSTEM = (
     "subject. Ignore off-topic sources. Do not repeat the draft."
 )
 
+# The source check as a follow-up turn of the draft's own conversation, so the engine can keep the
+# question and the draft in its KV cache and read only the sources (--check-continue). On a Pixel 8
+# Pro re-reading the 450-550-token draft cost about 60 s of every answer-first question.
+CHECK_FOLLOWUP = (
+    "Now check your answer above against these numbered sources from an offline copy of "
+    "Wikipedia. Read all the sources before writing. Then write a short source check, at most "
+    "120 words, with two parts. Corrections: each statement in your answer that a source "
+    "contradicts, with the correct fact and its citation like [2]. A statement is not wrong "
+    "merely because the sources do not mention it. Additions: up to three important specifics "
+    "that answer the question, that the sources provide and your answer lacks, with citations. "
+    "If there is nothing to correct, write 'No corrections' and cite the sources that support "
+    "your answer. Each source is about the subject named in its title; do not attach its facts "
+    "to another subject. Ignore off-topic sources. Do not repeat your answer."
+)
+
+
+def check_followup_user(context):
+    return f"{CHECK_FOLLOWUP}\n\nSources:\n\n{context}"
+
+
 # headings that answer an aspect the question asks about in other words
 ASPECT_HEADINGS = {
     "treat": "treatment, management, therapy", "aid": "treatment, management, first aid",
@@ -372,6 +392,22 @@ VOYAGE = None  # optional second Corpus built from Wikivoyage (--voyage-db)
 ENGINE = None  # a BmoeSession when --engine-cli is given; otherwise llama-server at --url
 
 
+def chat_messages(url, messages, max_tokens, temperature=0.0):
+    """A multi-turn request to llama-server (used for the follow-up source check)."""
+    body = {"messages": messages, "max_tokens": max_tokens, "temperature": temperature, "top_p": 0.8,
+            "top_k": 20, "presence_penalty": 0.0, "seed": 1234}
+    req = urllib.request.Request(url + "/v1/chat/completions", data=json.dumps(body).encode(),
+                                 headers={"Content-Type": "application/json"})
+    t0 = time.time()
+    with urllib.request.urlopen(req, timeout=3600) as r:
+        resp = json.load(r)
+    tm = resp.get("timings", {})
+    return {"text": resp["choices"][0]["message"]["content"],
+            "finish": resp["choices"][0].get("finish_reason"), "wall_s": round(time.time() - t0, 1),
+            "prompt_tokens": tm.get("prompt_n"), "prompt_tps": round(tm.get("prompt_per_second", 0), 2),
+            "gen_tokens": tm.get("predicted_n"), "gen_tps": round(tm.get("predicted_per_second", 0), 2)}
+
+
 def chat(url, system, user, max_tokens, temperature=0.7):
     if ENGINE is not None:
         # the session protocol takes one user message, so the system text leads the prompt;
@@ -469,8 +505,14 @@ def answer(corpus, args, question):
         res = chat(args.url, REWRITE_SYSTEM, user, args.max_tokens + 100, temperature=0.0)
         rec["answer"] = res.pop("text").strip()
     elif draft is not None and context:
-        user = f"Question: {question}\n\nDraft answer:\n{draft['text']}\n\nSources:\n\n{context}"
-        res = chat(args.url, VERIFY_SYSTEM, user, 260, temperature=0.0)
+        if args.check_continue:
+            res = chat_messages(args.url, [
+                {"role": "system", "content": CLOSED_SYSTEM}, {"role": "user", "content": question},
+                {"role": "assistant", "content": draft["text"]},
+                {"role": "user", "content": check_followup_user(context)}], 260)
+        else:
+            user = f"Question: {question}\n\nDraft answer:\n{draft['text']}\n\nSources:\n\n{context}"
+            res = chat(args.url, VERIFY_SYSTEM, user, 260, temperature=0.0)
         check = clean_check(res.pop("text"))
         rec["check"] = check
         # a check that was nothing but deliberation cleans to "": show the draft alone
@@ -502,6 +544,8 @@ def main():
     ap.add_argument("--max-tokens", type=int, default=600)
     ap.add_argument("--route-views", type=int, default=5000,
                     help="auto mode: go retrieval-first when the subject article has fewer monthly views")
+    ap.add_argument("--check-continue", action="store_true",
+                    help="answer-first questions: ask for the source check as a follow-up turn of the draft")
     ap.add_argument("--rewrite", action="store_true",
                     help="answer-first questions: revise the draft with the sources instead of appending a source check")
     ap.add_argument("--travel-route", action="store_true",

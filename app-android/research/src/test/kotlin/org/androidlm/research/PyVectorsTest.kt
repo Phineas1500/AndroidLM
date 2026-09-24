@@ -310,6 +310,7 @@ class PyVectorsTest {
         assertEquals("f559cfb82c78c77c65448041e7290216b88cd1fe48bf73fa76d20ee65819b749", sha256(Prompts.ANSWER_SYSTEM))
         assertEquals("03546ba08f0631423a6757422b8941bc171ccefd2db1d8620bbdbc0284780afd", sha256(Prompts.CLOSED_SYSTEM))
         assertEquals("35dfab9b25aabb3f7a830602e6bd1f8b2bf0692b3b0f8fc86cfd870d56972937", sha256(Prompts.VERIFY_SYSTEM))
+        assertEquals("b6356779b7115f97bc97994da4fda38656e213e4a1a44a1175f0864776a34f6f", sha256(Prompts.CHECK_FOLLOWUP))
         assertEquals("0a65d1938ad93fc3a363504cbdaf5542a186bbef3785f64cbec136968af60590", sha256(Lexicon.STOP.sorted().joinToString(" ")))
         assertEquals(
             // ";".join(k + "=" + v for k, v in sorted(ASPECT_HEADINGS.items())): values are ", "-separated phrases

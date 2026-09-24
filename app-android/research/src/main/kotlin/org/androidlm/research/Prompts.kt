@@ -39,6 +39,20 @@ object Prompts {
         "that support the draft. Each source is about the subject named in its title; do not " +
         "attach its facts to another subject. Ignore off-topic sources. Do not repeat the draft."
 
+    const val CHECK_FOLLOWUP: String =
+        "Now check your answer above against these numbered sources from an offline copy of " +
+        "Wikipedia. Read all the sources before writing. Then write a short source check, at most " +
+        "120 words, with two parts. Corrections: each statement in your answer that a source " +
+        "contradicts, with the correct fact and its citation like [2]. A statement is not wrong " +
+        "merely because the sources do not mention it. Additions: up to three important specifics " +
+        "that answer the question, that the sources provide and your answer lacks, with citations. " +
+        "If there is nothing to correct, write 'No corrections' and cite the sources that support " +
+        "your answer. Each source is about the subject named in its title; do not attach its facts " +
+        "to another subject. Ignore off-topic sources. Do not repeat your answer."
+
+    /** Follow-up user turn of the continued source check: rag.py `check_followup_user`. */
+    fun checkFollowupUser(context: String): String = CHECK_FOLLOWUP + "\n\nSources:\n\n" + context
+
     /** User message of the retrieval-first answer: rag.py `f"Sources:\n\n{context}\n\nQuestion: {question}"`. */
     fun answerUser(context: String, question: String): String =
         "Sources:\n\n" + context + "\n\nQuestion: " + question

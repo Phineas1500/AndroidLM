@@ -38,7 +38,7 @@ class ResearchPipelineTest {
 
     // ── scripted engine ──
 
-    private class Call(val prompt: String, val nPredict: Int)
+    private class Call(val prompt: String, val nPredict: Int, val continueChat: Boolean = false)
 
     /**
      * Returns [script]'s texts in order, streaming each in small pieces first. With [hangAt],
@@ -49,9 +49,9 @@ class ResearchPipelineTest {
         val hanging = CompletableDeferred<Unit>()
         @Volatile var cancelledCalls = 0
 
-        override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit): Generation {
+        override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean): Generation {
             val i = calls.size
-            calls.add(Call(prompt, nPredict))
+            calls.add(Call(prompt, nPredict, continueChat))
             assertTrue("unexpected engine call #$i:\n$prompt", i < script.size)
             val text = script[i]
             text.chunked(7).forEach(onToken)
@@ -265,6 +265,33 @@ class ResearchPipelineTest {
     // ── answer first ──
 
     @Test
+    fun continuedCheckIsAFollowUpTurnOfTheDraft() {
+        val case = goldenCase("Roughly how many times larger is the population of India")
+        val question = case["question"].asString
+        val context = case["hits_voyage_context"].asString
+        val draft = "India has about 1.4 billion people, roughly 35 times Canada's 40 million."
+        val rawCheck = "No corrections. Supported by [1].\nBut wait, let me re-read [2]."
+        val engine = FakeEngine(listOf("India\nCanada", draft, rawCheck))
+        val rec = Recorder()
+
+        val result = run(engine, sampleProvider(), question, rec, ResearchConfig(checkContinue = true))
+
+        assertEquals(3, engine.calls.size)
+        // the plan and the draft each start a conversation; the check continues the draft's
+        assertEquals(listOf(false, false, true), engine.calls.map { it.continueChat })
+        assertEquals(Prompts.CLOSED_SYSTEM + "\n\n" + question, engine.calls[1].prompt)
+        assertEquals(Prompts.CHECK_FOLLOWUP + "\n\nSources:\n\n" + context, engine.calls[2].prompt)
+        assertEquals(Prompts.checkFollowupUser(context), engine.calls[2].prompt)
+        assertEquals(260, engine.calls[2].nPredict)
+        assertEquals("No corrections. Supported by [1].", result.check)
+        assertEquals(draft + "\n\n**Source check**\nNo corrections. Supported by [1].", result.text)
+        assertEquals(
+            listOf(ResearchPhase.PLANNING, ResearchPhase.DRAFTING, ResearchPhase.SEARCHING, ResearchPhase.CHECKING),
+            result.timings.map { it.phase },
+        )
+    }
+
+    @Test
     fun widelyReadSubjectGoesAnswerFirst() {
         val case = goldenCase("Roughly how many times larger is the population of India")
         val question = case["question"].asString
@@ -288,6 +315,7 @@ class ResearchPipelineTest {
             engine.calls[2].prompt,
         )
         assertEquals(260, engine.calls[2].nPredict)
+        assertEquals(listOf(false, false, false), engine.calls.map { it.continueChat })
 
         assertEquals(RouteDecision(Route.ANSWER_FIRST, 540755L), result.route)
         assertEquals(draft, result.answer)
@@ -638,7 +666,7 @@ class ResearchPipelineTest {
         val question = "Roughly how many times larger is the population of India than that of Canada?"
         val engine = object : Engine {
             var n = 0
-            override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit): Generation {
+            override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean): Generation {
                 if (n++ == 0) return Generation("India")
                 throw IllegalStateException("prompt exceeds n_ctx")
             }

@@ -1,0 +1,45 @@
+diff --git a/core/src/engine/session.cpp b/core/src/engine/session.cpp
+index 7c55eb6..693a456 100644
+--- a/core/src/engine/session.cpp
++++ b/core/src/engine/session.cpp
+@@ -1283,6 +1283,40 @@ RunResult Session::generate(const GenerateRequest & req,
+     }
+     if (n_prompt < 1) return fail("empty prompt after tokenization");
+     tokens.resize(n_prompt);
++
++    // AndroidLM patch: append instead of re-rendering on a continued turn of a recurrent or hybrid
++    // model (Gated DeltaNet, Mamba). Such a cache cannot drop a partial tail, so the re-rendered
++    // conversation must extend kv_tokens exactly or the whole conversation is prefilled again, and
++    // it almost never does: a past assistant turn renders differently from the generation prompt
++    // it was produced under (Qwen drops the empty think block), and re-tokenizing generated text
++    // rarely reproduces the sampled tokens. So keep the KV as decoded and append only what the
++    // template puts after the last answer: its end-of-turn, the new user turn and the generation
++    // prompt. (Measured on a Pixel 8 Pro: a follow-up turn re-read ~1,700 tokens, ~170 s, of which
++    // ~1,150 were new.) Falls back to the re-render when the answer cannot be located in it.
++    if (chat_on && !req.clear_kv && !im.kv_tokens.empty() && im.chat_history.size() >= 2 &&
++        (llama_model_is_recurrent(im.model.get()) || llama_model_is_hybrid(im.model.get()))) {
++        const common_chat_msg & last_answer = im.chat_history[im.chat_history.size() - 2];
++        const std::string & content = last_answer.content;
++        const size_t at = (last_answer.role == "assistant" && !content.empty()) ? prompt.rfind(content)
++                                                                                : std::string::npos;
++        if (at != std::string::npos) {
++            const std::string tail = prompt.substr(at + content.size());
++            std::vector<llama_token> tail_tokens(tail.size() + 8);
++            int n_tail = llama_tokenize(im.vocab, tail.c_str(), (int) tail.size(), tail_tokens.data(),
++                                        (int) tail_tokens.size(), /*add_special*/ false, /*parse_special*/ true);
++            if (n_tail < 0) {
++                tail_tokens.resize(-n_tail);
++                n_tail = llama_tokenize(im.vocab, tail.c_str(), (int) tail.size(), tail_tokens.data(),
++                                        (int) tail_tokens.size(), false, true);
++            }
++            if (n_tail > 0) {
++                tail_tokens.resize(n_tail);
++                tokens = im.kv_tokens;
++                tokens.insert(tokens.end(), tail_tokens.begin(), tail_tokens.end());
++                n_prompt = (int) tokens.size();
++            }
++        }
++    }
+     if (n_prompt + req.n_predict + 8 > im.cfg.n_ctx)
+         return fail("prompt + n_predict exceeds the session n_ctx (" + std::to_string(im.cfg.n_ctx) +
+                     "); open the session with a larger n_ctx");

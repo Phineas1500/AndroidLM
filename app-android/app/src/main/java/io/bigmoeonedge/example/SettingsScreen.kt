@@ -329,6 +329,12 @@ fun SettingsScreen(current: AppSettings, onChange: (AppSettings) -> Unit, onBack
                         "takes effect on the next question.",
                     current.researchTravelRoute,
                 ) { onChange(current.copy(researchTravelRoute = it)) }
+                SwitchRow(
+                    "Faster source check",
+                    "The source check continues the draft's conversation instead of re-reading the " +
+                        "draft, which saves about a minute per question. Takes effect on the next question.",
+                    current.researchCheckContinue,
+                ) { onChange(current.copy(researchCheckContinue = it)) }
             }
 
             Section("Diagnostics") {
