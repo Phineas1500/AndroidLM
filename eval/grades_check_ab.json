@@ -1,0 +1,510 @@
+{
+  "exp-01": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": true,
+    "B_missed": true,
+    "prefer": "tie",
+    "reason": "Both add accurate 34.2% salinity and Jordan flow cut to 2% of historic; A adds 304 m depth, B density and Lake Lisan history. Neither fixes the draft's 'no microbial life' claim, which the Dead Sea lead contradicts."
+  },
+  "exp-02": {
+    "A_effect": "neutral",
+    "B_effect": "neutral",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "Draft already correct. A mostly restates the draft with commentary ('these specifics reinforce...'); B is brief and adds the reversing valve and a clean COP definition."
+  },
+  "exp-03": {
+    "A_effect": "helped",
+    "B_effect": "neutral",
+    "A_errors": [],
+    "B_errors": [
+      "'Corrects' the draft by saying the sources do not mention earthquakes as a cause; earthquakes (Nur's 'earthquake storm') are a standard competing explanation discussed in the Late Bronze Age collapse article"
+    ],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "A",
+    "reason": "Both add accurate specifics (Assyria/Egypt survived weakened, Nile drought; A the de Rouge/Maspero origin, B the Greek Dark Ages dates), but B casts doubt on the draft's valid earthquake explanation."
+  },
+  "exp-04": {
+    "A_effect": "hurt",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "A is a long restatement of the draft with 'Additions: None' (pure padding). B adds three accurate, relevant points: cellular+humoral immunity, inactivated-vaccine storage stability, outbreak risk when growing pathogens at scale."
+  },
+  "exp-05": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": true,
+    "B_missed": true,
+    "prefer": "tie",
+    "reason": "Both add accurate onset timing and dexamethasone-vs-acetazolamide; A adds the ~2,500 m threshold, B the two-day resolution and antacid myth. Neither fixes the draft's 'High Altitude Brain Swelling' expansion of HACE."
+  },
+  "cmp-01": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Both add accurate 1905-revolution groundwork and WWI bread-shortage trigger; B also the Estates-General-since-1614 detail and is cleaner, A wraps its additions in 'the draft lacks...' commentary."
+  },
+  "cmp-02": {
+    "A_effect": "neutral",
+    "B_effect": "helped",
+    "A_errors": [
+      "Treats the draft's correct 51%-of-hashpower security assumption as an error ('not just raw hash rate')"
+    ],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": true,
+    "prefer": "B",
+    "reason": "A fixes the 'Proof-of-Step' typo but mislabels the correct 51% assumption as wrong; B misses the typo but adds accurate asymmetric-security and DPoS specifics with no false corrections."
+  },
+  "cmp-03": {
+    "A_effect": "hurt",
+    "B_effect": "hurt",
+    "A_errors": [
+      "'Corrects' the draft to say malaria is spread exclusively by mosquito bites (transfusion, needle and congenital transmission are real)",
+      "Leaks prompt meta-reasoning ('the prompt asks to check against sources... I will focus on')"
+    ],
+    "B_errors": [
+      "Casts doubt on malaria transfusion/needle/congenital transmission (all real) under Corrections",
+      "Asserts dengue is transmitted exclusively via Aedes mosquitoes (transfusion, organ and vertical transmission occur)",
+      "Garbled addition 'Malaria causes reduced mosquito lifespans'"
+    ],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "A",
+    "reason": "Both wrongly 'correct' the draft's right malaria transmission routes; B adds a second false exclusivity claim for dengue and a garbled addition, A leaks meta-reasoning. Both add correct incubation periods."
+  },
+  "cmp-05": {
+    "A_effect": "neutral",
+    "B_effect": "hurt",
+    "A_errors": [],
+    "B_errors": [
+      "Nonsense 'correction' implying the draft's correct claim (fusion releases more energy per mass than fission) is wrong, citing fission vs methane combustion",
+      "'Corrects' the draft's accurate 'minimal long-lived waste' for fusion although the draft already covered neutron activation"
+    ],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "A",
+    "reason": "A is padded restatement plus a few accurate points; B's corrections are wrong or non sequiturs about correct draft claims, despite accurate additions (discovery 1938-39, stars)."
+  },
+  "syn-01": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [
+      "Says campaigns were limited by grazing needs of their 'cattle' (horses)"
+    ],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Both surface that fragmentation followed Mongke's 1259 death (countering the draft's 'divided among four sons' framing) and add accurate Yuan nominal-khagan detail; A adds Berke-Hulagu/Kaidu-Kublai wars, B the Toluid Civil War."
+  },
+  "syn-04": {
+    "A_effect": "neutral",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "A is mostly commentary ('supporting the draft', 'not contradicted') around two facts; B concisely adds length and 65-250 km width (implicitly undercutting the draft's dubious 19 km) and the source's list of linked economies."
+  },
+  "hop-01": {
+    "A_effect": "neutral",
+    "B_effect": "neutral",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Draft already answers fully; both add the accurate but peripheral Bouchard/Fort Julien detail, A restates the three scripts and Champollion, B adds granodiorite and the Nile's course."
+  },
+  "hop-02": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Near-identical: both add the Creed/protection detail, the 1935 museum opening (source-consistent; decree was late 1934) and the 2024 upper-floor museum. A's 'Corrections: None' then corrects a date in Additions."
+  },
+  "hop-03": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "Both add accurate P. rubens naming, 1940 purification and the 1941 constable case; B also adds Paine's 1930 eye-infection cure. Same correctness, slightly more relevant content in B."
+  },
+  "hop-04": {
+    "A_effect": "neutral",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": true,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "Draft's real error is picking Bolivia (Peru holds the larger share; answer is Huascaran, Cordillera Blanca). A only removes the stray Ojos del Salado line and affirms Bolivia/Sajama; B correctly switches the country to Peru and rejects Sajama, though it fails to name Huascaran and drifts to Aconcagua."
+  },
+  "trv-01": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [
+      "Spurious 'correction' that torii are donated by businesses 'not just individuals' (draft never said individuals)"
+    ],
+    "A_missed": false,
+    "B_missed": true,
+    "prefer": "A",
+    "reason": "Both fix Arashiyama (west, not north) and Kinkaku-ji (north); A also fixes Fushimi Inari's 'central' placement, which B leaves. B adds the 4 km / 2 h trail detail but has a spurious correction."
+  },
+  "trv-02": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Both add the accurate Nov-Jan peak-wind season and Los Glaciares May-Sep mandatory registration; A adds UNESCO/largest-park, B the Koppen climate type. Neither catches 'bears' (none in Patagonia), which the sources would not obviously cover."
+  },
+  "trv-03": {
+    "A_effect": "hurt",
+    "B_effect": "hurt",
+    "A_errors": [
+      "Invents 'Samegrelo-Mtsvane Zghava' and says Samegrelo-Zemo Svaneti is not one region (it is a single administrative region)",
+      "States Adjara is Muslim-majority (Orthodox Christians are the majority)"
+    ],
+    "B_errors": [
+      "Says Samegrelo-Zemo Svaneti is two distinct regions (it is one)",
+      "Places Zemo Svaneti in Mtskheta-Mtianeti (it is in Samegrelo-Zemo Svaneti)"
+    ],
+    "A_missed": true,
+    "B_missed": true,
+    "prefer": "tie",
+    "reason": "Both make wrong administrative-region 'corrections' of similar weight and both miss the draft's food errors ('Adjarian khinkali' for khachapuri, invented dishes) that the Wikivoyage Eat section covers; both add supra and accurate Kakheti details."
+  },
+  "trv-04": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": true,
+    "prefer": "A",
+    "reason": "Both add accurate UNESCO-1985 and Theodosian Walls context; A also states Marmara is to the south and the Golden Horn to the north, quietly correcting the draft's 'North (Sea of Marmara)' layout error, which B leaves standing."
+  },
+  "med-01": {
+    "A_effect": "neutral",
+    "B_effect": "neutral",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Draft is correct and complete; both add accurate but peripheral genetic specifics (HLA class II, >36 T2D genes, TCF7L2 1.5x; B also twin concordance)."
+  },
+  "med-02": {
+    "A_effect": "neutral",
+    "B_effect": "neutral",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "A",
+    "reason": "Draft complete; both add accurate heat-stroke complications and exertional sweating. A's 5-8% / >10% water-loss severity thresholds are more useful than B's 'purple fingernails' and 1-2% cognitive note."
+  },
+  "med-03": {
+    "A_effect": "helped",
+    "B_effect": "neutral",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "A",
+    "reason": "A adds useful accurate specifics (ETEC most common, Campylobacter in SE Asia, limit loperamide to 1-2 days); B's additions are vague ('antibiotics recommended based on destination') or trivial (ginger)."
+  },
+  "num-01": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Both explicitly fix the draft's stray opening figures (13-14x, twice) to ~35x and ~3x; B cites the underlying numbers, A adds India's rank by area. Equivalent."
+  },
+  "num-02": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "A",
+    "reason": "A correctly fixes the headline Neptune figure (4 h 10 min, not 4 h 7 min) though it rambles and is cut off; B misses it (sources had no Neptune data) but adds accurate perihelion/aphelion and 2-second details."
+  },
+  "num-03": {
+    "A_effect": "hurt",
+    "B_effect": "neutral",
+    "A_errors": [
+      "Calls the draft's correct ~88 C estimate wrong and endorses the wrong 84-85 C (at ~65.9 kPa water boils near 88 C)",
+      "Visible self-contradicting reasoning ('Actually... No...') shown to the user"
+    ],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "The draft's final 84-85 C is wrong (it equated 85 kPa with 65%); A doubles down on it and attacks the right 88 C with rambling text. B misses the error but adds only accurate trivia (99.97 C, NIST/IUPAC standard, explorers' altimetry)."
+  },
+  "abs-02": {
+    "A_effect": "neutral",
+    "B_effect": "hurt",
+    "A_errors": [],
+    "B_errors": [
+      "Pads the abstention with irrelevant van de Velde biography (Leeuwarden 1818, Menton 1898, surname etymology) presented as confirmations"
+    ],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "A",
+    "reason": "Draft correctly abstains. A notes the sources do not mention the novel (harmless); B appends unrelated facts about a Dutch cartographer, which is confusing padding."
+  },
+  "tail-02": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Both replace the invented style categories with the gold three (brush painting, realistic painting, watercolor splash ink) plus national colors; A adds the watercolor technique and punishment/Wu context, B the term ci qing and early penal texts."
+  },
+  "tail-03": {
+    "A_effect": "helped",
+    "B_effect": "neutral",
+    "A_errors": [],
+    "B_errors": [
+      "States the (fabricated) 1992 Landau earthquake is the costliest in German history and denies it for 1978 (the 1978 Albstadt quake, 275M DM, is the costliest)",
+      "Calls a 2021 M3.9 quake near Albstadt an aftershock of the 2011 Tohoku earthquake"
+    ],
+    "A_missed": false,
+    "B_missed": true,
+    "prefer": "A",
+    "reason": "Both surface the real 1911 Ms 6.1 and 1978 Ms 5.7 (6,850 buildings) quakes. A rejects the invented Landau quake; B explicitly reaffirms Landau as costliest (inverting the key answer) and adds a garbled Tohoku 'aftershock'. Neither names 1943."
+  },
+  "tail-04": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Both fix the founding date (8 April 1946), the 1999 monopoly end and the 2004 societe anonyme change; A adds the November 2005 float, B the exact 19 Nov 2004 date and ~1,700 nationalised producers. Neither names Marcel Paul."
+  },
+  "tail-15": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": true,
+    "B_missed": true,
+    "prefer": "tie",
+    "reason": "Both add accurate authorship scholarship (Lamotte/Demieville Sarvastivada monk, Po-kan Chou/Sengrui; B also Hikata) and that it survives only in Chinese. Both leave the draft's 200 fascicles and 8,000-line sutra errors (100 scrolls, 25,000 lines)."
+  },
+  "tail-19": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "Both overturn the draft's 'no failure' with the fire reports and Feb 2021 removal; B adds the Gamers Nexus 30 Nov 2020 report and fixes the launch year to Feb 2020. Neither can fix the invented founders (NZXT history not retrieved)."
+  },
+  "tail-23": {
+    "A_effect": "neutral",
+    "B_effect": "helped",
+    "A_errors": [
+      "Says Asman Airlines is not banned from Europe (all Kyrgyz airlines are on the EU ban list; that is the obstacle asked about)"
+    ],
+    "B_errors": [],
+    "A_missed": true,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "Both fix cargo->passenger flag carrier and Il-76->DHC-8-400. B correctly names the EU ban as the obstacle and adds the A320neo lease and routes; A inverts the key answer by saying there is no ban."
+  },
+  "trv2-01": {
+    "A_effect": "helped",
+    "B_effect": "neutral",
+    "A_errors": [
+      "Casts doubt on the Kuang Si bear sanctuary (the Free the Bears rescue centre is real) under Corrections",
+      "Casts doubt on Mekong village boat trips because the source does not mention them"
+    ],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": true,
+    "prefer": "A",
+    "reason": "A fixes the invented 'Khorvat Phu Pheng Hill' to Phou Si and adds Sai Bat timing/location and the commercialization caveat, but wrongly questions the bear sanctuary; B adds only the Sai Bat name and entry fees and leaves the wrong hill name."
+  },
+  "trv2-02": {
+    "A_effect": "neutral",
+    "B_effect": "neutral",
+    "A_errors": [
+      "Casts doubt on the draft's correct metro line names because the source does not name them",
+      "Leaks meta text ('strictly based on provided sources... [No source]')"
+    ],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "A fixes the Yandex.Traffic typo and adds useful metro stats (1966, 27.3 km, 23 stations) but questions correct line names and rambles; B is clean with budget-lodging info near Marjanishvili and one irrelevant city-hall fact. Neither fixes the Old Town bank error or the nonexistent Vake station."
+  },
+  "trv2-03": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Both give Monte Alban's 9 km distance, UNESCO 1987 and the seven moles; A adds cuisine staples with 'draft lacks' commentary, B notes the sources do not cover Mitla/Teotitlan. Neither fixes the garbled memela description or Teotitlan's direction."
+  },
+  "trv2-04": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Both add the 4-6 day duration, which operator runs which refugio (FantasticoSur vs Vertice) and the two-week payment rule; A explicitly corrects the EcoCamp attribution with some muddled CONAF wording, B is cleaner. Neither fixes Laguna de los Tres (Fitz Roy) or the W's leg orientation."
+  },
+  "trv2-05": {
+    "A_effect": "neutral",
+    "B_effect": "neutral",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": true,
+    "B_missed": true,
+    "prefer": "tie",
+    "reason": "Both add Rose City and the >1 h Monastery climb (B the useful donkey caveat, A UNESCO/New7Wonders). Both miss the draft's 300 m Siq, 10-15 min walk and 'shuttle bus' claims, which the Petra Layout section contradicts (Siq ~1.2 km)."
+  },
+  "trv2-06": {
+    "A_effect": "neutral",
+    "B_effect": "neutral",
+    "A_errors": [],
+    "B_errors": [
+      "'Corrects' claims the draft never made (that Samarkand and Bukhara are 'the second' largest city)"
+    ],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "A",
+    "reason": "Draft is sound; A adds peripheral population/rank facts and Itchan Kala's UNESCO status with 'details lacking' commentary; B adds similar facts but frames them as corrections of statements that are not in the draft."
+  },
+  "trv2-07": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "Both add acetazolamide prevention above 2,700 m (which the draft omits) and Ladakh rockfall/earthquake risk; A wraps it in commentary about what the sources lack, B is concise and adds the dose and 'not a substitute for gradual ascent'."
+  },
+  "trv2-09": {
+    "A_effect": "neutral",
+    "B_effect": "helped",
+    "A_errors": [
+      "Says the Nine Arch Bridge is wrongly placed near Demodara (it is the Demodara bridge)",
+      "Says the train route ends at Nanu Oya rather than Badulla (the line runs to Badulla)"
+    ],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "B cleanly fixes the bridge date (1919, not 1897) and adds the 9-10 h journey time. A gives 1919 and rightly doubts Adam's Peak starting from Ella, with useful fares/leech tips, but adds two wrong 'corrections' in a jumbled paragraph."
+  },
+  "trv2-11": {
+    "A_effect": "helped",
+    "B_effect": "helped",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Near-identical: both add fake Ministry of Tourism badges, the 'Marrakech, Arnakech' idiom and the post-2016 police clean-up. B repeats the same points across both sections."
+  },
+  "trv2-12": {
+    "A_effect": "hurt",
+    "B_effect": "helped",
+    "A_errors": [
+      "Lists correct recommendations (Ucisar, Ortahisar, Mustafapasa, Avanos, Ihlara Valley, Dark/Apple/Snake Churches, Pasabag, Love Valley) under Corrections merely because the sources do not mention them"
+    ],
+    "B_errors": [
+      "Garbles the museum-pass note as covering 'only the Goreme Open-Air Museum'"
+    ],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "A turns 'not in sources' into a long list of corrections of real, correct places, undermining a good draft. B adds Pigeon Valley, Urgup as a base and museum-pass pricing, with one garbled clause."
+  },
+  "trv2-13": {
+    "A_effect": "hurt",
+    "B_effect": "neutral",
+    "A_errors": [
+      "'Corrects' the 28-30 day duration although the source's 'at least four weeks' agrees",
+      "Casts doubt on the credencial requirement (public albergues do require it)"
+    ],
+    "B_errors": [
+      "Garbled '(3 days)' after 'at least four weeks'"
+    ],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "B",
+    "reason": "A makes false corrections on duration and the pilgrim-passport rule; B adds accurate UNESCO 1993, gite and route-city details with one garbled token. Neither fixes the Portuguese Way/Valladolid or Via Podiensis/Le Puy errors."
+  },
+  "trv2-14": {
+    "A_effect": "helped",
+    "B_effect": "neutral",
+    "A_errors": [
+      "Casts doubt on the House of Wonders being among the largest buildings (it was the tallest/largest)"
+    ],
+    "B_errors": [
+      "'Corrects' that the Palace Museum is Beit el-Sahel, not the House of Wonders - a claim the draft never made (it correctly said the House of Wonders was built as a palace)"
+    ],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "A",
+    "reason": "Both fix the Old Fort to the 17th century and add daily fort shows and UNESCO status. A usefully flags the invented Mikloni House Museum and Sunzilver Beach; B instead invents a correction and adds off-topic Jozani colobus trivia."
+  },
+  "trv2-16": {
+    "A_effect": "neutral",
+    "B_effect": "neutral",
+    "A_errors": [],
+    "B_errors": [],
+    "A_missed": false,
+    "B_missed": false,
+    "prefer": "tie",
+    "reason": "Both add Nijo Ichiba market and the Dec-Apr ski season; A's 'correction' merely quotes the draft's own temperatures as if from sources, B adds an irrelevant Seikan Tunnel fact. Neither fixes the Asahiyama 'snow monkeys' or 'rural Sapporo' errors."
+  }
+}

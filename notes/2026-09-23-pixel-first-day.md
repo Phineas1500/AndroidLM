@@ -86,3 +86,24 @@ acetazolamide dose) and made no false corrections.
 Where the time goes: the source check's prompt reading (about 170 s, because its prompt repeats
 the 450-550-token draft on top of about 1,000 tokens of sources), the draft's decode (140-180 s),
 and search, which takes 21-23 s on the phone against about 3 s on the server.
+
+## Source check as a follow-up turn (2026-09-24)
+
+`patches/0002` makes a continued conversation turn append only the new text on hybrid recurrent
+models (the engine used to re-read the whole conversation). Same two questions in the app:
+
+| Question | Check prompt tokens read, before -> after | Check prompt reading, before -> after |
+|---|---|---|
+| Dead Sea | 1,710 / 1,792 -> 1,238 | 173 / 159 s -> 131 s |
+| Leh, Ladakh | 1,634 / 1,716 -> 1,051 | 170 / 165 s -> 116 s |
+
+The saving is 30-50 s per answer-first question. End-to-end totals did not fall by as much
+because the phone ran slower in the later runs (draft decode 2.6-2.7 tok/s against 3.3-4.7
+earlier): the Pixel's skin-temperature throttling threshold is 39 C and back-to-back research
+runs keep the phone near it, so sustained runs are slower than short benchmarks.
+
+Quality of the follow-up-turn check (`eval/check_ab.jsonl`, `eval/grades_check_ab.json`): the same
+45 saved answer-first drafts and identical sources, checked both ways. Helped / neutral / hurt:
+old 24 / 15 / 6, new 26 / 15 / 4; grader preference old 13, new 14, tie 18; errors introduced 18
+vs 17; real draft errors missed 7 vs 10. The new form is at least as good overall (shorter and
+cleaner, better on travel, slightly more misses), so it stays the app's default.
