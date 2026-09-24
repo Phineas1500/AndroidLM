@@ -391,12 +391,29 @@ data class AppSettings(
         val THREAD_CHOICES = intArrayOf(THREADS_AUTO, 2, 3, 4, 5, 6, 8)
         val NPREDICT_CHOICES = intArrayOf(16, 32, 48, 64, 128, 256, 512, 1024, 2048)
 
+        /**
+         * Expert cache for a phone whose user has not chosen one. On a 12GB phone the default
+         * 2000 MiB leaves most of the RAM unused, and a bigger cache is lossless (it only changes
+         * where the weights come from). Pixel 8 Pro, Qwen3.6-35B-A3B, same answer each time:
+         * 2000 MiB 4.64 tok/s, 4000 MiB 5.56, 5000 MiB 6.05, 6000 MiB 6.27, with no more swapping
+         * than at 2000. Smaller phones keep [fallback].
+         */
+        fun defaultCacheMb(ctx: Context, fallback: Int): Int {
+            val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager ?: return fallback
+            val mi = android.app.ActivityManager.MemoryInfo().also { am.getMemoryInfo(it) }
+            val gib = mi.totalMem / (1024.0 * 1024.0 * 1024.0)
+            return if (gib >= LARGE_RAM_GIB) LARGE_RAM_CACHE_MB else fallback
+        }
+        /** A "12GB" phone reports about 11.2-11.6 GiB of total memory. */
+        const val LARGE_RAM_GIB = 11.0
+        const val LARGE_RAM_CACHE_MB = 5000
+
         fun load(ctx: Context): AppSettings {
             val p = ctx.prefs()
             val d = AppSettings()
             return AppSettings(
                 mmap = p.getBoolean("mmap", d.mmap),
-                cacheMb = p.getInt("cacheMb", d.cacheMb),
+                cacheMb = p.getInt("cacheMb", defaultCacheMb(ctx, d.cacheMb)),
                 cacheCeilMb = p.getInt("cacheCeilMb", d.cacheCeilMb),
                 ioThreads = p.getInt("ioThreads", d.ioThreads),
                 threads = p.getInt("threads", d.threads),

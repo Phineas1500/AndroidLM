@@ -1,0 +1,31 @@
+diff --git a/cli/main.cpp b/cli/main.cpp
+index ea3c2b7..897fc21 100644
+--- a/cli/main.cpp
++++ b/cli/main.cpp
+@@ -7,6 +7,9 @@
+ //
+ // Environment variables are read ONLY here, as overrides for the matching flags, so the
+ // engine stays env-free. The flag always wins over the env value.
++#if !defined(_WIN32)
++#include <sys/resource.h>
++#endif
+ #include "bmoe/config.h"
+ #include "bmoe/runtime.h"
+ #include "bmoe/session.h"
+@@ -586,6 +589,16 @@ static void print_predict_report(const RunSummary & s) {
+ }
+ 
+ int main(int argc, char ** argv) {
++    // BMOE_NICE=<n>: scheduling priority for the whole engine (every thread created later inherits
++    // it). An app that runs the engine next to its own UI threads (nice -10 on Android) sets a
++    // matching value, so a UI frame no longer preempts one compute thread and stalls the rest at
++    // the next barrier. Android lets any process lower its nice value to -20 (RLIMIT_NICE 40).
++#if !defined(_WIN32)
++    if (const char * nv = std::getenv("BMOE_NICE")) {
++        if (setpriority(PRIO_PROCESS, 0, std::atoi(nv)) != 0) std::fprintf(stderr, "bmoe: BMOE_NICE=%s failed\n", nv);
++    }
++#endif
++
+     RunConfig cfg;
+     std::string csv_path;
+     std::string route_trace_path;

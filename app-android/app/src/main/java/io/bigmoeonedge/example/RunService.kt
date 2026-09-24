@@ -72,6 +72,16 @@ import kotlin.concurrent.thread
 class RunService : Service() {
 
     private val telemetry = TelemetryParser()
+    // Last throttled screen update of a research generation (telemetry panel, streamed text).
+    @Volatile private var lastUiMs = 0L
+    @Volatile private var lastTextMs = 0L
+    /** True at most once per UI_FRAME_MS: whether a streamed research token should reach the screen. */
+    private fun textFrameDue(): Boolean {
+        val now = SystemClock.elapsedRealtime()
+        if (now - lastTextMs < UI_FRAME_MS) return false
+        lastTextMs = now
+        return true
+    }
     @Volatile private var proc: Process? = null
     @Volatile private var procWriter: BufferedWriter? = null
     @Volatile private var wake: PowerManager.WakeLock? = null
@@ -199,6 +209,16 @@ class RunService : Service() {
     /** True while this session thread is still the current one and not shutting down. */
     private fun current(myEpoch: Int) = epoch == myEpoch && !shuttingDown
 
+    /** BMOE_* lines of [DEV_ENGINE_ENV], if the file exists and is readable; empty otherwise. */
+    private fun devEngineEnv(): Map<String, String> = try {
+        File(DEV_ENGINE_ENV).takeIf { it.canRead() }?.readLines().orEmpty()
+            .map { it.trim() }
+            .filter { it.startsWith("BMOE_") && '=' in it }
+            .associate { it.substringBefore('=') to it.substringAfter('=') }
+    } catch (e: Exception) {
+        emptyMap()
+    }
+
     private fun runSession(argv: ArrayList<String>, model: String, myEpoch: Int, dying: Process?) {
         try {
             // The superseded process must be gone before this one starts — see awaitExit. Done here
@@ -213,6 +233,16 @@ class RunService : Service() {
             // mask from BMOE_CPUMASK when it builds its thread pool.
             val threads = argv.indexOf("-t").let { i -> if (i >= 0 && i + 1 < argv.size) argv[i + 1].toIntOrNull() else null } ?: 4
             CpuTopology.computeMask(threads)?.let { pb.environment()["BMOE_CPUMASK"] = it }
+            // Run the engine above the UI threads (nice -10 on Android). Its compute threads meet at
+            // a barrier after every operation, so a UI frame that preempts one of them stalls all.
+            // Pixel 8 Pro, same question: draft 3.49 -> 3.85 tok/s, source check 2.54 -> 2.91.
+            pb.environment()["BMOE_NICE"] = ENGINE_NICE.toString()
+            // Dev builds only: extra BMOE_* engine environment from DEV_ENGINE_ENV (KEY=VALUE per
+            // line), so engine tuning can be measured on a phone without rebuilding the app.
+            if (BuildConfig.SHARED_STORAGE) {
+                devEngineEnv().forEach { (k, v) -> pb.environment()[k] = v }
+            }
+            Log.i(LOG_TAG, "engine env: " + pb.environment().filterKeys { it.startsWith("BMOE_") })
             pb.directory(File(model).parentFile)
 
             val p = pb.start().also { proc = it }
@@ -320,15 +350,24 @@ class RunService : Service() {
                 if (inflight == null) main.post { notify("Generating…") }
             }
             telemetry.onLine(t) -> {
-                sampleCpuTemp()
                 val call = inflight
                 if (call != null) {
                     // A research generation: the telemetry panel stays live, but the text belongs
                     // to the pipeline (a plan is not an answer), which places it through its events.
-                    RunBus.update { it.copy(telemetry = telemetry.current.copy()) }
+                    // Screen updates are throttled (UI_FRAME_MS): every update recomposes the screen
+                    // and re-renders the growing answer on the UI thread, which shares the fast cores
+                    // with the engine's compute threads (measured +2-3% decode on a Pixel 8 Pro; the
+                    // larger share of that contention is fixed by ENGINE_NICE).
+                    val now = SystemClock.elapsedRealtime()
+                    if (now - lastUiMs >= UI_FRAME_MS) {
+                        lastUiMs = now
+                        sampleCpuTemp()
+                        RunBus.update { it.copy(telemetry = telemetry.current.copy()) }
+                    }
                     val delta = telemetry.lastDeltaText
                     if (!call.abandoned && delta.isNotEmpty()) call.onToken(delta)
                 } else {
+                    sampleCpuTemp()
                     RunBus.update {
                         it.copy(telemetry = telemetry.current.copy(), answer = telemetry.current.text,
                             reasoning = telemetry.current.reasoning)
@@ -758,9 +797,9 @@ class RunService : Service() {
             is ResearchEvent.Planned -> publishResearch(runId) { it.copy(titles = e.titles) }
             is ResearchEvent.Routed -> publishResearch(runId) { it.copy(route = e.decision, routeThreshold = e.threshold) }
             is ResearchEvent.SourcesFound -> publishResearch(runId) { it.copy(sources = e.sources, sourcesDropped = e.dropped) }
-            is ResearchEvent.AnswerToken -> telemetry.current.text.let { text -> publishResearch(runId) { it.copy(answer = text) } }
+            is ResearchEvent.AnswerToken -> if (textFrameDue()) telemetry.current.text.let { text -> publishResearch(runId) { it.copy(answer = text) } }
             is ResearchEvent.AnswerCompleted -> publishResearch(runId) { it.copy(answer = e.text) }
-            is ResearchEvent.CheckToken -> telemetry.current.text.let { text -> publishResearch(runId) { it.copy(check = text) } }
+            is ResearchEvent.CheckToken -> if (textFrameDue()) telemetry.current.text.let { text -> publishResearch(runId) { it.copy(check = text) } }
             is ResearchEvent.CheckCompleted -> publishResearch(runId) { it.copy(check = e.text) }
             is ResearchEvent.PhaseCompleted -> publishResearch(runId) { it.copy(timings = it.timings + e.timing) }
             is ResearchEvent.Completed -> Unit // everything in it has been published piecewise
@@ -917,6 +956,12 @@ class RunService : Service() {
         const val ACTION_RESEARCH = "io.bigmoeonedge.example.RESEARCH"
 
         const val LOG_TAG = "AndroidLM"
+        /** Engine scheduling priority (nice value); see runSession. */
+        const val ENGINE_NICE = -16
+        /** Minimum interval between screen updates while a research generation streams. */
+        const val UI_FRAME_MS = 250L
+        /** Dev builds: optional extra engine environment (BMOE_* KEY=VALUE lines). */
+        const val DEV_ENGINE_ENV = "/data/local/tmp/androidlm-engine.env"
 
         /** With [ACTION_RESEARCH], or with START_SESSION to research as soon as the model is ready. */
         const val EXTRA_QUESTION = "question"
