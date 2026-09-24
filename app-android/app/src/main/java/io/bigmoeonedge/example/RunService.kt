@@ -207,6 +207,10 @@ class RunService : Service() {
             val pb = ProcessBuilder(argv)
             pb.redirectErrorStream(false)
             pb.environment()["LD_LIBRARY_PATH"] = "$nativeDir:/system/lib64:/vendor/lib64"
+            // Pin the compute threads to the big cores (see CpuTopology); the engine reads the
+            // mask from BMOE_CPUMASK when it builds its thread pool.
+            val threads = argv.indexOf("-t").let { i -> if (i >= 0 && i + 1 < argv.size) argv[i + 1].toIntOrNull() else null } ?: 4
+            CpuTopology.computeMask(threads)?.let { pb.environment()["BMOE_CPUMASK"] = it }
             pb.directory(File(model).parentFile)
 
             val p = pb.start().also { proc = it }

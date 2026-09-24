@@ -26,8 +26,8 @@ data class AppSettings(
     val mmap: Boolean = false,          // baseline: no streaming — llama.cpp mmap loads the whole model
     val cacheMb: Int = 2000,            // LRU expert cache budget; Auto / 0 / 500..6000 (see CACHE_CHOICES)
     val cacheCeilMb: Int = 3000,        // with cacheMb=Auto: upper bound on the auto budget (0 = no cap)
-    val ioThreads: Int = 4,             // parallel expert-read lanes
-    val threads: Int = 4,               // compute threads (-t)
+    val ioThreads: Int = 2,             // parallel expert-read lanes (2 measured best on a Pixel 8 Pro)
+    val threads: Int = THREADS_AUTO,    // compute threads (-t); Auto = all cores above the little cluster
     val nExpertUsed: Int = 0,           // top-k override (0 = model default); lower = faster, changes output
     val nPredict: Int = DEFAULT_N_PREDICT,
     // Context the session is opened with: prompt plus reply for the whole conversation. It is also
@@ -36,7 +36,7 @@ data class AppSettings(
     val sessionCtx: Int = SESSION_CTX,
     val oDirect: Boolean = true,        // bypass the page cache
     val overlap: Boolean = true,        // read the next experts while the current layer computes
-    val denseWeights: DenseWeights = DenseWeights.ANON, // dense (non-expert) weight residency policy
+    val denseWeights: DenseWeights = DenseWeights.AHWB, // pinned: the kernel swapped anon weights to zram on a Pixel 8 Pro
     val prefetchLayers: Int = 0,        // temporal prefetch depth K (0 = off); needs the cache
     // Predictive prefetch (experimental): run the NEXT layer's router on the current layer's
     // input and speculate/retain on that prediction instead of the previous token's routing.
@@ -57,7 +57,7 @@ data class AppSettings(
     // Cache-aware expert dropping, as a PERCENTAGE of the uniform share 1/top-k (0 = off, 100 = the
     // share itself). Stored as an Int because the settings are integer rungs; the flag takes a
     // fraction. LOSSY and cache-dependent — it changes the output, and not reproducibly.
-    val dropColdPct: Int = 75,
+    val dropColdPct: Int = 0,           // lossless by default: research answers are evaluated without expert dropping
     // Serve the dense tables the graph only GATHERS ROWS from - a token embedding - out of flash
     // instead of RAM. Which tables qualify is decided by the graph at load, so this is one switch
     // for every model rather than a per-model list; on a model where nothing qualifies it does
@@ -144,11 +144,19 @@ data class AppSettings(
      *   marks each with a `turn` column, which is the only way to read the two-turn shape this
      *   engine is judged by (a fast turn, an idle, then the turn that pays for it).
      */
+    /**
+     * Compute threads actually used. Auto takes every core above the little cluster: measured on a
+     * Pixel 8 Pro with the compute threads pinned (CpuTopology), 5 threads on the four A715s plus the
+     * X3 decoded at 4.4 tok/s against 3.9 with the four A715s alone and 3.1 with three.
+     */
+    fun effectiveThreads(): Int =
+        if (threads != THREADS_AUTO) threads else (CpuTopology.fastCoreCount() ?: 4)
+
     fun sessionArgv(cliPath: String, modelPath: String, csvPath: String? = null): List<String> {
         val a = mutableListOf(
             cliPath,
             "-m", modelPath,
-            "-t", threads.toString(),
+            "-t", effectiveThreads().toString(),
             "-c", sessionCtx.toString(),
             // Never reserve a graph wider than the context itself.
             "--ubatch", minOf(SESSION_UBATCH, sessionCtx).toString(),
@@ -375,7 +383,8 @@ data class AppSettings(
         // Stops at 30 deliberately: 60 was measured to destroy the model while still reading well,
         // and 30 already costs a quarter in perplexity. Below 10 the saving is not worth a rung.
         val SUBSTITUTE_CHOICES = intArrayOf(0, 10, 15, 20, 30)
-        val THREAD_CHOICES = intArrayOf(2, 4, 6, 8)
+        const val THREADS_AUTO = 0
+        val THREAD_CHOICES = intArrayOf(THREADS_AUTO, 2, 3, 4, 5, 6, 8)
         val NPREDICT_CHOICES = intArrayOf(16, 32, 48, 64, 128, 256, 512, 1024, 2048)
 
         fun load(ctx: Context): AppSettings {

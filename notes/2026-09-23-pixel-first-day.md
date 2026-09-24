@@ -40,3 +40,30 @@ above about 2500 MiB, or a 3000 cache with pinned dense weights, overcommit it.
 Two bench mishaps to avoid: quitting a `screen` session does not stop an `adb shell` it already
 launched, and several matrices overlapped as a result (those results were discarded); the phone
 must be checked idle by process list before every measurement.
+
+## Tuning after the fix (clean runs, patched engine, cache 2000, dense ahwb, 2 lanes)
+
+| Compute threads | Decode |
+|---|---|
+| 3 on cpus 4-6 | 3.07 tok/s |
+| 4 on cpus 4-7 (A715) | 3.81-3.93 |
+| **5 on cpus 4-8 (A715 + X3)** | **4.41** |
+| 4, 6 active experts (lossy) | 3.97 |
+| 4, cache 1500 / 2500 | 3.15 / 3.81 |
+| 4, 4 lanes | 2.99 |
+
+The app now pins its compute threads itself (`CpuTopology`: every core above the little cluster,
+passed as `BMOE_CPUMASK`), defaults to Auto threads (5 here), pinned dense weights, 2 lanes and
+no expert dropping.
+
+## Long prompts (the real ~1,216-token research prompt, session mode)
+
+| Build, 5 threads on cpus 4-8 | Prompt read | Decode after |
+|---|---|---|
+| current (dotprod) | 147 s (8.3 tok/s) | 3.8 tok/s |
+| i8mm | 123 s (9.9 tok/s) | 2.7 tok/s |
+
+Prompt reading is compute-bound (CPU busy throughout; batch size 256 vs 512 and 2 vs 4 lanes made
+no difference; a warm cache did not help because a long prompt touches far more experts than
+2GB holds). The i8mm build reads prompts 16% faster but decodes 28% slower, which is a net loss
+for a full research question, so the app keeps the current build.

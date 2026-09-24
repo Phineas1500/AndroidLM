@@ -286,7 +286,10 @@ fun SettingsScreen(current: AppSettings, onChange: (AppSettings) -> Unit, onBack
             }
 
             Section("Compute") {
-                IntSetting("Compute threads", AppSettings.THREAD_CHOICES, current.threads) {
+                IntSetting(
+                    "Compute threads", AppSettings.THREAD_CHOICES, current.threads,
+                    format = { if (it == AppSettings.THREADS_AUTO) "Auto" else "$it" },
+                ) {
                     onChange(current.copy(threads = it))
                 }
                 IntSetting("Tokens to generate", AppSettings.NPREDICT_CHOICES, current.nPredict) {

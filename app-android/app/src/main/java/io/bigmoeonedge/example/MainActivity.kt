@@ -530,7 +530,7 @@ private fun configSummary(s: AppSettings): String {
             if (s.substitutePct > 0) parts += "prefer-cached ${s.substitutePct}%"
         }
     }
-    parts += "${s.threads} threads"
+    parts += "${s.effectiveThreads()} threads${if (s.threads == AppSettings.THREADS_AUTO) " (auto)" else ""}"
     if (s.nExpertUsed > 0) parts += "top-k ${s.nExpertUsed}"
     parts += "thinking ${if (s.thinking) "on" else "off"}"
     parts += "build ${BuildConfig.GIT_SHA}"
