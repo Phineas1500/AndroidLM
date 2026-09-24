@@ -255,6 +255,8 @@ class RunService : Service() {
                 try {
                     BufferedReader(InputStreamReader(p.errorStream)).forEachLine { line ->
                         if (errTail.length < 4000) errTail.append(line).append('\n')
+                        // Thread placement and priority reports, so they can be checked over adb.
+                        if ("affinity" in line || "BMOE_NICE" in line) Log.i(LOG_TAG, "engine: $line")
                         when {
                             "O_DIRECT returns wrong data" in line ->
                                 if (current(myEpoch)) RunBus.update { it.copy(ioMode = "buffered (O_DIRECT unsupported on this storage)") }

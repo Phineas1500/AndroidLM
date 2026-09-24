@@ -9,7 +9,7 @@ the first post and keep sped-up stretches labelled in it. The numbers come from
 > A 35B-parameter model doing research on a Pixel 8 Pro with no network: it looks things up in a
 > 21GB offline Wikipedia and cites its sources.
 >
-> About 5GB of RAM, 34GB on disk, no internet permission at all.
+> About 8GB of RAM, 34GB on disk, no internet permission at all.
 >
 > Code: github.com/Phineas1500/AndroidLM
 > For poidh.xyz/mainnet/bounty/31
@@ -18,7 +18,7 @@ the first post and keep sped-up stretches labelled in it. The numbers come from
 
 **2/ Why a big model fits.** Qwen3.6-35B-A3B at 2-bit is 12.3GB, but only 3B of its parameters
 work on any one token. The engine (BigMoeOnEdge, built on llama.cpp) streams the experts each
-token needs from flash into a 2GB cache. 3-4.4 tokens/s on the phone.
+token needs from flash into a 5GB cache. 4-6 tokens/s on the phone.
 
 **3/ Research, not recall.** The model first names the Wikipedia articles it needs. For obscure
 subjects it answers from the retrieved passages, with citations. For well-known ones it answers
@@ -43,8 +43,8 @@ Twyford". Ours: Ernst Chain and Howard Florey, 1945, with what each of them did.
 and a source check occasionally "corrects" something that was right. Every answer and grade is
 in the repo.
 
-**9/ Real timings.** Well-known subjects: first words in about 30 s, a cited check within
-6-7 min. Obscure subjects: a cited answer in about 3 min. The video speeds up the waits and says
+**9/ Real timings.** Well-known subjects: first words in about 22 s, a cited check within
+about 4.5 min. Obscure subjects: a cited answer in about 2 min. The video speeds up the waits and says
 so on screen.
 
 **10/ Reproducible.** Install script with checksums, the corpus build, eval questions, every

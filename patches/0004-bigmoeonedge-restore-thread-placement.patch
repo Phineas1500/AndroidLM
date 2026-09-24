@@ -1,0 +1,200 @@
+diff --git a/core/src/engine/session.cpp b/core/src/engine/session.cpp
+index 693a456..26957aa 100644
+--- a/core/src/engine/session.cpp
++++ b/core/src/engine/session.cpp
+@@ -12,6 +12,14 @@
+ #include "../io/platform_io.h"
+ #include "ggml-cpu.h"
+ #include <cstdlib>
++#if defined(__linux__)
++#include <dirent.h>
++#include <sched.h>
++#include <sys/syscall.h>
++#include <unistd.h>
++#endif
++#include <utility>
++#include <vector>
+ #include "../io/mapping_release.h"
+ 
+ #include "llama.h"
+@@ -264,6 +272,132 @@ dense_bytes_per_layer(const GgufOffsets & offs, const std::vector<LayerExperts>
+ 
+ // All native state lives here, behind the pimpl. Built once by Session::open(); every
+ // generate() reuses the loaded model, the live context and the warm expert cache.
++
++// ── compute-thread placement (BMOE_CPUMASK) ──────────────────────────────────────────────
++// ggml pins each pool worker to one cpu of the mask when the worker starts. On Android an app's
++// cgroup moves (on screen, off screen) move the engine process too and reset every thread's
++// affinity to the new cpuset. Measured on a Pixel 8 Pro with the app in the background: the
++// compute threads spread over the little cores and decode fell from ~3.9 to 0.4 tok/s. So the
++// placement is recorded once and checked before every prefill chunk and decode step (one
++// syscall). When a thread has escaped the mask, the workers are re-pinned and the rest float over
++// the fast cpus the new cpuset allows; if it allows fewer fast cpus than there are compute threads
++// (off screen: no prime core), the context computes with one thread per allowed fast cpu, because
++// two spinning compute threads on one core stall every barrier.
++struct CpuPlacement {
++#if defined(__linux__)
++    unsigned long long mask = 0;
++    int main_cpu = -1;
++    pid_t main_tid = 0;
++    std::vector<std::pair<pid_t, int>> workers; // tid, cpu
++    std::string last_state;
++
++    static unsigned long long get(pid_t tid) {
++        cpu_set_t set;
++        CPU_ZERO(&set);
++        if (sched_getaffinity(tid, sizeof(set), &set) != 0) return 0;
++        unsigned long long m = 0;
++        for (int c = 0; c < 64; ++c) if (CPU_ISSET(c, &set)) m |= 1ULL << c;
++        return m;
++    }
++    static bool set(pid_t tid, unsigned long long m) {
++        if (m == 0) return false;
++        cpu_set_t set;
++        CPU_ZERO(&set);
++        for (int c = 0; c < 64; ++c) if ((m >> c) & 1ULL) CPU_SET(c, &set);
++        return sched_setaffinity(tid, sizeof(set), &set) == 0;
++    }
++    static std::vector<pid_t> tasks() {
++        std::vector<pid_t> out;
++        if (DIR * d = opendir("/proc/self/task")) {
++            while (dirent * e = readdir(d)) {
++                const pid_t tid = (pid_t) std::atoi(e->d_name);
++                if (tid > 0) out.push_back(tid);
++            }
++            closedir(d);
++        }
++        return out;
++    }
++    // Around pool creation: the threads that appear are the pool's workers, created in order and
++    // given the first n-1 cpus of the mask (ggml_threadpool_new_impl); the main thread gets the next.
++    // Identified by appearance, not by their affinity, because a worker pins itself only once it
++    // starts running, which may be after ggml_threadpool_new returns.
++    void record(unsigned long long m, int n_threads, const std::vector<pid_t> & before) {
++        mask = m;
++        std::vector<int> cpus;
++        for (int c = 0; c < 64; ++c) if ((m >> c) & 1ULL) cpus.push_back(c);
++        if ((int) cpus.size() < n_threads) return;
++        main_cpu = cpus[n_threads - 1];
++        main_tid = (pid_t) syscall(SYS_gettid);
++        std::vector<pid_t> fresh;
++        for (pid_t tid : tasks())
++            if (std::find(before.begin(), before.end(), tid) == before.end()) fresh.push_back(tid);
++        std::sort(fresh.begin(), fresh.end());
++        if ((int) fresh.size() != n_threads - 1) { // not what was expected: pin the main thread only
++            std::fprintf(stderr, "bmoe: affinity: %zu new threads for a %d-thread pool; workers left to ggml\n",
++                         fresh.size(), n_threads);
++            return;
++        }
++        for (size_t j = 0; j < fresh.size(); ++j) workers.emplace_back(fresh[j], cpus[j]);
++    }
++    // Cheap check (one syscall). While the main thread stays within the mask nothing is touched:
++    // inside an app on screen it floats over the fast cores, which measured no slower than pinning.
++    void ensure(llama_context * ctx) {
++        if (main_cpu < 0) return;
++        const unsigned long long cur = get(0);
++        if (cur != 0 && (cur & ~mask) == 0) return;
++        const unsigned long long allowed = cur ? cur : mask; // after a cgroup move: the new cpuset
++        const unsigned long long fast = mask & allowed;
++        // Where computing may happen: the allowed fast cpus, or whatever is allowed if none is.
++        const unsigned long long compute = fast ? fast : allowed;
++        const unsigned long long spare = allowed & ~compute; // for idle workers and helpers
++        const int n_total = (int) workers.size() + 1;
++        const int n_use = std::max(1, std::min(n_total, __builtin_popcountll(compute)));
++        if (ctx && n_use != n_active) { llama_set_n_threads(ctx, n_use, n_use); n_active = n_use; }
++        // Workers 1..n_use-1 compute on their own cpu (or float over the compute cpus if it is not
++        // allowed); the others are idle and are kept off the compute cpus.
++        unsigned long long used = 0;
++        int pinned = 0;
++        for (int j = 0; j < (int) workers.size(); ++j) {
++            const pid_t tid = workers[j].first;
++            const unsigned long long own = 1ULL << workers[j].second;
++            if (j < n_use - 1) {
++                if ((compute & own) && set(tid, own)) { ++pinned; used |= own; }
++                else set(tid, compute);
++            } else {
++                set(tid, spare ? spare : allowed);
++            }
++        }
++        // The main thread is compute thread 0. With every thread computing it floats over the
++        // compute cpus, as it does on screen; with fewer, it takes a compute cpu no worker holds.
++        unsigned long long main_set = compute;
++        if (n_use < n_total && (compute & ~used)) main_set = compute & ~used;
++        set(0, main_set);
++        // Everything else (I/O lanes, the request reader): with every thread computing, float over
++        // the compute cpus as on screen; with fewer, stay off them.
++        const unsigned long long others_set = (n_use == n_total || !spare) ? compute : spare;
++        int others = 0;
++        for (pid_t tid : tasks()) {
++            if (tid == main_tid) continue;
++            bool is_worker = false;
++            for (const auto & w : workers) if (w.first == tid) { is_worker = true; break; }
++            if (!is_worker && set(tid, others_set)) ++others;
++        }
++        char buf[200];
++        std::snprintf(buf, sizeof(buf), "%d compute threads, %d/%d workers on their cpu, main on 0x%llx, %d others on 0x%llx (cpuset 0x%llx)",
++                      n_use, pinned, n_use - 1, main_set, others, others_set, allowed);
++        if (last_state != buf) {
++            std::fprintf(stderr, "bmoe: affinity restored: %s\n", buf);
++            last_state = buf;
++        }
++    }
++    int n_active = 0; // compute threads last set by ensure(); 0 = never changed
++#else
++    static std::vector<int> tasks() { return {}; }
++    void record(unsigned long long, int, const std::vector<int> &) {}
++    void ensure(llama_context *) {}
++#endif
++};
++
+ struct Session::Impl {
+     SessionConfig cfg;
+     std::string arch;
+@@ -279,6 +413,7 @@ struct Session::Impl {
+     // 0.8 tok/s, 60% of cycles in the compute-thread spin, hundreds of short-lived worker
+     // threads per token). Declared before ctx so that it is destroyed after it.
+     std::unique_ptr<ggml_threadpool, void (*)(ggml_threadpool *)> tpool{nullptr, ggml_threadpool_free};
++    CpuPlacement placement;            // BMOE_CPUMASK placement, re-applied when Android resets it
+     std::unique_ptr<llama_context, void (*)(llama_context *)> ctx{nullptr, llama_free};
+     std::unique_ptr<RouterHook> hook; // heap: its address is baked into cparams.cb_eval_user_data
+     ExpertStreamSource source;
+@@ -743,9 +878,15 @@ std::unique_ptr<Session> Session::open(const SessionConfig & cfg,
+             for (int i = 0; i < 64 && i < GGML_MAX_N_THREADS; ++i) tpp.cpumask[i] = ((mask >> i) & 1ULL) != 0;
+             tpp.strict_cpu = true;
+         }
++        const auto threads_before = CpuPlacement::tasks();
+         im.tpool.reset(ggml_threadpool_new(&tpp));
+         if (!im.tpool) return fail("failed to create the compute thread pool");
+         llama_attach_threadpool(ctx, im.tpool.get(), nullptr);
++        if (tpp.strict_cpu) {
++            unsigned long long mask = 0;
++            for (int i = 0; i < 64 && i < GGML_MAX_N_THREADS; ++i) if (tpp.cpumask[i]) mask |= 1ULL << i;
++            im.placement.record(mask, cfg.n_threads, threads_before);
++        }
+     }
+ 
+     // The MTP draft context: same model, same eval callback, but ctx_type = MTP so llama.cpp builds
+@@ -1198,6 +1339,7 @@ RunResult Session::generate(const GenerateRequest & req,
+     // Fresh cancel latch for this generation; a stale request from a prior aborted call must
+     // not carry over. (cancel() sets it; the abort callback reads it.)
+     im.cancel_requested.store(false, std::memory_order_relaxed);
++    im.placement.ensure(ctx);
+ 
+     RunResult res;
+     auto fail = [&](std::string msg) {
+@@ -1469,6 +1611,7 @@ RunResult Session::generate(const GenerateRequest & req,
+             pf = llama_batch_get_one(tokens.data() + i, chunk);
+         }
+         trace_begin(i, chunk, /*phase*/ 0);
++        im.placement.ensure(ctx);
+         if (llama_decode(ctx, pf) != 0) {
+             if (im.cancel_requested.load(std::memory_order_relaxed)) {
+                 rollback_turn();
+@@ -1571,6 +1714,7 @@ RunResult Session::generate(const GenerateRequest & req,
+ 
+     while (n_gen < req.n_predict) {
+         if (llama_vocab_is_eog(im.vocab, tok)) break;
++        im.placement.ensure(ctx);
+ 
+         // ── draft ──
+         // The source proposes a continuation of `tok`, capped at the caller's remaining budget: a

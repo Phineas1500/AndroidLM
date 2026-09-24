@@ -66,3 +66,38 @@ The Tensor G3 TPU is reachable by third-party apps only through NNAPI (deprecate
 transformer performance on G3 worth using). Google's LiteRT NPU path officially supports only
 Tensor G5/G6, needs a gated compiler whose licence forbids redistribution, and the TPU service
 admits only allowlisted apps. Routed experts streamed from flash cannot run on it at all.
+
+## The app in the background
+
+With the app sent to the home screen after the first answer token (the foreground service keeps
+running), the draft fell to 0.41 tok/s and search took 53 s. Android moves the app and the engine
+process (which shares the app's process cgroup) from the `top-app` cpuset (cpus 0-8) to
+`foreground` (cpus 0-7), and the move resets every thread's affinity to the new cpuset: the compute
+threads spread over the little cores and each barrier waits for the slowest one. Re-pinning alone
+was not enough: with the prime core (cpu 8) no longer allowed, five compute threads on four fast
+cores put two spinning threads on one core, which stalls every barrier (still under 0.75 tok/s).
+
+`patches/0004` records the pool's placement when it is created (workers are the threads that
+appear during pool creation) and checks the main thread's affinity before every prefill chunk and
+decode step (one syscall). If a thread has escaped the mask it re-pins the workers, and when the
+cpuset allows fewer fast cores than there are compute threads it computes with one thread per
+allowed fast core (`llama_set_n_threads`), parks the idle worker and the helper threads on the slow
+cores, and restores the full placement when the app returns to the screen. While the threads stay
+within the mask (on screen) it changes nothing.
+
+## Final build (patches 0001-0004, app defaults), same question, cool start
+
+| | Old defaults (morning) | Final build, on screen | Final build, sent to the home screen after the first token |
+|---|---|---|---|
+| First answer words | 24.5 s | 22.1 s | 22.0 s |
+| Draft | 3.49 tok/s | 5.77 tok/s | 3.99 tok/s (0.41 before patch 0004) |
+| Search | 19.6 s | 20.2 s | 51.8 s |
+| Source check | 2.54 tok/s | 4.23 tok/s | 2.07 tok/s |
+| Whole question | 340 s | 263 s | 375 s |
+
+Big Motor (sources first, 654-token source prompt), final build on screen: first words at 82 s,
+done at 105 s (130 s in the morning), same answer. Memory during an answer: engine 5.6GB resident
+(including the 5000 MiB cache), pinned dense weights 2.05GB, app 0.15GB; 1.1GB still available.
+
+Runs started between 29 and 30.5 C skin temperature; on this phone a 1.5 C warmer start costs up
+to about 15% of decode speed, which is the size of the run-to-run differences above.

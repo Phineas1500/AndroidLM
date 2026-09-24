@@ -5,6 +5,11 @@ Type each question exactly as written: the planner and router were tested on thi
 Scores are 0-10 from that run (small model / ours). Times are measured on the Pixel 8 Pro from
 the moment the question is sent, with the model already loaded; a hot phone is slower.
 
+The rehearsal times below were measured before the speed work of 2026-09-24
+(`notes/2026-09-24-speed-levers.md`). With the final build, prompt reading is unchanged and
+writing is 40-70% faster: the Dead Sea question (answer first, with source check) finished in 263 s
+instead of 340 s, and Big Motor (sources first) in 105 s instead of 130 s.
+
 ## Record these
 
 1. **1983 Harrods bombing** (obscure subject, sources first; 0 / 10)
@@ -78,7 +83,7 @@ the moment the question is sent, with the model already loaded; a hot phone is s
   used-car dealer Big Motor in 2023, who founded it, and what became of the company
   afterwards?" The 1.7B invents a founder, "Tetsuya Mihara", and a Toyota takeover. Rehearsed on
   the phone on 2026-09-24: sources first (1,066 monthly views), first words at 91 s, done at
-  130 s. It named the insurance-fraud scandal, Hiroyuki Kaneshige founding it in 1976 as
+  130 s; with the final build, first words at 82 s and done at 105 s, same answer. It named the insurance-fraud scandal, Hiroyuki Kaneshige founding it in 1976 as
   Kaneshige Auto Center, the licence revocation, and the sale to Itochu as WECARS, all cited.
 - **The Angola Three** (1 / 9), not recommended: "Who were the Angola Three, what crime were two
   of them convicted of in the early 1970s, and how long did they spend in solitary
