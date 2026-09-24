@@ -68,6 +68,27 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colorScheme.background) { Root() }
             }
         }
+        autoResearch(intent)
+    }
+
+    /**
+     * Dev builds only: start a research run on the first model from adb, for scripted timing runs
+     * (phase timings are logged under the AndroidLM tag):
+     *   adb shell am start -S -n io.github.phineas1500.androidlm.dev/io.bigmoeonedge.example.MainActivity \
+     *     --es research_question "..."
+     */
+    private fun autoResearch(intent: Intent?) {
+        if (!BuildConfig.SHARED_STORAGE) return
+        val question = intent?.getStringExtra(EXTRA_AUTO_RESEARCH)?.takeIf { it.isNotBlank() } ?: return
+        Thread {
+            val model = ModelManager.listMoeModels(this).firstOrNull() ?: return@Thread
+            val settings = AppSettings.load(this)
+            runOnUiThread { launchResearch(this, model, question, settings, RunBus.state.value.sessionSig) }
+        }.start()
+    }
+
+    companion object {
+        const val EXTRA_AUTO_RESEARCH = "research_question"
     }
 
     private fun isSystemDark(): Boolean {

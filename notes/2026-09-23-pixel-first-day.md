@@ -67,3 +67,22 @@ Prompt reading is compute-bound (CPU busy throughout; batch size 256 vs 512 and 
 no difference; a warm cache did not help because a long prompt touches far more experts than
 2GB holds). The i8mm build reads prompts 16% faster but decodes 28% slower, which is a net loss
 for a full research question, so the app keeps the current build.
+
+## First end-to-end runs in the app (2026-09-24, Pixel 8 Pro, `scripts/app_timing.sh`)
+
+Times from the moment the model was loaded (a cold app start adds about 28 s of model load).
+Decode in the app ran at 3.1-3.6 tok/s.
+
+| Question | Route | Plan | First word | Draft/answer done | Search | Check read / done | Total |
+|---|---|---|---|---|---|---|---|
+| 1983 Harrods bombing | retrieval-first | ~20 s | 151 s | 192 s | (in plan) | none | 192 s |
+| Dead Sea salinity and level | answer-first | 17 s | 30 s | 156 s (448 tok) | 23 s | 1,710 tok, 173 s / 383 s | 383 s |
+| Altitude in Leh, Ladakh | answer-first | 21 s | 35 s | 200 s (549 tok) | 21 s | 1,634 tok, 170 s / 420 s | 420 s |
+
+All three answers were accurate; the source checks added correct sourced specifics (Dead Sea
+34.2% salinity, 439.78 m below sea level, Jordan flow cut to about 2%; Leh at 3,524 m and the
+acetazolamide dose) and made no false corrections.
+
+Where the time goes: the source check's prompt reading (about 170 s, because its prompt repeats
+the 450-550-token draft on top of about 1,000 tokens of sources), the draft's decode (140-180 s),
+and search, which takes 21-23 s on the phone against about 3 s on the server.

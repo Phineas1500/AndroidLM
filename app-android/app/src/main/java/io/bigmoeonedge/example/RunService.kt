@@ -13,6 +13,8 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
+import android.os.SystemClock
+import android.util.Log
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -715,7 +717,34 @@ class RunService : Service() {
      * the parser's accumulation: it already honours the protocol's `reset` lines, which a plain
      * concatenation of deltas would not.
      */
-    private fun researchListener(runId: Int) = ResearchListener { e ->
+    private fun researchListener(runId: Int): ResearchListener {
+        // Phase timings go to logcat (tag AndroidLM) so scripted runs can be timed over adb:
+        //   adb logcat -s AndroidLM
+        val t0 = SystemClock.elapsedRealtime()
+        var sawAnswer = false
+        var sawCheck = false
+        fun log(msg: String) = Log.i(LOG_TAG, "run=$runId t=${SystemClock.elapsedRealtime() - t0}ms $msg")
+        return ResearchListener { e ->
+        when (e) {
+            is ResearchEvent.PhaseChanged -> log("phase=${e.phase}")
+            is ResearchEvent.Planned -> log("planned=${e.titles}")
+            is ResearchEvent.Routed -> log("route=${e.decision.route} views=${e.decision.views} travel=${e.decision.travel}")
+            is ResearchEvent.SourcesFound ->
+                log("sources=${e.sources.size} dropped=${e.dropped} [" + e.sources.joinToString(" | ") { "${it.title} — ${it.section}" } + "]")
+            is ResearchEvent.AnswerToken -> if (!sawAnswer) { sawAnswer = true; log("first_answer_token") }
+            is ResearchEvent.CheckToken -> if (!sawCheck) { sawCheck = true; log("first_check_token") }
+            is ResearchEvent.PhaseCompleted -> e.timing.let { tm ->
+                log("phase_done=${tm.phase} wall=${tm.wallMs}ms " + (tm.generation?.let {
+                    "tokens=${it.tokens} tok_s=${"%.2f".format(it.tokensPerSecond)} prompt_tokens=${it.promptTokens}"
+                } ?: ""))
+            }
+            is ResearchEvent.Completed -> {
+                log("completed")
+                e.result.text.chunked(900).forEachIndexed { i, part -> Log.i(LOG_TAG, "run=$runId text[$i]=$part") }
+            }
+            is ResearchEvent.Failed -> log("failed phase=${e.phase} ${e.message}")
+            else -> Unit
+        }
         when (e) {
             is ResearchEvent.PhaseChanged -> {
                 publishResearch(runId) {
@@ -733,6 +762,7 @@ class RunService : Service() {
             is ResearchEvent.PhaseCompleted -> publishResearch(runId) { it.copy(timings = it.timings + e.timing) }
             is ResearchEvent.Completed -> Unit // everything in it has been published piecewise
             is ResearchEvent.Failed -> Unit    // startResearch reports the failure it rethrows
+        }
         }
     }
 
@@ -882,6 +912,8 @@ class RunService : Service() {
 
         /** AndroidLM: run the research pipeline on [EXTRA_QUESTION] against the loaded session. */
         const val ACTION_RESEARCH = "io.bigmoeonedge.example.RESEARCH"
+
+        const val LOG_TAG = "AndroidLM"
 
         /** With [ACTION_RESEARCH], or with START_SESSION to research as soon as the model is ready. */
         const val EXTRA_QUESTION = "question"
