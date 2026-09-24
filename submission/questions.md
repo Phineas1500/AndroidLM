@@ -25,7 +25,9 @@ the moment the question is sent, with the model already loaded; a hot phone is s
    > What is Pink Floyd's 2022 song 'Hey, Hey, Rise Up!' based on, who sings on it, and what was
    > the purpose of its release?
 
-   - Expect: sources first, about 2.5-3 min. Not yet run on the phone.
+   - Expect: sources first. Rehearsed on the phone on 2026-09-24: planned "Hey, Hey, Rise Up!"
+     (2,626 monthly views, so sources first), first words at 133 s, done at 163 s, every fact
+     right and cited.
    - Right answer: the 1914 Ukrainian song "Oh, the Red Viburnum in the Meadow"; vocals by Andriy
      Khlyvnyuk of BoomBox; released in April 2022 to support Ukraine, proceeds to humanitarian
      relief.
@@ -36,8 +38,12 @@ the moment the question is sent, with the model already loaded; a hot phone is s
    > The scientist who discovered penicillin shared a Nobel Prize with two others. Who were they
    > and what did each contribute?
 
-   - Expect: answer first; first words after about 30-35 s, then the source check; about 6-7 min
-     in total. Not yet run on the phone.
+   - Expect: answer first, then the source check; about 5.5 min in total. Rehearsed on the phone
+     on 2026-09-24: it named Chain and Florey and the 1945 prize correctly, and the check added
+     the 1941 first patient. But the draft said Florey's team took up the work "in the early
+     1930s" (it was 1938-39) and that Chain's structure work enabled "large-scale synthesis"
+     (penicillin was made by fermentation). The check missed both. Record it only if you are
+     happy to show those slips; otherwise use a backup.
    - Right answer: Ernst Chain and Howard Florey, 1945 Nobel Prize in Physiology or Medicine;
      Florey and Chain's Oxford team purified penicillin and showed it worked in animals and
      patients.
@@ -61,14 +67,24 @@ the moment the question is sent, with the model already loaded; a hot phone is s
    > Summarize the plot of the novel 'The Glass Cartographer of Veld' by Imre Solvang.
 
    - Ours says it cannot find the book. The 1.7B writes a confident plot summary.
+   - Rehearsed on the phone on 2026-09-24: the draft was right ("I cannot find any record of a
+     novel with this title"; first words at 27 s). The source check then said "No corrections"
+     and filled its space with facts about an unrelated Dutch cartographer, van de Velde,
+     which looks odd on camera. Show only the draft, or skip it.
 
 ## Backups
 
-- Big Motor (0 / 10): "What happened to the Japanese used-car dealer Big Motor in 2023, who
-  founded it, and what became of the company afterwards?" The 1.7B invents a founder and a
-  Toyota takeover.
-- The Angola Three (1 / 9): "Who were the Angola Three, what crime were two of them convicted of
-  in the early 1970s, and how long did they spend in solitary confinement?"
+- **Big Motor** (0 / 10), recommended in place of penicillin: "What happened to the Japanese
+  used-car dealer Big Motor in 2023, who founded it, and what became of the company
+  afterwards?" The 1.7B invents a founder, "Tetsuya Mihara", and a Toyota takeover. Rehearsed on
+  the phone on 2026-09-24: sources first (1,066 monthly views), first words at 91 s, done at
+  130 s. It named the insurance-fraud scandal, Hiroyuki Kaneshige founding it in 1976 as
+  Kaneshige Auto Center, the licence revocation, and the sale to Itochu as WECARS, all cited.
+- **The Angola Three** (1 / 9), not recommended: "Who were the Angola Three, what crime were two
+  of them convicted of in the early 1970s, and how long did they spend in solitary
+  confinement?" Rehearsed on 2026-09-24 with a warm phone: first words at 150 s, done at 233 s.
+  The names, the 1972 killing of a guard and the 40-plus years are right, but it dates both
+  convictions to January 1974 and its last sentence on Woodfox is muddled.
 
 ## Avoid on camera
 

@@ -14,8 +14,12 @@ repo and a brief explanation of the approach; then a poidh claim with a screensh
 4. Open AndroidLM once and let the model load (a question started right after launch waits
    about 25-30 s for the load; either keep that in the video or ask a warm-up question first
    and cut it).
-5. Use Android's built-in screen recorder (Quick Settings > Screen record, "Record audio" off,
-   "Show touches" on). It has no length limit, unlike `adb screenrecord` (180 s).
+5. Leave 10-15 minutes between questions. Three back-to-back questions on 2026-09-24 took the
+   skin temperature from 30 C to 37 C; generation in those runs was 2.4-2.9 tokens/s, against
+   3.1-3.6 in earlier app runs.
+6. Use Android's built-in screen recorder (Quick Settings > Screen record, "Record audio" off,
+   "Show touches" on). Over USB, `adb shell screenrecord --time-limit 0` also records without a
+   length limit (tested on this phone; 6 Mbit/s gives about 40MB per minute at 1008x2244).
 
 ## Shots
 
