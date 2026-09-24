@@ -45,15 +45,16 @@ EOF
 )
 
 need=0
-while IFS='|' read -r name role bytes sha url dpath; do
+while IFS='|' read -r -u 3 name role bytes sha url dpath; do
   [ "$role" = corpus-optional ] && [ $VOYAGE = 0 ] && continue
   need=$((need + bytes))
-done <<< "$FILES"
+done 3<<< "$FILES"
 free_kb=$(adb shell df /data | awk 'NR==2{print $4}')
 echo "assets: $((need / 1000000000)) GB; free on the phone's /data: $((free_kb / 1000000)) GB"
 [ $((free_kb * 1024)) -gt $((need + 2000000000)) ] || die "not enough free space on the phone"
 
-while IFS='|' read -r name role bytes sha url dpath; do
+# fd 3, because adb and curl inside the loop read stdin and would eat the remaining lines
+while IFS='|' read -r -u 3 name role bytes sha url dpath; do
   [ "$role" = corpus-optional ] && [ $VOYAGE = 0 ] && continue
   local_file=$ASSETS/$name
   if [ ! -f "$local_file" ] || [ "$(filesize "$local_file")" != "$bytes" ]; then
@@ -77,7 +78,7 @@ while IFS='|' read -r name role bytes sha url dpath; do
     echo "pushing $name to $remote ..."
     adb push "$local_file" "$remote"
   fi
-done <<< "$FILES"
+done 3<<< "$FILES"
 # the app reads these without any storage permission, so they must be world-readable
 adb shell "chmod 755 '$DEVICE_ROOT' '$DEVICE_ROOT/corpus'; chmod 644 '$DEVICE_ROOT'/*.gguf '$DEVICE_ROOT'/corpus/*.db"
 
