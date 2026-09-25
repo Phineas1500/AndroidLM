@@ -29,10 +29,10 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 |---|---|
 | Storage | 33.9GB (model 12.3GB, Wikipedia 21.3GB, Wikivoyage 0.3GB) plus the 72MB APK |
 | Memory during a research question | about 7.8GB (engine 5.6GB including a 5GB expert cache, pinned dense weights 2.05GB, app 0.15GB) |
-| Generation speed | 4.2-5.8 tokens/s in the app (lower when the phone is hot) |
+| Generation speed | 4-6 tokens/s in the app (lower when the phone is hot) |
 | Model load | about 28 s on app start |
-| Answer-first question | first words after about 22 s; answer plus cited source check in about 4 min |
-| Retrieval-first question | first words after 75-150 s (longer source prompts take longer); cited answer done in 1.6-2.8 min |
+| Answer-first question | first words after about 25 s; answer plus cited source check in about 3.5 min |
+| Retrieval-first question | cited answer in about 2.5 min (median over 19 questions; first words after 1.3-2.2 min) |
 
 Against Qwen3-1.7B answering the same 72 questions from memory, graded 0-10 by Claude with one
 rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-model-comparison.md)):
@@ -45,7 +45,9 @@ rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-mo
 | All (72) | 2.6 | 7.0 |
 
 AndroidLM's answers in this table were produced on an ARM server with the same model and
-pipeline as the app.
+pipeline as the app. The obscure-subject questions asked in the app on the phone scored the same,
+graded blind against the server's answers: 7.1 vs 7.2, 84 vs 85 of 120 key facts
+([`notes/2026-09-25-phone-eval.md`](notes/2026-09-25-phone-eval.md)).
 
 Measurements, eval rounds and decisions are in [`notes/`](notes/); the Pixel findings are in
 [`notes/2026-09-23-pixel-first-day.md`](notes/2026-09-23-pixel-first-day.md) and
