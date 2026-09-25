@@ -61,3 +61,21 @@ All four answers were correct and cited. `scripts/demo/make_cut.py` edits a take
 sped-up stretch carries a label with its speed and real duration, placed from the app's phase log.
 Short cut (2:11; Harrods and Leh; within X's 2:20 limit for standard accounts) and full cut (3:22;
 all four) are kept outside the repository with the raw takes, which are the unedited evidence.
+
+## Recorded again, v2 (2026-09-25)
+
+The same four questions on the final build (57aad19 plus the plan-echo fix, 0b3f756: repacked
+dense weights, the cleaned-up screen with progress bars and tappable citations), recorded with
+`scripts/demo/record.sh` (which sets airplane mode, Do Not Disturb, touches and portrait, and
+restores them) and `scripts/demo/take.sh`, edited with `scripts/demo/make_cut.py`.
+
+| Take | Route | First words | Done |
+|---|---|---|---|
+| 1983 Harrods bombing | sources first | 102 s | 163 s (after a 21 s model load) |
+| Big Motor | sources first | 67 s | 93 s |
+| Pink Floyd, "Hey, Hey, Rise Up!" | sources first | 119 s | 142 s |
+| Altitude in Leh, Ladakh | answer first, then source check | 21 s | 269 s |
+
+All four answers correct and cited (the Harrods answer says "Provisional Irish IRA"; the Leh
+check adds an off-topic, cited note on earthquakes). Short cut 2:13 (Harrods and Leh), full cut
+3:18; raw takes kept with the cuts outside the repository.

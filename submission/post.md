@@ -1,7 +1,7 @@
 # X / Farcaster post draft
 
-For the user to post from their own account. Nothing here has been posted. Attach the short cut
-(2:11, fits X's 2:20 limit) to the first post, or the full cut (3:22) where longer video is allowed. The numbers come from
+For the user to post from their own account. Nothing here has been posted. Attach the v2 short cut
+(2:13, fits X's 2:20 limit) to the first post, or the v2 full cut (3:18) where longer video is allowed. The numbers come from
 `notes/2026-09-24-small-model-comparison.md`.
 
 ## Main post (under 280 characters)
