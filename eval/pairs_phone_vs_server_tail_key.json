@@ -1,0 +1,122 @@
+{
+ "tail-01": {
+  "A": "phone",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-02": {
+  "A": "phone",
+  "phone_route": "verify",
+  "server_route": "verify"
+ },
+ "tail-03": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "verify"
+ },
+ "tail-04": {
+  "A": "phone",
+  "phone_route": "verify",
+  "server_route": "verify"
+ },
+ "tail-05": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-06": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-07": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-08": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-09": {
+  "A": "phone",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-10": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-11": {
+  "A": "phone",
+  "phone_route": "verify",
+  "server_route": "plan"
+ },
+ "tail-12": {
+  "A": "phone",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-13": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-14": {
+  "A": "phone",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-15": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "verify"
+ },
+ "tail-16": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-17": {
+  "A": "phone",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-18": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-19": {
+  "A": "phone",
+  "phone_route": "verify",
+  "server_route": "verify"
+ },
+ "tail-20": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-21": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-22": {
+  "A": "server",
+  "phone_route": "plan",
+  "server_route": "plan"
+ },
+ "tail-23": {
+  "A": "phone",
+  "phone_route": "verify",
+  "server_route": "verify"
+ },
+ "tail-24": {
+  "A": "phone",
+  "phone_route": "plan",
+  "server_route": "plan"
+ }
+}

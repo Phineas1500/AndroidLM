@@ -1,0 +1,218 @@
+{
+ "tail-01": {
+  "A": 10,
+  "B": 9,
+  "A_key_facts": "5/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "A has all three, Angola, Jan 1974 conviction for killing Brent Miller, 40+ years, King 29 years and 2001 release (Woodfox 1972-2016 correct extra); B has April 1972 indictment/1974 conviction for killing a guard, 40+ years, King 29 years, but no Brent Miller and no 2001 release"
+ },
+ "tail-02": {
+  "A": 4,
+  "B": 8,
+  "A_key_facts": "2/5",
+  "B_key_facts": "5/5",
+  "A_fabricated": true,
+  "B_fabricated": false,
+  "note": "Both right on Confucianism and criminal marking; A invents Zhongshi/Japanese-influenced/Xishi categories and its check says 'No corrections' so they stand; B's draft invents Xiangyang/Jianghu/Modern but the check replaces them with brush painting, realistic painting and watercolor splash ink plus national colours"
+ },
+ "tail-03": {
+  "A": 4,
+  "B": 4,
+  "A_key_facts": "2/5",
+  "B_key_facts": "2/5",
+  "A_fabricated": false,
+  "B_fabricated": true,
+  "note": "A's draft denies any Albstadt quake and invents a 1992 Landau quake (2 billion DM) plus Uelzen/Landers noise; check restores 1911 Ms 6.1 and 1978 Ms 5.7 with 6,850 buildings and no deaths, rejects Landau but never names 1978 costliest. B cleanly gives 1911 Ms 6.1 and 1978 Ms 5.7 but flatly says neither was costliest and names 1756 Dueren as costliest. Neither has 1943 or 275 million DM"
+ },
+ "tail-04": {
+  "A": 7,
+  "B": 7,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "A's draft (20 Jan 1946, SA in 2000, monopoly ended 2004) all fixed by check to 8 April 1946, 1999 monopoly end, SA on 19 Nov 2004, adds Marcel Paul; no 2005 float/85%. B's draft (28 Dec 1946, 1997, 'July 10, 2000' law) fixed to 8 April 1946, 1999, SA 2004, Nov 2005 float; no Marcel Paul or 85%"
+ },
+ "tail-05": {
+  "A": 5,
+  "B": 5,
+  "A_key_facts": "2/5",
+  "B_key_facts": "2/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both right on Nisaean plain in Media and tall/prized (B adds mount of Persian nobility), both honest that extinction date is not in sources; no 430 BCE, sacred horses, warhorse head or 1204"
+ },
+ "tail-06": {
+  "A": 10,
+  "B": 8,
+  "A_key_facts": "5/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "A has fraud, Kaneshige resignation (25 July 2023), FSA revocation, Itochu/WECARS, 1976 Kaneshige Auto Center in Iwakuni, Sompo Japan; B has the same core but only 'founded 1976 by Kaneshige', no Iwakuni or Sompo"
+ },
+ "tail-07": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "5/5",
+  "B_key_facts": "5/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: island between two tunnel junctions, capacitive gate, Coulomb blockade, V < e/C, thermal energy low relative to charging energy (no explicit e^2/2C); A hedges that the temperature criterion is 'not fully detailed'"
+ },
+ "tail-08": {
+  "A": 10,
+  "B": 9,
+  "A_key_facts": "5/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both have late-19th-century Devon/Cornwall + Essex/Suffolk/Kent merger, Chinese/French influence, post-WWII decline, 1955 Howitt Report, unsuited to intensive farming; A also says it is still endangered, B stops at nearly extinct by the 1960s"
+ },
+ "tail-09": {
+  "A": 10,
+  "B": 10,
+  "A_key_facts": "5/5",
+  "B_key_facts": "5/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: 17 Dec 1983 car bomb, 37-minute warning, not evacuated, 3 police + 3 civilians, 90 injured, Army Council unauthorised/regret, shift to military targets"
+ },
+ "tail-10": {
+  "A": 6,
+  "B": 6,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both have Eyup, 1957 Vatan Partisi campaign, History Thesis, historical revolution/primitive socialism, Rashidun tribal elites, but neither states the charge (religion as a political tool, only communist so charged) nor the Quran/hadith use, so 'why prosecuted' is unanswered"
+ },
+ "tail-11": {
+  "A": 2,
+  "B": 5,
+  "A_key_facts": "1/5",
+  "B_key_facts": "2/5",
+  "A_fabricated": true,
+  "B_fabricated": false,
+  "note": "A says bagnes were established by a 1789 decree and abolished in 1854 (check reaffirms both), last convicts left in 1969; its 'two convicts chained together' doublage is corrected to released prisoners forced to reside in Guiana. B has 1852, May 1854 law, doublage as forced residence (no 'equal to sentence'), 1953 given as abolition; no 1938/1945"
+ },
+ "tail-12": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: Red Viburnum 1914 anthem, Khlyvnyuk of BoomBox, support for Ukraine during the invasion, proceeds to the Ukraine Humanitarian Relief Fund; no 8 April 2022 date, Gilmour not named"
+ },
+ "tail-13": {
+  "A": 8,
+  "B": 7,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: 11 Nov 2007, Legazpi, Josue Estebanez (soldier), counter-protest against a neo-Nazi rally, 26 years; A adds the first use of the ideological aggravator, B only the bare 26 years (plus correct age 16); no 19+7 breakdown, compensation or Supreme Court"
+ },
+ "tail-14": {
+  "A": 5,
+  "B": 6,
+  "A_key_facts": "2/5",
+  "B_key_facts": "2/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: late 1943, Katyusha melody, Curenna at Christmas 1943; B also has the official Alto performance on Epiphany 1944. Neither names Cascione or Sibilla, so 'how it came to be written' is unanswered; no Garibaldi brigades"
+ },
+ "tail-15": {
+  "A": 5,
+  "B": 8,
+  "A_key_facts": "3/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": true,
+  "B_fabricated": false,
+  "note": "Both right on Kumarajiva, 402-406 and the disputed Nagarjuna attribution. A's draft wrongly says 8,000-line sutra, 200 fascicles and 'Indo-Saka' and the check says 'No corrections' (adds Lamotte/Demieville, Sengrui). B is clean: 25,000-line sutra, Kuchean monk, Lamotte; no 100 scrolls, and the reason for the dispute is thin"
+ },
+ "tail-16": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: 61st-97th Streets, Upper West Side, 9 Nov 1982, neo-Italian Renaissance majority, Art Deco; A adds late 19th c. to early 1940s; no Dakota in either"
+ },
+ "tail-17": {
+  "A": 6,
+  "B": 6,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: unsigned editorial, Lady Macbeth as formalist/bourgeois, Stalin agreed but likely did not write it, and both honestly say symphony consequences are not in sources. A adds 28 Jan 1936 and correct extras (possible authors, Arkhangelsk, Glikman); B has no date and an irrelevant Prokofiev digression. No Fourth withdrawal or Fifth rehabilitation"
+ },
+ "tail-18": {
+  "A": 8,
+  "B": 8,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: full symptom list incl. worst when sitting/before bowel movement, constipation, drainage, fever, chills, mass; E. coli/gut bacteria; testing identifies the bacteria. No staph/MRSA trend (the actual reason) and no Crohn's; A even says anorectal abscesses generally involve gut flora rather than staph"
+ },
+ "tail-19": {
+  "A": 7,
+  "B": 4,
+  "A_key_facts": "5/5",
+  "B_key_facts": "2/5",
+  "A_fabricated": false,
+  "B_fabricated": true,
+  "note": "A's draft invents bearing/pump failures, 2018 launch and founders 'Jonney Li and Chris He', but the check fixes all three (Johnny Hou, Feb 2020, fire reports Nov 2020) and adds 2 Feb 2021 removal and Guardian; the invented brand-damage/pivot narrative stays. B's draft denies any failure and invents founders 'Jeroen van den Bosch and Ben Ku' and a 2019 launch; check restores fires and removal but the founders and 2019 stand"
+ },
+ "tail-20": {
+  "A": 8,
+  "B": 8,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: third-millennium claim, Terrien de Lacouperie with migration, rejection (Schlegel), Huntington/Bishop hyperdiffusionism, later archaeological pan-Eurasian arguments; A adds Lattimore. No Ping-ti Ho or Mallory/Mair/Tarim mummies in either"
+ },
+ "tail-21": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: ICMR DG/Secretary 2015-17, WHO DDG Programmes Oct 2017-Mar 2019, Chief Scientist to 2022, TB and HIV; no NIRT Chennai"
+ },
+ "tail-22": {
+  "A": 6,
+  "B": 6,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: Premier Automotive Supply 1940 with Jack and Joe, parts/electronics distributor; real but non-gold Israel gifts (Bezalel $25M, Be'er-Sheva museum, Mandel Leadership Institute 1992); both say nothing on Brandeis is in sources. No Negev center or $22.5M Humanities center"
+ },
+ "tail-23": {
+  "A": 7,
+  "B": 4,
+  "A_key_facts": "4/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": true,
+  "note": "A's draft invents a 737 cargo operator (founded 2018) blocked by EASA certification; check corrects to flag carrier with DHC-8-400s and adds A320neo lease and the EU ban on all Kyrgyz airlines; no Paris/Berlin/London. B's draft invents an Il-76/An-124 cargo operator; check corrects to passenger airline with DHC-8-400s, Manas, A320neo, Paris/Berlin/London, but wrongly states it is 'not banned from Europe'"
+ },
+ "tail-24": {
+  "A": 7,
+  "B": 8,
+  "A_key_facts": "3/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: no nodal agency because colleges sat under general universities, 2005 expert committee by-laws, 3 Sept 2021 bill; A only says 'formally established 2023', B adds 5 March 2023 (tied to first VC Datteswar Hota). No Sishu Bhawan Square or Rs 330.17 crore"
+ }
+}
