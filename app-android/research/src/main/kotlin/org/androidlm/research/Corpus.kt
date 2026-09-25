@@ -263,8 +263,11 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
      * goes first, the encyclopedia's on a tie, and the longer list's leftovers follow. Guide hits
      * are titled "Wikivoyage: ...".
      */
-    fun retrieve(question: String, titles: List<String>, k: Int = 6, voyage: Corpus? = null): List<Hit> {
-        val stems = stems(question)
+    fun retrieve(
+        question: String, titles: List<String>, k: Int = 6, voyage: Corpus? = null, pre: QuestionSearch? = null,
+    ): List<Hit> {
+        require(pre == null || pre.question == question) { "QuestionSearch is for another question" }
+        val stems = pre?.stems ?: stems(question)
         val perTitle = ArrayList<List<Hit>>()
         val seenAid = HashSet<ArticleRef>()
         for (t in titles) {
@@ -302,10 +305,22 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
         }
         val seen = hits.mapTo(HashSet()) { it.aid to it.start }
         val topic = stems(titles.joinToString(" ")).ifEmpty { stems }
-        for (h in bm25(stems)) {
+        for (h in pre?.bm25 ?: bm25(stems)) {
             if ((h.aid to h.start) !in seen && coverage(h.title + " " + h.text, topic) >= 0.5) hits.add(h)
         }
         return hits.take(max(k, perTitle.size * 2))
+    }
+
+    /**
+     * The half of [retrieve] that depends only on the question: its stems and the whole-index BM25
+     * hits. On a phone these are the slow, flash-bound part of a search (the stems read each word's
+     * full posting list to count documents), and they can run while the plan is still being
+     * written. [retrieve] given this result returns exactly what it would have computed itself.
+     * A [QuestionSearch] may come from another Corpus over the same database file.
+     */
+    fun questionSearch(question: String): QuestionSearch {
+        val stems = stems(question)
+        return QuestionSearch(question, stems, bm25(stems))
     }
 
     private data class Span(val start: Int, val end: Int)
@@ -355,3 +370,6 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
         }
     }
 }
+
+/** [Corpus.questionSearch]'s result: the question's stems and its whole-index BM25 hits. */
+class QuestionSearch(val question: String, val stems: List<Stem>, val bm25: List<Hit>)

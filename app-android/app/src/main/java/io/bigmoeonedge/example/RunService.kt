@@ -31,6 +31,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import org.androidlm.research.BackgroundSearch
 import org.androidlm.research.Engine
 import org.androidlm.research.Generation
 import org.androidlm.research.ResearchConfig
@@ -136,6 +137,42 @@ class RunService : Service() {
     private val corpusDispatcher by lazy { corpusExecutor.value.asCoroutineDispatcher() }
     private var corpora: AndroidCorpora? = null
     private var corporaFiles: CorpusFiles? = null
+
+    // A second connection on its own thread for the background search (ResearchPipeline's
+    // BackgroundSearch): the slow, flash-bound part of a search runs while the engine writes the
+    // plan and the draft. It runs at background priority, which on Android keeps it on the little
+    // cores, off the engine's compute cores, and is raised when the run waits for it.
+    // `searchCorpora`/`searchFiles`: search thread only.
+    @Volatile private var searchTid = 0
+    private val searchExecutor: Lazy<ExecutorService> = lazy {
+        Executors.newSingleThreadExecutor { r ->
+            Thread({
+                searchTid = android.os.Process.myTid()
+                runCatching { android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND) }
+                r.run()
+            }, "research-search")
+        }
+    }
+    private val searchDispatcher by lazy { searchExecutor.value.asCoroutineDispatcher() }
+    private var searchCorpora: AndroidCorpora? = null
+    private var searchFiles: CorpusFiles? = null
+
+    private fun setSearchPriority(background: Boolean) {
+        val tid = searchTid
+        if (tid == 0) return
+        runCatching {
+            android.os.Process.setThreadPriority(
+                tid,
+                if (background) android.os.Process.THREAD_PRIORITY_BACKGROUND else android.os.Process.THREAD_PRIORITY_DEFAULT,
+            )
+        }
+    }
+
+    /** Search thread only. */
+    private fun searchCorporaFor(files: CorpusFiles): AndroidCorpora {
+        searchCorpora?.let { if (searchFiles == files) return it else it.close() }
+        return AndroidCorpora(files).also { searchCorpora = it; searchFiles = files }
+    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -708,10 +745,12 @@ class RunService : Service() {
                 val files = withContext(Dispatchers.IO) { CorpusLocator.find(this@RunService) }
                     ?: throw IllegalStateException("no corpus found (${CorpusLocator.WIKI} in a \"${CorpusLocator.DIR}\" directory)")
                 val open = withContext(corpusDispatcher) { corporaFor(files) }
+                val searchOpen = withContext(searchDispatcher) { searchCorporaFor(files) }
+                val background = BackgroundSearch(searchOpen, searchDispatcher, ::setSearchPriority)
                 // (a preference of the method, not of the session: read per run, never in the argv)
                 val prefs = AppSettings.load(this@RunService)
                 val config = ResearchConfig(travelRoute = prefs.researchTravelRoute, checkContinue = prefs.researchCheckContinue)
-                ResearchPipeline(engine, open, corpusDispatcher, config).run(question, researchListener(runId))
+                ResearchPipeline(engine, open, corpusDispatcher, config, background).run(question, researchListener(runId))
             } catch (e: CancellationException) {
                 publishResearch(runId) { if (it.running) it.copy(phase = ResearchPhase.CANCELLED) else it }
                 throw e
@@ -778,7 +817,7 @@ class RunService : Service() {
             is ResearchEvent.AnswerToken -> if (!sawAnswer) { sawAnswer = true; log("first_answer_token") }
             is ResearchEvent.CheckToken -> if (!sawCheck) { sawCheck = true; log("first_check_token") }
             is ResearchEvent.PhaseCompleted -> e.timing.let { tm ->
-                log("phase_done=${tm.phase} wall=${tm.wallMs}ms " + (tm.generation?.let {
+                log("phase_done=${tm.phase} wall=${tm.wallMs}ms " + (tm.workMs?.let { "work=${it}ms " } ?: "") + (tm.generation?.let {
                     "tokens=${it.tokens} tok_s=${"%.2f".format(it.tokensPerSecond)} prompt_tokens=${it.promptTokens}"
                 } ?: ""))
             }
@@ -925,6 +964,10 @@ class RunService : Service() {
             // Behind whatever search is still running: the corpora close on their own thread.
             corpusExecutor.value.execute { corpora?.close(); corpora = null }
             corpusExecutor.value.shutdown()
+        }
+        if (searchExecutor.isInitialized()) {
+            searchExecutor.value.execute { searchCorpora?.close(); searchCorpora = null }
+            searchExecutor.value.shutdown()
         }
         super.onDestroy()
     }

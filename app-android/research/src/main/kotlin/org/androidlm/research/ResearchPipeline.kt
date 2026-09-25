@@ -2,6 +2,11 @@ package org.androidlm.research
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 
 /** What one generation produced, with the basic figures the engine reports at the end of it. */
@@ -87,8 +92,17 @@ data class ResearchSource(
     val via: String,
 )
 
-/** Wall time of one phase; [generation] is set for the phases that ran the model. */
-data class PhaseTiming(val phase: ResearchPhase, val wallMs: Long, val generation: Generation? = null)
+/**
+ * Wall time of one phase; [generation] is set for the phases that ran the model. For SEARCHING with
+ * a [BackgroundSearch], [wallMs] is how long the run waited for the search and [workMs] how long
+ * the search itself took (most of it overlapped with planning and drafting).
+ */
+data class PhaseTiming(
+    val phase: ResearchPhase,
+    val wallMs: Long,
+    val generation: Generation? = null,
+    val workMs: Long? = null,
+)
 
 data class ResearchResult(
     val question: String,
@@ -151,6 +165,21 @@ fun interface ResearchListener {
 }
 
 /**
+ * A second corpus connection on its own thread, for searching while the engine is busy: the
+ * question's stems and whole-index BM25 run while the plan is written, and on the answer-first
+ * route the rest of the search runs while the draft is written. [corpora] must be a separate
+ * [CorpusProvider] over the same files (a Corpus belongs to one connection and one thread), and
+ * [dispatcher] must be backed by ONE thread, not the main corpus thread. [priority] is told
+ * `true` while the search only overlaps the engine (so it can yield the fast cores to it) and
+ * `false` when the run is waiting for it; it may be called from any thread.
+ */
+class BackgroundSearch(
+    val corpora: CorpusProvider,
+    val dispatcher: CoroutineDispatcher,
+    val priority: (background: Boolean) -> Unit = {},
+)
+
+/**
  * rag.py `answer()` in `auto` mode over an [Engine] (its ENGINE branch of `chat()`: the engine
  * takes one user message, so every prompt is `system + "\n\n" + user`):
  *
@@ -172,7 +201,12 @@ class ResearchPipeline(
     private val corpora: CorpusProvider,
     private val corpusDispatcher: CoroutineDispatcher,
     private val config: ResearchConfig = ResearchConfig(),
+    private val background: BackgroundSearch? = null,
 ) {
+    // Background searches are not children of a run: cancelling a run must not wait for a query
+    // that is still reading the index. Their results are dropped; the thread moves on to the next.
+    private val backgroundScope = background?.let { CoroutineScope(SupervisorJob() + it.dispatcher) }
+
     /**
      * Answers [question], reporting progress to [listener]. Throws CancellationException when
      * cancelled (after `PhaseChanged(CANCELLED)`), and rethrows any failure (after `Failed` and
@@ -196,7 +230,22 @@ class ResearchPipeline(
         var phase = ResearchPhase.PLANNING
         val timings = ArrayList<PhaseTiming>()
 
-        suspend fun execute(): ResearchResult {
+        private val jobs = ArrayList<Job>()
+
+        suspend fun execute(): ResearchResult = try {
+            executeInner()
+        } finally {
+            jobs.forEach { it.cancel() }
+        }
+
+        private suspend fun executeInner(): ResearchResult {
+            // 0. with a background search: the question-only half of the search runs while the plan
+            //    is being written, on its own connection and thread
+            val pre: Deferred<QuestionSearch>? = background?.let { bg ->
+                bg.priority(true)
+                backgroundScope!!.async { bg.corpora.wiki().questionSearch(question) }.also { jobs.add(it) }
+            }
+
             // 1. plan
             val plan = generating(ResearchPhase.PLANNING, Prompts.PLAN_SYSTEM, question, config.planTokens) {}
             val titles = Planner.parsePlanOutput(plan.text)
@@ -210,13 +259,23 @@ class ResearchPipeline(
             }
             listener.onEvent(ResearchEvent.Routed(decision, config.routeViews))
 
-            // 3. answer first: the draft comes before the search
+            // 3. answer first: the draft comes before the search (with a background search, the search
+            //    runs while the draft is written; its result is only reported once the draft is done)
             var draft: String? = null
+            var early: Deferred<Pair<Searched, Long>>? = null
             if (decision.route == Route.ANSWER_FIRST) {
+                if (background != null && pre != null) {
+                    early = backgroundScope!!.async {
+                        val p = pre.await()
+                        val t0 = System.nanoTime()
+                        val s = search(background.corpora, p, titles)
+                        s to (System.nanoTime() - t0) / 1_000_000
+                    }.also { jobs.add(it) }
+                }
                 draft = answering(ResearchPhase.DRAFTING, Prompts.CLOSED_SYSTEM, question)
             }
 
-            val built = searching(titles)
+            val built = searching(titles, pre, early)
             val sources = built.usedHits.mapIndexed { i, h -> ResearchSource(i + 1, h.title, h.section, h.text, h.via) }
             val dropped = built.dropped
             listener.onEvent(ResearchEvent.SourcesFound(sources, dropped))
@@ -259,8 +318,8 @@ class ResearchPipeline(
             listener.onEvent(ResearchEvent.PhaseChanged(next))
         }
 
-        private fun completed(start: Long, generation: Generation? = null) {
-            val timing = PhaseTiming(phase, (System.nanoTime() - start) / 1_000_000, generation)
+        private fun completed(start: Long, generation: Generation? = null, workMs: Long? = null) {
+            val timing = PhaseTiming(phase, (System.nanoTime() - start) / 1_000_000, generation, workMs)
             timings.add(timing)
             listener.onEvent(ResearchEvent.PhaseCompleted(timing))
         }
@@ -296,16 +355,28 @@ class ResearchPipeline(
             return res.text
         }
 
-        private suspend fun searching(titles: List<String>): Searched {
+        private suspend fun searching(
+            titles: List<String>, pre: Deferred<QuestionSearch>?, early: Deferred<Pair<Searched, Long>>?,
+        ): Searched {
             enter(ResearchPhase.SEARCHING)
             val start = System.nanoTime()
-            val searched = withContext(corpusDispatcher) {
-                val hits = corpora.wiki().retrieve(question, titles, config.k, corpora.voyage())
-                val built = buildContext(hits, config.contextChars)
-                Searched(built.context, built.usedHits, hits.size - built.usedHits.size)
+            background?.priority?.invoke(false) // the run is waiting for the search now
+            if (early != null) {
+                val (searched, workMs) = early.await()
+                completed(start, workMs = workMs)
+                return searched
             }
+            val p = pre?.await()
+            val searched = withContext(corpusDispatcher) { search(corpora, p, titles) }
             completed(start)
             return searched
+        }
+
+        /** retrieve + pack, on [provider]'s thread (the caller's dispatcher decides which). */
+        private suspend fun search(provider: CorpusProvider, p: QuestionSearch?, titles: List<String>): Searched {
+            val hits = provider.wiki().retrieve(question, titles, config.k, provider.voyage(), p)
+            val built = buildContext(hits, config.contextChars)
+            return Searched(built.context, built.usedHits, hits.size - built.usedHits.size)
         }
     }
 

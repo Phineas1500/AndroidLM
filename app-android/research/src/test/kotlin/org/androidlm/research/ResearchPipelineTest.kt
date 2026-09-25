@@ -682,6 +682,146 @@ class ResearchPipelineTest {
         assertNotNull(rec.all<ResearchEvent.Failed>().single().message)
     }
 
+
+    // ── background search ──
+
+    /** A second provider over the same files, on its own thread, with its own thread record. */
+    private class Background(wiki: File, voyage: File?) : AutoCloseable {
+        val threads: MutableSet<Thread> = Collections.synchronizedSet(HashSet())
+        @Volatile var javaThread: Thread? = null
+        val dispatcher: ExecutorCoroutineDispatcher =
+            Executors.newSingleThreadExecutor { r -> Thread(r, "test-search").apply { isDaemon = true }.also { javaThread = it } }
+                .asCoroutineDispatcher()
+        val priorities: MutableList<Boolean> = Collections.synchronizedList(ArrayList())
+        private val dbs = ArrayList<JdbcSqlDatabase>()
+        private val provider = object : CorpusProvider {
+            private val zstd = JniZstdDecompressor()
+            private val w by lazy { open(wiki) }
+            private val v by lazy { voyage?.let { open(it) } }
+            private fun open(f: File): Corpus {
+                val db = JdbcSqlDatabase(f).also { dbs.add(it) }
+                return Corpus(ThreadRecordingDb(db, threads), zstd)
+            }
+            override fun wiki() = w
+            override fun voyage() = v
+        }
+        val search = BackgroundSearch(provider, dispatcher) { priorities.add(it) }
+
+        override fun close() {
+            runBlocking { withContext(dispatcher) { dbs.forEach { it.close() } } }
+            dispatcher.close()
+        }
+    }
+
+    private fun backgroundRun(
+        engine: Engine, bg: Background, question: String, rec: Recorder, config: ResearchConfig = ResearchConfig(),
+    ): ResearchResult = runBlocking {
+        withTimeout(60_000) {
+            ResearchPipeline(engine, sampleProvider(), corpusThread, config, bg.search).run(question, rec)
+        }
+    }
+
+    /** Everything but wall times: what a background search must leave unchanged. */
+    private fun ResearchResult.withoutTimes() = copy(timings = timings.map { it.copy(wallMs = 0, workMs = null) })
+
+    @Test
+    fun backgroundSearchChangesNothingButTheTimingAnswerFirst() {
+        val case = goldenCase("Roughly how many times larger is the population of India")
+        val question = case["question"].asString
+        val script = listOf("India\nCanada", "India has about 1.4 billion people.", "No corrections. See [1].")
+        val plainRec = Recorder()
+        val plainEngine = FakeEngine(script)
+        val plain = run(plainEngine, sampleProvider(), question, plainRec, ResearchConfig(checkContinue = true))
+
+        Background(fixture("sample_wiki.db"), fixture("sample_voyage.db")).use { bg ->
+            val rec = Recorder()
+            val engine = FakeEngine(script)
+            val result = backgroundRun(engine, bg, question, rec, ResearchConfig(checkContinue = true))
+
+            assertEquals(plainEngine.calls.map { it.prompt }, engine.calls.map { it.prompt })
+            assertEquals(plain.withoutTimes(), result.withoutTimes())
+            assertEquals(plainRec.shape(), rec.shape())
+            // the search ran in the background: its own time is reported beside the wait
+            val searching = result.timings.single { it.phase == ResearchPhase.SEARCHING }
+            assertNotNull(searching.workMs)
+            // background while the engine works, raised when the run waits for it
+            assertEquals(listOf(true, false), bg.priorities.toList())
+            // each connection stayed on its own thread
+            assertEquals(setOf(bg.javaThread), bg.threads.toSet())
+            assertCorpusThreadOnly()
+        }
+    }
+
+    @Test
+    fun backgroundSearchChangesNothingButTheTimingRetrievalFirst() {
+        val case = goldenCase("What happened in the 1983 Harrods bombing")
+        val question = case["question"].asString
+        val script = listOf("1. Harrods bombing\n2. \"Provisional Irish Republican Army\"\n", "An IRA car bomb [1].")
+        val plainRec = Recorder()
+        val plainEngine = FakeEngine(script)
+        val plain = run(plainEngine, sampleProvider(), question, plainRec)
+
+        Background(fixture("sample_wiki.db"), fixture("sample_voyage.db")).use { bg ->
+            val rec = Recorder()
+            val engine = FakeEngine(script)
+            val result = backgroundRun(engine, bg, question, rec)
+
+            assertEquals(plainEngine.calls.map { it.prompt }, engine.calls.map { it.prompt })
+            assertEquals(plain.withoutTimes(), result.withoutTimes())
+            assertEquals(plainRec.shape(), rec.shape())
+            assertEquals(listOf(true, false), bg.priorities.toList())
+            assertEquals(setOf(bg.javaThread), bg.threads.toSet())
+            assertCorpusThreadOnly()
+        }
+    }
+
+    @Test
+    fun questionSearchGivesRetrieveTheSameHits() {
+        val zstd = JniZstdDecompressor()
+        val wikiDb = JdbcSqlDatabase(fixture("sample_wiki.db"))
+        val voyageDb = JdbcSqlDatabase(fixture("sample_voyage.db"))
+        try {
+            val wiki = Corpus(wikiDb, zstd)
+            val voyage = Corpus(voyageDb, zstd)
+            var n = 0
+            for (c in golden.map { it.asJsonObject }) {
+                val question = c["question"].asString
+                val titles = c["titles"].asJsonArray.map { it.asString }
+                val pre = wiki.questionSearch(question)
+                assertEquals(question, wiki.retrieve(question, titles, 6, voyage), wiki.retrieve(question, titles, 6, voyage, pre))
+                assertEquals(question, wiki.retrieve(question, titles, 6), wiki.retrieve(question, titles, 6, null, pre))
+                n++
+            }
+            assertTrue(n > 0)
+        } finally {
+            wikiDb.close()
+            voyageDb.close()
+        }
+    }
+
+    @Test
+    fun cancellationMidDraftDoesNotWaitForTheBackgroundSearch() {
+        val question = "Roughly how many times larger is the population of India than that of Canada?"
+        Background(fixture("sample_wiki.db"), fixture("sample_voyage.db")).use { bg ->
+            val engine = FakeEngine(listOf("India\nCanada", "India has about"), hangAt = 1)
+            val rec = Recorder()
+            runBlocking {
+                withTimeout(60_000) {
+                    val job = async { ResearchPipeline(engine, sampleProvider(), corpusThread, ResearchConfig(), bg.search).run(question, rec) }
+                    engine.hanging.await()
+                    job.cancel()
+                    try {
+                        job.await()
+                        fail("a cancelled run must not return a result")
+                    } catch (expected: CancellationException) {
+                    }
+                }
+            }
+            assertEquals(1, engine.cancelledCalls)
+            assertEquals(listOf("phase:DRAFTING", "answer-tokens", "phase:CANCELLED"), rec.shape().takeLast(3))
+        }
+    }
+
     companion object {
         private const val CORPUS_THREAD = "test-corpus"
     }
