@@ -27,7 +27,15 @@ object Planner {
      * quotes; keep titles with 1 < length < 80 code points, at most four.
      */
     fun parsePlanOutput(text: String): List<String> =
-        Py.splitLines(text).map { cleanLine(it) }.filter { Py.len(it) in 2..79 }.take(MAX_TITLES)
+        Py.splitLines(text).map { cleanLine(it) }.filter { Py.len(it) in 2..79 && !isPromptEcho(it) }.take(MAX_TITLES)
+
+    /**
+     * rag.py `is_prompt_echo`: a line of four or more words found verbatim in the planning prompt is
+     * the model echoing its instructions ("Output only the titles, nothing else."), not a title.
+     */
+    fun isPromptEcho(line: String): Boolean =
+        line.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }.size >= 4 &&
+            Prompts.PLAN_SYSTEM.lowercase().contains(line.lowercase())
 
     /**
      * `LIST_MARKER.sub("", line).strip().strip('"')` with

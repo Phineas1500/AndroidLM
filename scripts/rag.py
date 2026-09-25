@@ -455,7 +455,13 @@ LIST_MARKER = re.compile(r"^\s*(?:[-*\u2022]\s+|\d{1,2}[.)]\s+)?")
 
 def parse_plan_output(text):
     titles = [LIST_MARKER.sub("", line).strip().strip('"') for line in text.splitlines()]
-    return [t for t in titles if 1 < len(t) < 80][:4]
+    # a line of four or more words found verbatim in the planning prompt is the model echoing its
+    # instructions ("Output only the titles, nothing else."), never an article title
+    return [t for t in titles if 1 < len(t) < 80 and not is_prompt_echo(t)][:4]
+
+
+def is_prompt_echo(line):
+    return len(line.split()) >= 4 and line.lower() in PLAN_SYSTEM.lower()
 
 
 def plan(url, question):

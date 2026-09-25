@@ -822,6 +822,14 @@ class ResearchPipelineTest {
         }
     }
 
+    @Test
+    fun planDropsAnEchoOfItsOwnInstructions() {
+        val out = "Harrods bombing\nIrish Republican Army\nOutput only the titles, nothing else."
+        assertEquals(listOf("Harrods bombing", "Irish Republican Army"), Planner.parsePlanOutput(out))
+        // a real title that shares words with the prompt is kept
+        assertEquals(listOf("Titles of nobility"), Planner.parsePlanOutput("Titles of nobility"))
+    }
+
     companion object {
         private const val CORPUS_THREAD = "test-corpus"
     }
