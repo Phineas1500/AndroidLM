@@ -47,10 +47,10 @@ index 6c2b929..52d4f46 100644
  
 diff --git a/ggml/src/ggml-cpu/iqk-moe.cpp b/ggml/src/ggml-cpu/iqk-moe.cpp
 new file mode 100644
-index 0000000..0116e7b
+index 0000000..aaa6888
 --- /dev/null
 +++ b/ggml/src/ggml-cpu/iqk-moe.cpp
-@@ -0,0 +1,676 @@
+@@ -0,0 +1,677 @@
 +// Batched expert matmuls for IQ2_XS and IQ3_XXS weights on ARM with dot-product instructions.
 +//
 +// The kernels are ik_llama.cpp's (ggml/src/iqk: iqk_common.h, iqk_gemm_iquants.cpp,
@@ -67,7 +67,8 @@ index 0000000..0116e7b
 +// let run longer takes more of them), and for each chunk:
 +//   n >= 32: the rows are converted 32 at a time to 8-row interleaved Q8_K_R8 and multiplied by
 +//            the tokens with vdotq_laneq_s32;
-+//   n <  32: each row is decoded once and multiplied by up to 8 tokens at a time.
++//   n <  32: each row is decoded once and multiplied by up to 8 tokens at a time (one token,
++//            in generation, included).
 +// The generic path decodes each row once per token.
 +
 +#define GGML_COMMON_IMPL_CPP
@@ -644,7 +645,7 @@ index 0000000..0116e7b
 +
 +struct Config {
 +    bool enabled          = true;
-+    int  min_rows         = 2;
++    int  min_rows         = 1;  // generation too: 6.9 against 6.5 tok/s on a Pixel 8 Pro
 +    int  convert_min_rows = 32; // ik converts to Q8_K_R8 from 32 tokens (MulMat::is_dequant_better, aarch64)
 +    int  chunk_rows       = 32; // rows per work item, a multiple of 8 (the Q8_K_R8 interleave)
 +    Config() {
@@ -729,10 +730,10 @@ index 0000000..0116e7b
 +#endif
 diff --git a/ggml/src/ggml-cpu/iqk-moe.h b/ggml/src/ggml-cpu/iqk-moe.h
 new file mode 100644
-index 0000000..28bd275
+index 0000000..6b1087c
 --- /dev/null
 +++ b/ggml/src/ggml-cpu/iqk-moe.h
-@@ -0,0 +1,33 @@
+@@ -0,0 +1,34 @@
 +#pragma once
 +
 +// Batched expert matmuls for IQ2_XS and IQ3_XXS weights on ARM with dot-product instructions,
@@ -746,9 +747,10 @@ index 0000000..28bd275
 +#endif
 +
 +// Rows per work item when ggml_iqk_moe_mul_mat takes an expert with this weight type, row length,
-+// number of rows and number of tokens; 0 when it does not. Off when GGML_IQK_MOE=0; tokens below
-+// GGML_IQK_MOE_MIN_ROWS (default 2) stay on the generic path, so single-token generation is
-+// unchanged. The rows per item (GGML_IQK_MOE_CHUNK_ROWS, default 32) are a multiple of 8.
++// number of rows and number of tokens; 0 when it does not. Off when GGML_IQK_MOE=0; an expert
++// with fewer tokens than GGML_IQK_MOE_MIN_ROWS (default 1: every expert, generation included)
++// stays on the generic path. The rows per item (GGML_IQK_MOE_CHUNK_ROWS, default 32) are a
++// multiple of 8.
 +int ggml_iqk_moe_chunk_rows(int type, int64_t ne00, int64_t nrows, int64_t n_tokens);
 +
 +// Rows [row_start, row_end) of one expert times its n_tokens activation rows; both are multiples
