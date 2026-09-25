@@ -75,6 +75,8 @@ class RunService : Service() {
     private val telemetry = TelemetryParser()
     // Last throttled screen update of a research generation (telemetry panel, streamed text).
     @Volatile private var lastUiMs = 0L
+    // Prompt-reading rate of the last long prompt (tokens/s); seeds the progress estimate.
+    @Volatile private var lastPrefillTps = 11.0
     @Volatile private var lastTextMs = 0L
     /** True at most once per UI_FRAME_MS: whether a streamed research token should reach the screen. */
     private fun textFrameDue(): Boolean {
@@ -383,12 +385,15 @@ class RunService : Service() {
                 main.removeCallbacks(idleUnload)
                 RunBus.update {
                     it.copy(state = EngineState.GENERATING, telemetry = telemetry.current.copy(),
-                        answer = "", reasoning = "", summary = "", error = null)
+                        answer = "", reasoning = "", summary = "", error = null, prefill = null)
                 }
                 // (a research run words its own notification, per phase)
                 if (inflight == null) main.post { notify("Generating…") }
             }
+            t.startsWith("BMOE_PREFILL ") -> onPrefill(t)
             telemetry.onLine(t) -> {
+                // the first token ends the prompt reading
+                if (RunBus.state.value.prefill != null) RunBus.update { it.copy(prefill = null) }
                 val call = inflight
                 if (call != null) {
                     // A research generation: the telemetry panel stays live, but the text belongs
@@ -418,7 +423,29 @@ class RunService : Service() {
         }
     }
 
+    /**
+     * BMOE_PREFILL {"id","done","total"}: the engine read `done` of `total` new prompt tokens. The
+     * rate starts from the last long prompt's and is re-measured as the chunks come in.
+     */
+    private fun onPrefill(line: String) {
+        val done = Regex(""""done":(\d+)""").find(line)?.groupValues?.get(1)?.toIntOrNull() ?: return
+        val total = Regex(""""total":(\d+)""").find(line)?.groupValues?.get(1)?.toIntOrNull() ?: return
+        val now = SystemClock.elapsedRealtime()
+        RunBus.update { st ->
+            val prev = st.prefill
+            val p = if (prev == null || done == 0 || total != prev.total) {
+                Prefill(done, total, now, now, lastPrefillTps)
+            } else {
+                val secs = (now - prev.startedMs) / 1000.0
+                val measured = if (secs > 3 && done > 0) done / secs else prev.tokensPerSecond
+                prev.copy(done = done, updatedMs = now, tokensPerSecond = measured)
+            }
+            st.copy(prefill = if (done >= total) null else p)
+        }
+    }
+
     private fun onDone(json: String) {
+        RunBus.update { if (it.prefill != null) it.copy(prefill = null) else it }
         // Set when this generation belongs to the research pipeline: it gets the result, and the
         // chat transcript, the READY state and the idle timer are left alone (the run goes on).
         val call = inflight
@@ -441,6 +468,8 @@ class RunService : Service() {
             val avgIoMs = o.optDouble("io_s_tok", -0.001) * 1000.0
             val avgStallMs = o.optDouble("stall_s_tok", -0.001) * 1000.0
             val prefillTps = o.optDouble("prefill_tps", -1.0)
+            // a long prompt's reading rate seeds the next prompt's progress estimate
+            if (prefillTps > 1.0 && nPrompt >= 300) lastPrefillTps = prefillTps
             val loadS = o.optDouble("load_s", -1.0)
             val readMib = o.optDouble("read_mib", -1.0)
             val cacheResidentMib = o.optDouble("cache_resident_mib", -1.0)
@@ -618,6 +647,7 @@ class RunService : Service() {
     }
 
     private fun onError(json: String) {
+        RunBus.update { if (it.prefill != null) it.copy(prefill = null) else it }
         val fatal = runCatching { JSONObject(json).optBoolean("fatal", true) }.getOrDefault(true)
         val msg = runCatching { JSONObject(json).optString("msg") }.getOrDefault("engine error")
         // A research generation fails its run with the engine's message (see startResearch).

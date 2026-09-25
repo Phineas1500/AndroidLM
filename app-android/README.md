@@ -22,8 +22,12 @@ instead of a plain chat turn. It is a port of `scripts/rag.py` (`--mode auto`):
    **Answer first**: answer from the model's own knowledge straight away, then search and append
    a short **Source check** of that draft against the passages.
 
-The screen shows the phase, the planned articles, the route and why, the streamed answer, the
-source check, and the numbered sources (tap one to read the passage the model was given).
+The screen shows the question, how it was answered (the route and why, the planned articles),
+the numbered sources (tap one to read the passage the model was given), the streamed answer and
+the source check, whose citations like [1] open the cited passage. While the engine reads a long
+prompt, a progress bar shows the tokens read and the time left (the engine reports each chunk,
+patch 0005); while it writes, the speed. Engine settings, the model file, live telemetry and the
+optional "Unload model now" sit under Details.
 
 Code: the pipeline and the retrieval library are the pure-JVM module `research/`
 (`ResearchPipeline`, `Corpus`, `Planner`, `Prompts`), unit-tested on the JVM against the Python

@@ -5,7 +5,11 @@ plugins {
 
 // Short git SHA of the build, injected into BuildConfig so the running APK is identifiable
 // (debug installs share a versionCode, so this is the only reliable "which build am I on").
+// A build from a copy of the sources outside git (a build machine synced with rsync) passes it
+// in: -PgitSha=<sha> or ANDROIDLM_GIT_SHA.
 def gitSha = {
+    def given = project.findProperty('gitSha') ?: System.getenv('ANDROIDLM_GIT_SHA')
+    if (given) return given.toString()
     try {
         def out = new ByteArrayOutputStream()
         exec {

@@ -45,6 +45,20 @@ data class ResearchUi(
     val running get() = phase != ResearchPhase.DONE && phase != ResearchPhase.CANCELLED && phase != ResearchPhase.FAILED
 }
 
+/**
+ * Prompt reading in progress: [done] of [total] new prompt tokens as of [updatedMs]
+ * (SystemClock.elapsedRealtime), read at about [tokensPerSecond]. The engine reports once per
+ * chunk (512 tokens), so the screen interpolates between reports at that rate.
+ */
+data class Prefill(val done: Int, val total: Int, val startedMs: Long, val updatedMs: Long, val tokensPerSecond: Double) {
+    /** Estimated tokens read by [nowMs]. */
+    fun estimate(nowMs: Long): Double =
+        minOf(total.toDouble(), done + (nowMs - updatedMs) / 1000.0 * tokensPerSecond)
+
+    /** Estimated seconds left at [nowMs]. */
+    fun secondsLeft(nowMs: Long): Double = maxOf(0.0, (total - estimate(nowMs)) / tokensPerSecond)
+}
+
 /** Immutable snapshot of the session + current generation, observed by the Compose UI. */
 data class UiState(
     val state: EngineState = EngineState.IDLE,
@@ -69,6 +83,8 @@ data class UiState(
     val streaming: Boolean = true,  // is the loaded session using the MoE streamer (vs mmap baseline)?
     // AndroidLM research mode: the run in progress or the last one finished; null in plain chat.
     val research: ResearchUi? = null,
+    // The engine is reading a prompt (BMOE_PREFILL), until its first token; null otherwise.
+    val prefill: Prefill? = null,
 ) {
     val loading get() = state == EngineState.LOADING
     val generating get() = state == EngineState.GENERATING

@@ -1,0 +1,50 @@
+diff --git a/core/include/bmoe/session.h b/core/include/bmoe/session.h
+index 1587d80..6d7a6bb 100644
+--- a/core/include/bmoe/session.h
++++ b/core/include/bmoe/session.h
+@@ -94,6 +94,10 @@ struct GenerateRequest {
+     // default output, and every benchmark run) does not, and should turn it off. Default on so an
+     // embedder that does not know about this flag keeps the old behaviour.
+     bool render_text = true;
++    // Called before each prompt chunk is read and once when the prompt is in: `done` of `total`
++    // new prompt tokens (a reused prefix is not counted). The prompt of a research answer takes
++    // a minute or more to read on a phone, and a UI needs something to show for it.
++    std::function<void(int done, int total)> on_prefill;
+ };
+ 
+ // Teacher-forced quality measurement. The text is fixed, so every cell scores the SAME token
+diff --git a/core/src/engine/session.cpp b/core/src/engine/session.cpp
+index 26957aa..f48a31d 100644
+--- a/core/src/engine/session.cpp
++++ b/core/src/engine/session.cpp
+@@ -1610,6 +1610,7 @@ RunResult Session::generate(const GenerateRequest & req,
+         } else {
+             pf = llama_batch_get_one(tokens.data() + i, chunk);
+         }
++        if (req.on_prefill) req.on_prefill(i - (int) n_common, n_prompt - (int) n_common);
+         trace_begin(i, chunk, /*phase*/ 0);
+         im.placement.ensure(ctx);
+         if (llama_decode(ctx, pf) != 0) {
+@@ -1628,6 +1629,7 @@ RunResult Session::generate(const GenerateRequest & req,
+         if (mtp_on && !common_speculative_process(im.mtp.get(), pf))
+             return fail("MTP draft context failed to process the prefill batch");
+     }
++    if (req.on_prefill) req.on_prefill(n_prompt - (int) n_common, n_prompt - (int) n_common);
+     // The suffix is now in the KV; record it so the next turn can diff against it.
+     if (chat_on)
+         for (int i = (int) n_common; i < n_prompt; ++i)
+diff --git a/cli/main.cpp b/cli/main.cpp
+index 897fc21..da00304 100644
+--- a/cli/main.cpp
++++ b/cli/main.cpp
+@@ -319,6 +319,10 @@ static int run_session_loop(const RunConfig & cfg,
+         req.think = cmd.think;
+         req.clear_kv = cmd.clear_kv;
+         req.render_text = true; // the line protocol carries the parsed answer on every token
++        req.on_prefill = [&](int done, int total) {
++            std::printf("BMOE_PREFILL {\"id\":%d,\"done\":%d,\"total\":%d}\n", cmd.id, done, total);
++            std::fflush(stdout);
++        };
+ 
+         ProgressDelta pd; // fresh per generation: the first line extends the empty state
+         RunResult r = session->generate(req, [&](const TokenMetrics & m) { emit_progress_line(m, pd); }, sink);

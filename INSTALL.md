@@ -30,9 +30,10 @@ interruption), checks their size and SHA-256 against `assets/manifest.json`, pus
 `/data/local/tmp/bmoe` on the phone, makes them readable by the app, and installs the APK.
 Pushing 34GB over USB takes roughly 15-40 minutes depending on the cable and port.
 
-Then, on the phone: turn on airplane mode, open AndroidLM, tap Refresh under "Add a model",
-choose the model, leave Research switched on, and ask something. The first question loads the
-model, which takes a while; later questions reuse it.
+Then, on the phone: turn on airplane mode, open AndroidLM (it finds the model and the corpus by
+itself; if it was open during the install, tap Refresh), leave Research switched on, type a
+question and tap Research. The first question loads the model, about 30 s; later questions reuse
+it.
 
 ## Without the script
 

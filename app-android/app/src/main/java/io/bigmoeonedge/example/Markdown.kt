@@ -23,6 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
@@ -42,19 +45,27 @@ import androidx.compose.ui.unit.sp
  * rather than swallowing it.
  */
 @Composable
-fun MarkdownText(text: String, modifier: Modifier = Modifier, fontSize: TextUnit = 15.sp) {
+fun MarkdownText(
+    text: String,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = 15.sp,
+    // Research answers cite their sources as [1], [2]...: with a handler those become tappable.
+    onCitation: ((Int) -> Unit)? = null,
+) {
     val codeBg = MaterialTheme.colorScheme.surfaceVariant
+    val citeColor = MaterialTheme.colorScheme.primary
+    val cite = onCitation?.let { Cite(it, citeColor) }
     val blocks = remember(text) { parseBlocks(text) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         blocks.forEach { block ->
             when (block) {
                 is Block.Heading -> Text(
-                    inline(block.text, codeBg),
+                    inline(block.text, codeBg, cite),
                     fontSize = headingSize(block.level, fontSize),
                     fontWeight = FontWeight.Bold,
                 )
 
-                is Block.Para -> Text(inline(block.text, codeBg), fontSize = fontSize)
+                is Block.Para -> Text(inline(block.text, codeBg, cite), fontSize = fontSize)
 
                 is Block.Item -> Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
@@ -63,7 +74,7 @@ fun MarkdownText(text: String, modifier: Modifier = Modifier, fontSize: TextUnit
                         fontSize = fontSize,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Text(inline(block.text, codeBg), fontSize = fontSize, modifier = Modifier.weight(1f))
+                    Text(inline(block.text, codeBg, cite), fontSize = fontSize, modifier = Modifier.weight(1f))
                 }
 
                 is Block.Quote -> Row(
@@ -75,7 +86,7 @@ fun MarkdownText(text: String, modifier: Modifier = Modifier, fontSize: TextUnit
                             .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(2.dp))
                     )
                     Text(
-                        inline(block.text, codeBg),
+                        inline(block.text, codeBg, cite),
                         fontSize = fontSize,
                         fontStyle = FontStyle.Italic,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -205,14 +216,20 @@ private fun parseBlocks(src: String): List<Block> {
     return out
 }
 
-private fun inline(src: String, codeBg: Color): AnnotatedString = buildAnnotatedString { appendInline(src, codeBg) }
+/** How citations render and what a tap on one does. */
+private class Cite(val onClick: (Int) -> Unit, val color: Color)
+
+private val CITATION = Regex("""\[(\d{1,2})]""")
+
+private fun inline(src: String, codeBg: Color, cite: Cite? = null): AnnotatedString =
+    buildAnnotatedString { appendInline(src, codeBg, cite) }
 
 /**
  * Inline emphasis. Every marker needs a closing partner: an unmatched one is emitted verbatim, so a
  * streaming answer shows its literal `**` for a moment instead of the rest of the text flipping
  * bold. Single `_` is not an italic marker on purpose — it would mangle identifiers like use_mmap.
  */
-private fun AnnotatedString.Builder.appendInline(src: String, codeBg: Color) {
+private fun AnnotatedString.Builder.appendInline(src: String, codeBg: Color, cite: Cite? = null) {
     var i = 0
     while (i < src.length) {
         val c = src[i]
@@ -245,7 +262,7 @@ private fun AnnotatedString.Builder.appendInline(src: String, codeBg: Color) {
                     } else {
                         SpanStyle(fontWeight = FontWeight.Bold)
                     }
-                    withStyle(style) { appendInline(src.substring(i + 2, end), codeBg) }
+                    withStyle(style) { appendInline(src.substring(i + 2, end), codeBg, cite) }
                     i = end + pair.length
                 }
             }
@@ -257,10 +274,22 @@ private fun AnnotatedString.Builder.appendInline(src: String, codeBg: Color) {
                     append(c); i++
                 } else {
                     withStyle(SpanStyle(fontStyle = FontStyle.Italic)) {
-                        appendInline(src.substring(i + 1, end), codeBg)
+                        appendInline(src.substring(i + 1, end), codeBg, cite)
                     }
                     i = end + 1
                 }
+            }
+
+            c == '[' && cite != null && CITATION.matchAt(src, i) != null -> {
+                val m = CITATION.matchAt(src, i)!!
+                val n = m.groupValues[1].toInt()
+                withLink(
+                    LinkAnnotation.Clickable(
+                        tag = "cite$n",
+                        styles = TextLinkStyles(SpanStyle(color = cite.color, fontWeight = FontWeight.SemiBold)),
+                    ) { cite.onClick(n) },
+                ) { append(m.value) }
+                i = m.range.last + 1
             }
 
             c == '[' -> {
@@ -271,7 +300,7 @@ private fun AnnotatedString.Builder.appendInline(src: String, codeBg: Color) {
                     // The target is shown, not opened: the demo has no browser intent and a model
                     // can hallucinate a URL, so the text carries the link and the user decides.
                     withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) {
-                        appendInline(link.groupValues[1], codeBg)
+                        appendInline(link.groupValues[1], codeBg, cite)
                     }
                     i = link.range.last + 1
                 }

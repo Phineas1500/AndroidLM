@@ -91,6 +91,6 @@ adb install -r "$APK"
 
 cat <<EOF
 
-Done. On the phone: turn on airplane mode, open AndroidLM, tap Refresh in "Add a model",
-pick the model, keep Research switched on, and ask a question.
+Done. On the phone: turn on airplane mode, open AndroidLM (it finds the model and the corpus
+by itself), keep Research switched on, type a question and tap Research.
 EOF

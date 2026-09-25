@@ -184,7 +184,7 @@ private fun MainScreen(
     val focusManager = LocalFocusManager.current
     val ui by RunBus.state.collectAsStateWithLifecycle()
 
-    var prompt by rememberSaveable { mutableStateOf("Explain what a mixture-of-experts model is, in two sentences.") }
+    var prompt by rememberSaveable { mutableStateOf("") }
     val listState = rememberLazyListState()
 
     // Item 0 is the controls block; the transcript and the in-flight answer follow it. The live
@@ -217,8 +217,14 @@ private fun MainScreen(
     LaunchedEffect(listState) {
         snapshotFlow { listState.isScrollInProgress }.collect { scrolling -> if (!scrolling) followTail = atBottom }
     }
+    // A new question (a research run, or a chat turn) is where the user wants to look, wherever
+    // they had scrolled to type it: follow its answer from the start.
+    LaunchedEffect(research?.question, research?.runId, ui.transcript.size) {
+        if (research?.running == true || ui.transcript.isNotEmpty()) followTail = true
+    }
     LaunchedEffect(total, ui.answer.length, ui.reasoning.length, followTail,
-        research?.answer?.length, research?.check?.length, research?.phase, research?.sources?.size) {
+        research?.answer?.length, research?.check?.length, research?.phase, research?.sources?.size,
+        ui.prefill?.total, ui.telemetry.step > 0) {
         // A long answer is taller than the viewport, so aligning the item's top would park the view
         // on its beginning; the large offset pins the list to the newest text instead.
         if (followTail && total > 1) runCatching { listState.scrollToItem(total - 1, Int.MAX_VALUE) }
@@ -236,14 +242,14 @@ private fun MainScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text("AndroidLM", fontSize = 22.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                        TextButton(onClick = onOpenMetrics) { Text("Metrics") }
                         TextButton(onClick = onOpenSettings) { Text("Settings") }
                     }
 
+                    val modelNames = remember(models) { friendlyModelNames(models.map { it.name }) }
                     when {
                         scanning -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                            Text("Scanning for MoE models…", fontSize = 14.sp)
+                            Text("Looking for the model…", fontSize = 14.sp)
                         }
                         models.isEmpty() -> {
                             ElevatedCard {
@@ -255,29 +261,32 @@ private fun MainScreen(
                                 )
                             }
                             TextButton(onClick = { requestSharedStorageAccess(context); onRefresh() }) { Text("Refresh") }
+                            // With no model yet, importing one is the first thing to do, so it is shown here.
+                            AddModelSection(models = models, scanning = scanning, loadedSig = ui.sessionSig, onModelReady = onRefresh)
                         }
+                        models.size == 1 -> Text(
+                            "Model: " + modelNames[0] + when {
+                                ui.loading -> " · loading…"
+                                ui.ready || ui.generating -> " · loaded"
+                                else -> ""
+                            },
+                            fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                         else -> LabeledDropdown(
                             label = "Model",
-                            options = models.map { it.name },
+                            options = modelNames,
                             selected = modelIdx,
                             onSelect = onSelectModel,
                         )
                     }
 
-                    // Bring a model into app storage without adb: a local file through the system
-                    // picker. It lands in the app models dir; on completion we re-scan so the
-                    // model appears above. (No catalog, no URL: this app has no network access.)
-                    AddModelSection(
-                        models = models,
-                        scanning = scanning,
-                        loadedSig = ui.sessionSig,
-                        onModelReady = onRefresh,
-                    )
-
                     OutlinedTextField(
                         value = prompt,
                         onValueChange = { prompt = it },
-                        label = { Text("Prompt") },
+                        label = { Text(if (researchOn) "Question" else "Message") },
+                        placeholder = {
+                            Text(if (researchOn) "Ask a research question: history, science, travel, health…" else "Say something")
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 2,
                     )
@@ -311,11 +320,13 @@ private fun MainScreen(
                                     // pipeline starts from an empty KV).
                                     launchResearch(context, models[modelIdx.coerceIn(0, models.size - 1)],
                                         prompt.trim(), settings, ui.sessionSig)
+                                    prompt = "" // the question is shown above its answer
                                 } else if (models.isNotEmpty() && !researchOn) {
                                     // First message of a conversation clears the KV; a follow-up continues it.
                                     launchPrompt(context, models[modelIdx.coerceIn(0, models.size - 1)],
                                         prompt.ifBlank { "The capital of Japan is" }, settings, ui.sessionSig,
                                         clearKv = ui.transcript.isEmpty())
+                                    prompt = ""
                                 }
                             },
                             enabled = !ui.busy && models.isNotEmpty() && (!researchOn || prompt.isNotBlank()),
@@ -333,92 +344,113 @@ private fun MainScreen(
                         ) { Text("Stop") }
                     }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        // Start a new conversation: the next Send clears the KV. Keeps the model loaded.
+                    // Start over: clears the screen (and, in chat, the conversation). Keeps the model loaded.
+                    if ((ui.transcript.isNotEmpty() || research != null) && !ui.busy) {
                         TextButton(
                             onClick = { RunBus.update { it.copy(transcript = emptyList(), answer = "", summary = "", error = null, research = null) } },
-                            enabled = (ui.transcript.isNotEmpty() || research != null) && !ui.busy,
-                        ) { Text("New chat") }
-
-                        // The session keeps the model resident (and the cache warm) between prompts. Free it
-                        // explicitly, or let the service auto-unload after an idle timeout.
-                        if (ui.ready || ui.loading) {
-                            TextButton(onClick = {
-                                context.startService(
-                                    Intent(context, RunService::class.java).setAction(RunService.ACTION_SHUTDOWN)
-                                )
-                            }) { Text("Unload model") }
-                        }
-                    }
-
-                    // A quick reminder of the active config (full controls in Settings), with the
-                    // rest of it one tap away: the line above names the levers that change the kind
-                    // of run, but "what exactly was this answer produced under" is a question the
-                    // main screen has to be able to answer too, not only a saved CSV (#136).
-                    // Remembered, not recomputed: this item redraws on every streamed token (it holds
-                    // the telemetry card), and the configuration it describes changes only when the
-                    // user changes a setting.
-                    val summary = remember(settings) { configSummary(settings) }
-                    Text(summary, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    var showConfig by rememberSaveable { mutableStateOf(false) }
-                    val flags = remember(settings, models, modelIdx) {
-                        models.getOrNull(modelIdx.coerceIn(0, (models.size - 1).coerceAtLeast(0)))
-                            ?.let { configFlags(settings, it.absolutePath, settings.metricsCsv) }
-                            .orEmpty()
-                    }
-                    if (flags.isNotEmpty()) {
-                        TextButton(
-                            onClick = { showConfig = !showConfig },
                             contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
-                        ) {
-                            Text(
-                                if (showConfig) "Hide full configuration"
-                                else "Full configuration (${flags.size} flags)",
-                                fontSize = 12.sp,
-                            )
-                        }
-                        if (showConfig) {
-                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                // The engine's own flag names rather than prose labels: this is the
-                                // command line the session runs on, and a name that matches the CLI
-                                // is what makes a screenshot of it reproducible off-device.
-                                flags.forEach { (flag, value) ->
-                                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                        Text(
-                                            flag, fontSize = 11.sp, fontFamily = FontFamily.Monospace,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            modifier = Modifier.weight(1f),
-                                        )
-                                        Text(value, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                                    }
-                                }
-                            }
-                        }
+                        ) { Text(if (researchOn) "Clear the answer" else "New chat") }
                     }
 
-                    if (ui.loading) {
+                    // (A research run shows its own loading and reading status.)
+                    if (ui.loading && research == null) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                            Text("Loading model…", fontSize = 14.sp)
+                            Text("Loading the model…", fontSize = 14.sp)
                         }
                     }
                     // After the model is loaded, the prompt is prefilled before the first token streams
                     // (no BMOE_PROGRESS yet). Signal that phase so a slow prefill does not look stuck.
-                    // (A research run says so in its own phase line.)
                     if (ui.generating && ui.telemetry.step == 0 && research?.running != true) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                            Text("Prefilling prompt…", fontSize = 14.sp)
+                            Text("Reading the prompt…", fontSize = 14.sp)
                         }
                     }
 
-                    TelemetryCard(ui, settings.threads, settings.overlap, settings.ioThreads)
+                    // Everything about the engine, for the curious and for reproducing a run: which
+                    // file, the flags the session runs with, live speed and memory telemetry, the
+                    // per-run metrics, and unloading the model. Collapsed by default.
+                    var showDetails by rememberSaveable { mutableStateOf(false) }
+                    TextButton(
+                        onClick = { showDetails = !showDetails },
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
+                    ) {
+                        Text(if (showDetails) "Hide details" else "Details: model file, engine settings, speed", fontSize = 12.sp)
+                    }
+                    if (showDetails) {
+                        models.getOrNull(modelIdx.coerceIn(0, (models.size - 1).coerceAtLeast(0)))?.let {
+                            Text(it.name, fontSize = 12.sp, fontFamily = FontFamily.Monospace,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        if (corpus != null) Hint("Corpus: " + corpus.label())
+                        if (models.isNotEmpty()) {
+                            // Bring a model into app storage without adb: a local file through the system
+                            // picker (no catalog, no URL: this app has no network access).
+                            AddModelSection(models = models, scanning = scanning, loadedSig = ui.sessionSig, onModelReady = onRefresh)
+                        }
+
+                        // A reminder of the active config (full controls in Settings), with the exact
+                        // engine flags one tap away, so a screenshot of a run is reproducible off-device.
+                        // Remembered, not recomputed: this item redraws while a run streams.
+                        val summary = remember(settings) { configSummary(settings) }
+                        Text(summary, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        var showConfig by rememberSaveable { mutableStateOf(false) }
+                        val flags = remember(settings, models, modelIdx) {
+                            models.getOrNull(modelIdx.coerceIn(0, (models.size - 1).coerceAtLeast(0)))
+                                ?.let { configFlags(settings, it.absolutePath, settings.metricsCsv) }
+                                .orEmpty()
+                        }
+                        if (flags.isNotEmpty()) {
+                            TextButton(
+                                onClick = { showConfig = !showConfig },
+                                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
+                            ) {
+                                Text(
+                                    if (showConfig) "Hide engine flags" else "Engine flags (${flags.size})",
+                                    fontSize = 12.sp,
+                                )
+                            }
+                            if (showConfig) {
+                                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    flags.forEach { (flag, value) ->
+                                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                            Text(
+                                                flag, fontSize = 11.sp, fontFamily = FontFamily.Monospace,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.weight(1f),
+                                            )
+                                            Text(value, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        TelemetryCard(ui, settings.threads, settings.overlap, settings.ioThreads)
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                            TextButton(onClick = onOpenMetrics) { Text("Metrics") }
+                            // The model stays loaded between questions and unloads itself after 10 idle
+                            // minutes; unloading now is optional and only frees the memory sooner.
+                            if (ui.ready) {
+                                TextButton(onClick = {
+                                    context.startService(
+                                        Intent(context, RunService::class.java).setAction(RunService.ACTION_SHUTDOWN)
+                                    )
+                                }) { Text("Unload model now (optional)") }
+                            }
+                        }
+                        if (ui.ready) {
+                            Hint("The model stays loaded between questions and unloads by itself after 10 idle minutes. Unloading now frees about 8 GB; the next question reloads it in about 30 s.")
+                        }
+                    }
                 }
             }
 
@@ -435,8 +467,8 @@ private fun MainScreen(
 
             if (research != null) {
                 item(key = "research") {
-                    ResearchView(research, loading = ui.loading,
-                        prefilling = ui.generating && ui.telemetry.step == 0)
+                    ResearchView(research, loading = ui.loading, prefill = ui.prefill,
+                        telemetry = ui.telemetry, generating = ui.generating)
                 }
             }
         }
