@@ -14,17 +14,38 @@ BUILD=${3:-build-android}
 ARM_ARCH=${ARM_ARCH:-armv8.2-a+dotprod+fp16}
 API=29
 
-# Our patches to the engine (see patches/*.patch); applying is idempotent.
-for patch in "$(dirname "$0")"/../patches/*.patch; do
-  [ -f "$patch" ] || continue
-  if git -C "$ROOT" apply --check "$patch" 2>/dev/null; then
-    git -C "$ROOT" apply "$patch" && echo "applied $(basename "$patch")"
-  elif git -C "$ROOT" apply --reverse --check "$patch" 2>/dev/null; then
-    echo "already applied: $(basename "$patch")"
-  else
-    echo "patch does not apply: $patch" >&2; exit 1
+# Our patches to the engine (patches/*.patch) and to its llama.cpp submodule
+# (patches/llama.cpp/*.patch, applied inside third_party/llama.cpp), in name order. Applying is
+# idempotent: a series already in the tree is recognised by reverse-applying it, last patch
+# first, to a scratch copy of the files it touches (patches that edit the same file can only be
+# checked in sequence, not one at a time).
+series_applied() {  # <repo dir> <patch>...
+  local dir=$1 tmp f i ok=0; shift
+  local -a ps=("$@")
+  tmp=$(mktemp -d)
+  for f in $(sed -n 's|^diff --git a/\([^ ]*\) b/.*|\1|p' "${ps[@]}" | sort -u); do
+    if [ -f "$dir/$f" ]; then mkdir -p "$tmp/$(dirname "$f")"; cp "$dir/$f" "$tmp/$f"; fi
+  done
+  for ((i = ${#ps[@]} - 1; i >= 0; i--)); do
+    (cd "$tmp" && git apply --reverse "${ps[i]}" 2>/dev/null) || { ok=1; break; }
+  done
+  rm -r "$tmp"
+  return $ok
+}
+apply_series() {  # <repo dir> <patch>...
+  local dir=$1 p; shift
+  [ -f "${1:-}" ] || return 0
+  if series_applied "$dir" "$@"; then
+    echo "already applied: $(basename -a "$@" | tr '\n' ' ')"
+    return 0
   fi
-done
+  for p in "$@"; do
+    if git -C "$dir" apply "$p"; then echo "applied $(basename "$p")"; else echo "patch does not apply: $p" >&2; exit 1; fi
+  done
+}
+PATCHES=$(cd "$(dirname "$0")/../patches" && pwd)
+apply_series "$ROOT" "$PATCHES"/*.patch
+apply_series "$ROOT/third_party/llama.cpp" "$PATCHES"/llama.cpp/*.patch
 
 NDK=$(ls -d "$ANDROID_HOME"/ndk/* | sort -V | tail -1)
 CMAKE_DIR=$(ls -d "$ANDROID_HOME"/cmake/* | sort -V | tail -1)/bin

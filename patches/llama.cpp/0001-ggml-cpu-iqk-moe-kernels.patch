@@ -1,0 +1,887 @@
+diff --git a/ggml/src/ggml-cpu/CMakeLists.txt b/ggml/src/ggml-cpu/CMakeLists.txt
+index 3c6343f..202727b 100644
+--- a/ggml/src/ggml-cpu/CMakeLists.txt
++++ b/ggml/src/ggml-cpu/CMakeLists.txt
+@@ -31,6 +31,8 @@ function(ggml_add_cpu_backend_variant_impl tag_name)
+         ggml-cpu/ggml-cpu.cpp
+         ggml-cpu/repack.cpp
+         ggml-cpu/repack.h
++        ggml-cpu/iqk-moe.cpp
++        ggml-cpu/iqk-moe.h
+         ggml-cpu/hbm.cpp
+         ggml-cpu/hbm.h
+         ggml-cpu/quants.c
+diff --git a/ggml/src/ggml-cpu/ggml-cpu.c b/ggml/src/ggml-cpu/ggml-cpu.c
+index 6c2b929..52d4f46 100644
+--- a/ggml/src/ggml-cpu/ggml-cpu.c
++++ b/ggml/src/ggml-cpu/ggml-cpu.c
+@@ -6,6 +6,7 @@
+ #include "ggml-cpu.h"
+ #include "traits.h"
+ #include "ggml-cpu-impl.h"
++#include "iqk-moe.h"
+ #include "ggml-impl.h"
+ #include "quants.h"
+ #include "ggml-threading.h"
+@@ -1672,6 +1673,21 @@ static void ggml_compute_forward_mul_mat_id(
+         const void * wdata = (src1->type == vec_dot_type) ? src1->data : params->wdata;
+         const size_t row_size = ggml_row_size(vec_dot_type, ne10);
+ 
++        // several tokens: ik_llama.cpp kernels for IQ2_XS / IQ3_XXS (iqk-moe.cpp), all of the
++        // expert's tokens per row chunk, the chunks claimed through the same counter as below
++        const int iqk_rows = src1->type != vec_dot_type ? ggml_iqk_moe_chunk_rows(type, ne00, ne01, cne1) : 0;
++        if (iqk_rows > 0) {
++            atomic_int * iqk_chunk_ctr = (atomic_int *)(atomic_current_chunk + cur_a);
++            const int64_t iqk_nchunk = (ne01 + iqk_rows - 1)/iqk_rows;
++            for (int64_t chunk = ith; chunk < iqk_nchunk;
++                 chunk = atomic_fetch_add_explicit(iqk_chunk_ctr, 1, memory_order_relaxed)) {
++                const int64_t ir0 = chunk*iqk_rows;
++                ggml_iqk_moe_mul_mat(type, ir0, MIN(ir0 + iqk_rows, ne01), ne00, ne11, src0_cur, nb01, wdata, row_size,
++                                     (float *) dst->data, nb1, nb2, matrix_rows + cur_a*ids->ne[0]*ids->ne[1], cne1);
++            }
++            continue;
++        }
++
+         const int64_t nr0 = ne01;
+         const int64_t nr1 = cne1;
+ 
+diff --git a/ggml/src/ggml-cpu/iqk-moe.cpp b/ggml/src/ggml-cpu/iqk-moe.cpp
+new file mode 100644
+index 0000000..0116e7b
+--- /dev/null
++++ b/ggml/src/ggml-cpu/iqk-moe.cpp
+@@ -0,0 +1,676 @@
++// Batched expert matmuls for IQ2_XS and IQ3_XXS weights on ARM with dot-product instructions.
++//
++// The kernels are ik_llama.cpp's (ggml/src/iqk: iqk_common.h, iqk_gemm_iquants.cpp,
++// iqk_gemm_kquants.cpp, iqk_mul_mat.cpp at 20f7a72), cut down to the aarch64 code for these two
++// types and adapted to this tree's block_q8_K (ik's has an extra field; these kernels read only d
++// and qs, so they run on the activations ggml_compute_forward_mul_mat_id already quantized).
++//
++// Copyright (C) 2024-2025 Iwan Kawrakow
++// MIT license
++// SPDX-License-Identifier: MIT
++//
++// Per expert, for n tokens routed to it, the rows are handed out to the threads in chunks (as
++// ggml_compute_forward_mul_mat_id does for its own path, so a fast core or a thread the scheduler
++// let run longer takes more of them), and for each chunk:
++//   n >= 32: the rows are converted 32 at a time to 8-row interleaved Q8_K_R8 and multiplied by
++//            the tokens with vdotq_laneq_s32;
++//   n <  32: each row is decoded once and multiplied by up to 8 tokens at a time.
++// The generic path decodes each row once per token.
++
++#define GGML_COMMON_IMPL_CPP
++#define GGML_COMMON_DECL_CPP
++#include "ggml-common.h"
++
++#include "ggml-impl.h"
++#include "ggml-cpu-impl.h"
++#include "iqk-moe.h"
++
++#include <algorithm>
++#include <array>
++#include <cassert>
++#include <cstdlib>
++#include <cstring>
++#include <vector>
++
++#if defined(__aarch64__) && defined(__ARM_NEON) && defined(__ARM_FEATURE_DOTPROD)
++
++#include <arm_neon.h>
++
++namespace {
++
++struct mmid_row_mapping {
++    int32_t i1;
++    int32_t i2;
++};
++
++struct DataInfo {
++    float       * s;
++    const char  * cy;
++    size_t        bs;
++    size_t        by;
++    int           cur_y = 0;
++    int           ne11;
++    const mmid_row_mapping * row_mapping = nullptr;
++    size_t        bs2 = 0;
++
++    inline const char * src1_row(int iy) const {
++        if (!row_mapping) return cy + (cur_y + iy)*by;
++        int i11 = row_mapping[cur_y + iy].i1 % ne11;
++        int i12 = row_mapping[cur_y + iy].i2;
++        return cy + (i11 + i12*ne11)*by;
++    }
++    inline void store(int ix, int iy, float result) const {
++        *(dst_row(iy) + ix) = result;
++    }
++    inline void store(int ix, int iy, float32x4_t result) const {
++        vst1q_f32(dst_row(iy) + ix, result);
++    }
++    inline float * dst_row(int iy) const {
++        if (!row_mapping) return s + (cur_y + iy)*bs;
++        int i12 = row_mapping[cur_y + iy].i2;
++        int i1  = row_mapping[cur_y + iy].i1;
++        int i2  = i12;
++        return s + i1*bs + i2*bs2;
++    }
++};
++
++typedef void (*mul_mat_t)(int n, const void * vx, size_t bx, const DataInfo& info, int nrc_x);
++
++#define IQK_MAX_NY 8
++
++#define IQK_SET_MUL_MAT_FUNCTIONS_T(kernel, Dequantizer, funcs) \
++            funcs[0] = kernel<Dequantizer, 1>;\
++            funcs[1] = kernel<Dequantizer, 2>;\
++            funcs[2] = kernel<Dequantizer, 3>;\
++            funcs[3] = kernel<Dequantizer, 4>;\
++            funcs[4] = kernel<Dequantizer, 5>;\
++            funcs[5] = kernel<Dequantizer, 6>;\
++            funcs[6] = kernel<Dequantizer, 7>;\
++            funcs[7] = kernel<Dequantizer, 8>;\
++
++#define IQK_SET_MUL_MAT_FUNCTIONS(kernel, funcs) \
++            funcs[0] = kernel<1>;\
++            funcs[1] = kernel<2>;\
++            funcs[2] = kernel<3>;\
++            funcs[3] = kernel<4>;\
++            funcs[4] = kernel<5>;\
++            funcs[5] = kernel<6>;\
++            funcs[6] = kernel<7>;\
++            funcs[7] = kernel<8>;\
++
++static const uint64_t keven_signs[128] = {
++    0x0101010101010101, 0xff010101010101ff, 0xff0101010101ff01, 0x010101010101ffff,
++    0xff01010101ff0101, 0x0101010101ff01ff, 0x0101010101ffff01, 0xff01010101ffffff,
++    0xff010101ff010101, 0x01010101ff0101ff, 0x01010101ff01ff01, 0xff010101ff01ffff,
++    0x01010101ffff0101, 0xff010101ffff01ff, 0xff010101ffffff01, 0x01010101ffffffff,
++    0xff0101ff01010101, 0x010101ff010101ff, 0x010101ff0101ff01, 0xff0101ff0101ffff,
++    0x010101ff01ff0101, 0xff0101ff01ff01ff, 0xff0101ff01ffff01, 0x010101ff01ffffff,
++    0x010101ffff010101, 0xff0101ffff0101ff, 0xff0101ffff01ff01, 0x010101ffff01ffff,
++    0xff0101ffffff0101, 0x010101ffffff01ff, 0x010101ffffffff01, 0xff0101ffffffffff,
++    0xff01ff0101010101, 0x0101ff01010101ff, 0x0101ff010101ff01, 0xff01ff010101ffff,
++    0x0101ff0101ff0101, 0xff01ff0101ff01ff, 0xff01ff0101ffff01, 0x0101ff0101ffffff,
++    0x0101ff01ff010101, 0xff01ff01ff0101ff, 0xff01ff01ff01ff01, 0x0101ff01ff01ffff,
++    0xff01ff01ffff0101, 0x0101ff01ffff01ff, 0x0101ff01ffffff01, 0xff01ff01ffffffff,
++    0x0101ffff01010101, 0xff01ffff010101ff, 0xff01ffff0101ff01, 0x0101ffff0101ffff,
++    0xff01ffff01ff0101, 0x0101ffff01ff01ff, 0x0101ffff01ffff01, 0xff01ffff01ffffff,
++    0xff01ffffff010101, 0x0101ffffff0101ff, 0x0101ffffff01ff01, 0xff01ffffff01ffff,
++    0x0101ffffffff0101, 0xff01ffffffff01ff, 0xff01ffffffffff01, 0x0101ffffffffffff,
++    0xffff010101010101, 0x01ff0101010101ff, 0x01ff01010101ff01, 0xffff01010101ffff,
++    0x01ff010101ff0101, 0xffff010101ff01ff, 0xffff010101ffff01, 0x01ff010101ffffff,
++    0x01ff0101ff010101, 0xffff0101ff0101ff, 0xffff0101ff01ff01, 0x01ff0101ff01ffff,
++    0xffff0101ffff0101, 0x01ff0101ffff01ff, 0x01ff0101ffffff01, 0xffff0101ffffffff,
++    0x01ff01ff01010101, 0xffff01ff010101ff, 0xffff01ff0101ff01, 0x01ff01ff0101ffff,
++    0xffff01ff01ff0101, 0x01ff01ff01ff01ff, 0x01ff01ff01ffff01, 0xffff01ff01ffffff,
++    0xffff01ffff010101, 0x01ff01ffff0101ff, 0x01ff01ffff01ff01, 0xffff01ffff01ffff,
++    0x01ff01ffffff0101, 0xffff01ffffff01ff, 0xffff01ffffffff01, 0x01ff01ffffffffff,
++    0x01ffff0101010101, 0xffffff01010101ff, 0xffffff010101ff01, 0x01ffff010101ffff,
++    0xffffff0101ff0101, 0x01ffff0101ff01ff, 0x01ffff0101ffff01, 0xffffff0101ffffff,
++    0xffffff01ff010101, 0x01ffff01ff0101ff, 0x01ffff01ff01ff01, 0xffffff01ff01ffff,
++    0x01ffff01ffff0101, 0xffffff01ffff01ff, 0xffffff01ffffff01, 0x01ffff01ffffffff,
++    0xffffffff01010101, 0x01ffffff010101ff, 0x01ffffff0101ff01, 0xffffffff0101ffff,
++    0x01ffffff01ff0101, 0xffffffff01ff01ff, 0xffffffff01ffff01, 0x01ffffff01ffffff,
++    0x01ffffffff010101, 0xffffffffff0101ff, 0xffffffffff01ff01, 0x01ffffffff01ffff,
++    0xffffffffffff0101, 0x01ffffffffff01ff, 0x01ffffffffffff01, 0xffffffffffffffff,
++};
++
++template <int nrc, typename block_q8 = block_q8_K> struct Q8 {
++
++    constexpr static int nrc_y = nrc;
++
++    Q8(const DataInfo& info) {
++        for (int iy = 0; iy < nrc_y; ++iy) y[iy] = (const block_q8 *)info.src1_row(iy);
++    }
++
++    inline int8x16x2_t load_quants(int iy, int i, int j) const { return vld1q_s8_x2(y[iy][i].qs + 32*j); }
++    inline float scale(int iy, int i) const { return y[iy][i].d; }
++
++    const block_q8 * y[nrc_y];
++};
++
++template <typename block_q>
++struct BaseDequantizer {
++    BaseDequantizer(const void * vx, size_t bx, int nrc) : vx(vx), x(nullptr), bx(bx), nrc(nrc) {}
++    inline void new_row(int ix) {
++        x = (const block_q *)((const char *)vx + ix*bx);
++    }
++    const void * vx;
++    const block_q * x;
++    const size_t bx;
++    const int nrc;
++    float d;
++};
++
++template <typename Q8>
++static inline void compute_8_blocks(const uint8x16x4_t& qx_1, const uint8x16x4_t& qx_2, const Q8& q8,
++        const int32x4x2_t& scales, int iy, int i, int j, int32x4_t& sumi) {
++    auto mzero = vdupq_n_s32(0);
++    auto q8b_1 = q8.load_quants(iy, i, 4*j+0);
++    auto p1 = ggml_vdotq_s32(ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_1.val[0]), q8b_1.val[0]),
++            vreinterpretq_s8_u8(qx_1.val[1]), q8b_1.val[1]); // block 1
++    auto q8b_2 = q8.load_quants(iy, i, 4*j+1);
++    auto p2 = ggml_vdotq_s32(ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_1.val[2]), q8b_2.val[0]),
++            vreinterpretq_s8_u8(qx_1.val[3]), q8b_2.val[1]); // block 2
++    auto p12 = vpaddq_s32(p1, p2);
++
++    auto q8b_3 = q8.load_quants(iy, i, 4*j+2);
++    auto p3 = ggml_vdotq_s32(ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_2.val[0]), q8b_3.val[0]),
++            vreinterpretq_s8_u8(qx_2.val[1]), q8b_3.val[1]); // block 1
++    auto q8b_4 = q8.load_quants(iy, i, 4*j+3);
++    auto p4 = ggml_vdotq_s32(ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_2.val[2]), q8b_4.val[0]),
++            vreinterpretq_s8_u8(qx_2.val[3]), q8b_4.val[1]); // block 2
++    auto p34 = vpaddq_s32(p3, p4);
++
++    auto pall = vpaddq_s32(p12, p34);
++    sumi = vmlaq_s32(sumi, scales.val[j], pall);
++}
++
++template <typename Q8>
++static inline void compute_16_blocks(const uint8x16x4_t& qx_1, const uint8x16x4_t& qx_2, const Q8& q8,
++        const int32x4x4_t& scales, int iy, int i, int j, int32x4_t& sumi) {
++
++    auto mzero = vdupq_n_s32(0);
++    auto q8b_1 = q8.load_quants(iy, i, 4*j+0);
++    auto p1 = vpaddq_s32(ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_1.val[0]), q8b_1.val[0]),
++                         ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_1.val[1]), q8b_1.val[1])); // blocks 0, 0, 1, 1,
++    auto q8b_2 = q8.load_quants(iy, i, 4*j+1);
++    auto p2 = vpaddq_s32(ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_1.val[2]), q8b_2.val[0]),
++                         ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_1.val[3]), q8b_2.val[1])); // blocks 3, 3, 4, 4,
++    auto p12 = vpaddq_s32(p1, p2); // blocks 0, 1, 2, 3
++    sumi = vmlaq_s32(sumi, scales.val[2*j+0], p12);
++
++    auto q8b_3 = q8.load_quants(iy, i, 4*j+2);
++    auto p3 = vpaddq_s32(ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_2.val[0]), q8b_3.val[0]),
++                         ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_2.val[1]), q8b_3.val[1])); // block 4, 4, 5, 5,
++    auto q8b_4 = q8.load_quants(iy, i, 4*j+3);
++    auto p4 = vpaddq_s32(ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_2.val[2]), q8b_4.val[0]),
++                         ggml_vdotq_s32(mzero, vreinterpretq_s8_u8(qx_2.val[3]), q8b_4.val[1])); // block 6, 6, 7, 7,
++    auto p34 = vpaddq_s32(p3, p4); // blocks 4, 5, 6, 7
++    sumi = vmlaq_s32(sumi, scales.val[2*j+1], p34);
++}
++
++template <typename Dequantizer, int nrc_y>
++static void mul_mat_qX_K_q8_K_T(int n, const void * vx, size_t bx, const DataInfo& info, int nrc_x) {
++    assert(n % QK_K == 0);
++    const int nb = n / QK_K;
++
++    Q8<nrc_y, block_q8_K> q8(info);
++
++    Dequantizer deq(vx, bx, nrc_y);
++
++    for (int ix = 0; ix < nrc_x; ++ix) {
++
++        deq.new_row(ix);
++
++        float32x4_t acc[nrc_y];
++        for (int iy = 0; iy < nrc_y; ++iy) acc[iy] = vdupq_n_f32(0.f);
++
++        for (int i = 0; i < nb; ++i) {
++
++            int32x4_t sumi[nrc_y];
++            for (int iy = 0; iy < nrc_y; ++iy) sumi[iy] = vdupq_n_s32(0);
++
++            if constexpr (Dequantizer::num_blocks() == 8) {
++                auto scales = deq.new_block(i, q8, acc);
++                deq.prepare(i, 0);
++                for (int iy = 0; iy < nrc_y; ++iy) compute_8_blocks(deq.bits.b1, deq.bits.b2, q8, scales, iy, i, 0, sumi[iy]);
++                deq.prepare(i, 1);
++                for (int iy = 0; iy < nrc_y; ++iy) compute_8_blocks(deq.bits.b1, deq.bits.b2, q8, scales, iy, i, 1, sumi[iy]);
++            }
++            else if constexpr (Dequantizer::num_blocks() == 16) {
++                auto scales = deq.new_block(i, q8, acc);
++                deq.prepare(i, 0);
++                for (int iy = 0; iy < nrc_y; ++iy) compute_16_blocks(deq.bits.b1, deq.bits.b2, q8, scales, iy, i, 0, sumi[iy]);
++                deq.prepare(i, 1);
++                for (int iy = 0; iy < nrc_y; ++iy) compute_16_blocks(deq.bits.b1, deq.bits.b2, q8, scales, iy, i, 1, sumi[iy]);
++            }
++
++            for (int iy = 0; iy < nrc_y; ++iy) {
++                acc[iy] = vmlaq_f32(acc[iy], vcvtq_f32_s32(sumi[iy]), vdupq_n_f32(deq.d*q8.scale(iy, i)));
++            }
++        }
++
++        for (int iy = 0; iy < nrc_y; ++iy) {
++            info.store(ix, iy, vaddvq_f32(acc[iy]));
++        }
++    }
++}
++
++// ---- iqk_gemm_iquants.cpp (aarch64): IQ2_XS and IQ3_XXS
++
++inline int32x4x4_t make_wider(const int16x8x2_t& scales16) {
++    int32x4x4_t scales = {
++        vmovl_s16(vget_low_s16 (scales16.val[0])),
++        vmovl_s16(vget_high_s16(scales16.val[0])),
++        vmovl_s16(vget_low_s16 (scales16.val[1])),
++        vmovl_s16(vget_high_s16(scales16.val[1])),
++    };
++    return scales;
++}
++
++struct SimpleBits {
++    uint8x16x4_t b1;
++    uint8x16x4_t b2;
++};
++
++inline int32x4x2_t prepare_scales_8(const uint32x4_t& v1, const uint32x4_t& v2) {
++    int32x4x2_t scales;
++    scales.val[0] = vreinterpretq_s32_u32(vorrq_u32(vshlq_n_u32(vshrq_n_u32(v1, 28), 1), vdupq_n_u32(1)));
++    scales.val[1] = vreinterpretq_s32_u32(vorrq_u32(vshlq_n_u32(vshrq_n_u32(v2, 28), 1), vdupq_n_u32(1)));
++    return scales;
++}
++
++inline void apply_signs_2(uint8x16_t * b, const uint64_t * signs, uint32_t sidx) {
++    auto s1 = vcombine_s8(vld1_s8((const int8_t *)(signs + ((sidx >> 0) & 127))), vld1_s8((const int8_t *)(signs + ((sidx >> 7) & 127))));
++    auto s2 = vcombine_s8(vld1_s8((const int8_t *)(signs + ((sidx >>14) & 127))), vld1_s8((const int8_t *)(signs + ((sidx >>21) & 127))));
++    b[0] = vreinterpretq_u8_s8(vmulq_s8(vreinterpretq_s8_u8(b[0]), s1));
++    b[1] = vreinterpretq_u8_s8(vmulq_s8(vreinterpretq_s8_u8(b[1]), s2));
++}
++
++inline int32x4x4_t prepare_4bit_scales16(const uint8_t * sc) {
++    auto aux = vld1_u8(sc);
++    auto scales_l = vand_u8(aux, vdup_n_u8(0xf));
++    auto scales_h = vshr_n_u8(aux, 4);
++    auto aux1 = vcombine_u8(vzip1_u8(scales_l, scales_h), vzip2_u8(scales_l, scales_h));
++
++    auto scales8 = vreinterpretq_s8_u8(vorrq_u8(vshlq_n_u8(aux1, 1), vdupq_n_u8(1)));
++    int16x8x2_t scales16 = { vmovl_s8(vget_low_s8(scales8)), vmovl_s8(vget_high_s8(scales8)) };
++    return make_wider(scales16);
++}
++
++struct DequantizerIQ2XS final : public BaseDequantizer<block_iq2_xs> {
++    DequantizerIQ2XS(const void * vx, size_t bx, int nrc) : BaseDequantizer(vx, bx, nrc) {}
++
++    constexpr static int num_blocks() { return 16; }
++
++    template <typename Q8>
++    inline int32x4x4_t new_block(int i, const Q8& /*q8*/, float32x4_t * /*acc*/) {
++        d = 0.125f * GGML_FP16_TO_FP32(x[i].d);
++        return prepare_4bit_scales16(x[i].scales);
++    }
++
++    inline static uint8x16_t make1(const uint16_t * qs) {
++        auto b = vcombine_u8(vld1_u8((const uint8_t *)(iq2xs_grid + (qs[0] & 511))), vld1_u8((const uint8_t *)(iq2xs_grid + (qs[1] & 511))));
++        auto s = vcombine_s8(vld1_s8((const int8_t *)(keven_signs + (qs[0] >> 9))), vld1_s8((const int8_t *)(keven_signs + (qs[1] >> 9))));
++        return vreinterpretq_u8_s8(vmulq_s8(vreinterpretq_s8_u8(b), s));
++    }
++
++    inline static void make4(const uint16_t * qs, uint8x16_t * b) {
++        b[0] = make1(qs + 0);
++        b[1] = make1(qs + 2);
++        b[2] = make1(qs + 4);
++        b[3] = make1(qs + 6);
++    }
++
++    inline void prepare(int i, int j) {
++        make4(x[i].qs + 16*j + 0, bits.b1.val);
++        make4(x[i].qs + 16*j + 8, bits.b2.val);
++    }
++
++    SimpleBits bits;
++};
++
++struct DequantizerIQ3XXS final : public BaseDequantizer<block_iq3_xxs> {
++    DequantizerIQ3XXS(const void * vx, size_t bx, int nrc) : BaseDequantizer(vx, bx, nrc) {}
++
++    constexpr static int num_blocks() { return 8; }
++
++    template <typename Q8>
++    inline int32x4x2_t new_block(int i, const Q8& /*q8*/, float32x4_t * /*acc*/) {
++        d = 0.25f * GGML_FP16_TO_FP32(x[i].d);
++        gas = vld1q_u32_x2((const uint32_t *)(x[i].qs + QK_K/4));
++        return prepare_scales_8(gas.val[0], gas.val[1]);
++    }
++
++    inline static void make2(const uint8_t * q3, uint32_t sidx, uint8x16_t * b) {
++        b[0] = vreinterpretq_u8_u32(uint32x4_t{iq3xxs_grid[q3[0]], iq3xxs_grid[q3[1]], iq3xxs_grid[q3[2]], iq3xxs_grid[q3[3]]});
++        b[1] = vreinterpretq_u8_u32(uint32x4_t{iq3xxs_grid[q3[4]], iq3xxs_grid[q3[5]], iq3xxs_grid[q3[6]], iq3xxs_grid[q3[7]]});
++        apply_signs_2(b, keven_signs, sidx);
++    }
++    inline void prepare(int i, int j) {
++        const auto * q3 = x[i].qs + 32*j;
++        const auto * signs = (const uint32_t *)(gas.val + j);
++        make2(q3, signs[0], bits.b1.val + 0); q3 += 8;
++        make2(q3, signs[1], bits.b1.val + 2); q3 += 8;
++        make2(q3, signs[2], bits.b2.val + 0); q3 += 8;
++        make2(q3, signs[3], bits.b2.val + 2);
++    }
++
++    SimpleBits bits;
++    uint32x4x2_t gas;
++};
++
++// ---- 8-row interleaved Q8_K (ik's GGML_TYPE_Q8_K_R8), converted to on the fly
++
++typedef struct {
++    ggml_half d[8];         // delta
++    int8_t    qs[8*QK_K];   // quants, stored as unsigned ints
++} block_q8_k_r8;
++static_assert(sizeof(block_q8_k_r8) == 8*sizeof(ggml_half) + 8*QK_K, "wrong q8_k_r8 block size");
++
++// bytes per row of Q8_K_R8 (ik's type traits: blck_size QK_K, type_size sizeof(block_q8_k_r8)/8)
++inline size_t q8_k_r8_row_size(int n) { return (size_t)(n/QK_K) * (sizeof(block_q8_k_r8)/8); }
++
++inline float convert_to_q8_k_r8(float d0, const int8x16x2_t * qx, const int8_t * scales, uint32_t * block, uint32_t * q8_k) {
++    auto max_i16 = vdupq_n_u16(0);
++    int16x8x4_t q[8];
++    for (int ib32 = 0; ib32 < 8; ++ib32) {
++        auto scale_l = vdup_n_s8(scales[2*ib32+0]);
++        auto scale_h = vdup_n_s8(scales[2*ib32+1]);
++        q[ib32].val[0] = vmull_s8(scale_l, vget_low_s8 (qx[ib32].val[0]));
++        q[ib32].val[1] = vmull_s8(scale_l, vget_high_s8(qx[ib32].val[0]));
++        q[ib32].val[2] = vmull_s8(scale_h, vget_low_s8 (qx[ib32].val[1]));
++        q[ib32].val[3] = vmull_s8(scale_h, vget_high_s8(qx[ib32].val[1]));
++        max_i16 = vmaxq_u16(max_i16, vmaxq_u16(vreinterpretq_u16_s16(vabsq_s16(q[ib32].val[0])), vreinterpretq_u16_s16(vabsq_s16(q[ib32].val[1]))));
++        max_i16 = vmaxq_u16(max_i16, vmaxq_u16(vreinterpretq_u16_s16(vabsq_s16(q[ib32].val[2])), vreinterpretq_u16_s16(vabsq_s16(q[ib32].val[3]))));
++    }
++    uint16_t imax = vmaxvq_u16(max_i16);
++    if (!imax) {
++        for (int ib32 = 0; ib32 < 8; ++ib32) for (int l = 0; l < 8; ++l) q8_k[64*ib32 + 8*l] = 0;
++        return 0.f;
++    }
++    float dnew = float(imax) * d0;
++    bool needs_scaling = true;
++    if (dnew <= 1.f) {
++        dnew = 1.f; needs_scaling = false;
++    }
++    auto scale = vdupq_n_f32(1/dnew);
++    for (int ib32 = 0; ib32 < 8; ++ib32) {
++        if (needs_scaling) {
++            for (int l = 0; l < 4; ++l) {
++                auto i1 = vcvtnq_s32_f32(vmulq_f32(scale, vcvtq_f32_s32(vmovl_s16(vget_low_s16 (q[ib32].val[l])))));
++                auto i2 = vcvtnq_s32_f32(vmulq_f32(scale, vcvtq_f32_s32(vmovl_s16(vget_high_s16(q[ib32].val[l])))));
++                q[ib32].val[l] = vcombine_s16(vmovn_s32(i1), vmovn_s32(i2));
++            }
++        }
++        for (int l = 0; l < 2; ++l) {
++            auto s8 = vcombine_s8(vmovn_s16(q[ib32].val[2*l+0]), vmovn_s16(q[ib32].val[2*l+1]));
++            vst1q_s8((int8_t *)block + 16*l, s8);
++        }
++        auto qb = q8_k + 64*ib32;
++        for (int l = 0; l < 8; ++l) {
++            qb[8*l] = block[l];
++        }
++    }
++    return dnew;
++}
++
++void iqk_convert_iq2_xs_q8_k_r8(int n, const void * vx, size_t bx, void * vy, int nrc_x) {
++    GGML_ASSERT(n%QK_K == 0);
++    GGML_ASSERT(nrc_x%8 == 0);
++
++    int nb = n/QK_K;
++
++    const block_iq2_xs * x8[8];
++
++    block_q8_k_r8 * y = (block_q8_k_r8 *)vy;
++
++    uint32_t block[8];
++
++    int8x16x2_t xv[8];
++
++    union { int8x16_t vec; int8_t val[16]; } helper;
++
++    for (int ix = 0; ix < nrc_x; ix += 8) {
++        for (int k = 0; k < 8; ++k) x8[k] = (const block_iq2_xs *)((const char *)vx + (ix + k)*bx);
++        for (int i = 0; i < nb; ++i) {
++            for (int k = 0; k < 8; ++k) {
++                float d = 0.125f * GGML_FP16_TO_FP32(x8[k][i].d);
++                auto aux = vld1_u8(x8[k][i].scales);
++                auto scales_l = vand_u8(aux, vdup_n_u8(0xf));
++                auto scales_h = vshr_n_u8(aux, 4);
++                auto aux1 = vcombine_u8(vzip1_u8(scales_l, scales_h), vzip2_u8(scales_l, scales_h));
++                helper.vec = vreinterpretq_s8_u8(vorrq_u8(vshlq_n_u8(aux1, 1), vdupq_n_u8(1)));
++                for (int ib32 = 0; ib32 < 8; ++ib32) {
++                    xv[ib32].val[0] = vreinterpretq_s8_u64(uint64x2_t{iq2xs_grid[x8[k][i].qs[4*ib32+0] & 511], iq2xs_grid[x8[k][i].qs[4*ib32+1] & 511]});
++                    xv[ib32].val[1] = vreinterpretq_s8_u64(uint64x2_t{iq2xs_grid[x8[k][i].qs[4*ib32+2] & 511], iq2xs_grid[x8[k][i].qs[4*ib32+3] & 511]});
++                    auto s1 = vreinterpretq_s8_u64(uint64x2_t{keven_signs[x8[k][i].qs[4*ib32+0] >> 9], keven_signs[x8[k][i].qs[4*ib32+1] >> 9]});
++                    auto s2 = vreinterpretq_s8_u64(uint64x2_t{keven_signs[x8[k][i].qs[4*ib32+2] >> 9], keven_signs[x8[k][i].qs[4*ib32+3] >> 9]});
++                    xv[ib32].val[0] = vmulq_s8(xv[ib32].val[0], s1);
++                    xv[ib32].val[1] = vmulq_s8(xv[ib32].val[1], s2);
++                }
++                float dnew = convert_to_q8_k_r8(1.f/124, xv, helper.val, block, (uint32_t *)y[i].qs + k);
++                y[i].d[k] = GGML_FP32_TO_FP16(d*dnew);
++            }
++        }
++        y += nb;
++    }
++}
++
++void iqk_convert_iq3_xxs_q8_k_r8(int n, const void * vx, size_t bx, void * vy, int nrc_x) {
++    GGML_ASSERT(n%QK_K == 0);
++    GGML_ASSERT(nrc_x%8 == 0);
++
++    int nb = n/QK_K;
++
++    const block_iq3_xxs * x8[8];
++
++    block_q8_k_r8 * y = (block_q8_k_r8 *)vy;
++
++    int8_t ls[16];
++    int8x16x2_t xv[8];
++    uint32_t block[8];
++    uint32_t aux32;
++
++    for (int ix = 0; ix < nrc_x; ix += 8) {
++        for (int k = 0; k < 8; ++k) x8[k] = (const block_iq3_xxs *)((const char *)vx + (ix + k)*bx);
++        for (int i = 0; i < nb; ++i) {
++            for (int k = 0; k < 8; ++k) {
++                float d = 0.25f * GGML_FP16_TO_FP32(x8[k][i].d);
++                auto qs  = x8[k][i].qs;
++                auto sas = qs + QK_K/4;
++                for (int ib32 = 0; ib32 < 8; ++ib32) {
++                    std::memcpy(&aux32, sas + 4*ib32, sizeof(uint32_t));
++                    ls[2*ib32 + 0] = ls[2*ib32 + 1] = (2*(aux32 >> 28) + 1);
++                    xv[ib32].val[0] = vreinterpretq_s8_u32(uint32x4_t{iq3xxs_grid[qs[0]], iq3xxs_grid[qs[1]], iq3xxs_grid[qs[2]], iq3xxs_grid[qs[3]]});
++                    xv[ib32].val[1] = vreinterpretq_s8_u32(uint32x4_t{iq3xxs_grid[qs[4]], iq3xxs_grid[qs[5]], iq3xxs_grid[qs[6]], iq3xxs_grid[qs[7]]});
++                    apply_signs_2((uint8x16_t *)xv[ib32].val, keven_signs, aux32);
++                    qs += 8;
++                }
++                float dnew = convert_to_q8_k_r8(1.f/124, xv, ls, block, (uint32_t *)y[i].qs + k);
++                y[i].d[k] = GGML_FP32_TO_FP16(d*dnew);
++            }
++        }
++        y += nb;
++    }
++}
++
++// ---- iqk_gemm_kquants.cpp (aarch64): Q8_K_R8 x Q8_K
++
++template <int nrc_y>
++void mul_mat_q8_k_r8_q8_k(int n, const void * vx, size_t bx, const DataInfo& info, int nrc_x) {
++    GGML_ASSERT(nrc_x%8 == 0);
++    Q8<nrc_y, block_q8_K> q8(info);
++    int nbl = n / QK_K;
++    float32x4_t acc[2*nrc_y] = {};
++    for (int ix = 0; ix < nrc_x; ix += 8) {
++        const block_q8_k_r8 * iq8 = (const block_q8_k_r8 *)((const char *)vx + ix*bx);
++        for (int ibl = 0; ibl < nbl; ++ibl) {
++            auto d4l = vcvt_f32_f16(vld1_f16((const float16_t *)iq8[ibl].d+0));
++            auto d4h = vcvt_f32_f16(vld1_f16((const float16_t *)iq8[ibl].d+4));
++            int32x4_t isum[2*nrc_y] = {};
++            for (int ib = 0; ib < QK_K/16; ++ib) {
++                auto q1 = vld1q_s8_x4(iq8[ibl].qs + 128*ib +  0);
++                auto q2 = vld1q_s8_x4(iq8[ibl].qs + 128*ib + 64);
++                for (int iy = 0; iy < nrc_y; ++iy) {
++                    auto y = vld1q_s8(q8.y[iy][ibl].qs+16*ib);
++                    isum[2*iy+0] = vdotq_laneq_s32(isum[2*iy+0], q1.val[0], y, 0);
++                    isum[2*iy+1] = vdotq_laneq_s32(isum[2*iy+1], q1.val[1], y, 0);
++                    isum[2*iy+0] = vdotq_laneq_s32(isum[2*iy+0], q1.val[2], y, 1);
++                    isum[2*iy+1] = vdotq_laneq_s32(isum[2*iy+1], q1.val[3], y, 1);
++                    isum[2*iy+0] = vdotq_laneq_s32(isum[2*iy+0], q2.val[0], y, 2);
++                    isum[2*iy+1] = vdotq_laneq_s32(isum[2*iy+1], q2.val[1], y, 2);
++                    isum[2*iy+0] = vdotq_laneq_s32(isum[2*iy+0], q2.val[2], y, 3);
++                    isum[2*iy+1] = vdotq_laneq_s32(isum[2*iy+1], q2.val[3], y, 3);
++                }
++            }
++            for (int iy = 0; iy < nrc_y; ++iy) {
++                auto d8 = vdupq_n_f32(q8.scale(iy, ibl));
++                acc[2*iy+0] = vfmaq_f32(acc[2*iy+0], vmulq_f32(d4l, d8), vcvtq_f32_s32(isum[2*iy+0]));
++                acc[2*iy+1] = vfmaq_f32(acc[2*iy+1], vmulq_f32(d4h, d8), vcvtq_f32_s32(isum[2*iy+1]));
++            }
++        }
++        for (int iy = 0; iy < nrc_y; ++iy) {
++            info.store(ix+0, iy, acc[2*iy+0]);
++            info.store(ix+4, iy, acc[2*iy+1]);
++            acc[2*iy+0] = acc[2*iy+1] = vdupq_n_f32(0.f);
++        }
++    }
++}
++
++// ---- iqk_mul_mat.cpp: MulMat::mul_mat_NxM and iqk_mul_mat_moe
++
++struct MulMat {
++    std::array<mul_mat_t, IQK_MAX_NY> funcs = {};
++    inline void mul_mat_NxM(int n, const void * vx, size_t bx, DataInfo& info, int nrc_x, int nrc_y) {
++        constexpr int k_x_step = 64;
++        int ny = funcs.size();
++        while (!funcs[ny-1] && ny > 0) --ny;
++        int n_left = nrc_y - info.cur_y;
++        int n_step = n_left/ny;
++        if (n_step > 0) {
++            if (n_step*ny != n_left) {
++                ++n_step;
++                int ny1 = n_left/n_step;
++                int ny2 = ny1 + 1;
++                int my1 = n_step*ny2 - n_left;
++                int my2 = n_step - my1;
++                for (int ix = 0; ix < nrc_x; ix += k_x_step) {
++                    auto this_info = info;
++                    this_info.s += ix;
++                    int this_nrc_x = ix + k_x_step <= nrc_x ? k_x_step : nrc_x - ix;
++                    for (int iy = 0; iy < my1; ++iy) {
++                        funcs[ny1-1](n, (const void *)((const char *)vx + ix*bx), bx, this_info, this_nrc_x);
++                        this_info.cur_y += ny1;
++                    }
++                    for (int iy = 0; iy < my2; ++iy) {
++                        funcs[ny2-1](n, (const void *)((const char *)vx + ix*bx), bx, this_info, this_nrc_x);
++                        this_info.cur_y += ny2;
++                    }
++                }
++                info.cur_y += n_left;
++            }
++            else {
++                for (int ix = 0; ix < nrc_x; ix += k_x_step) {
++                    auto this_info = info;
++                    this_info.s += ix;
++                    int this_nrc_x = ix + k_x_step <= nrc_x ? k_x_step : nrc_x - ix;
++                    for (int iy = 0; iy < n_step; ++iy) {
++                        funcs[ny-1](n, (const void *)((const char *)vx + ix*bx), bx, this_info, this_nrc_x);
++                        this_info.cur_y += ny;
++                    }
++                }
++                info.cur_y += ny * n_step;
++            }
++        }
++        n_left = nrc_y - info.cur_y;
++        if (n_left > 0) {
++            funcs[n_left-1](n, vx, bx, info, nrc_x);
++        }
++    }
++};
++
++struct Config {
++    bool enabled          = true;
++    int  min_rows         = 2;
++    int  convert_min_rows = 32; // ik converts to Q8_K_R8 from 32 tokens (MulMat::is_dequant_better, aarch64)
++    int  chunk_rows       = 32; // rows per work item, a multiple of 8 (the Q8_K_R8 interleave)
++    Config() {
++        if (const char * e = std::getenv("GGML_IQK_MOE"))                  enabled          = std::atoi(e) != 0;
++        if (const char * e = std::getenv("GGML_IQK_MOE_MIN_ROWS"))         min_rows         = std::max(1, std::atoi(e));
++        if (const char * e = std::getenv("GGML_IQK_MOE_CONVERT_MIN_ROWS")) convert_min_rows = std::max(1, std::atoi(e));
++        if (const char * e = std::getenv("GGML_IQK_MOE_CHUNK_ROWS"))       chunk_rows       = std::max(8, std::atoi(e) / 8 * 8);
++    }
++};
++
++const Config & config() {
++    static const Config c;
++    return c;
++}
++
++std::vector<char> & thread_local_work_buffer() {
++    thread_local std::vector<char> f;
++    return f;
++}
++
++} // namespace
++
++extern "C" int ggml_iqk_moe_chunk_rows(int type, int64_t ne00, int64_t nrows, int64_t n_tokens) {
++    const Config & c = config();
++    if (!c.enabled || n_tokens < c.min_rows || ne00 % QK_K != 0 || nrows % 8 != 0) return 0;
++    if (type != GGML_TYPE_IQ2_XS && type != GGML_TYPE_IQ3_XXS) return 0;
++    return c.chunk_rows;
++}
++
++extern "C" void ggml_iqk_moe_mul_mat(int type, int64_t row_start, int64_t row_end, int64_t ne00, int64_t ne11,
++                                     const void * A, size_t strideA,
++                                     const void * B, size_t strideB,
++                                     float * C, size_t nb1, size_t nb2,
++                                     const void * vrow_mapping, int64_t Ny) {
++    const mmid_row_mapping * row_mapping = (const mmid_row_mapping *)vrow_mapping;
++    const int nrc_x = (int)(row_end - row_start);
++    if (nrc_x <= 0) return;
++    MulMat mm;
++    DataInfo info{C + row_start, (const char *)B, nb1/sizeof(float), strideB, 0, (int)ne11, row_mapping, nb2/sizeof(float)};
++
++    if (Ny >= config().convert_min_rows) {
++        // rows converted 32 at a time to Q8_K_R8, then multiplied by all the tokens
++        GGML_ASSERT(row_start % 8 == 0 && nrc_x % 8 == 0);
++        IQK_SET_MUL_MAT_FUNCTIONS(mul_mat_q8_k_r8_q8_k, mm.funcs)
++        constexpr int k_x_step = 32;
++        const size_t row_size_qx = q8_k_r8_row_size(ne00);
++        auto & f = thread_local_work_buffer();
++        for (int ix = 0; ix < nrc_x; ix += k_x_step) {
++            auto this_info = info;
++            this_info.s += ix;
++            int this_nrc_x = ix + k_x_step <= nrc_x ? k_x_step : nrc_x - ix;
++            if (f.size() < row_size_qx*this_nrc_x) f.resize(row_size_qx*this_nrc_x);
++            const char * a = (const char *)A + (row_start + ix)*strideA;
++            if (type == GGML_TYPE_IQ2_XS) {
++                iqk_convert_iq2_xs_q8_k_r8(ne00, a, strideA, f.data(), this_nrc_x);
++            } else {
++                iqk_convert_iq3_xxs_q8_k_r8(ne00, a, strideA, f.data(), this_nrc_x);
++            }
++            mm.mul_mat_NxM(ne00, f.data(), row_size_qx, this_info, this_nrc_x, Ny);
++        }
++        return;
++    }
++
++    // each row decoded once, multiplied by up to 8 tokens at a time
++    if (type == GGML_TYPE_IQ2_XS) {
++        IQK_SET_MUL_MAT_FUNCTIONS_T(mul_mat_qX_K_q8_K_T, DequantizerIQ2XS, mm.funcs)
++    } else {
++        IQK_SET_MUL_MAT_FUNCTIONS_T(mul_mat_qX_K_q8_K_T, DequantizerIQ3XXS, mm.funcs)
++    }
++    mm.mul_mat_NxM(ne00, (const char *)A + strideA*row_start, strideA, info, nrc_x, Ny);
++}
++
++#else
++
++extern "C" int ggml_iqk_moe_chunk_rows(int, int64_t, int64_t, int64_t) { return 0; }
++
++extern "C" void ggml_iqk_moe_mul_mat(int, int64_t, int64_t, int64_t, int64_t, const void *, size_t, const void *, size_t,
++                                     float *, size_t, size_t, const void *, int64_t) {
++    GGML_ABORT("iqk-moe: not built for this target");
++}
++
++#endif
+diff --git a/ggml/src/ggml-cpu/iqk-moe.h b/ggml/src/ggml-cpu/iqk-moe.h
+new file mode 100644
+index 0000000..28bd275
+--- /dev/null
++++ b/ggml/src/ggml-cpu/iqk-moe.h
+@@ -0,0 +1,33 @@
++#pragma once
++
++// Batched expert matmuls for IQ2_XS and IQ3_XXS weights on ARM with dot-product instructions,
++// from ik_llama.cpp's iqk kernels (MIT, Copyright (C) 2024-2025 Iwan Kawrakow). See iqk-moe.cpp.
++
++#include <stddef.h>
++#include <stdint.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++// Rows per work item when ggml_iqk_moe_mul_mat takes an expert with this weight type, row length,
++// number of rows and number of tokens; 0 when it does not. Off when GGML_IQK_MOE=0; tokens below
++// GGML_IQK_MOE_MIN_ROWS (default 2) stay on the generic path, so single-token generation is
++// unchanged. The rows per item (GGML_IQK_MOE_CHUNK_ROWS, default 32) are a multiple of 8.
++int ggml_iqk_moe_chunk_rows(int type, int64_t ne00, int64_t nrows, int64_t n_tokens);
++
++// Rows [row_start, row_end) of one expert times its n_tokens activation rows; both are multiples
++// of 8 (ggml_iqk_moe_chunk_rows takes only experts whose row count is). a: the expert's weights
++// from row 0, stride_a bytes per row. b: the Q8_K activations, stride_b bytes per row, row
++// (i11 + i12*ne11) for a mapping entry {i1, i2}, i11 = i1 % ne11, i12 = i2. c: the output, row
++// i1*nb1 + i2*nb2 bytes from c. row_mapping: n_tokens entries of {int32 i1, int32 i2}, as
++// ggml_compute_forward_mul_mat_id builds them.
++void ggml_iqk_moe_mul_mat(int type, int64_t row_start, int64_t row_end, int64_t ne00, int64_t ne11,
++                          const void * a, size_t stride_a,
++                          const void * b, size_t stride_b,
++                          float * c, size_t nb1, size_t nb2,
++                          const void * row_mapping, int64_t n_tokens);
++
++#ifdef __cplusplus
++}
++#endif
+diff --git a/ggml/src/ggml-cpu/test-iqk-moe.cpp b/ggml/src/ggml-cpu/test-iqk-moe.cpp
+new file mode 100644
+index 0000000..07ee60d
+--- /dev/null
++++ b/ggml/src/ggml-cpu/test-iqk-moe.cpp
+@@ -0,0 +1,113 @@
++// Accuracy of the iqk-moe kernels against ggml's own vec_dot, both against a double-precision
++// reference computed from the dequantized weights and the Q8_K activations. Random weight bits
++// (every bit pattern is a valid IQ2_XS / IQ3_XXS block once d is set), random activations.
++// Not part of the CMake build; on an aarch64 machine with dotprod, after a static build in build/:
++//   g++ -O2 -std=c++17 -mcpu=native -Iggml/include -Iggml/src/ggml-cpu ggml/src/ggml-cpu/test-iqk-moe.cpp \
++//     build/ggml/src/libggml.a build/ggml/src/libggml-cpu.a build/ggml/src/libggml-base.a \
++//     -fopenmp -lpthread -lm -o test-iqk-moe && ./test-iqk-moe
++#include "ggml.h"
++#include "ggml-cpu.h"
++#include "iqk-moe.h"
++
++#include <cmath>
++#include <cstdio>
++#include <algorithm>
++#include <cstring>
++#include <random>
++#include <vector>
++
++struct Q8K { float d; int8_t qs[256]; int16_t bsums[16]; };
++
++static uint16_t fp16(float f) { return ggml_fp32_to_fp16(f); }
++
++int main() {
++    std::mt19937 rng(42);
++    std::normal_distribution<float> nd(0.f, 1.f);
++    std::uniform_int_distribution<int> byte(0, 255);
++    int fails = 0;
++    for (int type : {GGML_TYPE_IQ2_XS, GGML_TYPE_IQ3_XXS}) {
++        for (int ne00 : {512, 2048}) {
++            const int Nx = 64;
++            const size_t ra = ggml_row_size((ggml_type)type, ne00);
++            const size_t blk = ggml_type_size((ggml_type)type);
++            std::vector<uint8_t> A(Nx*ra);
++            for (auto & b : A) b = byte(rng);
++            for (int r = 0; r < Nx; ++r)
++                for (int ib = 0; ib < ne00/256; ++ib) {
++                    uint16_t d = fp16(0.001f + 0.02f*std::abs(nd(rng)));
++                    std::memcpy(A.data() + r*ra + ib*blk, &d, 2);   // d is the first field of both blocks
++                }
++            std::vector<float> Af(Nx*ne00);
++            for (int r = 0; r < Nx; ++r) ggml_get_type_traits((ggml_type)type)->to_float(A.data() + r*ra, Af.data() + r*ne00, ne00);
++
++            for (int Ny : {1, 2, 3, 5, 8, 9, 13, 31, 32, 33, 47, 64, 100}) {
++                const size_t rb = ggml_row_size(GGML_TYPE_Q8_K, ne00);
++                std::vector<float> Bf(Ny*ne00);
++                for (auto & x : Bf) x = nd(rng);
++                std::vector<uint8_t> B(Ny*rb);
++                auto from_float = ggml_get_type_traits_cpu(GGML_TYPE_Q8_K)->from_float;
++                for (int t = 0; t < Ny; ++t) from_float(Bf.data() + t*ne00, B.data() + t*rb, ne00);
++                // reference in double, from what the kernels actually see
++                std::vector<double> ref(Ny*Nx);
++                double rms = 0;
++                for (int t = 0; t < Ny; ++t) {
++                    const Q8K * q = (const Q8K *)(B.data() + t*rb);
++                    for (int r = 0; r < Nx; ++r) {
++                        double s = 0;
++                        for (int j = 0; j < ne00; ++j) s += (double)Af[r*ne00 + j] * q[j/256].d * q[j/256].qs[j%256];
++                        ref[t*Nx + r] = s; rms += s*s;
++                    }
++                }
++                rms = std::sqrt(rms/(Ny*Nx));
++                // ggml's vec_dot
++                auto vec_dot = ggml_get_type_traits_cpu((ggml_type)type)->vec_dot;
++                double e_gen = 0;
++                for (int t = 0; t < Ny; ++t)
++                    for (int r = 0; r < Nx; ++r) {
++                        float s;
++                        vec_dot(ne00, &s, 0, A.data() + r*ra, 0, B.data() + t*rb, 0, 1);
++                        e_gen = std::max(e_gen, std::abs(s - ref[t*Nx + r]));
++                    }
++                // iqk, rows split over 3 "threads" run one after the other. Activations laid out as
++                // the down projection's: ne11 = 3 slots per token, row (i1 % ne11) + i2*ne11; token t
++                // sits at slot t % 3 of position t / 3. Output rows strided by slot (nb1) and position (nb2).
++                const int ne11 = 3, npos = (Ny + 2)/3;
++                std::vector<uint8_t> B3((size_t)npos*ne11*rb, 0);
++                std::vector<int32_t> map(2*Ny);
++                for (int t = 0; t < Ny; ++t) {
++                    const int i1 = t % 3 + 3*(t & 1), i2 = t / 3;   // i1 beyond ne11 exercises the modulo
++                    map[2*t] = i1; map[2*t+1] = i2;
++                    std::memcpy(B3.data() + ((i1 % ne11) + i2*ne11)*rb, B.data() + t*rb, rb);
++                }
++                const size_t nb1 = (Nx + 5) * sizeof(float), nb2 = 6*nb1;
++                std::vector<float> C((size_t)npos*6*(Nx + 5), NAN);
++                // rows in 16-row work items, in a shuffled order, as threads would claim them
++                const int chunk = ggml_iqk_moe_chunk_rows(type, ne00, Nx, Ny) ? 16 : 0;
++                const bool ok = chunk > 0 || Ny < 2;
++                std::vector<int> items;
++                for (int r0 = 0; chunk && r0 < Nx; r0 += chunk) items.push_back(r0);
++                std::shuffle(items.begin(), items.end(), rng);
++                for (int r0 : items)
++                    ggml_iqk_moe_mul_mat(type, r0, std::min(r0 + chunk, Nx), ne00, ne11, A.data(), ra, B3.data(), rb, C.data(), nb1, nb2, map.data(), Ny);
++                if (!chunk) continue;   // one token: the generic path's
++                double e_iqk = 0, e2 = 0;
++                for (int t = 0; t < Ny; ++t)
++                    for (int r = 0; r < Nx; ++r) {
++                        float s = *((const float *)((const char *)C.data() + map[2*t]*nb1 + map[2*t+1]*nb2) + r);
++                        double e = std::isnan(s) ? INFINITY : std::abs(s - ref[t*Nx + r]);
++                        e_iqk = std::max(e_iqk, e); e2 += e*e;
++                    }
++                const double rms_err = std::sqrt(e2/(Ny*Nx));
++                // below 32 tokens the kernels are exact up to float rounding; from 32 the weights are
++                // requantized to 8 bits per 256-weight block (ik's design), bounded here at 6% of rms
++                const double tol = Ny < 32 ? std::max(1e-5*rms, 20*e_gen) : 0.06*rms;
++                const bool bad = !ok || !(e_iqk <= tol);
++                fails += bad;
++                std::printf("%-8s ne00 %4d tokens %3d | rms %9.4f | max err generic %.2e iqk %.2e (rel %.1e, rms rel %.1e)%s\n",
++                    ggml_type_name((ggml_type)type), ne00, Ny, rms, e_gen, e_iqk, e_iqk/rms, rms_err/rms, bad ? "  <-- FAIL" : "");
++            }
++        }
++    }
++    std::printf(fails ? "FAILED %d\n" : "ALL OK\n", fails);
++    return fails != 0;
++}

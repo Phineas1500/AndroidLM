@@ -12,6 +12,7 @@ following, each under its own terms.
 | Qwen3.6-35B-A3B | https://huggingface.co/Qwen/Qwen3.6-35B-A3B | Apache-2.0 | The language model |
 | Unsloth GGUF quantizations | https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF | Apache-2.0 (same as the model) | The 2-bit model file |
 | llama.cpp | https://github.com/ggml-org/llama.cpp | MIT | Inference runtime |
+| ik_llama.cpp | https://github.com/ikawrakow/ik_llama.cpp | MIT (Copyright (C) 2024-2025 Iwan Kawrakow and the ik_llama.cpp authors) | Its aarch64 matrix-multiplication kernels for IQ2_XS and IQ3_XXS weights, adapted in `patches/llama.cpp/0001-ggml-cpu-iqk-moe-kernels.patch` (the new file keeps the MIT notice) |
 | BigMoeOnEdge | https://github.com/Helldez/BigMoeOnEdge | Apache-2.0 | Expert-streaming engine and the Android app structure this project's app is derived from; `scripts/build-android-engine.sh` is a bash port of its `scripts/build-android.ps1` |
 
 Text derived from Wikipedia must remain under CC BY-SA 4.0 when redistributed, including inside

@@ -26,7 +26,11 @@ data class AppSettings(
     val mmap: Boolean = false,          // baseline: no streaming — llama.cpp mmap loads the whole model
     val cacheMb: Int = 2000,            // LRU expert cache budget; Auto / 0 / 500..6000 (see CACHE_CHOICES)
     val cacheCeilMb: Int = 3000,        // with cacheMb=Auto: upper bound on the auto budget (0 = no cap)
-    val ioThreads: Int = 2,             // parallel expert-read lanes (2 measured best on a Pixel 8 Pro)
+    // Parallel expert-read lanes. With the faster prompt kernels a short prompt waits on flash, the
+    // compute cores idle and clock down, and two lanes floating on them read slower: a 110-token
+    // prompt took 10.0 s with 2 lanes and 6.5 s with 4 on a Pixel 8 Pro; long prompts and
+    // generation measured the same or better with 4 (notes/2026-09-25-iqk-port.md).
+    val ioThreads: Int = 4,
     val threads: Int = THREADS_AUTO,    // compute threads (-t); Auto = all cores above the little cluster
     val nExpertUsed: Int = 0,           // top-k override (0 = model default); lower = faster, changes output
     val nPredict: Int = DEFAULT_N_PREDICT,
@@ -34,6 +38,9 @@ data class AppSettings(
     // memory — the KV cache is sized for it once at open — so on a model that already fills RAM a
     // shorter context hands the difference back to the expert cache and the dense weights.
     val sessionCtx: Int = SESSION_CTX,
+    // Widest graph computed at once (--ubatch); not a user setting, chosen per device at load
+    // (see defaultUbatch).
+    val ubatch: Int = SESSION_UBATCH,
     val oDirect: Boolean = true,        // bypass the page cache
     val overlap: Boolean = true,        // read the next experts while the current layer computes
     val denseWeights: DenseWeights = DenseWeights.AHWB, // pinned: the kernel swapped anon weights to zram on a Pixel 8 Pro
@@ -162,7 +169,7 @@ data class AppSettings(
             "-t", effectiveThreads().toString(),
             "-c", sessionCtx.toString(),
             // Never reserve a graph wider than the context itself.
-            "--ubatch", minOf(SESSION_UBATCH, sessionCtx).toString(),
+            "--ubatch", minOf(ubatch, sessionCtx).toString(),
             // Render the model's OWN chat template, whichever family it belongs to; the flag name
             // is historical (ChatML is only llama.cpp's fallback when a gguf ships no template).
             // Nothing here selects a format, so it is correct for every model in the catalog.
@@ -298,7 +305,8 @@ data class AppSettings(
         // with a large dense set it is the difference between decoding and swapping (DeepSeek V4
         // spent 13.9 s/token of "compute" that was really page faults, against 1.5 s at this
         // width). Prefill pays instead, and barely: chunking it costs ~7.7x the flash reads but
-        // only ~6% of prefill wall time, because prefill is compute-bound.
+        // only ~6% of prefill wall time, because prefill is compute-bound. (No longer true with
+        // the faster prompt kernels, so a 12GB phone reads prompts wider: see defaultUbatch.)
         const val SESSION_UBATCH = 512
 
         // Context rungs. 4096 is the default a chat wants; the shorter ones exist for a model that
@@ -398,15 +406,28 @@ data class AppSettings(
          * 2000 MiB 4.64 tok/s, 4000 MiB 5.56, 5000 MiB 6.05, 6000 MiB 6.27, with no more swapping
          * than at 2000. Smaller phones keep [fallback].
          */
-        fun defaultCacheMb(ctx: Context, fallback: Int): Int {
-            val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager ?: return fallback
+        fun defaultCacheMb(ctx: Context, fallback: Int): Int =
+            if (isLargeRam(ctx)) LARGE_RAM_CACHE_MB else fallback
+
+        /**
+         * Prefill width. A research prompt is 650-1,250 tokens; read in 512-token slices it streams
+         * the experts from flash once per slice. With the faster prompt kernels that is no longer
+         * hidden behind compute: on a Pixel 8 Pro the 1,216-token prompt read 22 GB in 45.5 s at
+         * 512 and 9 GB in 36.7 s at 1,280 (notes/2026-09-25-iqk-port.md). The price is a larger
+         * reserved compute buffer, 1,256 MiB instead of 502, so only a 12GB phone gets it.
+         */
+        fun defaultUbatch(ctx: Context): Int =
+            if (isLargeRam(ctx)) LARGE_RAM_UBATCH else SESSION_UBATCH
+
+        private fun isLargeRam(ctx: Context): Boolean {
+            val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager ?: return false
             val mi = android.app.ActivityManager.MemoryInfo().also { am.getMemoryInfo(it) }
-            val gib = mi.totalMem / (1024.0 * 1024.0 * 1024.0)
-            return if (gib >= LARGE_RAM_GIB) LARGE_RAM_CACHE_MB else fallback
+            return mi.totalMem / (1024.0 * 1024.0 * 1024.0) >= LARGE_RAM_GIB
         }
         /** A "12GB" phone reports about 11.2-11.6 GiB of total memory. */
         const val LARGE_RAM_GIB = 11.0
         const val LARGE_RAM_CACHE_MB = 5000
+        const val LARGE_RAM_UBATCH = 1280
 
         fun load(ctx: Context): AppSettings {
             val p = ctx.prefs()
@@ -441,6 +462,7 @@ data class AppSettings(
                 releaseMmap = p.getBoolean("releaseMmap", d.releaseMmap),
                 substitutePct = p.getInt("substitutePct", d.substitutePct),
                 sessionCtx = p.getInt("sessionCtx", d.sessionCtx),
+                ubatch = defaultUbatch(ctx),
                 spec = run {
                     val saved = p.getString("spec", null)
                     when {
