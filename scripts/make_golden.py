@@ -3,6 +3,10 @@
 port's tests to reproduce exactly. No model is involved: planned titles are given.
 
 Usage: make_golden.py sample_wiki.db sample_voyage.db > golden.json
+
+The Kotlin GoldenWordCountsTest also wants the sample's word-count file, built with a low
+threshold so that most stems are read from it: build_df.py sample_wiki.db sample_wiki_df.db 2.
+Build golden.json without that file next to sample_wiki.db (the output is the same either way).
 """
 import json
 import sys

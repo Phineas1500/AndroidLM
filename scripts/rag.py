@@ -148,6 +148,11 @@ def _prefix(stem):
     return stem[:-1] if stem.endswith("i") and len(stem) > 3 else stem
 
 
+def word_counts_path(path):
+    """Where a database's word-count file lives (scripts/build_df.py): wiki.db -> wiki_df.db."""
+    return path[:-3] + "_df.db" if path.endswith(".db") else path + "_df.db"
+
+
 class Corpus:
     def __init__(self, path):
         self.db = sqlite3.connect(path)
@@ -163,6 +168,30 @@ class Corpus:
         self.n_indexed = self.db.execute("select max(id) from chunks").fetchone()[0]
         self.has_redirects = self.db.execute(
             "select 1 from sqlite_master where name='redirects'").fetchone() is not None
+        self.has_word_counts = self._attach_word_counts(word_counts_path(path))
+
+    def _attach_word_counts(self, path):
+        """Attach the word-count file (scripts/build_df.py) when it belongs to this database: the
+        same max chunk id, and its check stems (small counts, so short posting lists) counted the
+        same by the index. A common stem's document count is then read from it instead of from
+        the stem's whole posting list; the counts are the index's own, so no result changes."""
+        if not os.path.exists(path):
+            return False
+        try:
+            self.db.execute("ATTACH DATABASE ? AS dfs", (path,))
+        except sqlite3.Error:
+            return False
+        try:
+            meta = dict(self.db.execute("select key, value from dfs.meta"))
+            check = json.loads(meta.get("check", "[]"))
+            ok = (int(meta.get("n_indexed", -1)) == self.n_indexed and len(check) > 0 and all(
+                (self.db.execute("select doc from fts_v where term=?", (t,)).fetchone() or (None,))[0] == d
+                for t, d in check))
+        except (sqlite3.Error, ValueError):
+            ok = False
+        if not ok:
+            self.db.execute("DETACH DATABASE dfs")
+        return ok
 
     def article(self, aid):
         """(title, views, text); text lives at a byte range inside a compressed block."""
@@ -196,7 +225,9 @@ class Corpus:
         self.db.execute("insert into temp.qtok(x) values(?)", (" ".join(words),))
         out = []
         for (s,) in self.db.execute("select term from temp.qtok_v").fetchall():
-            row = self.db.execute("select doc from fts_v where term=?", (s,)).fetchone()
+            # a common stem's count from the word-count file; a rarer one's from its short posting list
+            row = self.has_word_counts and self.db.execute("select doc from dfs.df where term=?", (s,)).fetchone()
+            row = row or self.db.execute("select doc from fts_v where term=?", (s,)).fetchone()
             if row:
                 out.append((s, math.log(self.n_indexed / row[0])))
         return out
@@ -355,13 +386,16 @@ class Corpus:
             hits.extend(per_title[0][:2])
         for rank in range(5):
             hits.extend(p[rank] for p in per_title if len(p) > rank and p[rank] not in hits)
+        limit = max(k, len(per_title) * 2)
+        if len(hits) >= limit:  # the titles' passages fill the result: no BM25 hit could reach it
+            return hits[:limit]
         seen = {(h["aid"], h["start"]) for h in hits}
         topic = self.stems(" ".join(titles)) or stems
         for h in self.bm25(stems):
             if (h["aid"], h["start"]) not in seen and \
                     self.coverage(h["title"] + " " + h["text"], topic) >= 0.5:
                 hits.append(h)
-        return hits[:max(k, len(per_title) * 2)]
+        return hits[:limit]
 
 
 def build_context(hits, budget_chars, passage_chars=650, lead_chars=1000):

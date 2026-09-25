@@ -3,7 +3,7 @@
 # checksums in assets/manifest.json. Run this where the databases are (they are 21GB+), after
 # `hf auth login` with a token that can write to the repository.
 #
-# Usage: publish_corpus.sh <hf-user>/<dataset-name> <dir containing wiki.db and voyage.db>
+# Usage: publish_corpus.sh <hf-user>/<dataset-name> <dir containing wiki.db, wiki_df.db and voyage.db>
 # This makes the files public. It is not run by any other script.
 set -euo pipefail
 
@@ -14,7 +14,7 @@ command -v hf >/dev/null || { echo "pip install -U huggingface_hub first (provid
 
 hf repo create "$REPO" --repo-type dataset || true
 hf upload "$REPO" "$ROOT/assets/hf_dataset_card.md" README.md --repo-type dataset
-for f in wiki.db voyage.db; do
+for f in wiki.db wiki_df.db voyage.db; do
   echo "hashing $f..."
   sha=$(sha256sum "$DIR/$f" | cut -d' ' -f1)
   echo "uploading $f ($sha)..."

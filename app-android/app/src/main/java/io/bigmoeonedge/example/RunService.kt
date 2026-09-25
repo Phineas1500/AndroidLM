@@ -150,7 +150,7 @@ class RunService : Service() {
         Executors.newSingleThreadExecutor { r ->
             Thread({
                 searchTid = android.os.Process.myTid()
-                runCatching { android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND) }
+                runCatching { android.os.Process.setThreadPriority(overlapSearchPriority()) }
                 r.run()
             }, "research-search")
         }
@@ -165,10 +165,18 @@ class RunService : Service() {
         runCatching {
             android.os.Process.setThreadPriority(
                 tid,
-                if (background) android.os.Process.THREAD_PRIORITY_BACKGROUND else android.os.Process.THREAD_PRIORITY_DEFAULT,
+                if (background) overlapSearchPriority() else android.os.Process.THREAD_PRIORITY_DEFAULT,
             )
         }
     }
+
+    /**
+     * The search thread's priority while it only overlaps the engine: background, unless a dev
+     * build's DEV_ENGINE_ENV sets ANDROIDLM_SEARCH_PRIORITY (an Android thread priority, e.g. 0).
+     */
+    private fun overlapSearchPriority(): Int =
+        (if (BuildConfig.SHARED_STORAGE) devEnv()["ANDROIDLM_SEARCH_PRIORITY"]?.toIntOrNull() else null)
+            ?: android.os.Process.THREAD_PRIORITY_BACKGROUND
 
     /** Search thread only. */
     private fun searchCorporaFor(files: CorpusFiles): AndroidCorpora {
@@ -249,10 +257,13 @@ class RunService : Service() {
     private fun current(myEpoch: Int) = epoch == myEpoch && !shuttingDown
 
     /** BMOE_* lines of [DEV_ENGINE_ENV], if the file exists and is readable; empty otherwise. */
-    private fun devEngineEnv(): Map<String, String> = try {
+    private fun devEngineEnv(): Map<String, String> = devEnv().filterKeys { it.startsWith("BMOE_") }
+
+    /** KEY=VALUE lines of [DEV_ENGINE_ENV], if the file exists and is readable; empty otherwise. */
+    private fun devEnv(): Map<String, String> = try {
         File(DEV_ENGINE_ENV).takeIf { it.canRead() }?.readLines().orEmpty()
             .map { it.trim() }
-            .filter { it.startsWith("BMOE_") && '=' in it }
+            .filter { '=' in it && !it.startsWith("#") }
             .associate { it.substringBefore('=') to it.substringAfter('=') }
     } catch (e: Exception) {
         emptyMap()
@@ -285,7 +296,8 @@ class RunService : Service() {
             if (BuildConfig.SHARED_STORAGE) {
                 devEngineEnv().forEach { (k, v) -> pb.environment()[k] = v }
             }
-            Log.i(LOG_TAG, "engine env: " + pb.environment().filterKeys { it.startsWith("BMOE_") })
+            Log.i(LOG_TAG, "engine env: " + pb.environment().filterKeys { it.startsWith("BMOE_") } +
+                " search priority while overlapping: ${overlapSearchPriority()}")
             pb.directory(File(model).parentFile)
 
             val p = pb.start().also { proc = it }
@@ -853,7 +865,7 @@ class RunService : Service() {
             is ResearchEvent.PhaseCompleted -> e.timing.let { tm ->
                 log("phase_done=${tm.phase} wall=${tm.wallMs}ms " + (tm.workMs?.let { "work=${it}ms " } ?: "") + (tm.generation?.let {
                     "tokens=${it.tokens} tok_s=${"%.2f".format(it.tokensPerSecond)} prompt_tokens=${it.promptTokens}"
-                } ?: ""))
+                } ?: "") + tm.parts.joinToString(" ") { (k, v) -> "$k=${v}ms" })
             }
             is ResearchEvent.Completed -> {
                 log("completed")

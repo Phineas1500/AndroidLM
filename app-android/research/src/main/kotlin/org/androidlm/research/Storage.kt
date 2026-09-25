@@ -14,6 +14,12 @@ interface SqlDatabase {
 
     /** Runs one statement that returns no rows (DDL, INSERT, DELETE). */
     fun exec(sql: String, vararg args: Any?)
+
+    /**
+     * Makes the query running on this connection, if any, stop and throw; callable from any
+     * thread. Later queries are unaffected. The default does nothing (the query runs to the end).
+     */
+    fun interrupt() {}
 }
 
 /** Decompresses one complete zstd frame (the corpus stores article text in such frames). */

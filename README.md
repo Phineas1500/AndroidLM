@@ -16,7 +16,8 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
   the time to read a prompt ([`notes/2026-09-25-iqk-port.md`](notes/2026-09-25-iqk-port.md)).
 - **Corpus:** English Wikipedia (FineWiki, August 2025) in one 21GB SQLite file: the 2M most-read
   articles in full, lead sections for the rest, a BM25 full-text index, Wikipedia's redirect
-  table, and monthly pageviews per article. Optional Wikivoyage (0.3GB) for travel questions.
+  table, and monthly pageviews per article, plus a 1.7MB file of the index's word counts that
+  keeps the search off the critical path. Optional Wikivoyage (0.3GB) for travel questions.
 - **Pipeline:** the model names the Wikipedia articles it wants; titles are resolved through
   redirects; a router sends little-read subjects retrieval-first (the model's memory of them is
   unreliable) and everything else answer-first, followed by a source check that cites passages.
@@ -73,6 +74,7 @@ checks their SHA-256, pushes them to the phone over USB and installs the APK. Bu
 | `scripts/build_corpus.py` | FineWiki parquet shards -> `wiki.db` (tiered by pageviews) |
 | `scripts/fetch_pageviews.sh` | Monthly Wikimedia pageviews -> per-article totals |
 | `scripts/build_redirects.py` | Adds Wikipedia's redirect table to `wiki.db` |
+| `scripts/build_df.py` | `wiki_df.db`: the index's word counts, so the search can rank a question's words without reading them from the index |
 | `scripts/rag.py` | The retrieval and answering pipeline (prototype of the on-device logic) |
 | `scripts/eval_models.sh`, `run_eval.py` | Run an eval set against a memory-capped llama-server |
 | `scripts/bench.sh`, `sbx.sh` | Benchmarks under a cgroup memory cap; sandbox for third-party code |
@@ -103,6 +105,8 @@ python scripts/build_corpus.py --out wiki.db --pageviews pageviews_en.tsv \
 # 4. Redirects, from https://dumps.wikimedia.org/enwiki/latest/
 python scripts/build_redirects.py wiki.db enwiki-latest-redirect.sql.gz \
        enwiki-latest-pages-articles-multistream-index.txt.bz2
+# 5. Word counts for the search (about 6 minutes; after any change to the index)
+python scripts/build_df.py wiki.db wiki_df.db
 ```
 
 ## Licence and attribution

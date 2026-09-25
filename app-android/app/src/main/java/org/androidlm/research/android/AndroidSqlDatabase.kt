@@ -1,6 +1,7 @@
 package org.androidlm.research.android
 
 import android.database.Cursor
+import androidx.core.os.CancellationSignal
 import io.requery.android.database.CursorWindow
 import io.requery.android.database.sqlite.SQLiteCursor
 import io.requery.android.database.sqlite.SQLiteDatabase
@@ -50,8 +51,24 @@ class AndroidSqlDatabase(
         }
     }
 
-    override fun query(sql: String, vararg args: Any?): List<Array<Any?>> =
-        db.rawQueryWithFactory(cursorFactory, sql, bind(args), null).use { c ->
+    // the running query's, for interrupt(); each query gets its own, so a cancel never outlives it
+    @Volatile private var running: CancellationSignal? = null
+
+    override fun interrupt() {
+        running?.cancel()
+    }
+
+    override fun query(sql: String, vararg args: Any?): List<Array<Any?>> {
+        val signal = CancellationSignal().also { running = it }
+        try {
+            return rows(db.rawQueryWithFactory(cursorFactory, sql, bind(args), null, signal), sql)
+        } finally {
+            running = null
+        }
+    }
+
+    private fun rows(cursor: Cursor, sql: String): List<Array<Any?>> =
+        cursor.use { c ->
             val n = c.columnCount
             val rows = ArrayList<Array<Any?>>()
             try {

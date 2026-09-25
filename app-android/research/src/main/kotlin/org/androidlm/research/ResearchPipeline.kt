@@ -52,6 +52,9 @@ interface CorpusProvider {
     /** The optional Wikivoyage corpus. */
     fun voyage(): Corpus?
 
+    /** [SqlDatabase.interrupt] on every open database; callable from any thread. */
+    fun interrupt() {}
+
     companion object {
         fun of(wiki: Corpus, voyage: Corpus? = null): CorpusProvider = object : CorpusProvider {
             override fun wiki() = wiki
@@ -95,13 +98,20 @@ data class ResearchSource(
 /**
  * Wall time of one phase; [generation] is set for the phases that ran the model. For SEARCHING with
  * a [BackgroundSearch], [wallMs] is how long the run waited for the search and [workMs] how long
- * the search itself took (most of it overlapped with planning and drafting).
+ * the search itself took (most of it overlapped with planning and drafting). [parts] breaks a
+ * search with a background half down, in milliseconds: `stems` and `bm25` (how long the question's
+ * stems and whole-index BM25 took; -1 when the BM25 did not finish), `bm25_at` (when it finished,
+ * from the start of the run), and on the retrieval-first route `bm25_needed` (0 when the planned
+ * articles' passages filled the sources, so the BM25 was stopped instead of awaited), `wait` (for
+ * the background half, once the run needed it) and `titles` (the planned articles' passages and
+ * the packing); on the answer-first route `titles` is the rest of the search.
  */
 data class PhaseTiming(
     val phase: ResearchPhase,
     val wallMs: Long,
     val generation: Generation? = null,
     val workMs: Long? = null,
+    val parts: List<Pair<String, Long>> = emptyList(),
 )
 
 data class ResearchResult(
@@ -229,21 +239,46 @@ class ResearchPipeline(
     private inner class Run(val question: String, val listener: ResearchListener) {
         var phase = ResearchPhase.PLANNING
         val timings = ArrayList<PhaseTiming>()
+        private val runStart = System.nanoTime()
 
         private val jobs = ArrayList<Job>()
 
         suspend fun execute(): ResearchResult = try {
             executeInner()
         } finally {
+            // a query still reading the index is stopped, not just abandoned
+            if (jobs.any { it.isActive }) background?.corpora?.interrupt()
             jobs.forEach { it.cancel() }
+        }
+
+        /**
+         * The half of a search that depends only on the question, on the background connection:
+         * its stems, then its whole-index BM25. Two jobs, so that a search whose planned articles
+         * already fill the sources can go on with the stems alone.
+         */
+        private inner class QuestionHalf(bg: BackgroundSearch) {
+            @Volatile private var stemsMs = -1L
+            @Volatile private var bmMs = -1L
+            @Volatile private var bmAtMs = -1L
+            val stems: Deferred<List<Stem>> = backgroundScope!!.async {
+                val t = System.nanoTime()
+                bg.corpora.wiki().stems(question).also { stemsMs = msSince(t) }
+            }.also { jobs.add(it) }
+            val bm25: Deferred<List<Hit>> = backgroundScope!!.async {
+                val s = stems.await()
+                val t = System.nanoTime()
+                bg.corpora.wiki().bm25(s).also { bmMs = msSince(t); bmAtMs = msSince(runStart) }
+            }.also { jobs.add(it) }
+
+            fun parts() = listOf("stems" to stemsMs, "bm25" to bmMs, "bm25_at" to bmAtMs)
         }
 
         private suspend fun executeInner(): ResearchResult {
             // 0. with a background search: the question-only half of the search runs while the plan
             //    is being written, on its own connection and thread
-            val pre: Deferred<QuestionSearch>? = background?.let { bg ->
+            val half: QuestionHalf? = background?.let { bg ->
                 bg.priority(true)
-                backgroundScope!!.async { bg.corpora.wiki().questionSearch(question) }.also { jobs.add(it) }
+                QuestionHalf(bg)
             }
 
             // 1. plan
@@ -264,18 +299,18 @@ class ResearchPipeline(
             var draft: String? = null
             var early: Deferred<Pair<Searched, Long>>? = null
             if (decision.route == Route.ANSWER_FIRST) {
-                if (background != null && pre != null) {
+                if (background != null && half != null) {
                     early = backgroundScope!!.async {
-                        val p = pre.await()
+                        val p = QuestionSearch(question, half.stems.await(), half.bm25.await())
                         val t0 = System.nanoTime()
                         val s = search(background.corpora, p, titles)
-                        s to (System.nanoTime() - t0) / 1_000_000
+                        s to msSince(t0)
                     }.also { jobs.add(it) }
                 }
                 draft = answering(ResearchPhase.DRAFTING, Prompts.CLOSED_SYSTEM, question)
             }
 
-            val built = searching(titles, pre, early)
+            val built = searching(titles, half, early)
             val sources = built.usedHits.mapIndexed { i, h -> ResearchSource(i + 1, h.title, h.section, h.text, h.via) }
             val dropped = built.dropped
             listener.onEvent(ResearchEvent.SourcesFound(sources, dropped))
@@ -318,8 +353,10 @@ class ResearchPipeline(
             listener.onEvent(ResearchEvent.PhaseChanged(next))
         }
 
-        private fun completed(start: Long, generation: Generation? = null, workMs: Long? = null) {
-            val timing = PhaseTiming(phase, (System.nanoTime() - start) / 1_000_000, generation, workMs)
+        private fun completed(
+            start: Long, generation: Generation? = null, workMs: Long? = null, parts: List<Pair<String, Long>> = emptyList(),
+        ) {
+            val timing = PhaseTiming(phase, msSince(start), generation, workMs, parts)
             timings.add(timing)
             listener.onEvent(ResearchEvent.PhaseCompleted(timing))
         }
@@ -356,20 +393,48 @@ class ResearchPipeline(
         }
 
         private suspend fun searching(
-            titles: List<String>, pre: Deferred<QuestionSearch>?, early: Deferred<Pair<Searched, Long>>?,
+            titles: List<String>, half: QuestionHalf?, early: Deferred<Pair<Searched, Long>>?,
         ): Searched {
             enter(ResearchPhase.SEARCHING)
             val start = System.nanoTime()
             background?.priority?.invoke(false) // the run is waiting for the search now
             if (early != null) {
                 val (searched, workMs) = early.await()
-                completed(start, workMs = workMs)
+                completed(start, workMs = workMs, parts = half!!.parts() + ("titles" to workMs))
                 return searched
             }
-            val p = pre?.await()
-            val searched = withContext(corpusDispatcher) { search(corpora, p, titles) }
-            completed(start)
-            return searched
+            if (half == null) {
+                val searched = withContext(corpusDispatcher) { search(corpora, null, titles) }
+                completed(start)
+                return searched
+            }
+            // Corpus.retrieve in two halves: the planned articles' passages on this connection, then,
+            // only if they leave room in the sources, the BM25 hits from the background connection
+            val w0 = System.nanoTime()
+            val stems = half.stems.await()
+            val stemsWaitMs = msSince(w0)
+            val t0 = System.nanoTime()
+            val t = withContext(corpusDispatcher) {
+                corpora.wiki().titleHits(question, titles, config.k, corpora.voyage(), stems)
+            }
+            var bmWaitMs = 0L
+            val hits = if (t.full) {
+                // no BM25 hit could reach the sources: stop the query instead of waiting for it
+                if (!half.bm25.isCompleted) background!!.corpora.interrupt()
+                t.hits.take(t.limit)
+            } else {
+                val w1 = System.nanoTime()
+                val bm = half.bm25.await()
+                bmWaitMs = msSince(w1)
+                withContext(corpusDispatcher) { corpora.wiki().withBm25(t, bm) }
+            }
+            val built = buildContext(hits, config.contextChars)
+            completed(start, parts = half.parts() + listOf(
+                "bm25_needed" to (if (t.full) 0L else 1L),
+                "wait" to stemsWaitMs + bmWaitMs,
+                "titles" to msSince(t0) - bmWaitMs,
+            ))
+            return Searched(built.context, built.usedHits, hits.size - built.usedHits.size)
         }
 
         /** retrieve + pack, on [provider]'s thread (the caller's dispatcher decides which). */
@@ -385,5 +450,7 @@ class ResearchPipeline(
     companion object {
         /** Between the draft and its source check in the final text (rag.py, verbatim). */
         const val SOURCE_CHECK_HEADING = "\n\n**Source check**\n"
+
+        private fun msSince(t: Long) = (System.nanoTime() - t) / 1_000_000
     }
 }

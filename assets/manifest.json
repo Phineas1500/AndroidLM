@@ -22,6 +22,15 @@
       "license": "CC BY-SA 4.0 (English Wikipedia via FineWiki, Aug 2025; redirects Sep 2026)"
     },
     {
+      "name": "wiki_df.db",
+      "role": "corpus",
+      "bytes": 1748992,
+      "sha256": "c87ba297ac464ed92c5f3087bcdcf4ef81ace57bd131b626d9cbd70c762a11fb",
+      "url": "https://huggingface.co/datasets/rammingaway/androidlm-corpus/resolve/main/wiki_df.db",
+      "device_path": "corpus/wiki_df.db",
+      "license": "CC BY-SA 4.0 (word counts derived from wiki.db)"
+    },
+    {
       "name": "voyage.db",
       "role": "corpus-optional",
       "bytes": 328810496,

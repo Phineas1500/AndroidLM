@@ -40,11 +40,18 @@ class Article(val title: String, val views: Long, val text: PyText)
  * Port of rag.py `class Corpus`: planned-title lookup plus gated BM25 over one corpus database
  * (schema at the top of scripts/build_corpus.py, optional `redirects` table from
  * scripts/build_redirects.py). Not thread-safe: it owns scratch tables on the connection.
+ *
+ * [wordCounts] is the path of the database's word-count file (scripts/build_df.py, rag.py
+ * `word_counts_path`), used when present and built from this database: the search then reads a
+ * common stem's document count from it instead of from the stem's whole posting list. The counts
+ * are the index's own, so nothing the search returns depends on whether the file is there.
  */
-class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
+class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor, wordCounts: String? = null) {
     /** max(chunks.id), standing in for the number of indexed chunks (as in Python). */
     val nIndexed: Long
     val hasRedirects: Boolean
+    /** Whether a matching word-count file is attached (see the class comment). */
+    val hasWordCounts: Boolean
 
     // decompressed blocks, least recently used first (Python keeps 32, evicting the oldest)
     private val blocks = object : LinkedHashMap<Long, ByteArray>(16, 0.75f, true) {
@@ -63,6 +70,24 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
         db.exec("CREATE VIRTUAL TABLE temp.qtok_v USING fts5vocab(temp, qtok, row)")
         nIndexed = db.query("select max(id) from chunks").first()[0] as Long
         hasRedirects = db.query("select 1 from sqlite_master where name='redirects'").isNotEmpty()
+        hasWordCounts = wordCounts != null && attachWordCounts(wordCounts)
+    }
+
+    /**
+     * Attaches the word-count file when it belongs to this database: the same max chunk id, and
+     * its check stems (a few with small counts, so short posting lists) counted the same by the
+     * index. Otherwise it stays detached and every count comes from the index.
+     */
+    private fun attachWordCounts(path: String): Boolean {
+        if (runCatching { db.exec("ATTACH DATABASE ? AS dfs", path) }.isFailure) return false
+        val ok = runCatching {
+            val meta = db.query("select key, value from dfs.meta").associate { it[0] as String to it[1] as String }
+            val check = CHECK_ENTRY.findAll(meta["check"].orEmpty()).map { it.groupValues[1] to it.groupValues[2].toLong() }.toList()
+            meta["n_indexed"]?.toLongOrNull() == nIndexed && check.isNotEmpty() &&
+                check.all { (term, doc) -> db.query("select doc from fts_v where term=?", term).firstOrNull()?.get(0) == doc }
+        }.getOrDefault(false)
+        if (!ok) runCatching { db.exec("DETACH DATABASE dfs") }
+        return ok
     }
 
     /** (title, views, text); text lives at a BYTE range inside a compressed block. */
@@ -98,7 +123,9 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
         val out = ArrayList<Stem>()
         for (r in db.query("select term from temp.qtok_v")) {
             val s = r[0] as String
-            val row = db.query("select doc from fts_v where term=?", s).firstOrNull()
+            // a common stem's count from the word-count file; a rarer one's from its short posting list
+            val row = (if (hasWordCounts) db.query("select doc from dfs.df where term=?", s).firstOrNull() else null)
+                ?: db.query("select doc from fts_v where term=?", s).firstOrNull()
             if (row != null) out.add(Stem(s, ln(nIndexed.toDouble() / (row[0] as Long).toDouble())))
         }
         return out
@@ -267,7 +294,19 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
         question: String, titles: List<String>, k: Int = 6, voyage: Corpus? = null, pre: QuestionSearch? = null,
     ): List<Hit> {
         require(pre == null || pre.question == question) { "QuestionSearch is for another question" }
-        val stems = pre?.stems ?: stems(question)
+        val t = titleHits(question, titles, k, voyage, pre?.stems)
+        return if (t.full) t.hits.take(t.limit) else withBm25(t, pre?.bm25 ?: bm25(t.stems))
+    }
+
+    /**
+     * The planned titles' passages, the first half of [retrieve]. When they already fill the
+     * result ([TitleHits.full]) no BM25 hit could reach it, so [retrieve] does not search for any.
+     * [questionStems] are the question's, when already known.
+     */
+    fun titleHits(
+        question: String, titles: List<String>, k: Int = 6, voyage: Corpus? = null, questionStems: List<Stem>? = null,
+    ): TitleHits {
+        val stems = questionStems ?: stems(question)
         val perTitle = ArrayList<List<Hit>>()
         val seenAid = HashSet<ArticleRef>()
         for (t in titles) {
@@ -303,12 +342,18 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
             // a generator feeding extend(): each `not in hits` test sees the items added before it
             for (p in perTitle) if (p.size > rank && p[rank] !in hits) hits.add(p[rank])
         }
+        return TitleHits(hits, max(k, perTitle.size * 2), titles, stems)
+    }
+
+    /** The second half of [retrieve]: [bm25] hits (for [TitleHits.stems]) gated and appended. */
+    fun withBm25(t: TitleHits, bm25: List<Hit>): List<Hit> {
+        val hits = ArrayList(t.hits)
         val seen = hits.mapTo(HashSet()) { it.aid to it.start }
-        val topic = stems(titles.joinToString(" ")).ifEmpty { stems }
-        for (h in pre?.bm25 ?: bm25(stems)) {
+        val topic = stems(t.titles.joinToString(" ")).ifEmpty { t.stems }
+        for (h in bm25) {
             if ((h.aid to h.start) !in seen && coverage(h.title + " " + h.text, topic) >= 0.5) hits.add(h)
         }
-        return hits.take(max(k, perTitle.size * 2))
+        return hits.take(t.limit)
     }
 
     /**
@@ -319,8 +364,11 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
      * A [QuestionSearch] may come from another Corpus over the same database file.
      */
     fun questionSearch(question: String): QuestionSearch {
+        val t0 = System.nanoTime()
         val stems = stems(question)
-        return QuestionSearch(question, stems, bm25(stems))
+        val t1 = System.nanoTime()
+        val hits = bm25(stems)
+        return QuestionSearch(question, stems, hits, (t1 - t0) / 1_000_000, (System.nanoTime() - t1) / 1_000_000)
     }
 
     private data class Span(val start: Int, val end: Int)
@@ -330,6 +378,12 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
     companion object {
         private const val BLOCK_CACHE = 32
         private const val ARTICLE_CACHE = 8
+
+        /** One `["stem", count]` pair of the word-count file's `check` (a JSON list of them). */
+        private val CHECK_ENTRY = Regex("""\[\s*"([^"\\]+)"\s*,\s*(\d+)\s*]""")
+
+        /** Where rag.py `word_counts_path` puts a database's word-count file: wiki.db -> wiki_df.db. */
+        fun wordCountsPath(dbPath: String): String = dbPath.removeSuffix(".db") + "_df.db"
 
         /** rag.py `aspect_bonus` default. */
         const val DEFAULT_ASPECT_BONUS = 0.25
@@ -372,4 +426,17 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor) {
 }
 
 /** [Corpus.questionSearch]'s result: the question's stems and its whole-index BM25 hits. */
-class QuestionSearch(val question: String, val stems: List<Stem>, val bm25: List<Hit>)
+/**
+ * The planned titles' passages ([hits], in order) and how many passages a retrieval keeps
+ * ([limit]); [titles] and [stems] are what the BM25 half needs.
+ */
+class TitleHits(val hits: List<Hit>, val limit: Int, val titles: List<String>, val stems: List<Stem>) {
+    /** The passages already fill the result: BM25 hits would all be cut. */
+    val full: Boolean get() = hits.size >= limit
+}
+
+/** [stemsMs] and [bmMs]: how long the two steps took (timing only; the results do not depend on it). */
+class QuestionSearch(
+    val question: String, val stems: List<Stem>, val bm25: List<Hit>,
+    val stemsMs: Long = 0, val bmMs: Long = 0,
+)

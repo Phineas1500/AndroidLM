@@ -58,14 +58,17 @@ object CorpusLocator {
  */
 class AndroidCorpora(private val files: CorpusFiles) : CorpusProvider, AutoCloseable {
     private val zstd = AndroidZstd()
-    private val databases = ArrayList<AndroidSqlDatabase>()
+    // written on the corpus thread, read by interrupt() from any thread
+    private val databases = java.util.concurrent.CopyOnWriteArrayList<AndroidSqlDatabase>()
     private var wiki: Corpus? = null
     private var voyage: Corpus? = null
 
     private fun open(f: File): Corpus {
         val db = AndroidSqlDatabase(f)
         databases.add(db)
-        return Corpus(db, zstd)
+        // the word-count file next to it (wiki_df.db), when installed; the search is the same without it
+        val counts = File(Corpus.wordCountsPath(f.path)).takeIf { it.isFile && it.canRead() }
+        return Corpus(db, zstd, counts?.path)
     }
 
     override fun wiki(): Corpus = wiki ?: open(files.wiki).also { wiki = it }
@@ -73,6 +76,10 @@ class AndroidCorpora(private val files: CorpusFiles) : CorpusProvider, AutoClose
     override fun voyage(): Corpus? {
         val f = files.voyage ?: return null
         return voyage ?: open(f).also { voyage = it }
+    }
+
+    override fun interrupt() {
+        databases.forEach { it.interrupt() }
     }
 
     override fun close() {

@@ -26,7 +26,10 @@ import org.junit.Test
 import java.io.File
 import java.sql.DriverManager
 import java.util.Collections
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * ResearchPipeline against a scripted engine. The sample databases and golden.json come from the
@@ -81,6 +84,8 @@ class ResearchPipelineTest {
             threads.add(Thread.currentThread())
             inner.exec(sql, *args)
         }
+
+        override fun interrupt() = inner.interrupt()
     }
 
     private lateinit var corpusThread: ExecutorCoroutineDispatcher
@@ -686,7 +691,30 @@ class ResearchPipelineTest {
     // ── background search ──
 
     /** A second provider over the same files, on its own thread, with its own thread record. */
-    private class Background(wiki: File, voyage: File?) : AutoCloseable {
+    /**
+     * The whole-index BM25 query held back for [holdMs] (on a phone it takes about 20 s) unless
+     * [interrupt] comes first, after which it throws, as an interrupted query does.
+     */
+    private class SlowBm25Db(private val inner: SqlDatabase, private val holdMs: Long) : SqlDatabase {
+        val interrupts = AtomicInteger()
+        private val released = CountDownLatch(1)
+
+        override fun query(sql: String, vararg args: Any?): List<Array<Any?>> {
+            if ("bm25(fts, 8.0, 3.0, 1.0)" in sql && released.await(holdMs, TimeUnit.MILLISECONDS)) {
+                throw IllegalStateException("interrupted")
+            }
+            return inner.query(sql, *args)
+        }
+
+        override fun exec(sql: String, vararg args: Any?) = inner.exec(sql, *args)
+
+        override fun interrupt() {
+            interrupts.incrementAndGet()
+            released.countDown()
+        }
+    }
+
+    private class Background(wiki: File, voyage: File?, holdBm25Ms: Long = 0) : AutoCloseable {
         val threads: MutableSet<Thread> = Collections.synchronizedSet(HashSet())
         @Volatile var javaThread: Thread? = null
         val dispatcher: ExecutorCoroutineDispatcher =
@@ -694,16 +722,21 @@ class ResearchPipelineTest {
                 .asCoroutineDispatcher()
         val priorities: MutableList<Boolean> = Collections.synchronizedList(ArrayList())
         private val dbs = ArrayList<JdbcSqlDatabase>()
+        @Volatile var slow: SlowBm25Db? = null
         private val provider = object : CorpusProvider {
             private val zstd = JniZstdDecompressor()
-            private val w by lazy { open(wiki) }
-            private val v by lazy { voyage?.let { open(it) } }
-            private fun open(f: File): Corpus {
+            private val w by lazy { open(wiki, holdBm25Ms) }
+            private val v by lazy { voyage?.let { open(it, 0) } }
+            private fun open(f: File, holdMs: Long): Corpus {
                 val db = JdbcSqlDatabase(f).also { dbs.add(it) }
-                return Corpus(ThreadRecordingDb(db, threads), zstd)
+                val inner: SqlDatabase = if (holdMs > 0) SlowBm25Db(db, holdMs).also { slow = it } else db
+                return Corpus(ThreadRecordingDb(inner, threads), zstd)
             }
             override fun wiki() = w
             override fun voyage() = v
+            override fun interrupt() {
+                slow?.interrupt()
+            }
         }
         val search = BackgroundSearch(provider, dispatcher) { priorities.add(it) }
 
@@ -722,7 +755,7 @@ class ResearchPipelineTest {
     }
 
     /** Everything but wall times: what a background search must leave unchanged. */
-    private fun ResearchResult.withoutTimes() = copy(timings = timings.map { it.copy(wallMs = 0, workMs = null) })
+    private fun ResearchResult.withoutTimes() = copy(timings = timings.map { it.copy(wallMs = 0, workMs = null, parts = emptyList()) })
 
     @Test
     fun backgroundSearchChangesNothingButTheTimingAnswerFirst() {
@@ -796,6 +829,72 @@ class ResearchPipelineTest {
         } finally {
             wikiDb.close()
             voyageDb.close()
+        }
+    }
+
+    /** retrieve() skips BM25 only when its hits could not reach the result: the same hits either way. */
+    @Test
+    fun skippingTheBm25ChangesNoRetrieval() {
+        val zstd = JniZstdDecompressor()
+        val wikiDb = JdbcSqlDatabase(fixture("sample_wiki.db"))
+        val voyageDb = JdbcSqlDatabase(fixture("sample_voyage.db"))
+        try {
+            val wiki = Corpus(wikiDb, zstd)
+            val voyage = Corpus(voyageDb, zstd)
+            var full = 0
+            var room = 0
+            for (c in golden.map { it.asJsonObject }) {
+                val question = c["question"].asString
+                val titles = c["titles"].asJsonArray.map { it.asString }
+                for (v in listOf(voyage, null)) {
+                    val t = wiki.titleHits(question, titles, 6, v)
+                    if (t.full) full++ else room++
+                    val always = wiki.withBm25(t, wiki.bm25(t.stems)) // the search before the skip
+                    assertEquals(question, always, wiki.retrieve(question, titles, 6, v))
+                }
+            }
+            assertTrue("both kinds of case covered", full > 0 && room > 0)
+        } finally {
+            wikiDb.close()
+            voyageDb.close()
+        }
+    }
+
+    @Test
+    fun retrievalFirstStopsTheBm25WhenThePlannedArticlesFillTheSources() {
+        val case = goldenCase("What happened in the 1983 Harrods bombing")
+        val question = case["question"].asString
+        val script = listOf("1. Harrods bombing\n2. \"Provisional Irish Republican Army\"\n", "An IRA car bomb [1].")
+        val plain = run(FakeEngine(script), sampleProvider(), question, Recorder())
+
+        Background(fixture("sample_wiki.db"), fixture("sample_voyage.db"), holdBm25Ms = 60_000).use { bg ->
+            val t0 = System.nanoTime()
+            val result = backgroundRun(FakeEngine(script), bg, question, Recorder())
+            val seconds = (System.nanoTime() - t0) / 1e9
+
+            assertEquals(plain.withoutTimes(), result.withoutTimes())
+            assertTrue("did not wait for the held BM25 ($seconds s)", seconds < 30)
+            assertTrue("the BM25 query was interrupted", bg.slow!!.interrupts.get() >= 1)
+            val parts = result.timings.single { it.phase == ResearchPhase.SEARCHING }.parts.toMap()
+            assertEquals(0L, parts["bm25_needed"])
+        }
+    }
+
+    @Test
+    fun retrievalFirstWaitsForTheBm25WhenTheSourcesHaveRoom() {
+        val case = goldenCase("What are the main arguments for and against rent control")
+        val question = case["question"].asString
+        val script = listOf("Rent control\nHousing economics", "Economists mostly oppose it [1].")
+        val config = ResearchConfig(routeViews = Long.MAX_VALUE) // retrieval first, whatever the views
+        val plain = run(FakeEngine(script), sampleProvider(), question, Recorder(), config)
+
+        Background(fixture("sample_wiki.db"), fixture("sample_voyage.db"), holdBm25Ms = 1_000).use { bg ->
+            val result = backgroundRun(FakeEngine(script), bg, question, Recorder(), config)
+
+            assertEquals(plain.withoutTimes(), result.withoutTimes())
+            assertEquals(0, bg.slow!!.interrupts.get())
+            val parts = result.timings.single { it.phase == ResearchPhase.SEARCHING }.parts.toMap()
+            assertEquals(1L, parts["bm25_needed"])
         }
     }
 
