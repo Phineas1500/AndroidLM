@@ -31,8 +31,8 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 | Memory during a research question | about 7.8GB (engine 5.6GB including a 5GB expert cache, pinned dense weights 2.05GB, app 0.15GB) |
 | Generation speed | 4.2-5.8 tokens/s in the app (lower when the phone is hot) |
 | Model load | about 28 s on app start |
-| Answer-first question | first words after about 22 s; answer plus cited source check in about 4.5 min |
-| Retrieval-first question | first words after 80-150 s (longer source prompts take longer); cited answer done in 1.8-2.8 min |
+| Answer-first question | first words after about 22 s; answer plus cited source check in about 4 min |
+| Retrieval-first question | first words after 75-150 s (longer source prompts take longer); cited answer done in 1.6-2.8 min |
 
 Against Qwen3-1.7B answering the same 72 questions from memory, graded 0-10 by Claude with one
 rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-model-comparison.md)):
@@ -51,8 +51,7 @@ Measurements, eval rounds and decisions are in [`notes/`](notes/); the Pixel fin
 [`notes/2026-09-23-pixel-first-day.md`](notes/2026-09-23-pixel-first-day.md) and
 [`notes/2026-09-24-speed-levers.md`](notes/2026-09-24-speed-levers.md) (which of the phone's
 cores, RAM, GPU and TPU help, and by how much). Known gaps: no
-signed release APK yet, the corpus is installed with adb (no in-app import), and search takes
-about 20 s on the phone.
+signed release APK yet, and the corpus is installed with adb (no in-app import).
 
 ## Install
 
