@@ -15,7 +15,8 @@ declares no INTERNET permission and uses no Google Play Services.
 
 - Model: Qwen3.6-35B-A3B at 2-bit (12.3GB). Only 3B parameters are active per token, so the
   engine streams the experts each token needs from flash into a 5GB cache (BigMoeOnEdge on
-  llama.cpp, plus four engine patches of ours). About 7.8GB of RAM in use; 4-6 tokens/s.
+  llama.cpp, plus engine patches of ours, including ik_llama.cpp's ARM kernels for the experts).
+  About 7.9GB of RAM in use; 4-6 tokens/s written, 24-30 tokens/s read.
 - Knowledge: an offline English Wikipedia (21GB SQLite: 2M articles in full, the rest as lead
   sections, full-text index, redirects, pageviews) and optional Wikivoyage. 33.9GB in total.
 - Research, not recall: the model names the articles it needs. Obscure subjects are answered
@@ -26,8 +27,8 @@ declares no INTERNET permission and uses no Google Play Services.
   obscure subjects 1.3 vs 7.2, with invented details left in 23 of 24 small-model answers vs 3 of
   ours. Answers and grades are in the repo.
 - Real timings on the phone (medians over 24 questions asked in the app): a cited answer about an
-  obscure subject in about 2.5 min; for well-known subjects, first words in about 25 s and a cited
-  source check in about 3.5 min. The phone's answers graded the same as the server's (7.1 vs 7.2).
+  obscure subject in about 1.7 min; for well-known subjects, first words in about 18 s and a cited
+  source check in about 3.2 min. The phone's answers graded the same as the server's (7.1 vs 7.2).
 
 Post: {{POST_URL}}
 Code, install script, eval sets and grades: https://github.com/Phineas1500/AndroidLM

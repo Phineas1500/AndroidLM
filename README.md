@@ -9,9 +9,11 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
 - **Model:** Qwen3.6-35B-A3B (35B parameters, 3B active per token) at 2-bit
   (`unsloth/Qwen3.6-35B-A3B-GGUF`, `UD-Q2_K_XL`, 12.3GB). The model file is larger than the
   memory the app uses: routed experts are streamed from flash into an in-RAM expert cache by
-  [BigMoeOnEdge](https://github.com/Helldez/BigMoeOnEdge), which is built on llama.cpp. Two
-  engine patches of ours (`patches/`) keep one pinned thread pool per session and let a
-  follow-up turn reuse the conversation instead of re-reading it.
+  [BigMoeOnEdge](https://github.com/Helldez/BigMoeOnEdge), which is built on llama.cpp. Our
+  engine patches (`patches/`) keep one pinned thread pool per session on the fast cores, let a
+  follow-up turn reuse the conversation instead of re-reading it, repack the dense weights, and
+  bring ik_llama.cpp's ARM kernels for the 2- and 3-bit experts into llama.cpp, which halves
+  the time to read a prompt ([`notes/2026-09-25-iqk-port.md`](notes/2026-09-25-iqk-port.md)).
 - **Corpus:** English Wikipedia (FineWiki, August 2025) in one 21GB SQLite file: the 2M most-read
   articles in full, lead sections for the rest, a BM25 full-text index, Wikipedia's redirect
   table, and monthly pageviews per article. Optional Wikivoyage (0.3GB) for travel questions.
@@ -28,11 +30,12 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 | | |
 |---|---|
 | Storage | 33.9GB (model 12.3GB, Wikipedia 21.3GB, Wikivoyage 0.3GB) plus the 72MB APK |
-| Memory during a research question | about 7.8GB (engine 5.6GB including a 5GB expert cache, pinned dense weights 2.05GB, app 0.15GB) |
+| Memory during a research question | about 7.9GB (engine 5.8GB including a 5GB expert cache, pinned dense weights 2.0GB, app 0.15GB) |
 | Generation speed | 4-6 tokens/s in the app (lower when the phone is hot) |
+| Prompt reading | 24-30 tokens/s in the app (a 1,000-token source prompt in 35-40 s) |
 | Model load | about 28 s on app start |
-| Answer-first question | first words after about 25 s; answer plus cited source check in about 3.5 min |
-| Retrieval-first question | cited answer in about 2.5 min (median over 19 questions; first words after 1.3-2.2 min) |
+| Answer-first question | first words after about 18 s; answer plus cited source check in about 3.2 min (medians over 6 questions) |
+| Retrieval-first question | cited answer in about 1.7 min (median 100 s over 18 questions; first words after 45-79 s) |
 
 Against Qwen3-1.7B answering the same 72 questions from memory, graded 0-10 by Claude with one
 rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-model-comparison.md)):
@@ -47,7 +50,9 @@ rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-mo
 AndroidLM's answers in this table were produced on an ARM server with the same model and
 pipeline as the app. The obscure-subject questions asked in the app on the phone scored the same,
 graded blind against the server's answers: 7.1 vs 7.2, 84 vs 85 of 120 key facts
-([`notes/2026-09-25-phone-eval.md`](notes/2026-09-25-phone-eval.md)).
+([`notes/2026-09-25-phone-eval.md`](notes/2026-09-25-phone-eval.md)); asked again with the
+faster prompt kernels, 6.9 against the earlier phone answers' 7.1, 84 vs 83 key facts
+([`notes/2026-09-25-iqk-port.md`](notes/2026-09-25-iqk-port.md)).
 
 Measurements, eval rounds and decisions are in [`notes/`](notes/); the Pixel findings are in
 [`notes/2026-09-23-pixel-first-day.md`](notes/2026-09-23-pixel-first-day.md) and
@@ -72,7 +77,7 @@ checks their SHA-256, pushes them to the phone over USB and installs the APK. Bu
 | `scripts/eval_models.sh`, `run_eval.py` | Run an eval set against a memory-capped llama-server |
 | `scripts/bench.sh`, `sbx.sh` | Benchmarks under a cgroup memory cap; sandbox for third-party code |
 | `app-android/` | The Android app (a fork of BigMoeOnEdge's demo) and the `research/` pipeline module |
-| `patches/` | Our patches to the BigMoeOnEdge engine, applied by the engine build script |
+| `patches/` | Our patches to the BigMoeOnEdge engine and (`patches/llama.cpp/`) to its llama.cpp, applied by the engine build script |
 | `scripts/build-android-engine.sh` | Cross-compiles the patched engine for Android arm64 |
 | `scripts/install.sh` | Downloads, verifies and pushes the model and corpus; installs the APK |
 | `scripts/app_timing.sh` | Times research questions in the app over adb (dev build only) |

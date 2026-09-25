@@ -43,9 +43,9 @@ Twyford". Ours: Ernst Chain and Howard Florey, 1945, with what each of them did.
 and a source check occasionally "corrects" something that was right. Every answer and grade is
 in the repo.
 
-**9/ Real timings, on the phone.** Well-known subjects: first words in about 25 s, a cited
-check in about 3.5 min. Obscure subjects: a cited answer in about 2.5 min (medians of 24 runs).
-The video speeds up waits and labels each with its real length.
+**9/ Real timings, on the phone.** Well-known subjects: first words in about 18 s, a cited
+check in about 3.2 min. Obscure subjects: a cited answer in about 1.7 min (medians of 24 runs).
+The video (an earlier, slower build) speeds up waits and labels each with its real length.
 
 **10/ Reproducible.** Install script with checksums, the corpus build, eval questions, every
 answer and grade, and our engine patches are in the repo. The corpus is on Hugging Face under
