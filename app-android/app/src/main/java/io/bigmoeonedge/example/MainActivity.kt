@@ -209,13 +209,21 @@ private fun MainScreen(
                 (last.index == info.totalItemsCount - 1 && last.offset + last.size <= info.viewportEndOffset)
         }
     }
+    // Only the user's own drag detaches the follow, and only where their scroll comes to rest re-arms
+    // it: the list's own scroll-to-bottom (and a layout change right after it, like the final timing
+    // line appearing) must never count as the user scrolling away.
+    var userScroll by remember { mutableStateOf(false) }
     LaunchedEffect(listState) {
-        listState.interactionSource.interactions.collect { if (it is DragInteraction.Start) followTail = false }
+        listState.interactionSource.interactions.collect {
+            if (it is DragInteraction.Start) { followTail = false; userScroll = true }
+        }
     }
     // Re-arm on settle, not the moment the bottom is touched: while an answer streams the bottom
     // keeps moving away, so only where a scroll actually comes to rest says what the user wants.
     LaunchedEffect(listState) {
-        snapshotFlow { listState.isScrollInProgress }.collect { scrolling -> if (!scrolling) followTail = atBottom }
+        snapshotFlow { listState.isScrollInProgress }.collect { scrolling ->
+            if (!scrolling && userScroll) { followTail = atBottom; userScroll = false }
+        }
     }
     // A new question (a research run, or a chat turn) is where the user wants to look, wherever
     // they had scrolled to type it: follow its answer from the start.
