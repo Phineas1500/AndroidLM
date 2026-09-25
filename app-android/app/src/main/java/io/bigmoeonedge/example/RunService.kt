@@ -276,6 +276,10 @@ class RunService : Service() {
             // a barrier after every operation, so a UI frame that preempts one of them stalls all.
             // Pixel 8 Pro, same question: draft 3.49 -> 3.85 tok/s, source check 2.54 -> 2.91.
             pb.environment()["BMOE_NICE"] = ENGINE_NICE.toString()
+            // Repacked dense weights (patches/0006): llama.cpp's interleaved kernels for the dense
+            // matmuls, the experts untouched. Pixel 8 Pro, 1,216-token prompt: read in 72.7 s
+            // instead of 93.8 s, writing 4.77 instead of 4.56 tok/s.
+            if (ENGINE_REPACK) pb.environment()["BMOE_REPACK"] = "1"
             // Dev builds only: extra BMOE_* engine environment from DEV_ENGINE_ENV (KEY=VALUE per
             // line), so engine tuning can be measured on a phone without rebuilding the app.
             if (BuildConfig.SHARED_STORAGE) {
@@ -1033,6 +1037,8 @@ class RunService : Service() {
         const val LOG_TAG = "AndroidLM"
         /** Engine scheduling priority (nice value); see runSession. */
         const val ENGINE_NICE = -16
+        /** Let the engine repack the dense weights at load (patches/0006); see runSession. */
+        const val ENGINE_REPACK = true
         /** Minimum interval between screen updates while a research generation streams. */
         const val UI_FRAME_MS = 250L
         /** Dev builds: optional extra engine environment (BMOE_* KEY=VALUE lines). */

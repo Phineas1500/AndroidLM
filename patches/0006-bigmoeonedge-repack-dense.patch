@@ -1,0 +1,115 @@
+diff --git a/core/src/engine/session.cpp b/core/src/engine/session.cpp
+index f48a31d..f1cab30 100644
+--- a/core/src/engine/session.cpp
++++ b/core/src/engine/session.cpp
+@@ -24,6 +24,7 @@
+ 
+ #include "llama.h"
+ #include "ggml.h"
++#include "ggml-backend.h"
+ 
+ // llama.cpp's `common` layer (NOT the stable public API): chat-template rendering and
+ // reasoning parsing. See the note in the root CMakeLists / docs/seam.md.
+@@ -414,6 +415,7 @@ struct Session::Impl {
+     // threads per token). Declared before ctx so that it is destroyed after it.
+     std::unique_ptr<ggml_threadpool, void (*)(ggml_threadpool *)> tpool{nullptr, ggml_threadpool_free};
+     CpuPlacement placement;            // BMOE_CPUMASK placement, re-applied when Android resets it
++    std::vector<pio::PinnedAlloc> repack_pins; // pinned copies of repacked dense tensors (BMOE_REPACK)
+     std::unique_ptr<llama_context, void (*)(llama_context *)> ctx{nullptr, llama_free};
+     std::unique_ptr<RouterHook> hook; // heap: its address is baked into cparams.cb_eval_user_data
+     ExpertStreamSource source;
+@@ -518,6 +520,8 @@ struct Session::Impl {
+         ctx.reset();
+         hook.reset();
+         model.reset();
++        for (pio::PinnedAlloc & p : repack_pins) pio::pinned_free(&p);
++        repack_pins.clear();
+         mapping_placeholders.release();
+         if (backend_inited) llama_backend_free();
+     }
+@@ -753,11 +757,26 @@ std::unique_ptr<Session> Session::open(const SessionConfig & cfg,
+     };
+     auto gguf = [&]() -> const GgufModelInfo & { return meta().info; };
+ 
+-    // Load with the layout the streamer requires: file-backed mmap, no repack (a repacked
+-    // q4_K buffer would break the rebind), experts on CPU.
++    // Load with the layout the streamer requires: file-backed mmap, experts on CPU, and experts
++    // never repacked (a repacked expert buffer would break the rebind: the streamer fills expert
++    // slots with the file's own bytes).
++    //
++    // BMOE_REPACK=1: the DENSE weights may be repacked. llama.cpp then loads the dense matmul
++    // weights it has interleaved CPU kernels for (Q4_K, Q5_K, Q6_K, Q8_0...) into its CPU_REPACK
++    // buffer, where prompt reading runs them as GEMMs instead of one row at a time; the experts are
++    // forced to the plain CPU buffer type, which keeps them in the file mapping for the streamer.
++    // Repacked tensors are then left out of the dense-weights policy (their bytes are no longer the
++    // file's) and, under the pinned policy, copied into pinned memory of their own.
++    const char * repack_env = std::getenv("BMOE_REPACK");
++    const bool repack = repack_env && std::atoi(repack_env) != 0;
+     llama_model_params mparams = llama_model_default_params();
+     mparams.load_mode = LLAMA_LOAD_MODE_MMAP;
+-    mparams.use_extra_bufts = false;
++    mparams.use_extra_bufts = repack;
++    static const llama_model_tensor_buft_override experts_plain[] = {
++        {"_exps", ggml_backend_cpu_buffer_type()},
++        {nullptr, nullptr},
++    };
++    if (repack) mparams.tensor_buft_overrides = experts_plain;
+     mparams.n_gpu_layers = 0;
+     // The nextn/MTP block is skipped at load unless asked for: llama.cpp marks its tensors
+     // TENSOR_SKIP by default, and only --mtp builds a graph over them. n_layer_nextn comes from
+@@ -1044,10 +1063,21 @@ std::unique_ptr<Session> Session::open(const SessionConfig & cfg,
+             // one entry's alias list so the bytes are still read and allocated exactly once.
+             std::vector<DenseTensorRef> dense, rows;
+             std::unordered_map<uint64_t, size_t> dense_at; // (shard, file offset) -> index in `dense`
++            std::vector<ggml_tensor *> repacked;
++            auto is_repacked = [](const ggml_tensor * t) {
++                return t->buffer && std::strcmp(ggml_backend_buft_name(ggml_backend_buffer_get_type(t->buffer)), "CPU_REPACK") == 0;
++            };
+             for (ggml_tensor * t : im.hook->captured_weight_objects()) {
+                 if (!t) continue;
+                 const std::string name = t->name;
+-                if (expert_names.count(name)) continue;
++                if (expert_names.count(name)) {
++                    if (is_repacked(t)) return fail("expert tensor '" + name + "' was repacked; the streamer cannot rebind it");
++                    continue;
++                }
++                if (is_repacked(t)) {
++                    if (std::find(repacked.begin(), repacked.end(), t) == repacked.end()) repacked.push_back(t);
++                    continue; // its bytes are llama.cpp's interleaved layout, not the file's
++                }
+                 auto off = offs.off_by_name.find(name);
+                 auto sz = offs.size_by_name.find(name);
+                 if (off == offs.off_by_name.end() || sz == offs.size_by_name.end()) continue; // not a file tensor
+@@ -1087,6 +1117,32 @@ std::unique_ptr<Session> Session::open(const SessionConfig & cfg,
+                 for (const auto & kv : offs.off_by_name)
+                     if (!expert_names.count(kv.first) && !owned.count(kv.first)) unaccounted.push_back(kv.first);
+             }
++            // Repacked dense tensors live in llama.cpp's CPU_REPACK buffer, plain anonymous memory the
++            // kernel may swap to zram. Under the pinned policy they get pinned copies too: the tensor
++            // keeps its buffer (which is what routes it to the repacked kernels) and points at the
++            // copy, and the original pages are released.
++            if (!repacked.empty()) {
++                size_t bytes = 0;
++                int pinned = 0;
++                const size_t page = pio::vm_page();
++                for (ggml_tensor * t : repacked) {
++                    const size_t n = ggml_nbytes(t);
++                    bytes += n;
++                    if (cfg.moe.dense_weights != DenseWeightsMode::Pinned) continue;
++                    pio::PinnedAlloc pa;
++                    if (!pio::pinned_alloc(n, &pa) || !pa.base) continue;
++                    std::memcpy(pa.base, t->data, n);
++                    const uintptr_t old = (uintptr_t) t->data;
++                    t->data = pa.base;
++                    im.repack_pins.push_back(pa);
++                    const uintptr_t a0 = (old + page - 1) & ~(uintptr_t) (page - 1);
++                    const uintptr_t a1 = (old + n) & ~(uintptr_t) (page - 1);
++                    if (a1 > a0) pio::vm_evict((void *) a0, (size_t) (a1 - a0));
++                    ++pinned;
++                }
++                std::fprintf(stderr, "bmoe: repacked %zu dense tensors (%.0f MiB), %d pinned\n", repacked.size(),
++                             bytes / (1024.0 * 1024.0), pinned);
++            }
+             const uint64_t row_budget = (uint64_t) std::max(0, cfg.moe.row_stream_mb) * 1024ull * 1024ull;
+             im.source.set_dense_tensors(std::move(dense));
+             im.source.set_row_tensors(std::move(rows), row_budget);
