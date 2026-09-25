@@ -41,3 +41,23 @@ repo and a brief explanation of the approach; then a poidh claim with a screensh
 - Keep one continuous unedited recording of at least one full question in the repo
   (`docs/demo/`) as the raw evidence.
 - Screenshot for the poidh claim: a completed cited answer with the airplane-mode icon visible.
+
+## Recorded (2026-09-24)
+
+Four takes, driven over USB with `scripts/demo/take.sh` (adb screen recording, scripted typing and
+taps, phone in airplane mode with Wi-Fi and Bluetooth off; the charging icon is the USB cable that
+drove the recording), each question's phases logged by the app. Takes started at a skin
+temperature of 30.5 C or within 9 minutes of the previous one, so only the first two include the
+model load.
+
+| Take | Route | First words | Done |
+|---|---|---|---|
+| 1983 Harrods bombing | sources first | 123 s | 186 s (after a 21 s model load) |
+| Big Motor | sources first | 80 s | 109 s (after a 20 s model load) |
+| Pink Floyd, "Hey, Hey, Rise Up!" | sources first | 143 s | 167 s |
+| Altitude in Leh, Ladakh | answer first, then source check | 23 s | 284 s |
+
+All four answers were correct and cited. `scripts/demo/make_cut.py` edits a take into a clip: every
+sped-up stretch carries a label with its speed and real duration, placed from the app's phase log.
+Short cut (2:11; Harrods and Leh; within X's 2:20 limit for standard accounts) and full cut (3:22;
+all four) are kept outside the repository with the raw takes, which are the unedited evidence.

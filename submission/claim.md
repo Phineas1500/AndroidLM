@@ -25,7 +25,7 @@ declares no INTERNET permission and uses no Google Play Services.
   answer graded 0-10 by Claude with one rubric: 2.6 vs 7.0 overall, ours higher on 71 of 72. On
   obscure subjects 1.3 vs 7.2, with invented details left in 23 of 24 small-model answers vs 3 of
   ours. Answers and grades are in the repo.
-- Real timings on the phone: first words after about 22 s for well-known subjects and 1.5-2.5
+- Real timings on the phone: first words after about 22 s for well-known subjects and 1.3-2.5
   min for obscure ones; a complete cited answer in 2-5 min.
 
 Post: {{POST_URL}}

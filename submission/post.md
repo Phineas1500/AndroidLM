@@ -1,7 +1,7 @@
 # X / Farcaster post draft
 
-For the user to post from their own account. Nothing here has been posted. Attach the video to
-the first post and keep sped-up stretches labelled in it. The numbers come from
+For the user to post from their own account. Nothing here has been posted. Attach the short cut
+(2:11, fits X's 2:20 limit) to the first post, or the full cut (3:22) where longer video is allowed. The numbers come from
 `notes/2026-09-24-small-model-comparison.md`.
 
 ## Main post (under 280 characters)
@@ -44,8 +44,8 @@ and a source check occasionally "corrects" something that was right. Every answe
 in the repo.
 
 **9/ Real timings.** Well-known subjects: first words in about 22 s, a cited check within
-about 4.5 min. Obscure subjects: a cited answer in about 2 min. The video speeds up the waits and says
-so on screen.
+about 4-5 min. Obscure subjects: a cited answer in 2-3 min. The video speeds up waits and labels each
+with its real length. (The charging icon is the USB cable used to record the screen.)
 
 **10/ Reproducible.** Install script with checksums, the corpus build, eval questions, every
 answer and grade, and our engine patches are in the repo. The corpus is on Hugging Face under
