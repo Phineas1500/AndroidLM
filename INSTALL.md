@@ -22,19 +22,28 @@ and the corpus are therefore copied to the phone from a computer.
 
 ```sh
 git clone https://github.com/Phineas1500/AndroidLM && cd AndroidLM
-# build the APK (see app-android/README.md) or download it from the releases page, then:
-scripts/install.sh --apk path/to/androidlm.apk
+# the signed app from the v1.0.0 release (or build it yourself: app-android/README.md)
+curl -L -o androidlm-1.0.0.apk \
+  https://github.com/Phineas1500/AndroidLM/releases/download/v1.0.0/androidlm-1.0.0.apk
+shasum -a 256 androidlm-1.0.0.apk   # 246bd4ee2ed7049d63b2b5ec926ca3efab29ea677d9c7f817a16a5e1bb4fc013
+scripts/install.sh --apk androidlm-1.0.0.apk
 ```
 
-The script downloads the three files into `./assets-cache` (resumable; run it again after an
-interruption), checks their size and SHA-256 against `assets/manifest.json`, pushes them to
-`/data/local/tmp/bmoe` on the phone, makes them readable by the app, and installs the APK.
+The script downloads the model and corpus files into `./assets-cache` (resumable; run it again
+after an interruption), checks their size and SHA-256 against `assets/manifest.json`, pushes them
+to `/data/local/tmp/bmoe` on the phone, makes them readable by the app, and installs the APK.
+The APK is signed with the project's release key (certificate SHA-256
+`51:B8:C6:1C:8F:1A:43:5E:09:49:64:A5:F6:A3:1E:AC:97:F6:55:2C:2D:4E:D2:42:0C:55:39:C4:3B:B8:3D:A3`);
+its package is `io.github.phineas1500.androidlm.dev`, the build that reads the model and corpus
+from `/data/local/tmp`. An earlier build of that package signed with another key has to be
+uninstalled first (see below).
 Pushing 34GB over USB takes roughly 15-40 minutes depending on the cable and port.
 
 Then, on the phone: turn on airplane mode, open AndroidLM (it finds the model and the corpus by
-itself; if it was open during the install, tap Refresh), leave Research switched on, type a
-question and tap Research. The first question loads the model, about 30 s; later questions reuse
-it.
+itself; if it was open during the install, tap Refresh; on first launch Android asks whether it
+may show notifications, which the app uses for its progress while it works), leave Research
+switched on, type a question and tap Research. The first question loads the model, about 30 s;
+later questions reuse it.
 
 ## Without the script
 
@@ -43,7 +52,7 @@ adb shell mkdir -p /data/local/tmp/bmoe/corpus
 adb push Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf /data/local/tmp/bmoe/
 adb push wiki.db wiki_df.db voyage.db /data/local/tmp/bmoe/corpus/
 adb shell 'chmod 755 /data/local/tmp/bmoe /data/local/tmp/bmoe/corpus; chmod 644 /data/local/tmp/bmoe/*.gguf /data/local/tmp/bmoe/corpus/*.db'
-adb install -r androidlm.apk
+adb install -r androidlm-1.0.0.apk
 ```
 
 `/data/local/tmp` is used because the app can open files there in place, without a storage
@@ -54,15 +63,16 @@ picker location at all.
 ## Removing it
 
 ```sh
-adb uninstall io.github.phineas1500.androidlm.dev   # or without .dev for the release flavour
+adb uninstall io.github.phineas1500.androidlm.dev
 adb shell rm -r /data/local/tmp/bmoe
 ```
 
 ## Status
 
 The install flow has been run end to end on a Pixel 8 Pro (Android 16): download, checksum
-verification, `adb push` of all three files and the APK install, followed by research questions in
-the app. The app has no network permission (`aapt2 dump permissions` lists no
-`android.permission.INTERNET`), so it cannot reach the network even with Wi-Fi on. Known gaps: there
-is no signed release APK yet (build the dev debug APK, see `app-android/README.md`), and the corpus
-can only be installed with adb (the model can also be imported with the in-app file picker).
+verification, `adb push` of the files and the APK install, followed by research questions in the
+app; the v1.0.0 APK was installed from scratch and answered a research question on that phone
+before it was published. The app has no network permission (`aapt2 dump permissions` lists no
+`android.permission.INTERNET`), so it cannot reach the network even with Wi-Fi on. Known gap: the
+corpus can only be installed with adb (the model can also be imported with the in-app file
+picker).

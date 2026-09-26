@@ -5,7 +5,7 @@
 source ~/androidlm-tools/env.sh
 NAME=$1; Q=$2
 PKG=io.github.phineas1500.androidlm.dev
-OUT=~/androidlm-tools/demo2; mkdir -p $OUT
+OUT=${DEMO_OUT:-~/androidlm-tools/demo2}; mkdir -p $OUT
 node() {  # centre of the first node whose text is $1 (or whose class contains $1 when $2 = class)
   adb shell "uiautomator dump /data/local/tmp/ui.xml >/dev/null 2>&1; cat /data/local/tmp/ui.xml" </dev/null > /tmp/take_ui.xml
   python3 - "$1" "${2:-text}" <<PY
@@ -34,9 +34,8 @@ adb shell "dumpsys window | grep -m1 mCurrentFocus" </dev/null | grep -q android
 totop
 C=$(node "Clear the answer"); [ -n "$C" ] && adb shell "input tap $C" </dev/null && sleep 1 && totop
 E=$(node EditText class); [ -n "$E" ] || { echo "no question box; abort"; exit 1; }
+adb logcat -G 16M </dev/null >/dev/null 2>&1
 adb logcat -c </dev/null
-adb logcat -s AndroidLM:I </dev/null > $OUT/$NAME.log 2>&1 &
-cap=$!
 adb shell "rm -f /sdcard/Movies/$NAME.mp4; nohup screenrecord --time-limit 0 --bit-rate 6000000 /sdcard/Movies/$NAME.mp4 >/dev/null 2>&1 &" </dev/null
 sleep 3
 adb shell "cmd statusbar expand-settings" </dev/null; sleep 4
@@ -56,16 +55,18 @@ for m in re.finditer(r"<node [^>]*>", s):
 if hit: print(hit[0], hit[1])
 PY
 )
-[ -n "$R" ] || { echo "Research button not found; abort"; adb shell "pkill -INT screenrecord" </dev/null; kill $cap; exit 1; }
+[ -n "$R" ] || { echo "Research button not found; abort"; adb shell "pkill -INT screenrecord" </dev/null; exit 1; }
 adb shell "input tap $R" </dev/null; echo "tapped Research $R"
 T0=$(date +%s)
-until grep -qE "completed|failed" $OUT/$NAME.log; do sleep 5; done
+# the app's own end-of-run line, read back from the phone's log buffer (a live logcat stream once
+# dropped a run's last lines; an engine warning forwarded to the log can contain "failed")
+until adb logcat -d -s AndroidLM:I </dev/null > $OUT/$NAME.log 2>&1 && grep -qE "run=[0-9]+ t=[0-9]+ms (completed|failed)" $OUT/$NAME.log; do sleep 5; done
 echo "research done after $(( $(date +%s) - T0 )) s"
 sleep 5
 for i in 1 2 3; do adb shell "input swipe 540 900 540 1600 1500" </dev/null; sleep 3; done   # read back up the answer
 sleep 2
 adb shell "pkill -INT screenrecord" </dev/null; sleep 4
-kill $cap 2>/dev/null
+adb logcat -d -s AndroidLM:I </dev/null > $OUT/$NAME.log 2>&1   # with the answer text after "completed"
 date +%s > $OUT/last_take_end
 adb pull /sdcard/Movies/$NAME.mp4 $OUT/ </dev/null | tail -1
 grep -E "phase_done|first_answer|first_check|route=|completed" $OUT/$NAME.log | sed -E "s/^.*AndroidLM: //"

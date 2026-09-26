@@ -60,11 +60,12 @@ search and writing, 7.2 against 7.0, 84 vs 82
 Measurements, eval rounds and decisions are in [`notes/`](notes/); the Pixel findings are in
 [`notes/2026-09-23-pixel-first-day.md`](notes/2026-09-23-pixel-first-day.md) and
 [`notes/2026-09-24-speed-levers.md`](notes/2026-09-24-speed-levers.md) (which of the phone's
-cores, RAM, GPU and TPU help, and by how much). Known gaps: no
-signed release APK yet, and the corpus is installed with adb (no in-app import).
+cores, RAM, GPU and TPU help, and by how much). Known gap: the corpus is installed with adb (no
+in-app import).
 
 ## Install
 
+The signed APK is in the [v1.0.0 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.0.0).
 [`INSTALL.md`](INSTALL.md): `scripts/install.sh` downloads the model and corpus on a computer,
 checks their SHA-256, pushes them to the phone over USB and installs the APK. Building the app:
 [`app-android/README.md`](app-android/README.md). Testing it: [`TESTING.md`](TESTING.md).
