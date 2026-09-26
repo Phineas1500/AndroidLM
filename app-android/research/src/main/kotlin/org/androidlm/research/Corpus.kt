@@ -63,6 +63,13 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor, wo
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Long, Article>?) = size > ARTICLE_CACHE
     }
 
+    // resolveTitle's answers: the database is read-only, so a title always resolves the same way.
+    // The pipeline resolves planned titles while the plan is still being written (a title that
+    // is not an article needs a full-text search, seconds on a phone) and finds them here after.
+    private val resolvedTitles = object : LinkedHashMap<String, Long?>(64, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Long?>?) = size > RESOLVED_CACHE
+    }
+
     init {
         // vocabulary views: fts_v gives each stem's document frequency, qtok stems a query
         db.exec("CREATE VIRTUAL TABLE IF NOT EXISTS temp.fts_v USING fts5vocab(main, fts, row)")
@@ -183,6 +190,12 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor, wo
      * redirect is more often a different entity than a near miss ("Ger" -> Ger Canning).
      */
     fun resolveTitle(title: String, fuzzy: Boolean = true): Long? {
+        val key = (if (fuzzy) "f:" else "x:") + title
+        if (resolvedTitles.containsKey(key)) return resolvedTitles[key]
+        return resolveTitleUncached(title, fuzzy).also { resolvedTitles[key] = it }
+    }
+
+    private fun resolveTitleUncached(title: String, fuzzy: Boolean): Long? {
         db.query("select id from articles where title = ? collate nocase", title).firstOrNull()
             ?.let { return it[0] as Long }
         if (hasRedirects) {
@@ -378,6 +391,7 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor, wo
     companion object {
         private const val BLOCK_CACHE = 32
         private const val ARTICLE_CACHE = 8
+        private const val RESOLVED_CACHE = 256
 
         /** One `["stem", count]` pair of the word-count file's `check` (a JSON list of them). */
         private val CHECK_ENTRY = Regex("""\[\s*"([^"\\]+)"\s*,\s*(\d+)\s*]""")

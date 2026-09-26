@@ -7,6 +7,8 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** What one generation produced, with the basic figures the engine reports at the end of it. */
@@ -273,6 +275,28 @@ class ResearchPipeline(
             fun parts() = listOf("stems" to stemsMs, "bm25" to bmMs, "bm25_at" to bmAtMs)
         }
 
+        /**
+         * Resolves each planned title on the corpus thread as soon as its line of the plan is
+         * complete, while the model writes the rest; Corpus keeps the answer, so the route and the
+         * search after the plan find it ready. A title that is not an article needs a full-text
+         * title search, seconds on a phone. Only a head start: the finished plan is parsed again,
+         * and a line that turns out not to be a title only costs a lookup. [onToken] is the plan's
+         * token callback (one thread, in order).
+         */
+        private inner class TitlePrefetch(private val scope: CoroutineScope) {
+            private val text = StringBuilder()
+            private val requested = HashSet<String>()
+
+            fun onToken(piece: String) {
+                text.append(piece)
+                if ('\n' !in piece) return
+                for (title in Planner.parsePlanOutput(text.substring(0, text.lastIndexOf("\n")))) {
+                    if (!requested.add(title)) continue
+                    scope.launch(corpusDispatcher) { runCatching { corpora.wiki().resolveTitle(title) } }
+                }
+            }
+        }
+
         private suspend fun executeInner(): ResearchResult {
             // 0. with a background search: the question-only half of the search runs while the plan
             //    is being written, on its own connection and thread
@@ -281,8 +305,9 @@ class ResearchPipeline(
                 QuestionHalf(bg)
             }
 
-            // 1. plan
-            val plan = generating(ResearchPhase.PLANNING, Prompts.PLAN_SYSTEM, question, config.planTokens) {}
+            // 1. plan; each title is resolved as soon as its line is written (TitlePrefetch)
+            val prefetch = TitlePrefetch(CoroutineScope(currentCoroutineContext()))
+            val plan = generating(ResearchPhase.PLANNING, Prompts.PLAN_SYSTEM, question, config.planTokens, prefetch::onToken)
             val titles = Planner.parsePlanOutput(plan.text)
             listener.onEvent(ResearchEvent.Planned(titles))
 

@@ -898,6 +898,50 @@ class ResearchPipelineTest {
         }
     }
 
+    /**
+     * The planned titles are looked up while the plan is still being written: this engine streams
+     * the plan's lines and then waits, before the planning call returns, for a title lookup on the
+     * corpus thread. The result is the same as with the plain engine.
+     */
+    @Test
+    fun plannedTitlesAreLookedUpWhileThePlanIsWritten() {
+        val case = goldenCase("What happened in the 1983 Harrods bombing")
+        val question = case["question"].asString
+        val script = listOf("1. Harrods bombing\n2. \"Provisional Irish Republican Army\"\n", "An IRA car bomb [1].")
+        val plain = run(FakeEngine(script), sampleProvider(), question, Recorder())
+
+        val lookedUp = CountDownLatch(1)
+        val corpora = object : CorpusProvider {
+            private val zstd = JniZstdDecompressor()
+            private val w by lazy {
+                val db = JdbcSqlDatabase(fixture("sample_wiki.db")).also { opened.add(it) }
+                Corpus(object : SqlDatabase by db {
+                    override fun query(sql: String, vararg args: Any?): List<Array<Any?>> {
+                        if ("from articles where title" in sql) lookedUp.countDown()
+                        return db.query(sql, *args)
+                    }
+                }, zstd)
+            }
+            private val v by lazy { Corpus(JdbcSqlDatabase(fixture("sample_voyage.db")).also { opened.add(it) }, zstd) }
+            override fun wiki() = w
+            override fun voyage() = v
+        }
+        var duringPlan = false
+        val engine = object : Engine {
+            private var i = 0
+            override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean): Generation {
+                val text = script[i++]
+                text.chunked(7).forEach(onToken)
+                if (i == 1) duringPlan = lookedUp.await(10, TimeUnit.SECONDS)
+                return Generation(text, tokens = text.length / 4, tokensPerSecond = 5.0, promptTokens = prompt.length / 4, wallSeconds = 0.5)
+            }
+        }
+        val result = run(engine, corpora, question, Recorder())
+
+        assertTrue("a planned title was looked up before the plan was finished", duringPlan)
+        assertEquals(plain.withoutTimes(), result.withoutTimes())
+    }
+
     @Test
     fun cancellationMidDraftDoesNotWaitForTheBackgroundSearch() {
         val question = "Roughly how many times larger is the population of India than that of Canada?"
