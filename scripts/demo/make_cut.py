@@ -9,6 +9,7 @@ usage: make_cut.py <take.mp4> <take.log> <out.mp4> <caption line>...
 """
 import datetime as dt
 import json
+import os
 import re
 import subprocess
 import sys
@@ -66,6 +67,28 @@ def main():
     start = end - dt.timedelta(seconds=dur)
     ev = events(log, end.year)
     t = {k: (v - start).total_seconds() for k, v in ev.items()}
+    # Placing the log by the mp4's creation_time and length is off by a few seconds and not by
+    # the same amount each time (from -1.0 to +4.6 s over the v3 takes), so SYNC=<event>:<video
+    # seconds> pins one event seen on screen (the frame where the first word appears, say) and
+    # moves all of them by the same offset
+    if os.environ.get("SYNC"):
+        name, at = os.environ["SYNC"].rsplit(":", 1)
+        offset = float(at) - t[name]
+        t = {k: v + offset for k, v in t.items()}
+        print(f"note: synced on {name} at {at} s (offset {offset:+.2f} s)")
+    print("events (video s): " + ", ".join(f"{k} {v:.1f}" for k, v in sorted(t.items(), key=lambda kv: kv[1])))
+    # The phone's log daemon occasionally drops a line. A missing first-token moment is read off
+    # the video instead (the frame where the answer's first word appears), in video seconds, from
+    # FIRST_ANSWER_AT / FIRST_CHECK_AT; estimating it from the phase's speed was 6 s off once.
+    for first, var in (("first_answer_token", "FIRST_ANSWER_AT"), ("first_check_token", "FIRST_CHECK_AT")):
+        if os.environ.get(var):
+            t[first] = float(os.environ[var])
+            print(f"note: {first} at {t[first]} s from {var} (read off the video)")
+    needed = ["first_answer_token"] + (["first_check_token"] if "start_DRAFTING" in t else [])
+    missing = [k for k in needed if k not in t]
+    if missing:
+        sys.exit(f"{', '.join(missing)} not in the log: find the frame where it happens and pass "
+                 f"FIRST_ANSWER_AT / FIRST_CHECK_AT (video seconds)")
     tap = t.get("engine_start", t["start_PLANNING"]) - 0.3
 
     answer_first = "start_DRAFTING" in t

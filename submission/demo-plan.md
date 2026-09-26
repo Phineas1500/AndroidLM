@@ -79,3 +79,31 @@ restores them) and `scripts/demo/take.sh`, edited with `scripts/demo/make_cut.py
 All four answers correct and cited (the Harrods answer says "Provisional Irish IRA"; the Leh
 check adds an off-topic, cited note on earthquakes). Short cut 2:13 (Harrods and Leh), full cut
 3:18; raw takes kept with the cuts outside the repository.
+
+## Recorded again, v3 (2026-09-25)
+
+On the v1.0.0 release APK (signed, installed from scratch), with the faster prompt reading, search
+and writing. The questions now include one of reasoning, as the bounty asks for explanation,
+comparison, synthesis and reasoning beyond recall: how long light takes to reach Earth and Neptune,
+"show the reasoning" (the 1.7B model scored 1.5 of 10 on it, ours 8.5). Recorded with
+`scripts/demo/record.sh v3 ~/androidlm-tools/demo3 t1_harrods t2_bigmotor t3_light t4_leh`, each
+take from 30.5 C.
+
+| Take | Route | First words | Done |
+|---|---|---|---|
+| 1983 Harrods bombing | sources first | 49 s | 82 s (after a 21 s model load) |
+| Big Motor | sources first | 42 s | 72 s |
+| Light from the Sun to Earth and Neptune | answer first, then source check | 12 s | 162 s |
+| Altitude in Leh, Ladakh | answer first, then source check | 14 s | 216 s |
+
+All four answers correct and cited; the light answer shows its working (149.6 million km / 299,792
+km/s = 499 s; 4.5 billion km, about 4 h 10 min) and its check confirms the Earth figure from the
+sources. The Leh draft stops mid-sentence at its 600-token limit, before the source check.
+
+Editing: `make_cut.py` places the app's log on the video by the mp4's creation time and length,
+which was off by -1.0 to +4.6 s on these takes, so each clip is pinned to one event read off the
+video (`SYNC=first_answer_token:87.8` for Harrods, `completed:90.3` for Big Motor, 30.8 s and
+31.8 s for the two drafts); a second event checked on the light take landed within 0.3 s. The
+phone's log dropped Big Motor's first-token line, so that moment was read off the video too
+(`FIRST_ANSWER_AT=60.0`). Short cut 2:07 (Harrods, Big Motor, light), full cut 3:22 (all four);
+claim screenshot `claim_v3_harrods.png`; raw takes, logs and cuts kept outside the repository.

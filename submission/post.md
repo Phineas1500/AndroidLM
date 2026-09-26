@@ -1,7 +1,8 @@
 # X / Farcaster post draft
 
-For the user to post from their own account. Nothing here has been posted. Attach the v2 short cut
-(2:13, fits X's 2:20 limit) to the first post, or the v2 full cut (3:18) where longer video is allowed. The numbers come from
+For the user to post from their own account. Nothing here has been posted. Attach the v3 short cut
+(2:07, fits X's 2:20 limit: Harrods, Big Motor, light travel time) to the first post, or the v3 full
+cut (3:22, adds altitude in Leh) where longer video is allowed. The numbers come from
 `notes/2026-09-24-small-model-comparison.md`.
 
 ## Main post (under 280 characters)
@@ -32,9 +33,9 @@ graded 0-10 by Claude: 2.6 vs 7.0, ours higher on 71 of 72. Obscure subjects 1.3
 injured. Ours, from the offline Wikipedia: a car bomb on 17 December, a 37-minute warning,
 6 killed, 90 injured, and the IRA Army Council saying it had not authorised it.
 
-**6/ Pink Floyd's "Hey, Hey, Rise Up!"** The 1.7B: an American Revolution satire featuring John
-Mulaney. Ours: based on the 1914 Ukrainian song "Oh, the Red Viburnum in the Meadow", sung by
-Andriy Khlyvnyuk of BoomBox, released to support Ukraine.
+**6/ Reasoning, not just lookup.** "How long does light take from the Sun to Earth and to
+Neptune? Show the reasoning." The 1.7B: 150 million km / 300,000 km/s = 300 s, blamed on a "curved
+path"; Neptune "about 35 minutes". Ours, on the phone: 499 s (8 min 20 s) and 4 h 10 min.
 
 **7/ Penicillin's Nobel Prize.** The 1.7B: shared with "Carl Henning Wieland and Frederick
 Twyford". Ours: Ernst Chain and Howard Florey, 1945, with what each of them did.
@@ -45,7 +46,7 @@ in the repo.
 
 **9/ Real timings, on the phone.** Well-known subjects: first words in about 18 s, a cited
 check in about 3 min. Obscure subjects: a cited answer in about 1.6 min (medians of 24 runs).
-The video (an earlier, slower build) speeds up waits and labels each with its real length.
+The video speeds up waits and labels each with its real length.
 
 **10/ Reproducible.** Install script with checksums, the corpus build, eval questions, every
 answer and grade, and our engine patches are in the repo. The corpus is on Hugging Face under
