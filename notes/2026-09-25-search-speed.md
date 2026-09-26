@@ -73,3 +73,55 @@ otherwise.
 Plans and sources were identical to the runs before the change for all four. Whole-question times
 in these runs are not comparable (they started at 33-36 C after the previous runs); the search
 wait is.
+
+## All 24 long-tail questions (app at 5bf9991: both changes and the single-token kernels)
+
+Asked as in the earlier runs (`scripts/phone_eval.sh`, each from 30.5 C or four minutes after the
+previous one; about 33 C here). Answers: `eval/answers_phone_tail_v3.jsonl`. All 24 answered;
+23 took the same route as the run before.
+
+| Route | Run | First words, median (range) | Done, median (range) | Search wait, median (range) |
+|---|---|---|---|---|
+| Sources first | original (19) | 111 s (77-134) | 148 s (102-191) | 12.0 s (8-20) |
+| | prompt kernels (18) | 62 s (45-79) | 100 s (85-135) | 12.4 s (11-21) |
+| | now (19) | 57 s (44-70) | 98 s (69-146) | 5.7 s (0.1-11) |
+| Answer first | original (5) | 25 s (21-26) | 206 s (177-253) | hidden |
+| | prompt kernels (6) | 18 s (16-21) | 191 s (132-252) | hidden |
+| | now (5) | 18 s (16-20) | 179 s (135-223) | hidden |
+
+Writing: median 4.2 tok/s on the sources-first answers (3.9 before) and 4.6 on the drafts (4.3).
+The BM25 was stopped on 11 of the 19 sources-first questions. The phone ran warmer than in the run
+before (starts at 33-34 C instead of about 32 C), which costs writing and prompt speed.
+
+Quality, blind against the previous run's answers with the same grader instructions
+(`eval/pairs_phone_v3_vs_iqk_tail_blind.json`, grades `eval/grades_phone_v3_vs_iqk_tail_blind.json`,
+key `eval/pairs_phone_v3_vs_iqk_tail_key.json`): 7.21 now against 7.00, key facts 84 against 82 of
+120, invented specifics left standing 2 against 3; 19 ties, 4 better now, 1 better before. The
+one gap of 3 points (tail-15, 9 against 6) took the other route.
+
+## 3. Looking up the planned titles while the plan is written (4a04f4e)
+
+In that run the wait was now mostly the planned articles' own lookups: a title that is not an
+article ("History of Italy during World War II", "The Resistance") needs a full-text title search,
+0.3-3.9 s on the VM and more on the phone. The pipeline now resolves each title on the corpus
+thread as soon as its line of the plan is complete, while the model writes the rest, and Corpus
+keeps resolveTitle's answers (the database is read-only). A title on the plan's last line cannot
+start early: the model ends the plan without a newline, so that line is only known complete when
+the plan is.
+
+| Question (same build otherwise) | Search wait before | With the look-ahead |
+|---|---|---|
+| tail-03 | 6.7 s | 3.1 s |
+| tail-12 | 5.7 s | 5.8 s (slow title on the last line) |
+| tail-13 | 10.9 s | 9.1 s (last line) |
+| tail-14 | 7.8 s | 7.3 s (last line) |
+| tail-15 | 3.0 s | 0.9 s |
+| tail-21 | 10.9 s | 6.2 s |
+| tail-24 | 2.3 s | 0.25 s |
+
+47 s against 33 s over the seven, with the same plans and sources. `plannedTitlesAreLookedUpWhileThePlanIsWritten`
+checks that a title lookup happens before the planning call returns.
+
+What is left: the BM25 on the questions that need it (8 of 19: it finishes 21-23 s into the run,
+about 10 s after the plan, because under the engine's memory and flash load it runs 4-15 times
+slower than on an idle phone), and fuzzy title searches for last-line titles.

@@ -44,7 +44,7 @@ and a source check occasionally "corrects" something that was right. Every answe
 in the repo.
 
 **9/ Real timings, on the phone.** Well-known subjects: first words in about 18 s, a cited
-check in about 3.2 min. Obscure subjects: a cited answer in about 1.7 min (medians of 24 runs).
+check in about 3 min. Obscure subjects: a cited answer in about 1.6 min (medians of 24 runs).
 The video (an earlier, slower build) speeds up waits and labels each with its real length.
 
 **10/ Reproducible.** Install script with checksums, the corpus build, eval questions, every

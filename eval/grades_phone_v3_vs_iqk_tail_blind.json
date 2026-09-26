@@ -1,0 +1,218 @@
+{
+ "tail-01": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Near-identical: King/Woodfox/Wallace, Louisiana State Penitentiary (B adds 'Angola Prison'), Jan 1974 conviction for killing a corrections officer, 40+ years each, King 29 years before conviction overturned; neither names Brent Miller or the 2001 release"
+ },
+ "tail-02": {
+  "A": 4,
+  "B": 3,
+  "A_key_facts": "2/5",
+  "B_key_facts": "1/5",
+  "A_fabricated": true,
+  "B_fabricated": true,
+  "note": "Both drafts right on Confucian filial piety and criminal marking but invent Zhongshi/Japanese-influenced/Western style categories; A's check says 'No corrections' and leaves them; B's check also leaves them and wrongly retracts Confucianism as a cause. Both add correct Wu Taibo extras"
+ },
+ "tail-03": {
+  "A": 2,
+  "B": 2,
+  "A_key_facts": "0/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both say sources record no 20th-century Albstadt quakes and offer 1756 Dueren as 'costliest or most significant' (A notes no cost data; B adds an 1886 Thuringia quake). No 1911/1943/1978, no 275 million DM; honest source caveat, no invented quake"
+ },
+ "tail-04": {
+  "A": 5,
+  "B": 6,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": true,
+  "B_fabricated": false,
+  "note": "Both drafts wrong (20 Jan 1946, 1,400 firms); checks fix to 8 April 1946, ~1,700 producers, 1999 EU-directive monopoly end, Marcel Paul. A leaves an invented 1997 'Ghysse law' and 'SA by 2000' standing; B's 'SA by 2008' is vague but not false. Neither gives 19 Nov 2004 or the 2005 float/85%"
+ },
+ "tail-05": {
+  "A": 5,
+  "B": 5,
+  "A_key_facts": "2/5",
+  "B_key_facts": "2/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Near-identical: tall/swift/spotted mount of Persian nobility from the Nisaean plain in Media; honest that the extinction date is not in sources. No 430 BCE, sacred horses, warhorse head or 1204"
+ },
+ "tail-06": {
+  "A": 10,
+  "B": 10,
+  "A_key_facts": "5/5",
+  "B_key_facts": "5/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: 2023 systematic insurance fraud, Kaneshige resigns, FSA revokes registration, sold to Itochu and rebranded WECARS, founded 1976 as Kaneshige Auto Center in Iwakuni, Sompo Japan implicated (B says it may have ignored the fraud)"
+ },
+ "tail-07": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "5/5",
+  "B_key_facts": "5/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: island between two tunnel junctions, capacitive gate, Coulomb blockade, V < e/C, thermal energy below charging energy (B says 'charge quantization energy'); no explicit e^2/2C"
+ },
+ "tail-08": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: late-19th-century merger of Devon/Cornwall and Essex/Suffolk/Kent blacks, 1955 Howitt Report's three breeds (Landrace, Large White, Welsh), unsuited to intensive farming, almost extinct by the 1960s; neither says still endangered (A says it has recovered; B adds correct Chinese/French influence)"
+ },
+ "tail-09": {
+  "A": 10,
+  "B": 10,
+  "A_key_facts": "5/5",
+  "B_key_facts": "5/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: 17 Dec 1983 car bomb, 37-minute warning, not evacuated, 3 police + 3 civilians, 90 injured, Army Council unauthorised/regret, shift to military targets"
+ },
+ "tail-10": {
+  "A": 6,
+  "B": 6,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: Eyup speech, 1957 Vatan Partisi campaign, History Thesis 'historical revolution', primitive socialism, Rashidun/tribal elites. Neither gives the charge (religion as a political tool, only communist so charged) or the Quran/hadith use; B loosely attributes the prosecution to his view of Islam, then says the charges are not in its sources"
+ },
+ "tail-11": {
+  "A": 3,
+  "B": 2,
+  "A_key_facts": "2/5",
+  "B_key_facts": "2/5",
+  "A_fabricated": true,
+  "B_fabricated": true,
+  "note": "Both drafts invent a '17 August 1789' founding decree. A: abolished 1854 and 'serve double' doublage; check restores 1852 and doublage as forced residence but says the system ran only to the late 19th century. B: bed-sharing 'doublage' is invented and never corrected; check turns a correct 1938 into 1852-1953. No 1945 for either"
+ },
+ "tail-12": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: 1914 anthem 'Oh, the Red Viburnum in the Meadow', Khlyvnyuk of BoomBox, support for Ukraine during the invasion, proceeds to Ukraine Humanitarian Relief Fund; no 8 April 2022 date, Gilmour not named"
+ },
+ "tail-13": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "5/5",
+  "B_key_facts": "5/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Identical: 11 Nov 2007 at Legazpi, 16-year-old victim, Josue Estebanez (soldier), counter-protest to a neo-Nazi rally, 26 years = 19 murder with ideological aggravator + 7 attempted homicide, 150,000 euros; no Supreme Court confirmation or line 3"
+ },
+ "tail-14": {
+  "A": 7,
+  "B": 7,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: late 1943, text by Felice Cascione, Katyusha melody, first sung at Curenna (Vendone) Christmas 1943; B adds Alto on Epiphany 1944. No Sibilla/'Ivan', no Garibaldi brigades"
+ },
+ "tail-15": {
+  "A": 6,
+  "B": 9,
+  "A_key_facts": "4/5",
+  "B_key_facts": "5/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "A: Kumarajiva 402-406 and disputed Nagarjuna attribution right, check fixes 8,000-line to 25,000-line sutra, but its dispute reasons (a '1,100 years' anachronism, South India/Sri Lanka) look invented, calls Yao Xing a general, no Lamotte or 100 scrolls, and the draft is cut off. B: 25,000-line sutra, Kuchean Kumarajiva 402-406, 100 scrolls, Lamotte, correct extras; no first-34-in-full"
+ },
+ "tail-16": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: 61st-97th Streets on the Upper West Side, 9 Nov 1982, majority neo-Italian Renaissance with Art Deco; A adds late 19th c. to early 1940s. No Dakota"
+ },
+ "tail-17": {
+  "A": 7,
+  "B": 7,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: unsigned editorial, Lady Macbeth as formalist/bourgeois/coarse/vulgar; the next-symphony part goes to the Fifth as the reply to criticism (A: Nov 1937 triumphal premiere; B: 28 Jan date, then 'general knowledge'). Neither covers the Fourth's withdrawal or Stalin"
+ },
+ "tail-18": {
+  "A": 8,
+  "B": 8,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Identical: full symptom list incl. worst when sitting/before bowel movement, constipation, drainage, fever/chills, mass; E. coli; testing identifies the bacteria (justified by spread risk, not exotic organisms). No staphylococcus/MRSA trend or Crohn's"
+ },
+ "tail-19": {
+  "A": 6,
+  "B": 6,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both drafts are long fabrications (A: pump/software failures, 2018 prebuilt, founder 'Jonney Li'; B: denies any scandal, supply-chain delays, 'Jonney Li and Chris He'). Checks fix to Johnny Hou, Feb 2020 release, fire reports (B: late 2020), Feb 2021 removal, Guardian first product. Invented narrative stays (A: retreat from prebuilts; B: 2017-2019 pre-order delays); no Gamers Nexus/30 Nov 2020"
+ },
+ "tail-20": {
+  "A": 8,
+  "B": 8,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: third-millennium claim, Terrien de Lacouperie with a mass migration, largely rejected (Schlegel critique is a correct extra), Huntington/Bishop hyperdiffusionism, later archaeology-based partial arguments; no Ping-ti Ho or Mallory/Mair/Tarim mummies"
+ },
+ "tail-21": {
+  "A": 9,
+  "B": 9,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Identical: ICMR DG/Secretary 2015-17, WHO DDG Programmes Oct 2017-Mar 2019, Chief Scientist to 2022, TB and HIV; no NIRT Chennai"
+ },
+ "tail-22": {
+  "A": 6,
+  "B": 6,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both: Premier Automotive Supply 1940 with Jack and Joe, parts/electronics distributor; Israel gifts are real but not gold (Bezalel $25M, Be'er-Sheva museum, 1992 Leadership Institute); say nothing on Brandeis is in sources; no Negev centre or $22.5M humanities centre"
+ },
+ "tail-23": {
+  "A": 7,
+  "B": 6,
+  "A_key_facts": "4/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both drafts invent a cargo airline (A: 747-400F; B: 737 freighters). Checks fix to passenger flag carrier at Manas with Dash 8-400s and Paris/Berlin/London routes. A keeps the EU ban on Kyrgyz carriers but omits the A320neo lease. B adds two DHC-8-400s and the A320neo lease but blames its missing EASA certification rather than the country-wide ban"
+ },
+ "tail-24": {
+  "A": 7,
+  "B": 7,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Near-identical: no nodal agency because colleges were under general universities, 2005 expert committee by-laws, 3 Sept 2021 Bill, 2023 establishment (no 5 March date or Sishu Bhawan Square); no Rs 330.17 crore"
+ }
+}

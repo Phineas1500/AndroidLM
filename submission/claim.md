@@ -27,8 +27,8 @@ declares no INTERNET permission and uses no Google Play Services.
   obscure subjects 1.3 vs 7.2, with invented details left in 23 of 24 small-model answers vs 3 of
   ours. Answers and grades are in the repo.
 - Real timings on the phone (medians over 24 questions asked in the app): a cited answer about an
-  obscure subject in about 1.7 min; for well-known subjects, first words in about 18 s and a cited
-  source check in about 3.2 min. The phone's answers graded the same as the server's (7.1 vs 7.2).
+  obscure subject in about 1.6 min; for well-known subjects, first words in about 18 s and a cited
+  source check in about 3 min. The phone's answers graded the same as the server's (7.1 vs 7.2).
 
 Post: {{POST_URL}}
 Code, install script, eval sets and grades: https://github.com/Phineas1500/AndroidLM

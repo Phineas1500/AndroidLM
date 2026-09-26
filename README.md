@@ -35,8 +35,8 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 | Generation speed | 4-6 tokens/s in the app (lower when the phone is hot) |
 | Prompt reading | 24-30 tokens/s in the app (a 1,000-token source prompt in 35-40 s) |
 | Model load | about 28 s on app start |
-| Answer-first question | first words after about 18 s; answer plus cited source check in about 3.2 min (medians over 6 questions) |
-| Retrieval-first question | cited answer in about 1.7 min (median 100 s over 18 questions; first words after 45-79 s) |
+| Answer-first question | first words after about 18 s; answer plus cited source check in about 3 min (medians over 5 questions) |
+| Retrieval-first question | cited answer in about 1.6 min (median 98 s over 19 questions; first words after 44-70 s) |
 
 Against Qwen3-1.7B answering the same 72 questions from memory, graded 0-10 by Claude with one
 rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-model-comparison.md)):
@@ -53,7 +53,9 @@ pipeline as the app. The obscure-subject questions asked in the app on the phone
 graded blind against the server's answers: 7.1 vs 7.2, 84 vs 85 of 120 key facts
 ([`notes/2026-09-25-phone-eval.md`](notes/2026-09-25-phone-eval.md)); asked again with the
 faster prompt kernels, 6.9 against the earlier phone answers' 7.1, 84 vs 83 key facts
-([`notes/2026-09-25-iqk-port.md`](notes/2026-09-25-iqk-port.md)).
+([`notes/2026-09-25-iqk-port.md`](notes/2026-09-25-iqk-port.md)); and again with the faster
+search and writing, 7.2 against 7.0, 84 vs 82
+([`notes/2026-09-25-search-speed.md`](notes/2026-09-25-search-speed.md)).
 
 Measurements, eval rounds and decisions are in [`notes/`](notes/); the Pixel findings are in
 [`notes/2026-09-23-pixel-first-day.md`](notes/2026-09-23-pixel-first-day.md) and
