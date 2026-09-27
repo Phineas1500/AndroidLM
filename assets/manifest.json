@@ -38,6 +38,15 @@
       "url": "https://huggingface.co/datasets/rammingaway/androidlm-corpus/resolve/main/voyage.db",
       "device_path": "corpus/voyage.db",
       "license": "CC BY-SA 4.0 (English Wikivoyage, Sep 2026)"
+    },
+    {
+      "name": "places.db",
+      "role": "places",
+      "bytes": 1701904384,
+      "sha256": "c2c1a46b6187db0a47fdf28209c8544cc0d265edd179cb019d17281449b3a9c0",
+      "url": "",
+      "device_path": "corpus/places.db",
+      "license": "ODbL 1.0 (OpenStreetMap contributors; Overture Maps Foundation places, CDLA-Permissive-2.0; GeoNames, CC BY 4.0)"
     }
   ]
 }

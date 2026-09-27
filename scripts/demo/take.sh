@@ -2,6 +2,7 @@
 # One demo take on the current app screen: $1 = take name, $2 = question script on the phone (types
 # the question). Screen recorded to /sdcard/Movies/<name>.mp4 and pulled to ~/androidlm-tools/demo2/,
 # with the app's phase log beside it. The app follows the answer itself, so nothing scrolls during a run.
+# Waits for the phone to cool to 30.5 C, or DEMO_COOL_S seconds (default 540) after the last take.
 source ~/androidlm-tools/env.sh
 NAME=$1; Q=$2
 PKG=io.github.phineas1500.androidlm.dev
@@ -25,7 +26,7 @@ LAST=$(cat $OUT/last_take_end 2>/dev/null || echo 0)
 while true; do
   t=$(adb shell "dumpsys thermalservice | sed -n \"/Current temperatures/,\\\$p\" | grep -m1 \"mName=VIRTUAL-SKIN,\"" </dev/null | sed -E "s/.*mValue=([0-9.]+).*/\1/")
   awk -v t="$t" "BEGIN{exit !(t>0 && t<=30.5)}" && break
-  [ $(( $(date +%s) - LAST )) -ge 540 ] && break
+  [ $(( $(date +%s) - LAST )) -ge ${DEMO_COOL_S:-540} ] && break
   sleep 15
 done
 echo "start skin=$t"

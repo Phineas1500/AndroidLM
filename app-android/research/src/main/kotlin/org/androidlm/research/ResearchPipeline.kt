@@ -436,26 +436,11 @@ class ResearchPipeline(
                 return placesNotice(t0, decision, String.format(java.util.Locale.US, NOTHING_FOUND,
                     PlacesText.whatText(ask), lookup.radiusKm, lookup.label))
             }
-            // the travel guide's words on each listed place, from the Wikivoyage corpus
-            val guide = withContext(corpusDispatcher) {
-                val voyage = corpora.voyage()
-                lookup.places.map { p ->
-                    p.guide.firstOrNull()?.let { g ->
-                        voyage?.resolveTitle(g.article, fuzzy = false)?.let { aid ->
-                            PlacesText.guideLine(voyage.article(aid).text.value, g.listing)
-                        }
-                    }
-                }
-            }
-            val sources = lookup.places.mapIndexed { i, p ->
-                ResearchSource(i + 1, p.name, PlacesText.summary(p, lookup.origin), PlacesText.details(p, guide[i], lookup.origin),
-                    "places", p.lat, p.lon)
-            }
+            val answer = withContext(corpusDispatcher) { PlacesAnswer.of(ask, lookup, corpora.voyage()) }
+            val sources = answer.sources
             listener.onEvent(ResearchEvent.SourcesFound(sources, lookup.total - sources.size))
             completed(t0)
-            val lines = lookup.places.take(PlacesText.MODEL_PLACES).mapIndexed { i, p ->
-                PlacesText.describe(p, i + 1, PlacesText.clip(guide[i], PlacesText.GUIDE_CHARS), lookup.origin)
-            }
+            val lines = answer.modelLines
             val res = generating(
                 ResearchPhase.ANSWERING, PlacesText.PLACES_SYSTEM, PlacesText.placesUser(question, where, lines),
                 config.placesTokens,

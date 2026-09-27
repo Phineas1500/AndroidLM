@@ -6,8 +6,6 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.os.Build
-import android.os.CancellationSignal
 import android.os.Looper
 import android.os.SystemClock
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -19,8 +17,8 @@ import kotlin.coroutines.resume
  * The phone's position for "near me" questions, from the platform LocationManager (no Google Play
  * Services). GPS works without any network, so this stays offline: a fix from the last
  * [MAX_AGE_MS] is used as it is, otherwise a fresh one is requested, GPS first, for up to
- * [FIX_TIMEOUT_MS] (a cold GPS start without assistance data can take that long, and longer
- * indoors). Null without location permission, with location off, or with no fix in time.
+ * [FIX_TIMEOUT_MS] (a cold GPS start without assistance data can take that long; indoors it may
+ * never come). Null without location permission, with location off, or with no fix in time.
  */
 class AndroidLocator(private val ctx: Context) : Locator {
 
@@ -45,29 +43,29 @@ class AndroidLocator(private val ctx: Context) : Locator {
         return withTimeoutOrNull(FIX_TIMEOUT_MS) { fix(lm, provider) }?.let { it.latitude to it.longitude }
     }
 
+    /**
+     * The first fix from [provider]. Continuous updates rather than the one-shot
+     * getCurrentLocation, which gives up after about 30 s: a GPS cold start without network
+     * assistance (airplane mode) can take longer. The caller's timeout bounds the wait.
+     */
     private suspend fun fix(lm: LocationManager, provider: String): Location? = suspendCancellableCoroutine { cont ->
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                val cancel = CancellationSignal()
-                cont.invokeOnCancellation { cancel.cancel() }
-                lm.getCurrentLocation(provider, cancel, ctx.mainExecutor) { loc -> if (cont.isActive) cont.resume(loc) }
-            } else {
-                val listener = object : LocationListener {
-                    override fun onLocationChanged(location: Location) {
-                        if (cont.isActive) cont.resume(location)
-                    }
-
-                    @Deprecated("Deprecated in Java")
-                    override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) {}
-                    override fun onProviderEnabled(provider: String) {}
-                    override fun onProviderDisabled(provider: String) {
-                        if (cont.isActive) cont.resume(null)
-                    }
-                }
-                cont.invokeOnCancellation { lm.removeUpdates(listener) }
-                @Suppress("DEPRECATION")
-                lm.requestSingleUpdate(provider, listener, Looper.getMainLooper())
+        val listener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                lm.removeUpdates(this)
+                if (cont.isActive) cont.resume(location)
             }
+
+            @Deprecated("Deprecated in Java")
+            override fun onStatusChanged(provider: String?, status: Int, extras: android.os.Bundle?) {}
+            override fun onProviderEnabled(provider: String) {}
+            override fun onProviderDisabled(provider: String) {
+                lm.removeUpdates(this)
+                if (cont.isActive) cont.resume(null)
+            }
+        }
+        cont.invokeOnCancellation { lm.removeUpdates(listener) }
+        try {
+            lm.requestLocationUpdates(provider, 1000L, 0f, listener, Looper.getMainLooper())
         } catch (e: SecurityException) {
             if (cont.isActive) cont.resume(null)
         }
@@ -75,7 +73,7 @@ class AndroidLocator(private val ctx: Context) : Locator {
 
     companion object {
         const val MAX_AGE_MS = 30L * 60 * 1000
-        const val FIX_TIMEOUT_MS = 45_000L
+        const val FIX_TIMEOUT_MS = 60_000L
         // GPS first: it needs no network. The network provider only helps where it can work offline.
         private val PROVIDERS = listOf(LocationManager.GPS_PROVIDER, "fused", LocationManager.NETWORK_PROVIDER)
 

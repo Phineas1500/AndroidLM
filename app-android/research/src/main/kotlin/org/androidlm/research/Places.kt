@@ -791,3 +791,51 @@ class Places(private val db: SqlDatabase) {
         const val MAX_RADIUS_KM = 50.0
     }
 }
+
+/**
+ * What the places route shows and what the model reads for one lookup: the numbered list as
+ * sources (each with its details and the travel guide's words) and the lines of the prompt.
+ * Built on the corpus thread ([voyage] is read for the guide's words). The app also builds one
+ * while the model is still loading, so the list is on screen before the model is ready.
+ */
+class PlacesAnswer(
+    val ask: PlaceAsk,
+    val lookup: PlacesLookup,
+    val where: String,
+    val sources: List<ResearchSource>,
+    val modelLines: List<String>,
+) {
+    companion object {
+        fun of(ask: PlaceAsk, lookup: PlacesLookup, voyage: Corpus?): PlacesAnswer {
+            // the travel guide's words on each listed place, from the Wikivoyage corpus
+            val guide = lookup.places.map { p ->
+                p.guide.firstOrNull()?.let { g ->
+                    voyage?.resolveTitle(g.article, fuzzy = false)?.let { aid ->
+                        PlacesText.guideLine(voyage.article(aid).text.value, g.listing)
+                    }
+                }
+            }
+            val sources = lookup.places.mapIndexed { i, p ->
+                ResearchSource(i + 1, p.name, PlacesText.summary(p, lookup.origin), PlacesText.details(p, guide[i], lookup.origin),
+                    "places", p.lat, p.lon)
+            }
+            val lines = lookup.places.take(PlacesText.MODEL_PLACES).mapIndexed { i, p ->
+                PlacesText.describe(p, i + 1, PlacesText.clip(guide[i], PlacesText.GUIDE_CHARS), lookup.origin)
+            }
+            val where = PlacesText.whereText(lookup.total, lookup.radiusKm, lookup.label, ask, lookup.capped)
+            return PlacesAnswer(ask, lookup, where, sources, lines)
+        }
+
+        /**
+         * The list for [question] from [corpora] (corpus thread), for the screen while the model
+         * loads: null unless it is a places question about a named place with something found.
+         */
+        fun preview(corpora: CorpusProvider, question: String): PlacesAnswer? {
+            val db = corpora.places() ?: return null
+            val ask = db.parse(question)?.takeIf { !it.here } ?: return null
+            val lookup = db.lookup(ask)?.takeIf { it.places.isNotEmpty() } ?: return null
+            return of(ask, lookup, corpora.voyage())
+        }
+    }
+}
+

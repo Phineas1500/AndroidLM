@@ -183,7 +183,11 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
 private fun StatusLine(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: Telemetry, generating: Boolean) {
     val nSources = r.sources?.size ?: 0
     val text = when (r.phase) {
-        ResearchPhase.PLANNING -> if (loading) "Loading the model (once per app start)…" else "Choosing Wikipedia articles to look up…"
+        ResearchPhase.PLANNING -> when {
+            loading && r.route?.route == Route.PLACES -> "Loading the model to write recommendations (once per app start)…"
+            loading -> "Loading the model (once per app start)…"
+            else -> "Choosing Wikipedia articles to look up…"
+        }
         ResearchPhase.SEARCHING -> when {
             r.route?.route != Route.PLACES -> "Searching the offline Wikipedia…"
             r.placesWhere == null -> "Finding your position (GPS)…"

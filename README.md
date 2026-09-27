@@ -36,13 +36,14 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 
 | | |
 |---|---|
-| Storage | 33.9GB (model 12.3GB, Wikipedia 21.3GB, Wikivoyage 0.3GB) plus the 72MB APK |
+| Storage | 35.6GB (model 12.3GB, Wikipedia 21.3GB, places 1.7GB, Wikivoyage 0.3GB) plus the 72MB APK |
 | Memory during a research question | about 7.9GB (engine 5.8GB including a 5GB expert cache, pinned dense weights 2.0GB, app 0.15GB) |
 | Generation speed | 4-6 tokens/s in the app (lower when the phone is hot) |
 | Prompt reading | 24-30 tokens/s in the app (a 1,000-token source prompt in 35-40 s) |
 | Model load | about 28 s on app start |
 | Answer-first question | first words after about 18 s; answer plus cited source check in about 3 min (medians over 5 questions) |
 | Retrieval-first question | cited answer in about 1.6 min (median 98 s over 19 questions; first words after 44-70 s) |
+| Places question ("best vegan restaurants in Lisbon") | list of places on screen after 0.19 s; the model's picks from it done after 68 s (medians over 24 questions) |
 
 Against Qwen3-1.7B answering the same 72 questions from memory, graded 0-10 by Claude with one
 rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-model-comparison.md)):

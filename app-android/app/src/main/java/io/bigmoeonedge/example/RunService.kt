@@ -34,11 +34,14 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.androidlm.research.BackgroundSearch
 import org.androidlm.research.Engine
 import org.androidlm.research.Generation
+import org.androidlm.research.PlacesAnswer
 import org.androidlm.research.ResearchConfig
 import org.androidlm.research.ResearchEvent
 import org.androidlm.research.ResearchListener
 import org.androidlm.research.ResearchPhase
 import org.androidlm.research.ResearchPipeline
+import org.androidlm.research.Route
+import org.androidlm.research.RouteDecision
 import org.androidlm.research.android.AndroidCorpora
 import org.androidlm.research.android.AndroidLocator
 import org.androidlm.research.android.CorpusFiles
@@ -252,6 +255,33 @@ class RunService : Service() {
         }
 
         thread(name = "bmoe-session") { runSession(argv, model, myEpoch, dying) }
+        if (question != null) previewPlaces(question)
+    }
+
+    /**
+     * A places question asked while the model loads: its list goes on screen now (a lookup takes
+     * a fraction of a second, the load half a minute); the run repeats the lookup once the model
+     * is ready and adds the recommendations.
+     */
+    private fun previewPlaces(question: String) {
+        scope.launch {
+            val preview = try {
+                val files = withContext(Dispatchers.IO) { CorpusLocator.find(this@RunService) } ?: return@launch
+                withContext(corpusDispatcher) { PlacesAnswer.preview(corporaFor(files), question) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (t: Throwable) {
+                Log.w(LOG_TAG, "places preview failed", t)
+                null
+            } ?: return@launch
+            RunBus.update {
+                val r = it.research
+                // (not once the run has started, nor over another question)
+                if (r == null || r.question != question || r.runId != 0) it
+                else it.copy(research = r.copy(route = RouteDecision(Route.PLACES, null), placesWhere = preview.where,
+                    sources = preview.sources, sourcesDropped = preview.lookup.total - preview.sources.size))
+            }
+        }
     }
 
     /** True while this session thread is still the current one and not shutting down. */
@@ -784,7 +814,9 @@ class RunService : Service() {
         acquireWake()
         RunBus.update {
             // Every research generation clears the KV, so a chat in progress cannot continue.
-            it.copy(state = EngineState.GENERATING, research = ResearchUi(question, runId = runId),
+            // (a places list shown while the model loaded stays until the run replaces it)
+            val preview = it.research?.takeIf { r -> r.question == question && r.runId == 0 && r.route?.route == Route.PLACES }
+            it.copy(state = EngineState.GENERATING, research = (preview ?: ResearchUi(question)).copy(runId = runId),
                 transcript = emptyList(), answer = "", reasoning = "", summary = "", error = null)
         }
         val job = scope.launch(start = CoroutineStart.LAZY) {
