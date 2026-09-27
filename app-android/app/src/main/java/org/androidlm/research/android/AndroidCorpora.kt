@@ -3,11 +3,15 @@ package org.androidlm.research.android
 import android.content.Context
 import org.androidlm.research.Corpus
 import org.androidlm.research.CorpusProvider
+import org.androidlm.research.Places
 import java.io.File
 
-/** The corpus databases found on the device: [wiki] is what research mode needs, [voyage] is optional. */
-data class CorpusFiles(val wiki: File, val voyage: File?) {
-    fun label(): String = if (voyage != null) "${wiki.name} + ${voyage.name}" else wiki.name
+/**
+ * The corpus databases found on the device: [wiki] is what research mode needs, [voyage] (the
+ * travel guide) and [places] (where to eat, drink and stay) are optional.
+ */
+data class CorpusFiles(val wiki: File, val voyage: File?, val places: File? = null) {
+    fun label(): String = listOfNotNull(wiki, voyage, places).joinToString(" + ") { it.name }
 }
 
 /**
@@ -21,6 +25,7 @@ object CorpusLocator {
     const val DIR = "corpus"
     const val WIKI = "wiki.db"
     const val VOYAGE = "voyage.db"
+    const val PLACES = "places.db"
 
     private val TMP_ROOTS = listOf(File("/data/local/tmp/androidlm"), File("/data/local/tmp/bmoe"))
 
@@ -34,19 +39,19 @@ object CorpusLocator {
     fun find(ctx: Context): CorpusFiles? {
         val dirs = dirs(ctx)
         fun first(name: String) = dirs.map { File(it, name) }.firstOrNull { it.isFile && it.canRead() }
-        return CorpusFiles(first(WIKI) ?: return null, first(VOYAGE))
+        return CorpusFiles(first(WIKI) ?: return null, first(VOYAGE), first(PLACES))
     }
 
     /** Where to put the files, for the screen that says research mode is unavailable. */
     fun hint(ctx: Context): String {
         val external = ctx.getExternalFilesDir(null)?.let { File(it, DIR).path }
         return buildString {
-            append("Research mode needs the offline Wikipedia corpus: $WIKI (and optionally $VOYAGE) in a ")
+            append("Research mode needs the offline Wikipedia corpus: $WIKI (and optionally $VOYAGE and $PLACES) in a ")
             append("\"$DIR\" directory. Push it with adb, then tap Refresh:\n")
             append("adb shell mkdir -p ${TMP_ROOTS[0].path}/$DIR\n")
-            append("adb push $WIKI $VOYAGE ${TMP_ROOTS[0].path}/$DIR/\n")
+            append("adb push $WIKI $VOYAGE $PLACES ${TMP_ROOTS[0].path}/$DIR/\n")
             append("adb shell chmod -R a+rX ${TMP_ROOTS[0].path}")
-            if (external != null) append("\nor: adb push $WIKI $VOYAGE $external/")
+            if (external != null) append("\nor: adb push $WIKI $VOYAGE $PLACES $external/")
         }
     }
 }
@@ -62,6 +67,7 @@ class AndroidCorpora(private val files: CorpusFiles) : CorpusProvider, AutoClose
     private val databases = java.util.concurrent.CopyOnWriteArrayList<AndroidSqlDatabase>()
     private var wiki: Corpus? = null
     private var voyage: Corpus? = null
+    private var places: Places? = null
 
     private fun open(f: File): Corpus {
         val db = AndroidSqlDatabase(f)
@@ -78,6 +84,11 @@ class AndroidCorpora(private val files: CorpusFiles) : CorpusProvider, AutoClose
         return voyage ?: open(f).also { voyage = it }
     }
 
+    override fun places(): Places? {
+        val f = files.places ?: return null
+        return places ?: Places(AndroidSqlDatabase(f).also { databases.add(it) }).also { places = it }
+    }
+
     override fun interrupt() {
         databases.forEach { it.interrupt() }
     }
@@ -87,5 +98,6 @@ class AndroidCorpora(private val files: CorpusFiles) : CorpusProvider, AutoClose
         databases.clear()
         wiki = null
         voyage = null
+        places = null
     }
 }

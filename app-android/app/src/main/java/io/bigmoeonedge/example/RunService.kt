@@ -40,6 +40,7 @@ import org.androidlm.research.ResearchListener
 import org.androidlm.research.ResearchPhase
 import org.androidlm.research.ResearchPipeline
 import org.androidlm.research.android.AndroidCorpora
+import org.androidlm.research.android.AndroidLocator
 import org.androidlm.research.android.CorpusFiles
 import org.androidlm.research.android.CorpusLocator
 import org.json.JSONObject
@@ -796,12 +797,14 @@ class RunService : Service() {
                 // (a preference of the method, not of the session: read per run, never in the argv)
                 val prefs = AppSettings.load(this@RunService)
                 val config = ResearchConfig(travelRoute = prefs.researchTravelRoute, checkContinue = prefs.researchCheckContinue)
-                ResearchPipeline(engine, open, corpusDispatcher, config, background).run(question, researchListener(runId))
+                ResearchPipeline(engine, open, corpusDispatcher, config, background, AndroidLocator(this@RunService))
+                    .run(question, researchListener(runId))
             } catch (e: CancellationException) {
                 publishResearch(runId) { if (it.running) it.copy(phase = ResearchPhase.CANCELLED) else it }
                 throw e
             } catch (t: Throwable) {
                 val msg = t.message ?: t.toString()
+                Log.e(LOG_TAG, "run=$runId research failed", t)
                 RunBus.update {
                     // (not when another run or session has replaced this one on screen)
                     val r = it.research
@@ -860,6 +863,7 @@ class RunService : Service() {
             is ResearchEvent.Routed -> log("route=${e.decision.route} views=${e.decision.views} travel=${e.decision.travel}")
             is ResearchEvent.SourcesFound ->
                 log("sources=${e.sources.size} dropped=${e.dropped} [" + e.sources.joinToString(" | ") { "${it.title} — ${it.section}" } + "]")
+            is ResearchEvent.PlacesFound -> log("places=${e.total} here=${e.here} where=${e.where}")
             is ResearchEvent.AnswerToken -> if (!sawAnswer) { sawAnswer = true; log("first_answer_token") }
             is ResearchEvent.CheckToken -> if (!sawCheck) { sawCheck = true; log("first_check_token") }
             is ResearchEvent.PhaseCompleted -> e.timing.let { tm ->
@@ -884,6 +888,7 @@ class RunService : Service() {
             is ResearchEvent.Planned -> publishResearch(runId) { it.copy(titles = e.titles) }
             is ResearchEvent.Routed -> publishResearch(runId) { it.copy(route = e.decision, routeThreshold = e.threshold) }
             is ResearchEvent.SourcesFound -> publishResearch(runId) { it.copy(sources = e.sources, sourcesDropped = e.dropped) }
+            is ResearchEvent.PlacesFound -> publishResearch(runId) { it.copy(placesWhere = e.where) }
             is ResearchEvent.AnswerToken -> if (textFrameDue()) telemetry.current.text.let { text -> publishResearch(runId) { it.copy(answer = text) } }
             is ResearchEvent.AnswerCompleted -> publishResearch(runId) { it.copy(answer = e.text) }
             is ResearchEvent.CheckToken -> if (textFrameDue()) telemetry.current.text.let { text -> publishResearch(runId) { it.copy(check = text) } }

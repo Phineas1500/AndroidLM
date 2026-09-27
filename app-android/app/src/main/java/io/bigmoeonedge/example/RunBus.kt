@@ -37,6 +37,7 @@ data class ResearchUi(
     val routeThreshold: Long = 0,
     val sources: List<ResearchSource>? = null, // null until the search is done
     val sourcesDropped: Int = 0,
+    val placesWhere: String? = null,       // the places route: what was searched, e.g. "185 vegan places to eat within 16 km of …"
     val answer: String = "",
     val check: String? = null,             // null when no source check has started
     val timings: List<PhaseTiming> = emptyList(),

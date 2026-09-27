@@ -2,12 +2,13 @@
 # Put AndroidLM on a phone from a computer: download the model and corpus (resumable), verify
 # them, push them over adb, and install the APK. The phone never needs a network connection.
 #
-# Usage: scripts/install.sh [--assets-dir DIR] [--apk FILE] [--no-download] [--no-voyage]
+# Usage: scripts/install.sh [--assets-dir DIR] [--apk FILE] [--no-download] [--no-voyage] [--no-places]
 #   --assets-dir DIR  where the large files are kept on this computer (default ./assets-cache)
 #   --apk FILE        APK to install (default: newest app-android/app/build/outputs/apk/**.apk)
 #   --no-download     only use files already present in the assets directory
 #   --no-voyage       skip the optional Wikivoyage corpus
-# Needs: adb (Android platform-tools), curl, python3, and about 35GB free here and on the phone.
+#   --no-places       skip the optional places database (where to eat, drink and stay)
+# Needs: adb (Android platform-tools), curl, python3, and about 37GB free here and on the phone.
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
@@ -16,13 +17,15 @@ ASSETS=$ROOT/assets-cache
 APK=""
 DOWNLOAD=1
 VOYAGE=1
+PLACES=1
 while [ $# -gt 0 ]; do
   case $1 in
     --assets-dir) ASSETS=$2; shift 2 ;;
     --apk) APK=$2; shift 2 ;;
     --no-download) DOWNLOAD=0; shift ;;
     --no-voyage) VOYAGE=0; shift ;;
-    -h|--help) sed -n '2,11p' "$0"; exit 0 ;;
+    --no-places) PLACES=0; shift ;;
+    -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
   esac
 done
@@ -47,6 +50,7 @@ EOF
 need=0
 while IFS='|' read -r -u 3 name role bytes sha url dpath; do
   [ "$role" = corpus-optional ] && [ $VOYAGE = 0 ] && continue
+  [ "$role" = places ] && [ $PLACES = 0 ] && continue
   need=$((need + bytes))
 done 3<<< "$FILES"
 free_kb=$(adb shell df /data | awk 'NR==2{print $4}')
@@ -56,6 +60,7 @@ echo "assets: $((need / 1000000000)) GB; free on the phone's /data: $((free_kb /
 # fd 3, because adb and curl inside the loop read stdin and would eat the remaining lines
 while IFS='|' read -r -u 3 name role bytes sha url dpath; do
   [ "$role" = corpus-optional ] && [ $VOYAGE = 0 ] && continue
+  [ "$role" = places ] && [ $PLACES = 0 ] && continue
   local_file=$ASSETS/$name
   if [ ! -f "$local_file" ] || [ "$(filesize "$local_file")" != "$bytes" ]; then
     [ $DOWNLOAD = 1 ] && [ -n "$url" ] || die "$name is missing or incomplete in $ASSETS and has no download URL yet"

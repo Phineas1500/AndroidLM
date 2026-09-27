@@ -82,7 +82,7 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
         if (r.titles != null || r.route != null) {
             Labeled("How it was answered") {
                 if (r.route != null) Text(routeText(r), fontSize = 13.sp)
-                if (r.titles != null) {
+                if (r.titles != null && r.route?.route != Route.PLACES) {
                     Text(
                         if (r.titles.isEmpty()) "No Wikipedia article was planned."
                         else "Articles looked up: " + r.titles.joinToString(" · "),
@@ -92,7 +92,14 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
             }
         }
 
-        if (r.sources != null) {
+        if (r.sources != null && r.route?.route == Route.PLACES) {
+            if (r.sources.isNotEmpty()) {
+                Labeled("Places (${r.sources.size}" + (if (r.sourcesDropped > 0) " of ${r.sources.size + r.sourcesDropped}" else "") + ") · tap one for details") {
+                    r.sources.forEach { s -> key(r.runId, s.number) { PlaceRow(s) } }
+                    Hint(PLACES_CREDIT)
+                }
+            }
+        } else if (r.sources != null) {
             Labeled(if (r.sources.isEmpty()) "Sources" else "Sources (${r.sources.size}) · tap one to read it") {
                 if (r.sources.isEmpty()) {
                     Hint(
@@ -108,8 +115,11 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
 
         if (r.answer.isNotEmpty()) {
             Labeled(
-                if (r.route?.route == Route.ANSWER_FIRST) "Answer, from the model's own knowledge"
-                else "Answer, from the sources"
+                when (r.route?.route) {
+                    Route.ANSWER_FIRST -> "Answer, from the model's own knowledge"
+                    Route.PLACES -> if (r.sources.isNullOrEmpty()) "Answer" else "Recommendations, from the list"
+                    else -> "Answer, from the sources"
+                }
             ) {
                 SelectionContainer { MarkdownText(r.answer, onCitation = cite) }
             }
@@ -150,9 +160,14 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
             text = {
                 Column(Modifier.heightIn(max = 480.dp).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    if (s.section.isNotEmpty()) Hint(s.section)
-                    SelectionContainer { Text(s.text, fontSize = 14.sp) }
-                    Hint(if (s.via == "title") "From a planned article, offline Wikipedia" else "From the full-text search, offline Wikipedia")
+                    if (s.via == "places") {
+                        SelectionContainer { Text(s.text, fontSize = 14.sp) }
+                        MapButton(s)
+                    } else {
+                        if (s.section.isNotEmpty()) Hint(s.section)
+                        SelectionContainer { Text(s.text, fontSize = 14.sp) }
+                        Hint(if (s.via == "title") "From a planned article, offline Wikipedia" else "From the full-text search, offline Wikipedia")
+                    }
                 }
             },
         )
@@ -169,9 +184,15 @@ private fun StatusLine(r: ResearchUi, loading: Boolean, prefill: Prefill?, telem
     val nSources = r.sources?.size ?: 0
     val text = when (r.phase) {
         ResearchPhase.PLANNING -> if (loading) "Loading the model (once per app start)…" else "Choosing Wikipedia articles to look up…"
-        ResearchPhase.SEARCHING -> "Searching the offline Wikipedia…"
+        ResearchPhase.SEARCHING -> when {
+            r.route?.route != Route.PLACES -> "Searching the offline Wikipedia…"
+            r.placesWhere == null -> "Finding your position (GPS)…"
+            else -> "Looking up places…"
+        }
         ResearchPhase.DRAFTING -> if (prefill != null) "Reading the question…" else "Writing an answer from the model's own knowledge…"
         ResearchPhase.ANSWERING -> when {
+            r.route?.route == Route.PLACES && prefill != null -> "Reading the list of places…"
+            r.route?.route == Route.PLACES -> "Writing recommendations from the list…"
             prefill != null && nSources > 0 -> "Reading $nSources sources…"
             prefill != null -> "Reading the question…"
             nSources > 0 -> "Writing the answer from the sources…"
@@ -221,6 +242,10 @@ private fun Labeled(label: String, content: @Composable ColumnScope.() -> Unit) 
 
 private fun routeText(r: ResearchUi): String {
     val d = r.route ?: return ""
+    if (d.route == Route.PLACES) {
+        return if (r.placesWhere != null) "From the offline map data and travel guide: ${r.placesWhere}."
+        else "A question about places near you: looking them up in the offline map data."
+    }
     val subject = r.titles?.firstOrNull()?.let { "\"$it\"" } ?: "the subject"
     val threshold = String.format(Locale.US, "%,d", r.routeThreshold)
     val views = d.views?.let { String.format(Locale.US, "%,d", it) }
@@ -244,13 +269,15 @@ private fun timingSummary(r: ResearchUi): String {
         val g = t.generation
         when (t.phase) {
             ResearchPhase.PLANNING -> String.format(Locale.US, "planned %.0f s", secs)
-            ResearchPhase.SEARCHING ->
-                if (t.workMs != null && t.wallMs < 500) "searched during the draft"
-                else String.format(Locale.US, "searched %.0f s", secs)
+            ResearchPhase.SEARCHING -> when {
+                r.route?.route == Route.PLACES -> String.format(Locale.US, "places found in %.1f s", secs)
+                t.workMs != null && t.wallMs < 500 -> "searched during the draft"
+                else -> String.format(Locale.US, "searched %.0f s", secs)
+            }
             ResearchPhase.DRAFTING, ResearchPhase.ANSWERING, ResearchPhase.CHECKING -> {
                 val what = when (t.phase) {
                     ResearchPhase.DRAFTING -> "answer"
-                    ResearchPhase.ANSWERING -> "answer"
+                    ResearchPhase.ANSWERING -> if (r.route?.route == Route.PLACES) "recommendations" else "answer"
                     else -> "check"
                 }
                 if (g == null) String.format(Locale.US, "%s %.0f s", what, secs)
@@ -294,4 +321,65 @@ private fun SourceRow(s: ResearchSource) {
             }
         }
     }
+}
+
+/** Credit for the places list (ODbL and the Overture and Wikivoyage licences ask for it). */
+private const val PLACES_CREDIT =
+    "Map data © OpenStreetMap contributors (ODbL) and the Overture Maps Foundation; travel guide: Wikivoyage (CC BY-SA). " +
+        "No ratings: check a place is open before going."
+
+/** A place of the list: its name and what it is; tapping it shows the details and a map link. */
+@Composable
+private fun PlaceRow(s: ResearchSource) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.clickable { expanded = !expanded }.padding(horizontal = 10.dp, vertical = 6.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("[${s.number}]", fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Column(Modifier.weight(1f)) {
+                    Text(s.title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(s.section, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Text(if (expanded) "▾" else "▸", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            if (expanded) {
+                SelectionContainer {
+                    Text(s.text, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp))
+                }
+                MapButton(s)
+            }
+        }
+    }
+}
+
+/**
+ * Opens the place in whatever map app is installed (a geo: link; an offline map app such as
+ * Organic Maps or OsmAnd shows it without a network). The app itself never goes online.
+ */
+@Composable
+private fun MapButton(s: ResearchSource) {
+    val lat = s.lat ?: return
+    val lon = s.lon ?: return
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var missing by remember { mutableStateOf(false) }
+    TextButton(
+        onClick = {
+            val label = android.net.Uri.encode(s.title)
+            val uri = android.net.Uri.parse(String.format(Locale.US, "geo:%.6f,%.6f?q=%.6f,%.6f(%s)", lat, lon, lat, lon, label))
+            try {
+                context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
+            } catch (e: android.content.ActivityNotFoundException) {
+                missing = true
+            }
+        },
+        contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp),
+    ) { Text("Open in a map app", fontSize = 13.sp) }
+    if (missing) Hint(String.format(Locale.US, "No map app is installed. The place is at %.5f, %.5f.", lat, lon))
 }

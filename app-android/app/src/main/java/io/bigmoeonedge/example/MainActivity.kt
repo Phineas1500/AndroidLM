@@ -38,6 +38,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.androidlm.research.android.CorpusFiles
+import org.androidlm.research.PlacesText
+import org.androidlm.research.android.AndroidLocator
 import org.androidlm.research.android.CorpusLocator
 import java.io.File
 import java.util.Locale
@@ -317,6 +319,18 @@ private fun MainScreen(
                         }
                     }
 
+                    // A "near me" question needs the phone's position: location access is asked for
+                    // then, and the question runs whatever the answer (without it, the answer says
+                    // to name the city).
+                    var awaitingLocation by remember { mutableStateOf<String?>(null) }
+                    val locationAsk = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+                        val q = awaitingLocation
+                        awaitingLocation = null
+                        if (q != null && models.isNotEmpty()) {
+                            launchResearch(context, models[modelIdx.coerceIn(0, models.size - 1)], q, settings, RunBus.state.value.sessionSig)
+                        }
+                    }
+
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Button(
                             onClick = {
@@ -326,8 +340,13 @@ private fun MainScreen(
                                 if (models.isNotEmpty() && researchOn && prompt.isNotBlank()) {
                                     // Each research question stands alone (every generation of the
                                     // pipeline starts from an empty KV).
-                                    launchResearch(context, models[modelIdx.coerceIn(0, models.size - 1)],
-                                        prompt.trim(), settings, ui.sessionSig)
+                                    val q = prompt.trim()
+                                    if (PlacesText.parse(q, emptyList())?.here == true && !AndroidLocator.permitted(context)) {
+                                        awaitingLocation = q
+                                        locationAsk.launch(AndroidLocator.PERMISSIONS)
+                                    } else {
+                                        launchResearch(context, models[modelIdx.coerceIn(0, models.size - 1)], q, settings, ui.sessionSig)
+                                    }
                                     prompt = "" // the question is shown above its answer
                                 } else if (models.isNotEmpty() && !researchOn) {
                                     // First message of a conversation clears the KV; a follow-up continues it.

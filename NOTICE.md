@@ -14,6 +14,13 @@ following, each under its own terms.
 | llama.cpp | https://github.com/ggml-org/llama.cpp | MIT | Inference runtime |
 | ik_llama.cpp | https://github.com/ikawrakow/ik_llama.cpp | MIT (Copyright (C) 2024-2025 Iwan Kawrakow and the ik_llama.cpp authors) | Its aarch64 matrix-multiplication kernels for IQ2_XS and IQ3_XXS weights, adapted in `patches/llama.cpp/0001-ggml-cpu-iqk-moe-kernels.patch` (the new file keeps the MIT notice) |
 | BigMoeOnEdge | https://github.com/Helldez/BigMoeOnEdge | Apache-2.0 | Expert-streaming engine and the Android app structure this project's app is derived from; `scripts/build-android-engine.sh` is a bash port of its `scripts/build-android.ps1` |
+| OpenStreetMap | https://www.openstreetmap.org, via QLever (https://qlever.dev) | ODbL 1.0 (© OpenStreetMap contributors) | Places with diet tags, opening hours and cuisines in the places database (`places.db`, built by `scripts/build_places.py`) |
+| Overture Maps places | https://overturemaps.org (release 2026-09-23.1) | CDLA-Permissive-2.0; Foursquare Open Source Places records Apache-2.0; AllThePlaces records CC0-1.0 | Places to eat, drink and stay in `places.db` |
+| GeoNames | https://www.geonames.org | CC BY 4.0 | City, region and country names in `places.db`, to find the city a question names |
+| Wikivoyage | https://en.wikivoyage.org | CC BY-SA 4.0 | Travel guide text in `voyage.db`; listing names matched to places in `places.db` |
 
 Text derived from Wikipedia must remain under CC BY-SA 4.0 when redistributed, including inside
 a packaged corpus database.
+
+`places.db` contains OpenStreetMap data and is published under the ODbL 1.0 in its own dataset
+repository; the app shows the map-data credit under every list of places.

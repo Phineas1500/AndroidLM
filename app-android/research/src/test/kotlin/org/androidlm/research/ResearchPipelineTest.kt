@@ -163,6 +163,7 @@ class ResearchPipelineTest {
                     is ResearchEvent.Planned -> "planned"
                     is ResearchEvent.Routed -> "routed:" + e.decision.route
                     is ResearchEvent.SourcesFound -> "sources"
+                    is ResearchEvent.PlacesFound -> "places"
                     is ResearchEvent.AnswerToken -> "answer-tokens"
                     is ResearchEvent.AnswerCompleted -> "answer"
                     is ResearchEvent.CheckToken -> "check-tokens"
@@ -971,6 +972,130 @@ class ResearchPipelineTest {
         assertEquals(listOf("Harrods bombing", "Irish Republican Army"), Planner.parsePlanOutput(out))
         // a real title that shares words with the prompt is kept
         assertEquals(listOf("Titles of nobility"), Planner.parsePlanOutput("Titles of nobility"))
+    }
+
+    // ── places ──
+
+    /** The sample corpora plus fixtures/sample_places.db (Buenos Aires), opened on the corpus thread. */
+    private fun placesProvider(): CorpusProvider {
+        val base = sampleProvider()
+        val placesFile = fixture("sample_places.db")
+        return object : CorpusProvider {
+            private val placesDb by lazy {
+                Places(ThreadRecordingDb(JdbcSqlDatabase(placesFile).also { opened.add(it) }, dbThreads))
+            }
+            override fun wiki() = base.wiki()
+            override fun voyage() = base.voyage()
+            override fun places() = placesDb
+        }
+    }
+
+    private fun runWith(engine: Engine, corpora: CorpusProvider, question: String, rec: Recorder, locator: Locator?): ResearchResult =
+        runBlocking { withTimeout(60_000) { ResearchPipeline(engine, corpora, corpusThread, ResearchConfig(), null, locator).run(question, rec) } }
+
+    @Test
+    fun aPlacesQuestionIsAnsweredFromThePlacesDatabase() {
+        val question = "Tell me the best vegan restaurants in Buenos Aires"
+        val answer = "- Lotos [1]: a long-running vegan restaurant on Avenida Córdoba."
+        val engine = FakeEngine(listOf(answer))
+        val rec = Recorder()
+
+        val result = runWith(engine, placesProvider(), question, rec, null)
+
+        // one generation, over the list; no plan, no Wikipedia search
+        assertEquals(1, engine.calls.size)
+        val prompt = engine.calls[0].prompt
+        assertTrue(prompt.startsWith(PlacesText.PLACES_SYSTEM + "\n\nPlaces (185 vegan places to eat within 16 km of Buenos Aires, Argentina):\n\n[1] Lotos: "))
+        assertTrue(prompt.endsWith("\n\nQuestion: " + question))
+        assertEquals(PlacesText.MODEL_PLACES, prompt.lines().count { Regex("^\\[\\d+] ").containsMatchIn(it) })
+        assertEquals(360, engine.calls[0].nPredict)
+
+        assertEquals(Route.PLACES, result.route.route)
+        assertEquals(12, result.sources.size)
+        assertEquals("Lotos", result.sources[0].title)
+        assertEquals("places", result.sources[0].via)
+        assertTrue(result.sources[0].section.startsWith("vegan restaurant · Av. Córdoba 1583 · 1.9 km from the centre"))
+        assertNotNull(result.sources[0].lat)
+        assertEquals(185 - 12, result.sourcesDropped)
+        assertEquals(answer, result.answer)
+        assertEquals(answer, result.text)
+        assertNull(result.check)
+        assertEquals(
+            listOf(
+                "routed:PLACES", "phase:SEARCHING", "places", "sources", "completed:SEARCHING",
+                "phase:ANSWERING", "answer-tokens", "completed:ANSWERING", "answer", "result", "phase:DONE",
+            ),
+            rec.shape(),
+        )
+        assertEquals("185 vegan places to eat within 16 km of Buenos Aires, Argentina", rec.all<ResearchEvent.PlacesFound>().single().where)
+        assertCorpusThreadOnly()
+    }
+
+    @Test
+    fun aQuestionThatIsNotAboutPlacesTakesTheWikipediaRoute() {
+        val question = "What is the capital of Argentina?"
+        val engine = FakeEngine(listOf("Argentina\n", "Buenos Aires.", "No corrections."))
+        val rec = Recorder()
+
+        val result = runWith(engine, placesProvider(), question, rec, null)
+
+        assertEquals(Prompts.PLAN_SYSTEM + "\n\n" + question, engine.calls[0].prompt)
+        assertTrue(result.route.route != Route.PLACES)
+        assertTrue(rec.all<ResearchEvent.PlacesFound>().isEmpty())
+    }
+
+    @Test
+    fun aCityWithNothingOfTheKindFallsBackToWikipedia() {
+        // the sample has no halal places in Buenos Aires
+        val question = "halal food in Buenos Aires please"
+        val engine = FakeEngine(listOf("Buenos Aires\n", "Some answer.", "No corrections."))
+        val rec = Recorder()
+
+        val result = runWith(engine, placesProvider(), question, rec, null)
+
+        assertEquals(Prompts.PLAN_SYSTEM + "\n\n" + question, engine.calls[0].prompt)
+        assertTrue(result.route.route != Route.PLACES)
+    }
+
+    @Test
+    fun nearMeUsesThePhonesPosition() {
+        val engine = FakeEngine(listOf("- Lotos [1]"))
+        val rec = Recorder()
+
+        val result = runWith(engine, placesProvider(), "Best vegan restaurants near me", rec) { -34.6 to -58.4 }
+
+        assertEquals(Route.PLACES, result.route.route)
+        assertTrue(engine.calls[0].prompt.contains("Places (35 vegan places to eat within 2 km of your position):"))
+        assertTrue(result.sources[0].section.contains("km from you"))
+        assertEquals(listOf("routed:PLACES", "phase:SEARCHING", "places", "sources"), rec.shape().take(4))
+    }
+
+    @Test
+    fun nearMeWithoutAPositionSaysSoWithoutTheModel() {
+        val engine = FakeEngine(emptyList())
+        val rec = Recorder()
+
+        val result = runWith(engine, placesProvider(), "Best vegan restaurants near me", rec) { null }
+
+        assertEquals(0, engine.calls.size)
+        assertEquals(Route.PLACES, result.route.route)
+        assertEquals(ResearchPipeline.NO_POSITION, result.answer)
+        assertTrue(result.sources.isEmpty())
+        assertEquals(
+            listOf("routed:PLACES", "phase:SEARCHING", "sources", "completed:SEARCHING", "answer", "result", "phase:DONE"),
+            rec.shape(),
+        )
+    }
+
+    @Test
+    fun withoutAPlacesDatabaseAPlacesQuestionTakesTheWikipediaRoute() {
+        val question = "Tell me the best vegan restaurants in Buenos Aires"
+        val engine = FakeEngine(listOf("Buenos Aires\nVeganism\n", "Some answer.", "No corrections."))
+
+        val result = runWith(engine, sampleProvider(), question, Recorder(), null)
+
+        assertEquals(Prompts.PLAN_SYSTEM + "\n\n" + question, engine.calls[0].prompt)
+        assertTrue(result.route.route != Route.PLACES)
     }
 
     companion object {

@@ -54,15 +54,27 @@ interface CorpusProvider {
     /** The optional Wikivoyage corpus. */
     fun voyage(): Corpus?
 
+    /** The optional places database (places.db): where to eat, drink and stay. */
+    fun places(): Places? = null
+
     /** [SqlDatabase.interrupt] on every open database; callable from any thread. */
     fun interrupt() {}
 
     companion object {
-        fun of(wiki: Corpus, voyage: Corpus? = null): CorpusProvider = object : CorpusProvider {
+        fun of(wiki: Corpus, voyage: Corpus? = null, places: Places? = null): CorpusProvider = object : CorpusProvider {
             override fun wiki() = wiki
             override fun voyage() = voyage
+            override fun places() = places
         }
     }
+}
+
+/**
+ * The phone's position, for "near me" questions: (latitude, longitude), or null when it is not
+ * available (no permission, location off, no fix in time). May take seconds; must be cancellable.
+ */
+fun interface Locator {
+    suspend fun here(): Pair<Double, Double>?
 }
 
 /** The knobs of rag.py `answer()`; the defaults are its command-line defaults. */
@@ -84,17 +96,25 @@ data class ResearchConfig(
      * engine reads only the sources. Off by default, as in rag.py; the app turns it on.
      */
     val checkContinue: Boolean = false,
+    /** The places answer: a handful of one-line recommendations from the list. */
+    val placesTokens: Int = 360,
 )
 
 enum class ResearchPhase { PLANNING, SEARCHING, DRAFTING, ANSWERING, CHECKING, DONE, CANCELLED, FAILED }
 
-/** One passage that reached the model; [number] is its citation number in the context. */
+/**
+ * One passage that reached the model; [number] is its citation number in the context. On the
+ * places route a source is a place: [title] its name, [section] what it is, [text] its details,
+ * [via] "places", and [lat]/[lon] where it is.
+ */
 data class ResearchSource(
     val number: Int,
     val title: String,
     val section: String,
     val text: String,
     val via: String,
+    val lat: Double? = null,
+    val lon: Double? = null,
 )
 
 /**
@@ -142,6 +162,12 @@ sealed class ResearchEvent {
     data class Routed(val decision: RouteDecision, val threshold: Long) : ResearchEvent()
 
     data class SourcesFound(val sources: List<ResearchSource>, val dropped: Int) : ResearchEvent()
+
+    /**
+     * The places route found where to look: [where] says what was searched ("186 vegan places to
+     * eat within 16 km of Buenos Aires, Argentina"); the places follow as [SourcesFound].
+     */
+    data class PlacesFound(val where: String, val total: Int, val here: Boolean) : ResearchEvent()
 
     /** Streamed text of the answer (the draft, on the answer-first route). */
     data class AnswerToken(val text: String) : ResearchEvent()
@@ -214,6 +240,7 @@ class ResearchPipeline(
     private val corpusDispatcher: CoroutineDispatcher,
     private val config: ResearchConfig = ResearchConfig(),
     private val background: BackgroundSearch? = null,
+    private val locator: Locator? = null,
 ) {
     // Background searches are not children of a run: cancelling a run must not wait for a query
     // that is still reading the index. Their results are dropped; the thread moves on to the next.
@@ -298,7 +325,11 @@ class ResearchPipeline(
         }
 
         private suspend fun executeInner(): ResearchResult {
-            // 0. with a background search: the question-only half of the search runs while the plan
+            // 0. a question about where to eat, drink or stay goes to the places database, when it
+            //    names a place the database knows (or asks "near me"); everything else goes on below
+            placesRun()?.let { return it }
+
+            // with a background search: the question-only half of the search runs while the plan
             //    is being written, on its own connection and thread
             val half: QuestionHalf? = background?.let { bg ->
                 bg.priority(true)
@@ -368,6 +399,80 @@ class ResearchPipeline(
 
             val text = if (check != null) answer + SOURCE_CHECK_HEADING + check else answer
             val result = ResearchResult(question, titles, decision, sources, dropped, answer, check, text, timings.toList())
+            listener.onEvent(ResearchEvent.Completed(result))
+            enter(ResearchPhase.DONE)
+            return result
+        }
+
+        /**
+         * The places route (places.py `lookup` + PLACES_SYSTEM), or null when the question is not
+         * about places or names no place the database knows. A "near me" question stays here even
+         * without a position or with nothing found: the Wikipedia pipeline could not place it.
+         */
+        private suspend fun placesRun(): ResearchResult? {
+            val t0 = System.nanoTime()
+            val (db, ask) = withContext(corpusDispatcher) {
+                val db = corpora.places() ?: return@withContext null
+                db.parse(question)?.let { db to it }
+            } ?: return null
+            val decision = RouteDecision(Route.PLACES, null)
+            val lookup: PlacesLookup?
+            if (ask.here) {
+                listener.onEvent(ResearchEvent.Routed(decision, config.routeViews))
+                enter(ResearchPhase.SEARCHING)
+                val here = locator?.here()
+                lookup = if (here == null) null else withContext(corpusDispatcher) { db.lookup(ask, here) }
+                if (lookup == null) return placesNotice(t0, decision, NO_POSITION)
+            } else {
+                lookup = withContext(corpusDispatcher) { db.lookup(ask) } ?: return null
+                // nothing of the kind there in the map data: the Wikipedia pipeline may still know
+                if (lookup.places.isEmpty()) return null
+                listener.onEvent(ResearchEvent.Routed(decision, config.routeViews))
+                enter(ResearchPhase.SEARCHING)
+            }
+            val where = PlacesText.whereText(lookup.total, lookup.radiusKm, lookup.label, ask, lookup.capped)
+            listener.onEvent(ResearchEvent.PlacesFound(where, lookup.total, ask.here))
+            if (lookup.places.isEmpty()) {
+                return placesNotice(t0, decision, String.format(java.util.Locale.US, NOTHING_NEAR, lookup.radiusKm))
+            }
+            // the travel guide's words on each listed place, from the Wikivoyage corpus
+            val guide = withContext(corpusDispatcher) {
+                val voyage = corpora.voyage()
+                lookup.places.map { p ->
+                    p.guide.firstOrNull()?.let { g ->
+                        voyage?.resolveTitle(g.article, fuzzy = false)?.let { aid ->
+                            PlacesText.guideLine(voyage.article(aid).text.value, g.listing)
+                        }
+                    }
+                }
+            }
+            val sources = lookup.places.mapIndexed { i, p ->
+                ResearchSource(i + 1, p.name, PlacesText.summary(p, lookup.origin), PlacesText.details(p, guide[i], lookup.origin),
+                    "places", p.lat, p.lon)
+            }
+            listener.onEvent(ResearchEvent.SourcesFound(sources, lookup.total - sources.size))
+            completed(t0)
+            val lines = lookup.places.take(PlacesText.MODEL_PLACES).mapIndexed { i, p ->
+                PlacesText.describe(p, i + 1, PlacesText.clip(guide[i], PlacesText.GUIDE_CHARS), lookup.origin)
+            }
+            val res = generating(
+                ResearchPhase.ANSWERING, PlacesText.PLACES_SYSTEM, PlacesText.placesUser(question, where, lines),
+                config.placesTokens,
+            ) { listener.onEvent(ResearchEvent.AnswerToken(it)) }
+            listener.onEvent(ResearchEvent.AnswerCompleted(res.text))
+            val result = ResearchResult(question, emptyList(), decision, sources, lookup.total - sources.size,
+                res.text, null, res.text, timings.toList())
+            listener.onEvent(ResearchEvent.Completed(result))
+            enter(ResearchPhase.DONE)
+            return result
+        }
+
+        /** A places answer without the model: why there is no list. */
+        private fun placesNotice(t0: Long, decision: RouteDecision, text: String): ResearchResult {
+            listener.onEvent(ResearchEvent.SourcesFound(emptyList(), 0))
+            completed(t0)
+            listener.onEvent(ResearchEvent.AnswerCompleted(text))
+            val result = ResearchResult(question, emptyList(), decision, emptyList(), 0, text, null, text, timings.toList())
             listener.onEvent(ResearchEvent.Completed(result))
             enter(ResearchPhase.DONE)
             return result
@@ -475,6 +580,17 @@ class ResearchPipeline(
     companion object {
         /** Between the draft and its source check in the final text (rag.py, verbatim). */
         const val SOURCE_CHECK_HEADING = "\n\n**Source check**\n"
+
+        /** The answer to a "near me" question when the phone's position is not available. */
+        const val NO_POSITION =
+            "Your position is not available: location access is off for AndroidLM, or the phone has no GPS " +
+                "fix yet (indoors it can take a while). Ask again with the name of the city, for example " +
+                "\"vegan restaurants in Lisbon\"."
+
+        /** The answer to a "near me" question with nothing nearby; the radius is filled in. */
+        const val NOTHING_NEAR =
+            "Nothing of that kind within %.0f km of your position in the offline map data. Try a wider " +
+                "question, or name the nearest city."
 
         private fun msSince(t: Long) = (System.nanoTime() - t) / 1_000_000
     }

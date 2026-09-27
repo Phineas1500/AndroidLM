@@ -7,6 +7,12 @@ enum class Route {
 
     /** rag.py "verify": the model answers from its own knowledge, then a source check follows. */
     ANSWER_FIRST,
+
+    /**
+     * A question about where to eat, drink or stay (places.py): the places database lists the
+     * places, the model recommends from the list.
+     */
+    PLACES,
 }
 
 /**
