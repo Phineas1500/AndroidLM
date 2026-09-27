@@ -31,5 +31,7 @@ Tbilisi, Mexico City, Cape Town, Seoul...) and ramen/coffee/hostels/halal/kosher
 4/ Which phone were you on? Your source check ran at 1.1 tok/s, a quarter of what the Pixel 8
 Pro does; I want to find out why. github.com/Phineas1500/AndroidLM
 
-Numbers to check before posting: the v1.1 release link, the clip, and the speed line (from
-notes/2026-09-27-places.md).
+Release: https://github.com/Phineas1500/AndroidLM/releases/tag/v1.1.0 (APK + INSTALL.md; places.db at
+huggingface.co/datasets/rammingaway/androidlm-places). The speed line matches the 24-question eval
+(list after a median 0.15 s, recommendations done after 52 s). The demo clip was recorded with an
+earlier 1.1 build; the flow (list first, then the model's picks) is the same.
