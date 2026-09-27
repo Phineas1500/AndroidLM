@@ -50,6 +50,12 @@ QUESTIONS = [
     "cheap places to eat in London",
     "vegan pubs in London",
     "Any vegetarian Indian restaurants in London?",
+    "Where are the best tapas bars in Buenos Aires?",
+    "best vegan restaurants in Porto",
+    "vegan food in Cambridge, MA",
+    "Tell me the best vegan restaurants in Bali",
+    "vegan restaurants in Texas",
+    "best vegan restaurants in DC",
 ]
 HERE = (-34.6, -58.4)
 NORM = ["Lisboa", "São Paulo", "Zürich", "Kraków", "Straße", "Ærøskøbing", "İstanbul", "Hà Nội",

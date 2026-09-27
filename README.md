@@ -18,6 +18,12 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
   articles in full, lead sections for the rest, a BM25 full-text index, Wikipedia's redirect
   table, and monthly pageviews per article, plus a 1.7MB file of the index's word counts that
   keeps the search off the critical path. Optional Wikivoyage (0.3GB) for travel questions.
+- **Places:** 12.6 million places to eat, drink and stay, worldwide, in one 1.7GB SQLite file:
+  Overture Maps places merged with OpenStreetMap's diet tags and opening hours, GeoNames cities,
+  and the Wikivoyage listings matched to them. A question like "the best vegan restaurants in
+  Lisbon" or "cheap hostels near me" (GPS, no network) gets a ranked list of real places in
+  under half a second, then the model's recommendations from that list
+  ([`notes/2026-09-27-places.md`](notes/2026-09-27-places.md)).
 - **Pipeline:** the model names the Wikipedia articles it wants; titles are resolved through
   redirects; a router sends little-read subjects retrieval-first (the model's memory of them is
   unreliable) and everything else answer-first, followed by a source check that cites passages.
@@ -78,6 +84,8 @@ checks their SHA-256, pushes them to the phone over USB and installs the APK. Bu
 | `scripts/fetch_pageviews.sh` | Monthly Wikimedia pageviews -> per-article totals |
 | `scripts/build_redirects.py` | Adds Wikipedia's redirect table to `wiki.db` |
 | `scripts/build_df.py` | `wiki_df.db`: the index's word counts, so the search can rank a question's words without reading them from the index |
+| `scripts/build_places.py`, `fetch_osm_diet.py` | `places.db`: Overture Maps places, OpenStreetMap diet tags, GeoNames cities, Wikivoyage listings |
+| `scripts/places.py` | Places questions: parsing, finding the city, ranking (prototype of the app's `Places.kt`) |
 | `scripts/rag.py` | The retrieval and answering pipeline (prototype of the on-device logic) |
 | `scripts/eval_models.sh`, `run_eval.py` | Run an eval set against a memory-capped llama-server |
 | `scripts/bench.sh`, `sbx.sh` | Benchmarks under a cgroup memory cap; sandbox for third-party code |
@@ -110,6 +118,18 @@ python scripts/build_redirects.py wiki.db enwiki-latest-redirect.sql.gz \
        enwiki-latest-pages-articles-multistream-index.txt.bz2
 # 5. Word counts for the search (about 6 minutes; after any change to the index)
 python scripts/build_df.py wiki.db wiki_df.db
+```
+
+The places database (about 15GB of downloads, 6 minutes to build on a laptop; needs `duckdb`):
+
+```sh
+# Overture Maps places, one release (16 parquet files, 11GB), from
+#   s3://overturemaps-us-west-2/release/2026-09-23.1/theme=places/type=place/
+# GeoNames cities1000.zip (unzipped), admin1CodesASCII.txt and countryInfo.txt from
+#   https://download.geonames.org/export/dump/
+python scripts/fetch_osm_diet.py osm-diet.json          # OpenStreetMap diet tags, one QLever query
+python scripts/build_places.py --overture overture/ --osm osm-diet.json --geonames geonames/ \
+       --voyage voyage.db --work work/ --out places.db
 ```
 
 ## Licence and attribution

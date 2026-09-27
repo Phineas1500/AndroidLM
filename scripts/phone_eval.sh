@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 # Ask the app, on the phone, every question of a question file (JSONL with id and q), one at a
 # time through the dev-only research_question extra, and keep each run's AndroidLM log.
-# Each run starts at 30.5 C or 4 minutes after the previous one ended, whichever comes first.
+# Each run starts at 30.5 C or 4 minutes (PHONE_EVAL_GAP seconds) after the previous one ended,
+# whichever comes first.
 # usage: phone_eval.sh <questions.jsonl> <out dir>
 source ~/androidlm-tools/env.sh
 Q=$1; OUT=$2; mkdir -p "$OUT"
+GAP=${PHONE_EVAL_GAP:-240}
 PKG=io.github.phineas1500.androidlm.dev
 python3 -c "import json,sys; [print(json.loads(l)['id']+'\t'+json.loads(l)['q']) for l in open(sys.argv[1])]" "$Q" > "$OUT/questions.tsv"
 # The run's log is read back from the phone's own buffer, large enough for a whole run: a live
@@ -19,7 +21,7 @@ while IFS=$'\t' read -r -u 3 id q; do
   while true; do
     t=$(adb shell "dumpsys thermalservice | sed -n \"/Current temperatures/,\\\$p\" | grep -m1 \"mName=VIRTUAL-SKIN,\"" </dev/null | sed -E "s/.*mValue=([0-9.]+).*/\1/")
     awk -v t="$t" "BEGIN{exit !(t>0 && t<=30.5)}" && break
-    [ $(( $(date +%s) - LAST )) -ge 240 ] && break
+    [ $(( $(date +%s) - LAST )) -ge $GAP ] && break
     sleep 15
   done
   echo "##### $id start skin=$t $(date +%T)"

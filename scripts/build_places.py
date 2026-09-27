@@ -245,7 +245,7 @@ def load_geonames(gn_dir):
         f = line.rstrip("\n").split("\t")
         gid, name, ascii_name, alt = int(f[0]), f[1], f[2], f[3]
         lat, lon, cc, a1, pop = float(f[4]), float(f[5]), f[8], f[10], int(f[14] or 0)
-        cities.append((gid, name, ascii_name, alt, lat, lon, cc, regions.get(f"{cc}.{a1}"), pop))
+        cities.append((gid, name, ascii_name, alt, lat, lon, cc, regions.get(f"{cc}.{a1}"), pop, int(f[7] == "PPLC")))
     return countries, regions, cities
 
 
@@ -490,7 +490,8 @@ def write_sqlite(con, out, countries, regions, cities, names):
         CREATE TABLE guide(place INTEGER NOT NULL, article TEXT NOT NULL, section TEXT NOT NULL,
             tier TEXT, listing TEXT NOT NULL);
         CREATE TABLE cities(id INTEGER PRIMARY KEY, name TEXT NOT NULL, country TEXT NOT NULL,
-            admin1 TEXT, lat REAL NOT NULL, lon REAL NOT NULL, population INTEGER NOT NULL);
+            admin1 TEXT, lat REAL NOT NULL, lon REAL NOT NULL, population INTEGER NOT NULL,
+            capital INTEGER NOT NULL);
         CREATE TABLE city_names(key TEXT NOT NULL, city INTEGER NOT NULL, PRIMARY KEY(key, city)) WITHOUT ROWID;
         CREATE TABLE countries(code TEXT PRIMARY KEY, name TEXT NOT NULL);
         CREATE TABLE region_names(key TEXT NOT NULL, country TEXT NOT NULL, admin1 TEXT NOT NULL,
@@ -537,16 +538,20 @@ def write_sqlite(con, out, countries, regions, cities, names):
         log(f"  wrote {n} places")
     db.execute("create index places_cell on places(cell)")
     db.execute("create index guide_place on guide(place)")
-    db.executemany("insert into cities values (?,?,?,?,?,?,?)",
-                   [(c[0], c[1], c[6], c[7], c[4], c[5], c[8]) for c in cities])
+    db.execute("create index cities_region on cities(country, admin1, population)")
+    db.executemany("insert into cities values (?,?,?,?,?,?,?,?)",
+                   [(c[0], c[1], c[6], c[7], c[4], c[5], c[8], c[9]) for c in cities])
     db.executemany("insert or ignore into city_names values (?,?)", [(k, i) for k, ids in names.items() for i in ids])
     db.executemany("insert into countries values (?,?)", sorted(countries.items()))
     rn = set()
     for code, cname in countries.items():
         rn.add((norm_key(cname), code, ""))
     for code, rname in regions.items():
-        cc = code.split(".")[0]
+        cc, sub = code.split(".", 1)
         rn.add((norm_key(rname), cc, rname))
+        # "Cambridge, MA", "Vancouver, BC", "Perth, WA": the state and province codes
+        if cc in ("US", "CA", "AU") and sub.isalpha():
+            rn.add((sub.lower(), cc, rname))
     for key, cc in ALIASES.items():
         rn.add((key, cc, ""))
     db.executemany("insert or ignore into region_names values (?,?,?)", [r for r in rn if r[0]])

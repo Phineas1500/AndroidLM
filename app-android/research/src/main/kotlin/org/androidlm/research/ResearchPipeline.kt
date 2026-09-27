@@ -425,15 +425,16 @@ class ResearchPipeline(
                 if (lookup == null) return placesNotice(t0, decision, NO_POSITION)
             } else {
                 lookup = withContext(corpusDispatcher) { db.lookup(ask) } ?: return null
-                // nothing of the kind there in the map data: the Wikipedia pipeline may still know
-                if (lookup.places.isEmpty()) return null
                 listener.onEvent(ResearchEvent.Routed(decision, config.routeViews))
                 enter(ResearchPhase.SEARCHING)
             }
             val where = PlacesText.whereText(lookup.total, lookup.radiusKm, lookup.label, ask, lookup.capped)
             listener.onEvent(ResearchEvent.PlacesFound(where, lookup.total, ask.here))
             if (lookup.places.isEmpty()) {
-                return placesNotice(t0, decision, String.format(java.util.Locale.US, NOTHING_NEAR, lookup.radiusKm))
+                // said plainly rather than left to the Wikipedia pipeline, which can only guess at
+                // places (the old route invented restaurants)
+                return placesNotice(t0, decision, String.format(java.util.Locale.US, NOTHING_FOUND,
+                    PlacesText.whatText(ask), lookup.radiusKm, lookup.label))
             }
             // the travel guide's words on each listed place, from the Wikivoyage corpus
             val guide = withContext(corpusDispatcher) {
@@ -587,10 +588,10 @@ class ResearchPipeline(
                 "fix yet (indoors it can take a while). Ask again with the name of the city, for example " +
                 "\"vegan restaurants in Lisbon\"."
 
-        /** The answer to a "near me" question with nothing nearby; the radius is filled in. */
-        const val NOTHING_NEAR =
-            "Nothing of that kind within %.0f km of your position in the offline map data. Try a wider " +
-                "question, or name the nearest city."
+        /** The answer when the map data has nothing of the kind; what, the radius and where are filled in. */
+        const val NOTHING_FOUND =
+            "The offline map data (OpenStreetMap and Overture Maps) has no %s within %.0f km of %s. " +
+                "Try a wider question, such as places to eat rather than a diet or a cuisine."
 
         private fun msSince(t: Long) = (System.nanoTime() - t) / 1_000_000
     }

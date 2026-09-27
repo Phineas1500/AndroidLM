@@ -1045,16 +1045,23 @@ class ResearchPipelineTest {
     }
 
     @Test
-    fun aCityWithNothingOfTheKindFallsBackToWikipedia() {
-        // the sample has no halal places in Buenos Aires
+    fun aCityWithNothingOfTheKindSaysSoWithoutTheModel() {
+        // the sample has no halal places in or around Buenos Aires: the search widens to 50 km,
+        // then says so instead of leaving the question to the Wikipedia route, which would guess
         val question = "halal food in Buenos Aires please"
-        val engine = FakeEngine(listOf("Buenos Aires\n", "Some answer.", "No corrections."))
+        val engine = FakeEngine(emptyList())
         val rec = Recorder()
 
         val result = runWith(engine, placesProvider(), question, rec, null)
 
-        assertEquals(Prompts.PLAN_SYSTEM + "\n\n" + question, engine.calls[0].prompt)
-        assertTrue(result.route.route != Route.PLACES)
+        assertEquals(0, engine.calls.size)
+        assertEquals(Route.PLACES, result.route.route)
+        assertEquals(
+            "The offline map data (OpenStreetMap and Overture Maps) has no halal places to eat within 50 km of " +
+                "Buenos Aires, Argentina. Try a wider question, such as places to eat rather than a diet or a cuisine.",
+            result.answer,
+        )
+        assertEquals("0 halal places to eat within 50 km of Buenos Aires, Argentina", rec.all<ResearchEvent.PlacesFound>().single().where)
     }
 
     @Test

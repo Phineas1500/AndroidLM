@@ -5,9 +5,9 @@ and the corpus are therefore copied to the phone from a computer.
 
 ## What you need
 
-- An Android phone with 12GB of RAM, arm64, Android 10 or newer, and about 36GB free.
+- An Android phone with 12GB of RAM, arm64, Android 10 or newer, and about 38GB free.
   Developed for a Pixel 8 Pro; nothing here needs Google Play Services.
-- A computer with about 35GB free, `adb` (Android platform-tools), `curl` and `python3`.
+- A computer with about 37GB free, `adb` (Android platform-tools), `curl` and `python3`.
 - A USB data cable, and USB debugging enabled on the phone
   (Settings > About phone > tap Build number 7 times, then Developer options > USB debugging).
 
@@ -17,6 +17,7 @@ and the corpus are therefore copied to the phone from a computer.
 | `wiki.db` | 21.3GB | English Wikipedia: text, search index, redirects, pageviews (CC BY-SA 4.0) |
 | `wiki_df.db` | 1.7MB | Word counts for `wiki.db`'s index, so a search does not have to read them from it; optional (same results without it, slower) |
 | `voyage.db` | 0.3GB | English Wikivoyage travel guides, optional (CC BY-SA 4.0) |
+| `places.db` | 1.7GB | 12.6 million places to eat, drink and stay, worldwide, for questions like "vegan restaurants in Lisbon" or "hostels near me"; optional (ODbL: © OpenStreetMap contributors, Overture Maps Foundation, GeoNames) |
 
 ## Steps
 
@@ -37,7 +38,7 @@ The APK is signed with the project's release key (certificate SHA-256
 its package is `io.github.phineas1500.androidlm.dev`, the build that reads the model and corpus
 from `/data/local/tmp`. An earlier build of that package signed with another key has to be
 uninstalled first (see below).
-Pushing 34GB over USB takes roughly 15-40 minutes depending on the cable and port.
+Pushing 36GB over USB takes roughly 15-40 minutes depending on the cable and port.
 
 Then, on the phone: turn on airplane mode, open AndroidLM (it finds the model and the corpus by
 itself; if it was open during the install, tap Refresh; on first launch Android asks whether it
@@ -50,7 +51,7 @@ later questions reuse it.
 ```sh
 adb shell mkdir -p /data/local/tmp/bmoe/corpus
 adb push Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf /data/local/tmp/bmoe/
-adb push wiki.db wiki_df.db voyage.db /data/local/tmp/bmoe/corpus/
+adb push wiki.db wiki_df.db voyage.db places.db /data/local/tmp/bmoe/corpus/
 adb shell 'chmod 755 /data/local/tmp/bmoe /data/local/tmp/bmoe/corpus; chmod 644 /data/local/tmp/bmoe/*.gguf /data/local/tmp/bmoe/corpus/*.db'
 adb install -r androidlm-1.0.0.apk
 ```

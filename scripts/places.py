@@ -186,6 +186,7 @@ class City:
     lat: float
     lon: float
     population: int
+    capital: int = 0
     country_name: str = ""
 
     @property
@@ -200,11 +201,19 @@ class City:
         return ", ".join(parts)
 
 
+PRIMARY_WEIGHT = 3  # a city whose own name is the one asked for counts as three times its size
+CAPITAL_WEIGHT = 5  # and a national capital by its own name five times again ("Washington": the city, not the state)
+
+
 def locate(db, ask):
     """The city the question names: for each candidate (place_candidates), the longest run of
-    words at its start that is a city name, narrowed by a country or region named after it
-    ("Paris, Texas"), else the most populous. A candidate after "in/near/around" is taken when
-    it is capitalised or a city of 100,000 or more; a bare capitalised run only in the latter case."""
+    words at its start that names a city, narrowed by a country or region named after it
+    ("Paris, Texas"). Among cities of that name the largest wins, a city whose own name it is
+    (not an alternate name: "Porto" is also a name of Bordeaux) counting three times its size.
+    After "in/near/around", a state or province counts too, by the people in all of its cities, and
+    stands for its largest city ("Bali": Denpasar, not Bāli in West Bengal). National capitals count
+    five times their size ("Washington"). A candidate after "in/near/around" is taken when it is capitalised or
+    a city of 100,000 or more; a bare capitalised run only in the latter case."""
     for text, anchored in place_candidates(ask.question):
         words = norm_key(text).split()
         capital = text[:1].isupper()
@@ -213,22 +222,48 @@ def locate(db, ask):
             if not anchored and key in NOT_PLACES:
                 continue
             ids = [r[0] for r in db.execute("select city from city_names where key = ?", (key,))]
-            if not ids:
-                continue
             cities = [City(*r) for r in db.execute(
-                f"select id, name, country, admin1, lat, lon, population from cities where id in ({','.join('?' * len(ids))})", ids)]
+                f"select id, name, country, admin1, lat, lon, population, capital from cities where id in ({','.join('?' * len(ids))})",
+                ids)] if ids else []
             rest = words[n:]
-            if rest:
+            if rest and cities:
                 hinted = _hinted(db, cities, rest)
                 if hinted:
                     cities = hinted
-            c = max(cities, key=lambda c: (c.population, -c.id))
-            if not ((anchored and capital) or c.population >= 100_000):
+            best = max(cities, key=lambda c: (_weight(c, key), -c.id), default=None)
+            weight = _weight(best, key) if best else 0
+            if anchored:
+                region, people = _region_city(db, key)
+                if region is not None and people > weight:
+                    best = region
+            if best is None:
                 continue
-            row = db.execute("select name from countries where code = ?", (c.country,)).fetchone()
-            c.country_name = row[0] if row else ""
-            return c
+            if not ((anchored and capital) or best.population >= 100_000):
+                continue
+            row = db.execute("select name from countries where code = ?", (best.country,)).fetchone()
+            best.country_name = row[0] if row else ""
+            return best
     return None
+
+
+def _weight(c, key):
+    if norm_key(c.name) != key:
+        return c.population  # an alternate name (Hong Kong was once "Victoria")
+    return c.population * PRIMARY_WEIGHT * (CAPITAL_WEIGHT if c.capital else 1)
+
+
+def _region_city(db, key):
+    """The state or province named [key] with the most people in its cities: its largest city,
+    and those people. (None, 0) when no region has that name."""
+    best, people = None, 0
+    for cc, a1 in db.execute("select country, admin1 from region_names where key = ? and admin1 <> '' order by country, admin1",
+                             (key,)).fetchall():
+        n = db.execute("select coalesce(sum(population), 0) from cities where country = ? and admin1 = ?", (cc, a1)).fetchone()[0]
+        r = db.execute("select id, name, country, admin1, lat, lon, population, capital from cities "
+                       "where country = ? and admin1 = ? order by population desc, id limit 1", (cc, a1)).fetchone()
+        if r and n > people:
+            best, people = City(*r), n
+    return best, people
 
 
 def _hinted(db, cities, rest):
@@ -370,7 +405,9 @@ def find(db, ask, lat, lon, radius_km, limit=12):
     kinds = _kinds(db)
     group = GROUPS[ask.group]
     cells = cells_around(lat, lon, radius_km)
-    wanted = [i for i, (name, path) in kinds.items() if in_group(ask, path)]
+    # the group's categories, and the one kind of place asked for wherever it sits ("tapas bars":
+    # tapas_bar is a casual eatery, not a bar)
+    wanted = [i for i, (name, path) in kinds.items() if in_group(ask, path) or (ask.sub and ask.sub in path)]
     sql = (f"select id, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine "
            f"from places where cell in ({','.join('?' * len(cells))}) and kind in ({','.join('?' * len(wanted))})")
     args = cells + wanted
@@ -571,6 +608,8 @@ def guide_text(voyage, p):
 
 HERE_RADII = (2.0, 5.0, 10.0)  # km around the phone, widened until MIN_HERE places match
 MIN_HERE = 5
+CITY_WIDEN = (1.0, 2.0, 4.0)   # the city's radius, widened when nothing matches
+MAX_RADIUS_KM = 50.0
 
 
 @dataclass
@@ -598,8 +637,13 @@ def lookup(db, ask, here=None):
     city = locate(db, ask)
     if city is None:
         return None
-    places, total, capped = find(db, ask, city.lat, city.lon, city.radius_km)
-    return Lookup(city.label(), city.radius_km, total, places, capped, "the centre", city)
+    # nothing of the kind in the city: the nearest there is, up to MAX_RADIUS_KM away
+    for m in CITY_WIDEN:
+        r = min(city.radius_km * m, MAX_RADIUS_KM)
+        places, total, capped = find(db, ask, city.lat, city.lon, r)
+        if total > 0:
+            break
+    return Lookup(city.label(), r, total, places, capped, "the centre", city)
 
 
 # ---- what the model reads -------------------------------------------------------------------
@@ -609,22 +653,26 @@ PLACES_SYSTEM = (
     "which comes from offline map data (OpenStreetMap and Overture Maps) and the Wikivoyage travel "
     "guide, best matches first. Recommend the three to five places that best answer the question, one "
     "short line each (under 30 words, in your own words, not copied from the list): its name and number "
-    "like [2], what kind of place it is and where, and the gist of the travel guide's words when the "
-    "list quotes them. Use only facts from the list; add what you know about a place only if it is "
-    "well known and you are sure. Never invent ratings, prices, dishes or opening hours. Close with "
-    "one sentence noting that map data has no ratings and places close, so it is worth checking "
-    "before going. No preamble, no LaTeX, no visible deliberation."
+    "like [2], what kind of place it is, its street as the list gives it, and the gist of the travel "
+    "guide's words when the list quotes them. Use only facts from the list; add what you know about a "
+    "place only if it is well known and you are sure. Never invent ratings, prices, dishes, "
+    "neighbourhoods or opening hours. Close with one sentence noting that map data has no ratings and "
+    "places close, so it is worth checking before going. No preamble, no LaTeX, no visible deliberation."
 )
 MODEL_PLACES = 6     # places the model reads (the list shows up to find()'s limit)
 GUIDE_CHARS = 180    # of each travel-guide listing
 
 
-def where_text(total, radius_km, label, ask, capped=False):
+def what_text(ask):
     what = {"eat": "places to eat", "cafe": "cafes", "drink": "places to drink", "sweet": "bakeries and sweet shops",
             "stay": "places to stay"}[ask.group]
     if ask.diet:
         what = ask.diet.replace("_", "-") + " " + what
-    return f"{total}{'+' if capped else ''} {what} within {radius_km:.0f} km of {label}"
+    return what
+
+
+def where_text(total, radius_km, label, ask, capped=False):
+    return f"{total}{'+' if capped else ''} {what_text(ask)} within {radius_km:.0f} km of {label}"
 
 
 def places_user(question, where, lines):

@@ -42,6 +42,8 @@ data class City(
     val lat: Double,
     val lon: Double,
     val population: Long,
+    /** 1 for a national capital (GeoNames PPLC). */
+    val capital: Int = 0,
     val countryName: String = "",
 ) {
     val radiusKm: Double get() = PlacesText.cityRadiusKm(population)
@@ -497,16 +499,16 @@ object PlacesText {
         "which comes from offline map data (OpenStreetMap and Overture Maps) and the Wikivoyage travel " +
         "guide, best matches first. Recommend the three to five places that best answer the question, one " +
         "short line each (under 30 words, in your own words, not copied from the list): its name and number " +
-        "like [2], what kind of place it is and where, and the gist of the travel guide's words when the " +
-        "list quotes them. Use only facts from the list; add what you know about a place only if it is " +
-        "well known and you are sure. Never invent ratings, prices, dishes or opening hours. Close with " +
-        "one sentence noting that map data has no ratings and places close, so it is worth checking " +
-        "before going. No preamble, no LaTeX, no visible deliberation."
+        "like [2], what kind of place it is, its street as the list gives it, and the gist of the travel " +
+        "guide's words when the list quotes them. Use only facts from the list; add what you know about a " +
+        "place only if it is well known and you are sure. Never invent ratings, prices, dishes, " +
+        "neighbourhoods or opening hours. Close with one sentence noting that map data has no ratings and " +
+        "places close, so it is worth checking before going. No preamble, no LaTeX, no visible deliberation."
     const val MODEL_PLACES = 6
     const val GUIDE_CHARS = 180
 
-    /** places.py `where_text`. */
-    fun whereText(total: Int, radiusKm: Double, label: String, ask: PlaceAsk, capped: Boolean = false): String {
+    /** places.py `what_text`. */
+    fun whatText(ask: PlaceAsk): String {
         var what = when (ask.group) {
             "eat" -> "places to eat"
             "cafe" -> "cafes"
@@ -515,8 +517,12 @@ object PlacesText {
             else -> "places to stay"
         }
         if (ask.diet != null) what = ask.diet.replace("_", "-") + " " + what
-        return String.format(Locale.US, "%d%s %s within %.0f km of %s", total, if (capped) "+" else "", what, radiusKm, label)
+        return what
     }
+
+    /** places.py `where_text`. */
+    fun whereText(total: Int, radiusKm: Double, label: String, ask: PlaceAsk, capped: Boolean = false): String =
+        String.format(Locale.US, "%d%s %s within %.0f km of %s", total, if (capped) "+" else "", whatText(ask), radiusKm, label)
 
     /** places.py `places_user`. */
     fun placesUser(question: String, where: String, lines: List<String>): String =
@@ -574,21 +580,55 @@ class Places(private val db: SqlDatabase) {
                 val key = words.subList(0, n).joinToString(" ")
                 if (!anchored && key in PlacesText.NOT_PLACES) continue
                 val ids = db.query("select city from city_names where key = ?", key).map { it[0] as Long }
-                if (ids.isEmpty()) continue
-                var cities = db.query(
-                    "select id, name, country, admin1, lat, lon, population from cities where id in (" +
+                var cities = if (ids.isEmpty()) emptyList() else db.query(
+                    "select id, name, country, admin1, lat, lon, population, capital from cities where id in (" +
                         ids.joinToString(",") { "?" } + ")", *ids.toTypedArray(),
-                ).map { City(it[0] as Long, it[1] as String, it[2] as String, it[3] as String?, num(it[4]), num(it[5]), it[6] as Long) }
+                ).map { city(it) }
                 val rest = words.subList(n, words.size)
-                if (rest.isNotEmpty()) hinted(cities, rest)?.let { cities = it }
-                val c = cities.maxWith(compareBy<City>({ it.population }, { -it.id }))
-                if (!((anchored && capital) || c.population >= 100_000)) continue
-                val cn = db.query("select name from countries where code = ?", c.country).firstOrNull()?.get(0) as String?
-                return c.copy(countryName = cn ?: "")
+                if (rest.isNotEmpty() && cities.isNotEmpty()) hinted(cities, rest)?.let { cities = it }
+                // an alternate name counts the city's people once (Hong Kong was once "Victoria")
+                fun weight(c: City) =
+                    if (PlacesText.normKey(c.name) != key) c.population
+                    else c.population * PRIMARY_WEIGHT * (if (c.capital != 0) CAPITAL_WEIGHT else 1L)
+                var best = cities.maxWithOrNull(compareBy<City>({ weight(it) }, { -it.id }))
+                val w = best?.let { weight(it) } ?: 0L
+                if (anchored) {
+                    val (region, people) = regionCity(key)
+                    if (region != null && people > w) best = region
+                }
+                if (best == null) continue
+                if (!((anchored && capital) || best.population >= 100_000)) continue
+                val cn = db.query("select name from countries where code = ?", best.country).firstOrNull()?.get(0) as String?
+                return best.copy(countryName = cn ?: "")
             }
         }
         return null
     }
+
+    /**
+     * places.py `_region_city`: the state or province named [key] with the most people in its
+     * cities, as its largest city, and those people; (null, 0) when no region has that name.
+     */
+    private fun regionCity(key: String): Pair<City?, Long> {
+        var best: City? = null
+        var people = 0L
+        for (r in db.query("select country, admin1 from region_names where key = ? and admin1 <> '' order by country, admin1", key)) {
+            val n = (db.query("select coalesce(sum(population), 0) from cities where country = ? and admin1 = ?", r[0], r[1])
+                .first()[0] as Number).toLong()
+            val row = db.query(
+                "select id, name, country, admin1, lat, lon, population, capital from cities " +
+                    "where country = ? and admin1 = ? order by population desc, id limit 1", r[0], r[1],
+            ).firstOrNull() ?: continue
+            if (n > people) {
+                best = city(row)
+                people = n
+            }
+        }
+        return best to people
+    }
+
+    private fun city(r: Array<Any?>) =
+        City(r[0] as Long, r[1] as String, r[2] as String, r[3] as String?, num(r[4]), num(r[5]), r[6] as Long, (r[7] as Long).toInt())
 
     private fun hinted(cities: List<City>, rest: List<String>): List<City>? {
         for (i in rest.indices) {
@@ -608,7 +648,9 @@ class Places(private val db: SqlDatabase) {
     /** places.py `find`: the places around (lat, lon) that answer [ask], best first, and how many matched. */
     fun find(ask: PlaceAsk, lat: Double, lon: Double, radiusKm: Double, limit: Int = 12): Found {
         val cells = PlacesText.cellsAround(lat, lon, radiusKm)
-        val wanted = kinds.filter { PlacesText.inGroup(ask, it.value.second) }.keys.toList()
+        // the group's categories, and the one kind of place asked for wherever it sits ("tapas bars":
+        // tapas_bar is a casual eatery, not a bar)
+        val wanted = kinds.filter { PlacesText.inGroup(ask, it.value.second) || (ask.sub != null && ask.sub in it.value.second) }.keys.toList()
         val sql = StringBuilder(
             "select id, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine " +
                 "from places where cell in (" + cells.joinToString(",") { "?" } + ") and kind in (" + wanted.joinToString(",") { "?" } + ")",
@@ -725,14 +767,27 @@ class Places(private val db: SqlDatabase) {
             return PlacesLookup("your position", radius, found.total, found.places, found.capped, "you")
         }
         val city = locate(ask) ?: return null
-        val found = find(ask, city.lat, city.lon, city.radiusKm)
-        return PlacesLookup(city.label(), city.radiusKm, found.total, found.places, found.capped, "the centre", city)
+        // nothing of the kind in the city: the nearest there is, up to MAX_RADIUS_KM away
+        var found = Found(emptyList(), 0, false)
+        var radius = city.radiusKm
+        for (m in CITY_WIDEN) {
+            radius = min(city.radiusKm * m, MAX_RADIUS_KM)
+            found = find(ask, city.lat, city.lon, radius)
+            if (found.total > 0) break
+        }
+        return PlacesLookup(city.label(), radius, found.total, found.places, found.capped, "the centre", city)
     }
 
     private fun num(v: Any?): Double = (v as Number).toDouble()
 
     companion object {
         val HERE_RADII = listOf(2.0, 5.0, 10.0)
+        /** places.py `PRIMARY_WEIGHT`: a city whose own name is the one asked for counts as three times its size. */
+        const val PRIMARY_WEIGHT = 3L
+        /** places.py `CAPITAL_WEIGHT`: a national capital by its own name counts five times again. */
+        const val CAPITAL_WEIGHT = 5L
         const val MIN_HERE = 5
+        val CITY_WIDEN = listOf(1.0, 2.0, 4.0)
+        const val MAX_RADIUS_KM = 50.0
     }
 }
