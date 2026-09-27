@@ -8,7 +8,7 @@ restaurants in [city I am currently in]", which none of them did well.
 
 > Thanks for trying AndroidLM! Your vegan-restaurants test was exactly what it couldn't do:
 > Wikipedia doesn't list restaurants, so it guessed. v1.1 adds an offline places database
-> (12.6M places: OpenStreetMap + Overture + Wikivoyage). "Best vegan restaurants in Lisbon":
+> (21M places: OpenStreetMap + Overture + Wikivoyage). "Best vegan restaurants in Lisbon":
 > real places in 0.1s, airplane mode, GPS works for "near me" too.
 > [clip]
 
@@ -18,12 +18,14 @@ restaurants in [city I am currently in]", which none of them did well.
 was the gap: Wikipedia has no restaurant lists, so the old app guessed (for Lisbon it named
 places that don't exist). Fixed in v1.1, fully offline: [clip]
 
-2/ How: a 1.7GB database of 12.6M places to eat, drink and stay worldwide. Overture Maps places
-+ OpenStreetMap diet tags (vegan/vegetarian/halal/kosher/gluten-free, opening hours) + GeoNames
-cities + Wikivoyage's own recommendations matched to them. "Near me" uses GPS, no network.
+2/ How: a 2.9GB database of 21M places worldwide: to eat, drink and stay, plus pharmacies,
+ATMs, hospitals, supermarkets, stations. Overture Maps places + OpenStreetMap diet tags
+(vegan/vegetarian/halal/kosher/gluten-free, opening hours) + GeoNames cities + Wikivoyage's own
+recommendations matched to them. "Near me" uses GPS, no network.
 
-3/ The list is on screen in 0.1-0.3 s on a Pixel 8 Pro; the model then picks 3-5 from it in
-about a minute, using only what the list says. Tested on 14 cities (Lisbon, Berlin, Chiang Mai,
+3/ The ranked list is the answer, in about 0.1 s on a Pixel 8 Pro, without even loading the
+model. The model only writes when the question asks for more ("...and how much should I tip?")
+or is in another language (Chinese works). Tested on 14 cities (Lisbon, Berlin, Chiang Mai,
 Tbilisi, Mexico City, Cape Town, Seoul...) and ramen/coffee/hostels/halal/kosher/tapas questions.
 
 4/ Which phone were you on? Your source check ran at 1.1 tok/s, a quarter of what the Pixel 8

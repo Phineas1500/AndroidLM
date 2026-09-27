@@ -38,6 +38,10 @@ data class ResearchUi(
     val sources: List<ResearchSource>? = null, // null until the search is done
     val sourcesDropped: Int = 0,
     val placesWhere: String? = null,       // the places route: what was searched, e.g. "185 vegan places to eat within 16 km of …"
+    val placesListOnly: Boolean = false,   // the places list is the answer (the model wrote nothing)
+    val translatedAs: String? = null,      // a question in another language, as it was searched for in English
+    val askedAs: String? = null,           // a follow-up rewritten to stand on its own (what the run answered)
+    val finishedAt: Long? = null,          // SystemClock.elapsedRealtime() when the run was done
     val answer: String = "",
     val check: String? = null,             // null when no source check has started
     val timings: List<PhaseTiming> = emptyList(),
@@ -84,6 +88,8 @@ data class UiState(
     val streaming: Boolean = true,  // is the loaded session using the MoE streamer (vs mmap baseline)?
     // AndroidLM research mode: the run in progress or the last one finished; null in plain chat.
     val research: ResearchUi? = null,
+    // Earlier research runs of this session, oldest first, shown above the current one.
+    val researchHistory: List<ResearchUi> = emptyList(),
     // The engine is reading a prompt (BMOE_PREFILL), until its first token; null otherwise.
     val prefill: Prefill? = null,
 ) {

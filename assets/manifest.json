@@ -42,8 +42,8 @@
     {
       "name": "places.db",
       "role": "places",
-      "bytes": 1701904384,
-      "sha256": "c2c1a46b6187db0a47fdf28209c8544cc0d265edd179cb019d17281449b3a9c0",
+      "bytes": 2877513728,
+      "sha256": "3d416d275f7579329aa5bc20f359c17a56f4b06ca9ef0bab9a05304903973744",
       "url": "",
       "device_path": "corpus/places.db",
       "license": "ODbL 1.0 (OpenStreetMap contributors; Overture Maps Foundation places, CDLA-Permissive-2.0; GeoNames, CC BY 4.0)"

@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 sys.path.insert(0, __import__("os").path.dirname(__file__))
 from build_places import (CELL_COLS, GLUTEN_FREE, HALAL, KOSHER, SRC_GUIDE, SRC_OSM, SRC_OVERTURE,  # noqa: E402
                           VEGAN_LIMITED, VEGAN_NO, VEGAN_ONLY, VEGAN_YES, VEGETARIAN_LIMITED,
-                          VEGETARIAN_ONLY, VEGETARIAN_YES, city_radius_km, norm_key)
+                          VEGETARIAN_ONLY, VEGETARIAN_YES, city_radius_km, fame_bonus, norm_key)
 
 # ---- the question -----------------------------------------------------------------------------
 
@@ -38,7 +38,29 @@ GROUPS = {
     "sweet": ("bakery", "patisserie", "dessert_shop", "ice_cream_shop", "donut_shop", "cupcake_shop",
               "candy_store", "chocolatier", "frozen_yoghurt_shop", "gelato"),
     "stay": ("lodging",),
+    # what else a traveller looks for (build_places.py TRAVEL)
+    "pharmacy": ("pharmacy_and_drug_store",),
+    "health": ("hospital", "emergency_or_urgent_care_facility", "primary_care_or_general_clinic", "dental_clinic"),
+    "money": ("atm", "bank_or_credit_union", "currency_exchange"),
+    "phone": ("mobile_phone_store", "telecommunications_company"),
+    "shop": ("grocery_store", "convenience_store", "shopping_mall", "market"),
+    "laundry": ("laundromat", "laundry_service"),
+    "coworking": ("coworking_space", "shared_office_space"),
+    "post": ("post_office",),
+    "police": ("police_station",),
+    "embassy": ("embassy",),
+    "sights": ("museum", "art_gallery", "zoo", "aquarium", "amusement_park", "theatre_venue", "monument", "historic_site",
+               "castle", "palace", "fort", "religious_landmark", "botanical_garden", "park", "national_park", "beach",
+               "public_plaza", "hiking_trail"),
+    "transport": ("train_station", "bus_station", "metro_station", "airport", "car_rental_service", "bike_rental",
+                  "scooter_rental", "ferry_service"),
+    "fitness": ("gym",),
 }
+GROUP_LABEL = {"eat": "places to eat", "cafe": "cafes", "drink": "places to drink", "sweet": "bakeries and sweet shops",
+               "stay": "places to stay", "pharmacy": "pharmacies", "health": "hospitals and clinics",
+               "money": "ATMs, banks and money changers", "phone": "phone shops", "shop": "shops and markets",
+               "laundry": "laundries", "coworking": "coworking spaces", "post": "post offices", "police": "police stations",
+               "embassy": "embassies", "sights": "sights", "transport": "stations and transport", "fitness": "gyms"}
 # words -> group; a word ending in "s" also matches without it
 KIND_WORDS = [
     ("places to eat", "eat"), ("place to eat", "eat"), ("where to eat", "eat"), ("food", "eat"),
@@ -53,6 +75,25 @@ KIND_WORDS = [
     ("accommodation", "stay"), ("place to stay", "stay"), ("places to stay", "stay"),
     ("where to stay", "stay"), ("where should i stay", "stay"), ("where can i stay", "stay"),
     ("where to sleep", "stay"), ("bed and breakfast", "stay"), ("b&b", "stay"),
+    ("pharmacy", "pharmacy"), ("pharmacies", "pharmacy"), ("chemist", "pharmacy"), ("drugstore", "pharmacy"),
+    ("hospital", "health"), ("clinic", "health"), ("doctor", "health"), ("urgent care", "health"),
+    ("emergency room", "health"), ("dentist", "health"),
+    ("atm", "money"), ("cash machine", "money"), ("withdraw cash", "money"), ("withdraw money", "money"), ("bank", "money"),
+    ("currency exchange", "money"), ("exchange money", "money"), ("change money", "money"), ("money changer", "money"),
+    ("phone shop", "phone"), ("phone store", "phone"), ("mobile phone shop", "phone"),
+    ("supermarket", "shop"), ("grocery", "shop"), ("groceries", "shop"), ("convenience store", "shop"),
+    ("shopping mall", "shop"), ("mall", "shop"), ("market", "shop"),
+    ("laundry", "laundry"), ("laundromat", "laundry"), ("coworking", "coworking"), ("co-working", "coworking"),
+    ("post office", "post"), ("police station", "police"), ("embassy", "embassy"), ("embassies", "embassy"),
+    ("consulate", "embassy"),
+    ("museum", "sights"), ("gallery", "sights"), ("galleries", "sights"), ("zoo", "sights"), ("aquarium", "sights"),
+    ("castle", "sights"), ("palace", "sights"), ("park", "sights"), ("beach", "sights"), ("beaches", "sights"),
+    ("temple", "sights"), ("church", "sights"), ("churches", "sights"), ("monument", "sights"), ("hiking", "sights"),
+    ("botanical garden", "sights"),
+    ("train station", "transport"), ("bus station", "transport"), ("metro station", "transport"),
+    ("subway station", "transport"), ("airport", "transport"), ("car rental", "transport"), ("rent a car", "transport"),
+    ("bike rental", "transport"), ("rent a bike", "transport"), ("scooter rental", "transport"), ("ferry", "transport"),
+    ("gym", "fitness"),
 ]
 DIET_WORDS = [
     ("plant based", "vegan"), ("plant-based", "vegan"), ("vegan", "vegan"),
@@ -72,13 +113,54 @@ SUB_WORDS = {"hostel": "hostel", "bed and breakfast": "bed_and_breakfast", "b&b"
              "dim sum": "dim_sum_restaurant", "noodle": "noodles_restaurant", "taco": "taco_restaurant",
              "burger": "burger_restaurant", "dumpling": "dumpling_restaurant", "curry": "indian_restaurant",
              "street food": "food_stand", "food truck": "food_truck_stand", "juice": "smoothie_juice_bar",
-             "bubble tea": "bubble_tea_shop", "wine bar": "wine_bar", "cocktail bar": "cocktail_bar"}
+             "bubble tea": "bubble_tea_shop", "wine bar": "wine_bar", "cocktail bar": "cocktail_bar",
+             "hospital": "hospital", "dentist": "dental_clinic", "urgent care": "emergency_or_urgent_care_facility",
+             "emergency room": "emergency_or_urgent_care_facility", "clinic": "primary_care_or_general_clinic",
+             "doctor": "primary_care_or_general_clinic", "atm": "atm", "cash machine": "atm", "withdraw cash": "atm",
+             "withdraw money": "atm", "bank": "bank_or_credit_union", "currency exchange": "currency_exchange",
+             "exchange money": "currency_exchange", "change money": "currency_exchange",
+             "money changer": "currency_exchange", "supermarket": "grocery_store", "grocery": "grocery_store",
+             "groceries": "grocery_store", "convenience store": "convenience_store", "shopping mall": "shopping_mall",
+             "mall": "shopping_mall", "market": "market", "museum": "museum", "gallery": "art_gallery",
+             "galleries": "art_gallery", "zoo": "zoo", "aquarium": "aquarium", "castle": "castle", "palace": "palace",
+             "park": "park", "beach": "beach", "beaches": "beach", "temple": "religious_landmark",
+             "church": "religious_landmark", "churches": "religious_landmark", "monument": "monument",
+             "hiking": "hiking_trail", "botanical garden": "botanical_garden", "train station": "train_station",
+             "bus station": "bus_station", "metro station": "metro_station", "subway station": "metro_station",
+             "airport": "airport", "car rental": "car_rental_service", "rent a car": "car_rental_service",
+             "bike rental": "bike_rental", "rent a bike": "bike_rental", "scooter rental": "scooter_rental",
+             "ferry": "ferry_service"}
 RECOMMEND = re.compile(r"\b(best|good|great|top|recommend\w*|suggest\w*|where|find|any|list|options?|"
                        r"places?|spots?|cheap|affordable|nice|popular|famous|must|should i|can i|could i|"
                        r"favou?rite|near|nearby)\b")
 # a question about a place's food or drink in general, not a request for places
 GENERAL = re.compile(r"\b(what('s| is| are) (the )?\w+( \w+)? (like|scene)|typical|traditional|cuisine of|dishes|known for|famous for|specialit(y|ies)|must[- ]try)\b")
-KNOWLEDGE = re.compile(r"\b(history|origins?|invented|why|who (founded|owns|opened)|when (was|did)|how (did|do|does|is|are) \w+ (made|cooked|prepared))\b")
+KNOWLEDGE = re.compile(r"\b(history|origins?|invented|why|who (founded|owns|opened)|when (was|did)|how (did|do|does|is|are) \w+ (made|cooked|prepared)|"
+                       r"oldest|first|largest|biggest|how many)\b")
+# a trip question with more in it than places (what to see, getting around, an itinerary): the
+# travel guide answers it, not a list of places
+TRIP = re.compile(r"\b(what (should|can|to) (i|we) (see|do|visit)|things to (do|see)|sights|sightseeing|get(ting)? around|"
+                  r"itinerary|how (do|can|should) (i|we) get|\d+ days|(two|three|four|five|six|seven|few) days|a week in|weekend in)\b")
+# words that name places to go to: with a city, a request for places even without "best" or "where"
+PLACE_NOUNS = re.compile(r"\b(restaurants?|cafes?|caf\u00e9s?|coffee shops?|bars?|pubs?|hotels?|hostels?|bakery|bakeries|"
+                         r"eatery|eateries|guest ?houses?|bistros?|brewery|breweries|pharmacy|pharmacies|chemists?|"
+                         r"hospitals?|clinics?|dentists?|atms?|banks?|supermarkets?|groceries|grocery stores?|"
+                         r"museums?|galleries|gallery|beaches|beach|parks?|gyms?|laundromats?|laundry|coworking|"
+                         r"embassy|embassies|markets?|malls?)\b")
+# a question about opening hours late in the day
+LATE = re.compile(r"\b(open late|late at night|late night|late-night|24 hours|24/7|all night|open now|tonight|after midnight|at night)\b")
+# a question that asks for more than the places (advice, a comparison, a quality the map data does
+# not record): the model answers it from the list; a plain request is answered by the list itself
+ADVICE = re.compile(r"\b(safe|safety|dangerous|danger|scams?|costs?|prices?|pricey|how much|fees?|tips?|tipping|worth|"
+                    r"which one|which is|compare|comparison|versus|vs|difference|better|advice|etiquette|"
+                    r"reservations?|book|booking|romantic|views?|kids?|child|children|family|families|date|quiet|lively|"
+                    r"authentic|locals?|touristy|tourist trap|avoid|foreigners?|english|speaks?|wifi|wi-fi|dress|cards?|"
+                    r"payment|pay|menu|order|open on|opening hours|clos(es|ing)|monday|tuesday|wednesday|thursday|"
+                    r"friday|saturday|sunday)\b")
+HOURS = re.compile(r"\b(open|opening|hours|clos(e|es|ed|ing)|late|tonight|now|today|tomorrow|morning|breakfast|"
+                   r"monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekends?|24/7)\b")
+LATE_HOURS = re.compile(r"24/7|-\s*(2[2-4]|0[0-5])[:.]")
+CRYPTO = re.compile(r"\b(bitcoin|crypto|btc)", re.I)
 HERE = re.compile(r"\b(near me|nearby|around me|around here|near here|close to me|close by|where i am|"
                   r"my location|this city|this town|city i am (currently )?in|city i'm (currently )?in|"
                   r"current city|my area|in my city)\b")
@@ -108,11 +190,28 @@ class PlaceAsk:
     here: bool = False         # "near me": the phone's position
     restaurant: bool = False   # the question says "restaurant(s)": prefer restaurants to cafes and shops
     question: str = ""
+    late: bool = False         # the question asks about late opening hours
 
 
 def _has(text, phrase):
-    p = re.escape(phrase)
-    return re.search(rf"(?<![a-z0-9]){p}s?(?![a-z0-9])", text) is not None
+    return _at(text, phrase) is not None
+
+
+def _at(text, phrase):
+    """Where [phrase] (or its plural in "s") first occurs in [text] as whole words, or None."""
+    m = re.search(rf"(?<![a-z0-9]){re.escape(phrase)}s?(?![a-z0-9])", text)
+    return m.start() if m else None
+
+
+def _first(text, pairs):
+    """The value of the (phrase, value) pair whose phrase occurs first; at the same place the
+    longer phrase, then the earlier pair."""
+    best, key = None, None
+    for i, (w, v) in enumerate(pairs):
+        at = _at(text, w)
+        if at is not None and (key is None or (at, -len(w), i) < key):
+            best, key = v, (at, -len(w), i)
+    return best
 
 
 def parse(question, cuisines=()):
@@ -120,15 +219,14 @@ def parse(question, cuisines=()):
     category names in places.db (to recognise "ramen", "Thai food"...)."""
     q = question.strip()
     low = q.lower()
-    if KNOWLEDGE.search(low):
+    if KNOWLEDGE.search(low) or TRIP.search(low):
         return None
     diet = next((d for w, d in DIET_WORDS if _has(low, w)), None)
-    group = next((g for w, g in KIND_WORDS if _has(low, w)), None)
-    sub = None
-    for w, cat in SUB_WORDS.items():
-        if _has(low, w):
-            sub = cat
-            break
+    # the kind of place named first is the one asked for ("a pharmacy near my hotel")
+    group = _first(low, KIND_WORDS)
+    # one kind within that group only ("a pharmacy near my hotel" is not about hotels)
+    word_group = dict(KIND_WORDS)
+    sub = _first(low, [(w, c) for w, c in SUB_WORDS.items() if word_group.get(w, group) == group])
     if sub is None:
         words = set(re.findall(r"[a-z]+", low))
         for cat in cuisines:
@@ -144,14 +242,18 @@ def parse(question, cuisines=()):
         group = "eat"
     # a request for places: says so (best, where, recommend, places...), or names places in the
     # plural, or asks for a diet or a kind of place; "what is the food like" is not one
-    asks = RECOMMEND.search(low) or re.search(r"\b(restaurants|cafes|cafés|bars|pubs|hotels|hostels|bakeries)\b", low)
+    asks = RECOMMEND.search(low) or PLACE_NOUNS.search(low)
     if not asks and (GENERAL.search(low) or not (diet or sub)):
         return None
     here = HERE.search(low) is not None
     if not here and not place_candidates(q):
         return None
+    # the best museums or sights of a city are what the model and Wikipedia know well; the list
+    # is for those near the phone
+    if group == "sights" and not here:
+        return None
     price = "Budget" if CHEAP.search(low) else "Splurge" if FANCY.search(low) else None
-    return PlaceAsk(group, diet, sub, price, here, _has(low, "restaurant"), q)
+    return PlaceAsk(group, diet, sub, price, here, _has(low, "restaurant"), q, LATE.search(low) is not None)
 
 
 CAPITALISED = re.compile(r"[A-Z][\w'\u2019.-]*(?:\s+(?:[A-Z][\w'\u2019.-]*|de|da|do|del|la|le|el|of|upon|am|sur|an|on|y|i)(?=\s+[A-Z]))*(?:\s+[A-Z][\w'\u2019.-]*)?")
@@ -300,6 +402,7 @@ class Place:
     website: str
     hours: str
     cuisine: str
+    fame: int = 0         # monthly views of the place's own Wikipedia article
     km: float = 0.0
     tier: int = 9
     score: float = 0.0
@@ -408,7 +511,7 @@ def find(db, ask, lat, lon, radius_km, limit=12):
     # the group's categories, and the one kind of place asked for wherever it sits ("tapas bars":
     # tapas_bar is a casual eatery, not a bar)
     wanted = [i for i, (name, path) in kinds.items() if in_group(ask, path) or (ask.sub and ask.sub in path)]
-    sql = (f"select id, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine "
+    sql = (f"select id, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine, fame "
            f"from places where cell in ({','.join('?' * len(cells))}) and kind in ({','.join('?' * len(wanted))})")
     args = cells + wanted
     if ask.diet:
@@ -455,14 +558,17 @@ def find(db, ask, lat, lon, radius_km, limit=12):
                     f"order by place, rowid", chunk):
                 by_id[place].guide.append((article, section, gtier, listing))
     for p in out:
-        p.score = score(p, radius_km, ask.price)
+        p.score = score(p, radius_km, ask.price, ask.late)
     # for "restaurants", restaurants before cafes, bakeries and shops of the same tier
     out.sort(key=lambda p: (p.tier, int(ask.restaurant and "restaurant" not in p.kinds), -p.score, p.id))
-    # the same chain at most twice
+    # the same chain at most twice; another record of a place already listed (its name's words all
+    # in the other's, within a kilometre: "British Museum, London" after "The British Museum") not at all
     seen, picked = {}, []
     for p in out:
         key = norm_key(p.name)
         if p.chain and seen.get(key, 0) >= 1 or seen.get(key, 0) >= 2:
+            continue
+        if any(_same_place(p, q) for q in picked):
             continue
         seen[key] = seen.get(key, 0) + 1
         picked.append(p)
@@ -471,6 +577,19 @@ def find(db, ask, lat, lon, radius_km, limit=12):
     for p in picked:
         p.why = reasons(p, ask)
     return picked, len(out), capped
+
+
+DUP_STOP = {"the", "at", "of", "and", "de", "del", "la", "le", "el", "da", "do", "di"}
+
+
+def _words(name):
+    return {w for w in norm_key(name).split() if w not in DUP_STOP}
+
+
+def _same_place(p, q):
+    """[p] is another record of [q]: one name's words all in the other's, within a kilometre."""
+    a, b = _words(p.name), _words(q.name)
+    return bool(a) and bool(b) and (a <= b or b <= a) and distance_km(p.lat, p.lon, q.lat, q.lon) <= 1.0
 
 
 OPTIONS_BITS = {"vegan": VEGAN_YES | VEGAN_LIMITED, "vegetarian": VEGETARIAN_YES | VEGETARIAN_LIMITED | VEGAN_YES}
@@ -497,10 +616,13 @@ def _places(db, sql, args, ask, kinds, lat, lon, radius_km, sub_rx):
     tier; and how many rows there were."""
     out = []
     rows = db.execute(sql, args).fetchall()
-    for (pid, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine) in rows:
+    crypto_ok = CRYPTO.search(ask.question) is not None
+    for (pid, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine, fame) in rows:
         kname, kpath = kinds[kind]
+        if ask.group == "money" and not crypto_ok and CRYPTO.search(name):
+            continue  # a bitcoin ATM is not where to withdraw cash
         p = Place(pid, name, kname, kpath, alt, diet, src, conf, chain, lat5 / 1e5, lon5 / 1e5, street, locality,
-                  phone, website, hours, cuisine)
+                  phone, website, hours, cuisine, fame)
         p.km = distance_km(lat, lon, p.lat, p.lon)
         if p.km > radius_km:
             continue
@@ -532,10 +654,12 @@ def is_sub(p, sub, rx=None):
     return rx.search(p.name.lower()) is not None
 
 
-def score(p, radius_km, price=None):
-    s = p.conf / 100.0
+def score(p, radius_km, price=None, late=False):
+    s = p.conf / 100.0 + fame_bonus(p.fame)
+    if late and p.hours and LATE_HOURS.search(p.hours):
+        s += 1.0
     if p.src & SRC_GUIDE:
-        s += 2.0
+        s += 1.5
         if price and any(g[2] and g[2].lower().startswith(price.lower()[:4]) for g in p.guide):
             s += 1.0
     if p.src & SRC_OSM and p.src & SRC_OVERTURE:
@@ -554,6 +678,9 @@ def reasons(p, ask):
         lab = DIET_LABEL.get((ask.diet, p.tier))
         if lab is None:
             lab = ask.diet.replace("_", "-") if p.tier == 0 else ask.diet.replace("_", "-") + " options"
+        # a vegan place found for a vegetarian question says it is vegan
+        if ask.diet == "vegetarian" and p.tier == 0 and diet_tier(p, "vegan") == 0:
+            lab = "vegan"
         why.append(lab)
     if p.guide:
         article, section, gtier, listing = p.guide[0]
@@ -574,14 +701,15 @@ def kind_bits(p):
     return [kind_label(p.kind)] + why
 
 
-def describe(p, n=None, guide_text=None, origin="the centre"):
-    """One place as the model and the list show it."""
+def describe(p, n=None, guide_text=None, origin="the centre", brief=False, hours=True):
+    """One place as the model and the list show it. [brief]: the model's line, without the street
+    (the app shows it); [hours]: with the opening hours (the model gets them when asked about)."""
     head = f"[{n}] " if n is not None else ""
     bits = kind_bits(p)
-    if p.street:
+    if p.street and not brief:
         bits.append(p.street + (f", {p.locality}" if p.locality else ""))
     bits.append(f"{p.km:.1f} km from {origin}")
-    if p.hours:
+    if p.hours and hours:
         bits.append(f"hours: {p.hours}")
     line = f"{head}{p.name}: " + "; ".join(bits) + "."
     if guide_text:
@@ -649,23 +777,23 @@ def lookup(db, ask, here=None):
 # ---- what the model reads -------------------------------------------------------------------
 
 PLACES_SYSTEM = (
-    "You are an offline travel assistant. Answer the question from the numbered list of places, "
-    "which comes from offline map data (OpenStreetMap and Overture Maps) and the Wikivoyage travel "
-    "guide, best matches first. Recommend the three to five places that best answer the question, one "
-    "short line each (under 30 words, in your own words, not copied from the list): its name and number "
-    "like [2], what kind of place it is, its street as the list gives it, and the gist of the travel "
-    "guide's words when the list quotes them. Use only facts from the list; add what you know about a "
-    "place only if it is well known and you are sure. Never invent ratings, prices, dishes, "
-    "neighbourhoods or opening hours. Close with one sentence noting that map data has no ratings and "
-    "places close, so it is worth checking before going. No preamble, no LaTeX, no visible deliberation."
+    "You are an offline travel assistant. The question comes with a numbered list of places from "
+    "offline map data (OpenStreetMap and Overture Maps) and the Wikivoyage travel guide, best matches "
+    "first; the app shows the list, with each place's address, distance and hours, next to your answer. "
+    "First answer what the question asks beyond the places (costs, tipping, safety, which one suits), in "
+    "a sentence or two, from what you know and from the list. Then name the three to five places that "
+    "best answer it, one line each: its name and number like [2], what kind of place it is, and what the "
+    "list says about it that matters for the question (the travel guide's words when quoted, hours when "
+    "asked about). Say nothing about a place that the list does not say: no praise, popularity, ratings, "
+    "atmosphere, dishes, prices or neighbourhoods, unless it is a famous place you know well. No "
+    "introduction, no closing remarks, no LaTeX, no visible deliberation."
 )
 MODEL_PLACES = 6     # places the model reads (the list shows up to find()'s limit)
 GUIDE_CHARS = 180    # of each travel-guide listing
 
 
 def what_text(ask):
-    what = {"eat": "places to eat", "cafe": "cafes", "drink": "places to drink", "sweet": "bakeries and sweet shops",
-            "stay": "places to stay"}[ask.group]
+    what = GROUP_LABEL[ask.group]
     if ask.diet:
         what = ask.diet.replace("_", "-") + " " + what
     return what
@@ -680,8 +808,19 @@ def places_user(question, where, lines):
     return "Places (" + where + "):\n\n" + "\n".join(lines) + "\n\nQuestion: " + question
 
 
-def context_lines(places, voyage, origin):
-    return [describe(p, i, _clip(guide_text(voyage, p), GUIDE_CHARS), origin) for i, p in enumerate(places[:MODEL_PLACES], 1)]
+def needs_words(ask):
+    """The question asks for more than a list of places: the model writes the answer from it."""
+    return ADVICE.search(ask.question.lower()) is not None
+
+
+def asks_hours(ask):
+    """The question is about when places are open: the model's lines then give their hours."""
+    return ask.late or HOURS.search(ask.question.lower()) is not None
+
+
+def context_lines(places, voyage, origin, hours=True):
+    return [describe(p, i, _clip(guide_text(voyage, p), GUIDE_CHARS), origin, brief=True, hours=hours)
+            for i, p in enumerate(places[:MODEL_PLACES], 1)]
 
 
 def _clip(text, n):
@@ -701,8 +840,8 @@ def voyage_reader(path):
         r = c.execute("select block_id, off, len from articles where title = ?", (title,)).fetchone()
         if not r:
             return None
-        raw = d.decompress(c.execute("select zdata from blocks where id = ?", (r[0],)).fetchone()[0]).decode("utf-8")
-        return raw[r[1]:r[1] + r[2]]
+        raw = d.decompress(c.execute("select zdata from blocks where id = ?", (r[0],)).fetchone()[0])
+        return raw[r[1]:r[1] + r[2]].decode("utf-8")  # a byte range in the block
     return text
 
 
@@ -727,7 +866,7 @@ def main():
     print("city:", lk.city)
     voyage = voyage_reader(a.voyage) if a.voyage else None
     print(places_user(a.question, where_text(lk.total, lk.radius_km, lk.label, ask, lk.capped),
-                      context_lines(lk.places, voyage, lk.origin)))
+                      context_lines(lk.places, voyage, lk.origin, asks_hours(ask))))
 
 
 if __name__ == "__main__":

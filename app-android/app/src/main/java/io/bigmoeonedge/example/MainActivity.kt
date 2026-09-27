@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.androidlm.research.android.CorpusFiles
 import org.androidlm.research.PlacesText
+import org.androidlm.research.Translation
 import org.androidlm.research.android.AndroidLocator
 import org.androidlm.research.android.CorpusLocator
 import java.io.File
@@ -70,6 +71,13 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colorScheme.background) { Root() }
             }
         }
+        autoResearch(intent)
+    }
+
+    /** Dev builds: a question sent to the running app (am start --activity-single-top) is a follow-up. */
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
         autoResearch(intent)
     }
 
@@ -341,7 +349,8 @@ private fun MainScreen(
                                     // Each research question stands alone (every generation of the
                                     // pipeline starts from an empty KV).
                                     val q = prompt.trim()
-                                    if (PlacesText.parse(q, emptyList())?.here == true && !AndroidLocator.permitted(context)) {
+                                    val here = PlacesText.parse(q, emptyList())?.here == true || Translation.mentionsHere(q)
+                                    if (here && !AndroidLocator.permitted(context)) {
                                         awaitingLocation = q
                                         locationAsk.launch(AndroidLocator.PERMISSIONS)
                                     } else {
@@ -372,9 +381,11 @@ private fun MainScreen(
                     }
 
                     // Start over: clears the screen (and, in chat, the conversation). Keeps the model loaded.
-                    if ((ui.transcript.isNotEmpty() || research != null) && !ui.busy) {
+                    if ((ui.transcript.isNotEmpty() || research != null || ui.researchHistory.isNotEmpty()) && !ui.busy) {
                         TextButton(
-                            onClick = { RunBus.update { it.copy(transcript = emptyList(), answer = "", summary = "", error = null, research = null) } },
+                            // (in research, also the history: the next question starts a new topic)
+                            onClick = { RunBus.update { it.copy(transcript = emptyList(), answer = "", summary = "", error = null,
+                                research = null, researchHistory = emptyList()) } },
                             contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
                         ) { Text(if (researchOn) "Clear the answer" else "New chat") }
                     }
@@ -492,6 +503,10 @@ private fun MainScreen(
                 }
             }
 
+            // earlier questions of the session, folded; the current one below them
+            ui.researchHistory.forEachIndexed { i, old ->
+                item(key = "history-$i-${old.runId}") { ResearchHistoryItem(old, ui.telemetry) }
+            }
             if (research != null) {
                 item(key = "research") {
                     ResearchView(research, loading = ui.loading, prefill = ui.prefill,

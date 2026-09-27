@@ -1,0 +1,15 @@
+{"id": "place-01", "q": "Where can I get good food late at night in Berlin?", "cat": "place", "check": "Real late-night places (Imbiss, döner, spätis); list"}
+{"id": "place-02", "q": "best pizza in Naples", "cat": "place", "check": "Da Michele, Sorbillo, Starita, Di Matteo"}
+{"id": "place-04", "q": "Where can I get breakfast in Tbilisi?", "cat": "place", "check": "Real cafés"}
+{"id": "place-07", "q": "vegan restaurnts in lisbon", "cat": "place", "check": "Typo"}
+{"id": "edge-03", "q": "I'm going to be in Lisbon for three days next week. What should I see, what should I eat, and how do I get around?", "cat": "edge", "check": "Multi-part travel; itinerary"}
+{"id": "tech-01", "q": "Which signature algorithms are quantum resistant?", "cat": "tech", "check": "ML-DSA (Dilithium), SLH-DSA (SPHINCS+), FN-DSA (Falcon); hash-based (XMSS, LMS); ECDSA/RSA are not"}
+{"id": "reason-07", "q": "Who was US president when the Berlin Wall fell, and how old was he at the time?", "cat": "reason", "check": "George H. W. Bush, 65 (born June 12, 1924; wall fell Nov 9, 1989)"}
+{"id": "fact-04", "q": "When did Ethereum switch to proof of stake?", "cat": "fact", "check": "The Merge, 15 September 2022"}
+{"id": "broad-01", "q": "Tell me about Japan", "cat": "broad", "check": "Capital Tokyo, ~124M people, constitutional monarchy, economy, history highlights; accurate numbers"}
+{"id": "fresh-01", "q": "Who is the current president of Argentina?", "cat": "fresh", "check": "Javier Milei (since Dec 2023); note data date"}
+{"id": "zh-02", "q": "墨子的兼爱思想是什么？", "cat": "zh", "check": "Chinese: Mozi's universal love"}
+{"id": "health-02", "q": "What are the symptoms of dengue fever and what should I do?", "cat": "health", "check": "Fever, severe headache, pain behind eyes, joint/muscle pain, rash; paracetamol not NSAIDs; warning signs -> hospital"}
+{"id": "trav-01", "q": "How do I get from Lisbon airport to the city centre?", "cat": "trav", "check": "Metro red line (change to green/blue), Aerobus, taxi/Uber; ~20-30 min"}
+{"id": "poi-01", "q": "Where can I find a pharmacy in Lisbon that's open late?", "cat": "poi", "check": "Real pharmacies or the 'farmácia de serviço' rota system; no invented names"}
+{"id": "edge-01", "q": "Japan", "cat": "edge", "check": "One word"}

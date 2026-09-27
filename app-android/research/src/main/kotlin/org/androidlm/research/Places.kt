@@ -31,6 +31,8 @@ data class PlaceAsk(
     /** The question says "restaurant(s)": restaurants rank above cafes and shops. */
     val restaurant: Boolean = false,
     val question: String = "",
+    /** The question asks about late opening hours. */
+    val late: Boolean = false,
 )
 
 /** A GeoNames city (places.py `City`). */
@@ -82,6 +84,8 @@ class Place(
     val website: String?,
     val hours: String?,
     val cuisine: String?,
+    /** Monthly views of the place's own Wikipedia article. */
+    val fame: Int = 0,
 ) {
     var km = 0.0
     var tier = 9
@@ -158,27 +162,160 @@ object PlacesText {
 
     val GROUPS: Map<String, List<String>> = mapOf(
         "eat" to listOf("restaurant", "casual_eatery", "food_and_drink", "non_alcoholic_beverage_venue"),
-        "cafe" to listOf("cafe", "coffee_shop", "coffee_roastery", "non_alcoholic_beverage_venue", "tea_room",
-            "bubble_tea_shop", "breakfast_and_brunch_restaurant"),
+        "cafe" to listOf("cafe", "coffee_shop", "coffee_roastery", "non_alcoholic_beverage_venue", "tea_room", "bubble_tea_shop", "breakfast_and_brunch_restaurant"),
         "drink" to listOf("alcoholic_beverage_venue"),
-        "sweet" to listOf("bakery", "patisserie", "dessert_shop", "ice_cream_shop", "donut_shop", "cupcake_shop",
-            "candy_store", "chocolatier", "frozen_yoghurt_shop", "gelato"),
+        "sweet" to listOf("bakery", "patisserie", "dessert_shop", "ice_cream_shop", "donut_shop", "cupcake_shop", "candy_store", "chocolatier", "frozen_yoghurt_shop", "gelato"),
         "stay" to listOf("lodging"),
+        "pharmacy" to listOf("pharmacy_and_drug_store"),
+        "health" to listOf("hospital", "emergency_or_urgent_care_facility", "primary_care_or_general_clinic", "dental_clinic"),
+        "money" to listOf("atm", "bank_or_credit_union", "currency_exchange"),
+        "phone" to listOf("mobile_phone_store", "telecommunications_company"),
+        "shop" to listOf("grocery_store", "convenience_store", "shopping_mall", "market"),
+        "laundry" to listOf("laundromat", "laundry_service"),
+        "coworking" to listOf("coworking_space", "shared_office_space"),
+        "post" to listOf("post_office"),
+        "police" to listOf("police_station"),
+        "embassy" to listOf("embassy"),
+        "sights" to listOf("museum", "art_gallery", "zoo", "aquarium", "amusement_park", "theatre_venue", "monument", "historic_site", "castle", "palace", "fort", "religious_landmark", "botanical_garden", "park", "national_park", "beach", "public_plaza", "hiking_trail"),
+        "transport" to listOf("train_station", "bus_station", "metro_station", "airport", "car_rental_service", "bike_rental", "scooter_rental", "ferry_service"),
+        "fitness" to listOf("gym"),
+    )
+    val GROUP_LABEL: Map<String, String> = mapOf(
+        "eat" to "places to eat",
+        "cafe" to "cafes",
+        "drink" to "places to drink",
+        "sweet" to "bakeries and sweet shops",
+        "stay" to "places to stay",
+        "pharmacy" to "pharmacies",
+        "health" to "hospitals and clinics",
+        "money" to "ATMs, banks and money changers",
+        "phone" to "phone shops",
+        "shop" to "shops and markets",
+        "laundry" to "laundries",
+        "coworking" to "coworking spaces",
+        "post" to "post offices",
+        "police" to "police stations",
+        "embassy" to "embassies",
+        "sights" to "sights",
+        "transport" to "stations and transport",
+        "fitness" to "gyms",
     )
 
     private val KIND_WORDS = listOf(
-        "places to eat" to "eat", "place to eat" to "eat", "where to eat" to "eat", "food" to "eat",
-        "restaurant" to "eat", "eatery" to "eat", "eateries" to "eat", "dinner" to "eat", "lunch" to "eat",
-        "meal" to "eat", "dining" to "eat", "eat" to "eat", "brunch" to "cafe", "breakfast" to "cafe",
-        "cafe" to "cafe", "café" to "cafe", "coffee" to "cafe", "tea house" to "cafe",
-        "bar" to "drink", "pub" to "drink", "beer" to "drink", "brewery" to "drink", "breweries" to "drink",
-        "cocktail" to "drink", "wine" to "drink", "nightlife" to "drink", "drinks" to "drink",
-        "bakery" to "sweet", "bakeries" to "sweet", "pastry" to "sweet", "pastries" to "sweet",
-        "dessert" to "sweet", "ice cream" to "sweet", "gelato" to "sweet", "donut" to "sweet",
-        "hotel" to "stay", "hostel" to "stay", "guesthouse" to "stay", "guest house" to "stay",
-        "accommodation" to "stay", "place to stay" to "stay", "places to stay" to "stay",
-        "where to stay" to "stay", "where should i stay" to "stay", "where can i stay" to "stay",
-        "where to sleep" to "stay", "bed and breakfast" to "stay", "b&b" to "stay",
+        "places to eat" to "eat",
+        "place to eat" to "eat",
+        "where to eat" to "eat",
+        "food" to "eat",
+        "restaurant" to "eat",
+        "eatery" to "eat",
+        "eateries" to "eat",
+        "dinner" to "eat",
+        "lunch" to "eat",
+        "meal" to "eat",
+        "dining" to "eat",
+        "eat" to "eat",
+        "brunch" to "cafe",
+        "breakfast" to "cafe",
+        "cafe" to "cafe",
+        "café" to "cafe",
+        "coffee" to "cafe",
+        "tea house" to "cafe",
+        "bar" to "drink",
+        "pub" to "drink",
+        "beer" to "drink",
+        "brewery" to "drink",
+        "breweries" to "drink",
+        "cocktail" to "drink",
+        "wine" to "drink",
+        "nightlife" to "drink",
+        "drinks" to "drink",
+        "bakery" to "sweet",
+        "bakeries" to "sweet",
+        "pastry" to "sweet",
+        "pastries" to "sweet",
+        "dessert" to "sweet",
+        "ice cream" to "sweet",
+        "gelato" to "sweet",
+        "donut" to "sweet",
+        "hotel" to "stay",
+        "hostel" to "stay",
+        "guesthouse" to "stay",
+        "guest house" to "stay",
+        "accommodation" to "stay",
+        "place to stay" to "stay",
+        "places to stay" to "stay",
+        "where to stay" to "stay",
+        "where should i stay" to "stay",
+        "where can i stay" to "stay",
+        "where to sleep" to "stay",
+        "bed and breakfast" to "stay",
+        "b&b" to "stay",
+        "pharmacy" to "pharmacy",
+        "pharmacies" to "pharmacy",
+        "chemist" to "pharmacy",
+        "drugstore" to "pharmacy",
+        "hospital" to "health",
+        "clinic" to "health",
+        "doctor" to "health",
+        "urgent care" to "health",
+        "emergency room" to "health",
+        "dentist" to "health",
+        "atm" to "money",
+        "cash machine" to "money",
+        "withdraw cash" to "money",
+        "withdraw money" to "money",
+        "bank" to "money",
+        "currency exchange" to "money",
+        "exchange money" to "money",
+        "change money" to "money",
+        "money changer" to "money",
+        "phone shop" to "phone",
+        "phone store" to "phone",
+        "mobile phone shop" to "phone",
+        "supermarket" to "shop",
+        "grocery" to "shop",
+        "groceries" to "shop",
+        "convenience store" to "shop",
+        "shopping mall" to "shop",
+        "mall" to "shop",
+        "market" to "shop",
+        "laundry" to "laundry",
+        "laundromat" to "laundry",
+        "coworking" to "coworking",
+        "co-working" to "coworking",
+        "post office" to "post",
+        "police station" to "police",
+        "embassy" to "embassy",
+        "embassies" to "embassy",
+        "consulate" to "embassy",
+        "museum" to "sights",
+        "gallery" to "sights",
+        "galleries" to "sights",
+        "zoo" to "sights",
+        "aquarium" to "sights",
+        "castle" to "sights",
+        "palace" to "sights",
+        "park" to "sights",
+        "beach" to "sights",
+        "beaches" to "sights",
+        "temple" to "sights",
+        "church" to "sights",
+        "churches" to "sights",
+        "monument" to "sights",
+        "hiking" to "sights",
+        "botanical garden" to "sights",
+        "train station" to "transport",
+        "bus station" to "transport",
+        "metro station" to "transport",
+        "subway station" to "transport",
+        "airport" to "transport",
+        "car rental" to "transport",
+        "rent a car" to "transport",
+        "bike rental" to "transport",
+        "rent a bike" to "transport",
+        "scooter rental" to "transport",
+        "ferry" to "transport",
+        "gym" to "fitness",
     )
     private val DIET_WORDS = listOf(
         "plant based" to "vegan", "plant-based" to "vegan", "vegan" to "vegan",
@@ -187,24 +324,111 @@ object PlacesText {
         "coeliac" to "gluten_free", "halal" to "halal", "kosher" to "kosher",
     )
     private val SUB_WORDS = listOf(
-        "hostel" to "hostel", "bed and breakfast" to "bed_and_breakfast", "b&b" to "bed_and_breakfast",
-        "guest house" to "guest_house", "guesthouse" to "guest_house", "campsite" to "campground",
-        "camping" to "campground", "hotel" to "hotel", "bakery" to "bakery", "bakeries" to "bakery",
-        "ice cream" to "ice_cream_shop", "gelato" to "ice_cream_shop", "donut" to "donut_shop",
-        "dessert" to "dessert_shop", "brewery" to "brewery", "breweries" to "brewery", "pub" to "pub",
-        "brunch" to "breakfast_and_brunch_restaurant", "breakfast" to "breakfast_and_brunch_restaurant",
-        "coffee" to "coffee_shop", "steak" to "steakhouse", "tapas" to "tapas_bar",
-        "dim sum" to "dim_sum_restaurant", "noodle" to "noodles_restaurant", "taco" to "taco_restaurant",
-        "burger" to "burger_restaurant", "dumpling" to "dumpling_restaurant", "curry" to "indian_restaurant",
-        "street food" to "food_stand", "food truck" to "food_truck_stand", "juice" to "smoothie_juice_bar",
-        "bubble tea" to "bubble_tea_shop", "wine bar" to "wine_bar", "cocktail bar" to "cocktail_bar",
+        "hostel" to "hostel",
+        "bed and breakfast" to "bed_and_breakfast",
+        "b&b" to "bed_and_breakfast",
+        "guest house" to "guest_house",
+        "guesthouse" to "guest_house",
+        "campsite" to "campground",
+        "camping" to "campground",
+        "hotel" to "hotel",
+        "bakery" to "bakery",
+        "bakeries" to "bakery",
+        "ice cream" to "ice_cream_shop",
+        "gelato" to "ice_cream_shop",
+        "donut" to "donut_shop",
+        "dessert" to "dessert_shop",
+        "brewery" to "brewery",
+        "breweries" to "brewery",
+        "pub" to "pub",
+        "brunch" to "breakfast_and_brunch_restaurant",
+        "breakfast" to "breakfast_and_brunch_restaurant",
+        "coffee" to "coffee_shop",
+        "steak" to "steakhouse",
+        "tapas" to "tapas_bar",
+        "dim sum" to "dim_sum_restaurant",
+        "noodle" to "noodles_restaurant",
+        "taco" to "taco_restaurant",
+        "burger" to "burger_restaurant",
+        "dumpling" to "dumpling_restaurant",
+        "curry" to "indian_restaurant",
+        "street food" to "food_stand",
+        "food truck" to "food_truck_stand",
+        "juice" to "smoothie_juice_bar",
+        "bubble tea" to "bubble_tea_shop",
+        "wine bar" to "wine_bar",
+        "cocktail bar" to "cocktail_bar",
+        "hospital" to "hospital",
+        "dentist" to "dental_clinic",
+        "urgent care" to "emergency_or_urgent_care_facility",
+        "emergency room" to "emergency_or_urgent_care_facility",
+        "clinic" to "primary_care_or_general_clinic",
+        "doctor" to "primary_care_or_general_clinic",
+        "atm" to "atm",
+        "cash machine" to "atm",
+        "withdraw cash" to "atm",
+        "withdraw money" to "atm",
+        "bank" to "bank_or_credit_union",
+        "currency exchange" to "currency_exchange",
+        "exchange money" to "currency_exchange",
+        "change money" to "currency_exchange",
+        "money changer" to "currency_exchange",
+        "supermarket" to "grocery_store",
+        "grocery" to "grocery_store",
+        "groceries" to "grocery_store",
+        "convenience store" to "convenience_store",
+        "shopping mall" to "shopping_mall",
+        "mall" to "shopping_mall",
+        "market" to "market",
+        "museum" to "museum",
+        "gallery" to "art_gallery",
+        "galleries" to "art_gallery",
+        "zoo" to "zoo",
+        "aquarium" to "aquarium",
+        "castle" to "castle",
+        "palace" to "palace",
+        "park" to "park",
+        "beach" to "beach",
+        "beaches" to "beach",
+        "temple" to "religious_landmark",
+        "church" to "religious_landmark",
+        "churches" to "religious_landmark",
+        "monument" to "monument",
+        "hiking" to "hiking_trail",
+        "botanical garden" to "botanical_garden",
+        "train station" to "train_station",
+        "bus station" to "bus_station",
+        "metro station" to "metro_station",
+        "subway station" to "metro_station",
+        "airport" to "airport",
+        "car rental" to "car_rental_service",
+        "rent a car" to "car_rental_service",
+        "bike rental" to "bike_rental",
+        "rent a bike" to "bike_rental",
+        "scooter rental" to "scooter_rental",
+        "ferry" to "ferry_service",
     )
     private val RECOMMEND = Regex(U + "\\b(best|good|great|top|recommend\\w*|suggest\\w*|where|find|any|list|options?|" +
         "places?|spots?|cheap|affordable|nice|popular|famous|must|should i|can i|could i|" +
         "favou?rite|near|nearby)\\b")
-    private val PLURAL_PLACES = Regex(U + "\\b(restaurants|cafes|cafés|bars|pubs|hotels|hostels|bakeries)\\b")
+    private val PLACE_NOUNS = Regex(U + "\\b(restaurants?|cafes?|cafés?|coffee shops?|bars?|pubs?|hotels?|hostels?|bakery|bakeries|eatery|eateries|guest ?houses?|bistros?|brewery|breweries|pharmacy|pharmacies|chemists?|hospitals?|clinics?|dentists?|atms?|banks?|supermarkets?|groceries|grocery stores?|museums?|galleries|gallery|beaches|beach|parks?|gyms?|laundromats?|laundry|coworking|embassy|embassies|markets?|malls?)\\b")
+    private val LATE = Regex(U + "\\b(open late|late at night|late night|late-night|24 hours|24/7|all night|open now|tonight|after midnight|at night)\\b")
+    // places.py ADVICE: a question that asks for more than the places
+    private val ADVICE = Regex(U + "\\b(safe|safety|dangerous|danger|scams?|costs?|prices?|pricey|how much|fees?|tips?|tipping|worth|" +
+        "which one|which is|compare|comparison|versus|vs|difference|better|advice|etiquette|" +
+        "reservations?|book|booking|romantic|views?|kids?|child|children|family|families|date|quiet|lively|" +
+        "authentic|locals?|touristy|tourist trap|avoid|foreigners?|english|speaks?|wifi|wi-fi|dress|cards?|" +
+        "payment|pay|menu|order|open on|opening hours|clos(es|ing)|monday|tuesday|wednesday|thursday|" +
+        "friday|saturday|sunday)\\b")
+    private val HOURS = Regex(U + "\\b(open|opening|hours|clos(e|es|ed|ing)|late|tonight|now|today|tomorrow|morning|breakfast|" +
+        "monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekends?|24/7)\\b")
+    private val LATE_HOURS = Regex("24/7|-\\s*(2[2-4]|0[0-5])[:.]")
+    private val CRYPTO = Regex(U + "\\b(bitcoin|crypto|btc)", setOf(RegexOption.IGNORE_CASE))
+    private val TRIP = Regex(U + "\\b(what (should|can|to) (i|we) (see|do|visit)|things to (do|see)|sights|sightseeing|get(ting)? around|" +
+        "itinerary|how (do|can|should) (i|we) get|\\d+ days|(two|three|four|five|six|seven|few) days|a week in|weekend in)\\b")
     private val GENERAL = Regex(U + "\\b(what('s| is| are) (the )?\\w+( \\w+)? (like|scene)|typical|traditional|cuisine of|dishes|known for|famous for|specialit(y|ies)|must[- ]try)\\b")
-    private val KNOWLEDGE = Regex(U + "\\b(history|origins?|invented|why|who (founded|owns|opened)|when (was|did)|how (did|do|does|is|are) \\w+ (made|cooked|prepared))\\b")
+    private val KNOWLEDGE = Regex(U + "\\b(history|origins?|invented|why|who (founded|owns|opened)|when (was|did)|how (did|do|does|is|are) \\w+ (made|cooked|prepared)|" +
+        "oldest|first|largest|biggest|how many)\\b")
     private val HERE = Regex(U + "\\b(near me|nearby|around me|around here|near here|close to me|close by|where i am|" +
         "my location|this city|this town|city i am (currently )?in|city i'm (currently )?in|" +
         "current city|my area|in my city)\\b")
@@ -262,17 +486,38 @@ object PlacesText {
     )
 
     /** places.py `_has`: [phrase] (or its plural in "s") as a whole word in [text]. */
-    fun has(text: String, phrase: String): Boolean =
-        Regex("(?<![a-z0-9])" + Regex.escape(phrase) + "s?(?![a-z0-9])").containsMatchIn(text)
+    fun has(text: String, phrase: String): Boolean = at(text, phrase) != null
+
+    /** places.py `_at`: where [phrase] (or its plural in "s") first occurs in [text] as whole words. */
+    fun at(text: String, phrase: String): Int? =
+        Regex("(?<![a-z0-9])" + Regex.escape(phrase) + "s?(?![a-z0-9])").find(text)?.range?.first
+
+    /** places.py `_first`: the value whose phrase occurs first; at the same place the longer phrase, then the earlier pair. */
+    fun first(text: String, pairs: List<Pair<String, String>>): String? {
+        var best: String? = null
+        var key: Triple<Int, Int, Int>? = null
+        for ((i, pair) in pairs.withIndex()) {
+            val a = at(text, pair.first) ?: continue
+            val k = Triple(a, -pair.first.length, i)
+            if (key == null || compareValuesBy(k, key, { it.first }, { it.second }, { it.third }) < 0) {
+                best = pair.second
+                key = k
+            }
+        }
+        return best
+    }
 
     /** places.py `parse`. [cuisines]: places.db's category names, in id order. */
     fun parse(question: String, cuisines: List<String>): PlaceAsk? {
         val q = Py.strip(question)
         val low = q.lowercase(Locale.ROOT)
-        if (KNOWLEDGE.containsMatchIn(low)) return null
+        if (KNOWLEDGE.containsMatchIn(low) || TRIP.containsMatchIn(low)) return null
         val diet = DIET_WORDS.firstOrNull { has(low, it.first) }?.second
-        var group = KIND_WORDS.firstOrNull { has(low, it.first) }?.second
-        var sub = SUB_WORDS.firstOrNull { has(low, it.first) }?.second
+        // the kind of place named first is the one asked for ("a pharmacy near my hotel")
+        var group = first(low, KIND_WORDS)
+        // one kind within that group only ("a pharmacy near my hotel" is not about hotels)
+        val wordGroup = KIND_WORDS.toMap()
+        var sub = first(low, SUB_WORDS.filter { (wordGroup[it.first] ?: group) == group })
         if (sub == null) {
             val words = WORDS.findAll(low).map { it.value }.toSet()
             for (cat in cuisines) {
@@ -289,12 +534,15 @@ object PlacesText {
         }
         if (group == null && diet == null && sub == null) return null
         if (group == null) group = "eat"
-        val asks = RECOMMEND.containsMatchIn(low) || PLURAL_PLACES.containsMatchIn(low)
+        val asks = RECOMMEND.containsMatchIn(low) || PLACE_NOUNS.containsMatchIn(low)
         if (!asks && (GENERAL.containsMatchIn(low) || (diet == null && sub == null))) return null
         val here = HERE.containsMatchIn(low)
         if (!here && placeCandidates(q).isEmpty()) return null
+        // the best museums or sights of a city are what the model and Wikipedia know well; the list
+        // is for those near the phone
+        if (group == "sights" && !here) return null
         val price = if (CHEAP.containsMatchIn(low)) "Budget" else if (FANCY.containsMatchIn(low)) "Splurge" else null
-        return PlaceAsk(group, diet, sub, price, here, has(low, "restaurant"), q)
+        return PlaceAsk(group, diet, sub, price, here, has(low, "restaurant"), q, LATE.containsMatchIn(low))
     }
 
     /** places.py `place_candidates`: (text, anchored), most likely first. */
@@ -371,6 +619,19 @@ object PlacesText {
         return rx.containsMatchIn(p.name.lowercase(Locale.ROOT))
     }
 
+    private val DUP_STOP = setOf("the", "at", "of", "and", "de", "del", "la", "le", "el", "da", "do", "di")
+
+    private fun words(name: String): Set<String> =
+        normKey(name).split(" ").filter { it.isNotEmpty() && it !in DUP_STOP }.toSet()
+
+    /** places.py `_same_place`: one name's words all in the other's, within a kilometre. */
+    fun samePlace(p: Place, q: Place): Boolean {
+        val a = words(p.name)
+        val b = words(q.name)
+        return a.isNotEmpty() && b.isNotEmpty() && (b.containsAll(a) || a.containsAll(b)) &&
+            distanceKm(p.lat, p.lon, q.lat, q.lon) <= 1.0
+    }
+
     private val OPTIONS_BITS = mapOf("vegan" to (VEGAN_YES or VEGAN_LIMITED), "vegetarian" to (VEGETARIAN_YES or VEGETARIAN_LIMITED or VEGAN_YES))
 
     /** places.py `overrule_branches`. */
@@ -388,11 +649,18 @@ object PlacesText {
         }
     }
 
+    /** build_places.py `fame_bonus`. */
+    fun fameBonus(views: Int): Double = if (views > 0) min(3.0, log10(1 + views / 100.0)) else 0.0
+
+    /** Whether [name] is a crypto ATM's (places.py `CRYPTO`). */
+    fun crypto(text: String): Boolean = CRYPTO.containsMatchIn(text)
+
     /** places.py `score`. */
-    fun score(p: Place, radiusKm: Double, price: String? = null): Double {
-        var s = p.conf / 100.0
+    fun score(p: Place, radiusKm: Double, price: String? = null, late: Boolean = false): Double {
+        var s = p.conf / 100.0 + fameBonus(p.fame)
+        if (late && !p.hours.isNullOrEmpty() && LATE_HOURS.containsMatchIn(p.hours)) s += 1.0
         if (p.src and SRC_GUIDE != 0) {
-            s += 2.0
+            s += 1.5
             if (!price.isNullOrEmpty() && p.guide.any { !it.tier.isNullOrEmpty() && it.tier.lowercase(Locale.ROOT).startsWith(price.lowercase(Locale.ROOT).take(4)) }) s += 1.0
         }
         if (p.src and SRC_OSM != 0 && p.src and SRC_OVERTURE != 0) s += 0.5
@@ -406,8 +674,10 @@ object PlacesText {
     fun reasons(p: Place, ask: PlaceAsk): List<String> {
         val why = ArrayList<String>()
         if (ask.diet != null) {
-            val lab = DIET_LABEL[ask.diet to p.tier]
+            var lab = DIET_LABEL[ask.diet to p.tier]
                 ?: if (p.tier == 0) ask.diet.replace("_", "-") else ask.diet.replace("_", "-") + " options"
+            // a vegan place found for a vegetarian question says it is vegan
+            if (ask.diet == "vegetarian" && p.tier == 0 && dietTier(p, "vegan") == 0) lab = "vegan"
             why.add(lab)
         }
         p.guide.firstOrNull()?.let { g ->
@@ -427,13 +697,28 @@ object PlacesText {
         return (listOf(kindLabel(p.kind)) + why).toMutableList()
     }
 
-    /** places.py `describe`. */
-    fun describe(p: Place, n: Int? = null, guideText: String? = null, origin: String = "the centre"): String {
+    /** places.py `needs_words`: the question asks for more than a list of places, so the model answers it from the list. */
+    fun needsWords(ask: PlaceAsk): Boolean = ADVICE.containsMatchIn(ask.question.lowercase(Locale.ROOT))
+
+    /**
+     * The answer of a question the list answers by itself: what was found, and its best places as
+     * the list shows them (for the history and a follow-up; the app shows the list itself).
+     */
+    fun listText(where: String, places: List<Place>, origin: String): String =
+        where.replaceFirstChar { it.uppercase(Locale.ROOT) } + ", best matches first:\n\n" +
+            places.take(MODEL_PLACES).mapIndexed { i, p -> describe(p, i + 1, null, origin) }.joinToString("\n")
+
+    /** places.py `asks_hours`: the question is about when places are open. */
+    fun asksHours(ask: PlaceAsk): Boolean = ask.late || HOURS.containsMatchIn(ask.question.lowercase(Locale.ROOT))
+
+    /** places.py `describe`: [brief] the model's line (no street), [hours] with the opening hours. */
+    fun describe(p: Place, n: Int? = null, guideText: String? = null, origin: String = "the centre",
+                 brief: Boolean = false, hours: Boolean = true): String {
         val head = if (n != null) "[$n] " else ""
         val bits = kindBits(p)
-        if (!p.street.isNullOrEmpty()) bits.add(p.street + (if (!p.locality.isNullOrEmpty()) ", " + p.locality else ""))
+        if (!p.street.isNullOrEmpty() && !brief) bits.add(p.street + (if (!p.locality.isNullOrEmpty()) ", " + p.locality else ""))
         bits.add(String.format(Locale.US, "%.1f km from %s", p.km, origin))
-        if (!p.hours.isNullOrEmpty()) bits.add("hours: " + p.hours)
+        if (!p.hours.isNullOrEmpty() && hours) bits.add("hours: " + p.hours)
         var line = head + p.name + ": " + bits.joinToString("; ") + "."
         if (!guideText.isNullOrEmpty()) line += " The travel guide says: $guideText"
         return line
@@ -495,27 +780,22 @@ object PlacesText {
         if (s.codePointCount(0, s.length) <= n) s else s.substring(0, s.offsetByCodePoints(0, n))
 
     const val PLACES_SYSTEM: String =
-        "You are an offline travel assistant. Answer the question from the numbered list of places, " +
-        "which comes from offline map data (OpenStreetMap and Overture Maps) and the Wikivoyage travel " +
-        "guide, best matches first. Recommend the three to five places that best answer the question, one " +
-        "short line each (under 30 words, in your own words, not copied from the list): its name and number " +
-        "like [2], what kind of place it is, its street as the list gives it, and the gist of the travel " +
-        "guide's words when the list quotes them. Use only facts from the list; add what you know about a " +
-        "place only if it is well known and you are sure. Never invent ratings, prices, dishes, " +
-        "neighbourhoods or opening hours. Close with one sentence noting that map data has no ratings and " +
-        "places close, so it is worth checking before going. No preamble, no LaTeX, no visible deliberation."
+        "You are an offline travel assistant. The question comes with a numbered list of places from " +
+        "offline map data (OpenStreetMap and Overture Maps) and the Wikivoyage travel guide, best matches " +
+        "first; the app shows the list, with each place's address, distance and hours, next to your answer. " +
+        "First answer what the question asks beyond the places (costs, tipping, safety, which one suits), in " +
+        "a sentence or two, from what you know and from the list. Then name the three to five places that " +
+        "best answer it, one line each: its name and number like [2], what kind of place it is, and what the " +
+        "list says about it that matters for the question (the travel guide's words when quoted, hours when " +
+        "asked about). Say nothing about a place that the list does not say: no praise, popularity, ratings, " +
+        "atmosphere, dishes, prices or neighbourhoods, unless it is a famous place you know well. No " +
+        "introduction, no closing remarks, no LaTeX, no visible deliberation."
     const val MODEL_PLACES = 6
     const val GUIDE_CHARS = 180
 
     /** places.py `what_text`. */
     fun whatText(ask: PlaceAsk): String {
-        var what = when (ask.group) {
-            "eat" -> "places to eat"
-            "cafe" -> "cafes"
-            "drink" -> "places to drink"
-            "sweet" -> "bakeries and sweet shops"
-            else -> "places to stay"
-        }
+        var what = GROUP_LABEL.getValue(ask.group)
         if (ask.diet != null) what = ask.diet.replace("_", "-") + " " + what
         return what
     }
@@ -652,7 +932,7 @@ class Places(private val db: SqlDatabase) {
         // tapas_bar is a casual eatery, not a bar)
         val wanted = kinds.filter { PlacesText.inGroup(ask, it.value.second) || (ask.sub != null && ask.sub in it.value.second) }.keys.toList()
         val sql = StringBuilder(
-            "select id, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine " +
+            "select id, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine, fame " +
                 "from places where cell in (" + cells.joinToString(",") { "?" } + ") and kind in (" + wanted.joinToString(",") { "?" } + ")",
         )
         val args = ArrayList<Any?>(cells + wanted)
@@ -712,7 +992,7 @@ class Places(private val db: SqlDatabase) {
                 }
             }
         }
-        for (p in out) p.score = PlacesText.score(p, radiusKm, ask.price)
+        for (p in out) p.score = PlacesText.score(p, radiusKm, ask.price, ask.late)
         // for "restaurants", restaurants before cafes, bakeries and shops of the same tier
         out.sortWith(compareBy<Place>({ it.tier }, { if (ask.restaurant && "restaurant" !in it.kinds) 1 else 0 }, { -it.score }, { it.id }))
         val seen = HashMap<String, Int>()
@@ -721,6 +1001,8 @@ class Places(private val db: SqlDatabase) {
             val key = PlacesText.normKey(p.name)
             val n = seen[key] ?: 0
             if ((p.chain != 0 && n >= 1) || n >= 2) continue
+            // another record of a place already listed ("British Museum, London" after "The British Museum")
+            if (picked.any { PlacesText.samePlace(p, it) }) continue
             seen[key] = n + 1
             picked.add(p)
             if (picked.size >= limit) break
@@ -735,12 +1017,16 @@ class Places(private val db: SqlDatabase) {
     ): Pair<ArrayList<Place>, Int> {
         val out = ArrayList<Place>()
         val rows = db.query(sql, *args.toTypedArray())
+        val cryptoOk = PlacesText.crypto(ask.question)
         for (r in rows) {
             val (kname, kpath) = kinds.getValue(r[2] as Long)
+            // a bitcoin ATM is not where to withdraw cash
+            if (ask.group == "money" && !cryptoOk && PlacesText.crypto(r[1] as String)) continue
             val p = Place(
                 r[0] as Long, r[1] as String, kname, kpath, r[3] as String?, (r[4] as Long).toInt(), (r[5] as Long).toInt(),
                 (r[6] as Long).toInt(), (r[7] as Long).toInt(), (r[8] as Long) / 1e5, (r[9] as Long) / 1e5,
                 r[10] as String?, r[11] as String?, r[12] as String?, r[13] as String?, r[14] as String?, r[15] as String?,
+                (r[16] as Long).toInt(),
             )
             p.km = PlacesText.distanceKm(lat, lon, p.lat, p.lon)
             if (p.km > radiusKm) continue
@@ -819,8 +1105,9 @@ class PlacesAnswer(
                 ResearchSource(i + 1, p.name, PlacesText.summary(p, lookup.origin), PlacesText.details(p, guide[i], lookup.origin),
                     "places", p.lat, p.lon)
             }
+            val hours = PlacesText.asksHours(ask)
             val lines = lookup.places.take(PlacesText.MODEL_PLACES).mapIndexed { i, p ->
-                PlacesText.describe(p, i + 1, PlacesText.clip(guide[i], PlacesText.GUIDE_CHARS), lookup.origin)
+                PlacesText.describe(p, i + 1, PlacesText.clip(guide[i], PlacesText.GUIDE_CHARS), lookup.origin, brief = true, hours = hours)
             }
             val where = PlacesText.whereText(lookup.total, lookup.radiusKm, lookup.label, ask, lookup.capped)
             return PlacesAnswer(ask, lookup, where, sources, lines)

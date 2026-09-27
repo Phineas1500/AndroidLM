@@ -2,7 +2,9 @@
 # Run the eval set against one or more GGUF models, one llama-server at a time.
 # Usage: eval_models.sh TAG=model.gguf [TAG=model.gguf ...]
 # Set RAG_DB=path/to/wiki.db to answer through scripts/rag.py; RAG_MODE=plan|bm25|none picks its
-# retrieval mode (none = closed-book); VOYAGE_DB=path adds the Wikivoyage corpus.
+# retrieval mode (none = closed-book); VOYAGE_DB=path adds the Wikivoyage corpus; CHECK_CONTINUE=1
+# asks for the source check as a follow-up turn, as the app does; WORKED=1 gives questions that need
+# a calculation a few lines of working first.
 # This measures answer quality, not streaming speed.
 set -euo pipefail
 
@@ -31,6 +33,7 @@ for pair in "$@"; do
   if [ -n "${RAG_DB:-}" ]; then
     "$ROOT/venv/bin/python" "$ROOT/scripts/rag.py" --db "$RAG_DB" --mode "${RAG_MODE:-plan}" \
       ${VOYAGE_DB:+--voyage-db "$VOYAGE_DB"} ${TRAVEL_ROUTE:+--travel-route} ${REWRITE:+--rewrite} \
+      ${CHECK_CONTINUE:+--check-continue} ${WORKED:+--worked} \
       --questions "$QUESTIONS" --url "http://127.0.0.1:$PORT" \
       --out "$ROOT/eval/answers_${tag}_${RAG_MODE:-plan}${RUN_SUFFIX:-}.jsonl"
   else

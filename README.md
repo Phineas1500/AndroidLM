@@ -18,12 +18,14 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
   articles in full, lead sections for the rest, a BM25 full-text index, Wikipedia's redirect
   table, and monthly pageviews per article, plus a 1.7MB file of the index's word counts that
   keeps the search off the critical path. Optional Wikivoyage (0.3GB) for travel questions.
-- **Places:** 12.6 million places to eat, drink and stay, worldwide, in one 1.7GB SQLite file:
-  Overture Maps places merged with OpenStreetMap's diet tags and opening hours, GeoNames cities,
-  and the Wikivoyage listings matched to them. A question like "the best vegan restaurants in
-  Lisbon" or "cheap hostels near me" (GPS, no network) gets a ranked list of real places in
-  under half a second, then the model's recommendations from that list
-  ([`notes/2026-09-27-places.md`](notes/2026-09-27-places.md)).
+- **Places:** 21.1 million places worldwide in one 2.9GB SQLite file: where to eat, drink and
+  stay, and what a traveller needs (pharmacies, ATMs and money changers, hospitals, supermarkets,
+  stations, sights). Overture Maps places merged with OpenStreetMap's diet tags and opening hours,
+  GeoNames cities, the Wikivoyage listings matched to them, and how widely read each place's
+  Wikipedia article is. A question like "the best vegan restaurants in Lisbon" or "a pharmacy near
+  me" (GPS, no network) is answered by a ranked list of real places in about 0.1 s, without the
+  model; the model writes only when the question asks for more (tipping, safety, a comparison)
+  or is in another language ([`notes/2026-09-27-places.md`](notes/2026-09-27-places.md)).
 - **Pipeline:** the model names the Wikipedia articles it wants; titles are resolved through
   redirects; a router sends little-read subjects retrieval-first (the model's memory of them is
   unreliable) and everything else answer-first, followed by a source check that cites passages.
@@ -36,14 +38,14 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 
 | | |
 |---|---|
-| Storage | 35.6GB (model 12.3GB, Wikipedia 21.3GB, places 1.7GB, Wikivoyage 0.3GB) plus the 72MB APK |
+| Storage | 36.8GB (model 12.3GB, Wikipedia 21.3GB, places 2.9GB, Wikivoyage 0.3GB) plus the 72MB APK |
 | Memory during a research question | about 7.9GB (engine 5.8GB including a 5GB expert cache, pinned dense weights 2.0GB, app 0.15GB) |
 | Generation speed | 4-6 tokens/s in the app (lower when the phone is hot) |
 | Prompt reading | 24-30 tokens/s in the app (a 1,000-token source prompt in 35-40 s) |
 | Model load | about 28 s on app start |
 | Answer-first question | first words after about 18 s; answer plus cited source check in about 3 min (medians over 5 questions) |
 | Retrieval-first question | cited answer in about 1.6 min (median 98 s over 19 questions; first words after 44-70 s) |
-| Places question ("best vegan restaurants in Lisbon") | list of places on screen after 0.19 s; the model's picks from it done after 68 s (medians over 24 questions) |
+| Places question ("best vegan restaurants in Lisbon") | answered by the ranked list 0.08 s after the question (median over 24 questions, at most 0.14 s), without loading the model; one that asks for more ("...and how much should I tip?") or is in another language gets the model's answer from the list in 35-45 s |
 
 Against Qwen3-1.7B answering the same 72 questions from memory, graded 0-10 by Claude with one
 rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-model-comparison.md)):

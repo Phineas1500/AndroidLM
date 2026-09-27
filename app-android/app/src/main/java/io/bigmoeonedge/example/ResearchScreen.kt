@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.androidlm.research.PhaseTiming
+import org.androidlm.research.checkCorrects
 import org.androidlm.research.ResearchPhase
 import org.androidlm.research.ResearchSource
 import org.androidlm.research.Route
@@ -78,6 +79,8 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         HorizontalDivider()
         SelectionContainer { Text(r.question, fontSize = 18.sp, fontWeight = FontWeight.SemiBold) }
+        if (r.translatedAs != null) Hint("Searched for in English as: " + r.translatedAs)
+        if (r.askedAs != null) Hint("Read with the previous answer as: " + r.askedAs)
 
         if (r.titles != null || r.route != null) {
             Labeled("How it was answered") {
@@ -94,7 +97,10 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
 
         if (r.sources != null && r.route?.route == Route.PLACES) {
             if (r.sources.isNotEmpty()) {
-                Labeled("Places (${r.sources.size}" + (if (r.sourcesDropped > 0) " of ${r.sources.size + r.sourcesDropped}" else "") + ") · tap one for details") {
+                val counted = "(${r.sources.size}" + (if (r.sourcesDropped > 0) " of ${r.sources.size + r.sourcesDropped}" else "") + ")"
+                // a plain request for places: the list is the answer, ranked by the diet, the travel
+                // guide and how well known a place is
+                Labeled((if (r.placesListOnly) "Best matches first " else "Places ") + counted + " · tap one for details") {
                     r.sources.forEach { s -> key(r.runId, s.number) { PlaceRow(s) } }
                     Hint(PLACES_CREDIT)
                 }
@@ -113,7 +119,20 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
             }
         }
 
-        if (r.answer.isNotEmpty()) {
+        // (a list that is the answer is not repeated as text: its text is for the history and follow-ups)
+        val listIsAnswer = r.placesListOnly && !r.sources.isNullOrEmpty()
+        if (r.answer.isNotEmpty() && r.check != null && checkCorrects(r.check)) {
+            Surface(
+                color = MaterialTheme.colorScheme.errorContainer,
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text("The source check below corrects part of this answer.", fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
+            }
+        }
+        if (r.answer.isNotEmpty() && !listIsAnswer) {
             Labeled(
                 when (r.route?.route) {
                     Route.ANSWER_FIRST -> "Answer, from the model's own knowledge"
@@ -183,6 +202,8 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
 private fun StatusLine(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: Telemetry, generating: Boolean) {
     val nSources = r.sources?.size ?: 0
     val text = when (r.phase) {
+        ResearchPhase.TRANSLATING -> if (loading) "Loading the model (once per app start)…" else "Translating the question into English for the search…"
+        ResearchPhase.REWRITING -> "Reading the follow-up with the previous answer…"
         ResearchPhase.PLANNING -> when {
             loading && r.route?.route == Route.PLACES -> "Loading the model to write recommendations (once per app start)…"
             loading -> "Loading the model (once per app start)…"
@@ -272,6 +293,8 @@ private fun timingSummary(r: ResearchUi): String {
         val secs = t.wallMs / 1000.0
         val g = t.generation
         when (t.phase) {
+            ResearchPhase.TRANSLATING -> String.format(Locale.US, "translated %.0f s", secs)
+            ResearchPhase.REWRITING -> String.format(Locale.US, "follow-up read %.0f s", secs)
             ResearchPhase.PLANNING -> String.format(Locale.US, "planned %.0f s", secs)
             ResearchPhase.SEARCHING -> when {
                 r.route?.route == Route.PLACES -> String.format(Locale.US, "places found in %.1f s", secs)
@@ -387,3 +410,32 @@ private fun MapButton(s: ResearchSource) {
     ) { Text("Open in a map app", fontSize = 13.sp) }
     if (missing) Hint(String.format(Locale.US, "No map app is installed. The place is at %.5f, %.5f.", lat, lon))
 }
+
+/** An earlier question of the session: folded to the question and a line of its answer; tap to open. */
+@Composable
+fun ResearchHistoryItem(r: ResearchUi, telemetry: Telemetry) {
+    var open by rememberSaveable(r.runId, r.question) { mutableStateOf(false) }
+    if (open) {
+        Column {
+            TextButton(onClick = { open = false }, contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp)) {
+                Text("Fold this answer", fontSize = 12.sp)
+            }
+            ResearchView(r, loading = false, prefill = null, telemetry = telemetry, generating = false)
+        }
+        return
+    }
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier.fillMaxWidth().clickable { open = true },
+    ) {
+        Column(Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
+            Text(r.question, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            val first = r.answer.lineSequence().map { it.trim() }.firstOrNull { it.isNotEmpty() } ?: ""
+            if (first.isNotEmpty()) {
+                Text(first, fontSize = 12.sp, maxLines = 2, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+

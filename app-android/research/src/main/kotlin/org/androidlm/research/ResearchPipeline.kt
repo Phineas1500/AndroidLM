@@ -98,9 +98,107 @@ data class ResearchConfig(
     val checkContinue: Boolean = false,
     /** The places answer: a handful of one-line recommendations from the list. */
     val placesTokens: Int = 360,
+    /**
+     * rag.py `--worked`: a question that needs a calculation (Worked.needs) gets a few lines of
+     * working before its answer. Off by default, as in rag.py; the app turns it on.
+     */
+    val worked: Boolean = false,
 )
 
-enum class ResearchPhase { PLANNING, SEARCHING, DRAFTING, ANSWERING, CHECKING, DONE, CANCELLED, FAILED }
+enum class ResearchPhase { TRANSLATING, REWRITING, PLANNING, SEARCHING, DRAFTING, ANSWERING, CHECKING, DONE, CANCELLED, FAILED }
+
+/** A finished question and its answer, for the follow-up question that comes after it. */
+data class Exchange(val question: String, val answer: String)
+
+/**
+ * Follow-up questions ("what about Porto?", "how old was he?", "which of those is open late?"):
+ * whether a question needs the previous exchange to be understood, and the rewrite's result.
+ */
+object FollowUp {
+    private val OPENERS = Regex("^(and|also|what about|how about|and what|what else|tell me more|more about|" +
+        "which (one|ones|of)|how so|same for|compared (to|with))\\b")
+    private val SHORT = Regex("^(in|near|for|at|why|how|really)\\b")
+    private val PRONOUNS = Regex("\\b(it|its|they|them|their|those|these|that|this|there|he|him|his|she|her|hers|one|ones)\\b")
+    private val PERSONAL = Regex("^(he|him|his|she|her|hers)$")
+    private val SPACE = Regex("\\s+")
+    const val PREVIOUS_ANSWER_CHARS = 700
+    const val MAX_TOKENS = 80
+
+    /**
+     * Opens like a follow-up ("what about...", "which of..."), or is a few words ("in Porto?",
+     * "why?"), or is short, names nothing (no capitalised word after the first) and points back
+     * with a pronoun ("how old was he?"), or has "he", "she"... before any name ("when did he win
+     * the Nobel prize?"). "Is it safe to drink the water in Mexico City?" and "How old was Obama
+     * when he became president?" name what they are about, so they stand alone.
+     */
+    fun looksLike(question: String): Boolean {
+        val t = question.trim()
+        val q = t.lowercase(java.util.Locale.ROOT).trimEnd('?', '.', '!')
+        val words = q.split(SPACE).filter { it.isNotEmpty() }
+        if (words.isEmpty() || words.size > 16) return false
+        if (OPENERS.containsMatchIn(q)) return true
+        if (words.size <= 4 && SHORT.containsMatchIn(q)) return true
+        val raw = t.split(SPACE).filter { it.isNotEmpty() }
+        val names = raw.drop(1).any { w -> w.firstOrNull()?.isUpperCase() == true }
+        if (words.size <= 12 && !names && PRONOUNS.containsMatchIn(q)) return true
+        // a person pointed back to before anyone is named
+        for ((i, w) in raw.withIndex()) {
+            if (i > 0 && w.firstOrNull()?.isUpperCase() == true) return false
+            if (PERSONAL.matches(w.lowercase(java.util.Locale.ROOT).trim('?', '.', '!', ',', '\'', '"'))) return true
+        }
+        return false
+    }
+
+    /** The rewrite's question: its first non-empty line without quotes; null when it is not usable. */
+    fun parse(text: String): String? {
+        val line = text.lines().map { it.trim().trim('"', '\u201c', '\u201d').trim() }.firstOrNull { it.isNotEmpty() } ?: return null
+        return line.takeIf { it.length in 3..300 }
+    }
+}
+
+/**
+ * A question asked in another language: the places database, the plan and the search all work in
+ * English, so it is first translated (a short generation), and the answer is asked for in the
+ * language of the question.
+ */
+object Translation {
+    const val MAX_TOKENS = 80
+    private val U = if (System.getProperty("java.vm.name") == "Dalvik") "" else "(?U)"
+    private val ENGLISH = Regex(U + "\\b(the|in|of|for|to|and|is|are|what|where|which|who|how|why|when|best|near|me|my|" +
+        "can|should|tell|about|with|restaurants?)\\b")
+    // frequent words of the languages of Western Europe that are rare in English questions
+    private val OTHER = Regex(U + "\\b(el|los|las|en|del|y|que|qué|donde|dónde|cuál|cuáles|mejor|mejores|son|una|" +
+        "les|des|du|et|est|où|quel|quels|quelle|quelles|meilleur|meilleurs|sont|der|die|das|und|ist|sind|wo|welche|" +
+        "beste|besten|il|di|che|dove|migliori|sono|em|os|não|onde|melhor|melhores|são|quais)\\b")
+    // "near me" in the scripts the translation is for (the translated question then says so)
+    private val HERE = Regex("附近|周边|周围|身边|近く|近所|근처|주변|рядом|поблизости|cerca de mí|cerca de aquí|près de moi|" +
+        "in der nähe|in meiner nähe|vicino a me|perto de mim")
+
+    /**
+     * Most of the question's letters are in another script than the Latin one (Chinese, Japanese,
+     * Korean, Russian, Arabic...), or it is in Latin letters with more of the frequent words of
+     * Spanish, French, German, Italian or Portuguese than of English (at least two).
+     */
+    fun needed(question: String): Boolean {
+        var latin = 0
+        var other = 0
+        question.codePoints().forEach { c ->
+            if (Character.isLetter(c)) {
+                if (Character.UnicodeScript.of(c) == Character.UnicodeScript.LATIN) latin++ else other++
+            }
+        }
+        if (other > latin) return true
+        val low = question.lowercase(java.util.Locale.ROOT)
+        val foreign = OTHER.findAll(low).count()
+        return foreign >= 2 && foreign > ENGLISH.findAll(low).count()
+    }
+
+    /** The question (in any language) asks about the phone's surroundings. */
+    fun mentionsHere(question: String): Boolean = HERE.containsMatchIn(question.lowercase(java.util.Locale.ROOT))
+
+    /** The translation: its first non-empty line without quotes; null when it is not usable. */
+    fun parse(text: String): String? = FollowUp.parse(text)
+}
 
 /**
  * One passage that reached the model; [number] is its citation number in the context. On the
@@ -158,6 +256,12 @@ sealed class ResearchEvent {
 
     data class Planned(val titles: List<String>) : ResearchEvent()
 
+    /** A follow-up question was rewritten to stand on its own; the run answers [question]. */
+    data class Rewritten(val question: String) : ResearchEvent()
+
+    /** A question in another language, translated into English for the search. */
+    data class Translated(val question: String) : ResearchEvent()
+
     /** The router's decision; `decision.views` is null when the first planned title did not resolve. */
     data class Routed(val decision: RouteDecision, val threshold: Long) : ResearchEvent()
 
@@ -167,7 +271,7 @@ sealed class ResearchEvent {
      * The places route found where to look: [where] says what was searched ("186 vegan places to
      * eat within 16 km of Buenos Aires, Argentina"); the places follow as [SourcesFound].
      */
-    data class PlacesFound(val where: String, val total: Int, val here: Boolean) : ResearchEvent()
+    data class PlacesFound(val where: String, val total: Int, val here: Boolean, val listOnly: Boolean = false) : ResearchEvent()
 
     /** Streamed text of the answer (the draft, on the answer-first route). */
     data class AnswerToken(val text: String) : ResearchEvent()
@@ -251,8 +355,28 @@ class ResearchPipeline(
      * cancelled (after `PhaseChanged(CANCELLED)`), and rethrows any failure (after `Failed` and
      * `PhaseChanged(FAILED)`).
      */
-    suspend fun run(question: String, listener: ResearchListener): ResearchResult {
-        val run = Run(question, listener)
+    /**
+     * A places question that the list answers by itself (in English, not a follow-up to rewrite,
+     * asking for nothing beyond the places): answered without the model, which need not even be
+     * loaded. Null, before any event, when the question needs the model; [run] then answers it.
+     */
+    suspend fun runWithoutModel(question: String, listener: ResearchListener, previous: Exchange? = null): ResearchResult? {
+        if (Translation.needed(question) || previous != null && FollowUp.looksLike(question)) return null
+        val run = Run(question, listener, previous)
+        try {
+            return run.placesRun(allowModel = false)
+        } catch (e: CancellationException) {
+            listener.onEvent(ResearchEvent.PhaseChanged(ResearchPhase.CANCELLED))
+            throw e
+        } catch (e: Throwable) {
+            listener.onEvent(ResearchEvent.Failed(run.phase, e.message ?: e.toString()))
+            listener.onEvent(ResearchEvent.PhaseChanged(ResearchPhase.FAILED))
+            throw e
+        }
+    }
+
+    suspend fun run(question: String, listener: ResearchListener, previous: Exchange? = null): ResearchResult {
+        val run = Run(question, listener, previous)
         try {
             return run.execute()
         } catch (e: CancellationException) {
@@ -265,7 +389,7 @@ class ResearchPipeline(
         }
     }
 
-    private inner class Run(val question: String, val listener: ResearchListener) {
+    private inner class Run(var question: String, val listener: ResearchListener, val previous: Exchange?) {
         var phase = ResearchPhase.PLANNING
         val timings = ArrayList<PhaseTiming>()
         private val runStart = System.nanoTime()
@@ -325,6 +449,11 @@ class ResearchPipeline(
         }
 
         private suspend fun executeInner(): ResearchResult {
+            // a question in another language is searched for in English, and answered in its own
+            if (Translation.needed(question)) translate()
+            // a follow-up is first rewritten to stand on its own, from the previous exchange
+            if (previous != null && FollowUp.looksLike(question)) rewrite(previous)
+
             // 0. a question about where to eat, drink or stay goes to the places database, when it
             //    names a place the database knows (or asks "near me"); everything else goes on below
             placesRun()?.let { return it }
@@ -350,6 +479,10 @@ class ResearchPipeline(
             }
             listener.onEvent(ResearchEvent.Routed(decision, config.routeViews))
 
+            // a question that needs a calculation gets a few lines of working first (rag.py --worked)
+            val worked = config.worked && Worked.needs(question)
+            val closedSystem = if (worked) Prompts.WORKED_SYSTEM else Prompts.CLOSED_SYSTEM
+
             // 3. answer first: the draft comes before the search (with a background search, the search
             //    runs while the draft is written; its result is only reported once the draft is done)
             var draft: String? = null
@@ -363,7 +496,7 @@ class ResearchPipeline(
                         s to msSince(t0)
                     }.also { jobs.add(it) }
                 }
-                draft = answering(ResearchPhase.DRAFTING, Prompts.CLOSED_SYSTEM, question)
+                draft = answering(ResearchPhase.DRAFTING, closedSystem, answerQuestion)
             }
 
             val built = searching(titles, half, early)
@@ -384,7 +517,7 @@ class ResearchPipeline(
                     } else {
                         generating(
                             ResearchPhase.CHECKING, Prompts.VERIFY_SYSTEM,
-                            Prompts.verifyUser(question, draft, context), config.checkTokens, onCheckToken,
+                            Prompts.verifyUser(answerQuestion, draft, context), config.checkTokens, onCheckToken,
                         )
                     }
                     // a check that was nothing but deliberation cleans to "": show the draft alone
@@ -392,9 +525,10 @@ class ResearchPipeline(
                     listener.onEvent(ResearchEvent.CheckCompleted(check ?: ""))
                 }
             } else if (context.isNotEmpty()) {
-                answer = answering(ResearchPhase.ANSWERING, Prompts.ANSWER_SYSTEM, Prompts.answerUser(context, question))
+                answer = answering(ResearchPhase.ANSWERING, if (worked) Prompts.WORKED_SOURCES_SYSTEM else Prompts.ANSWER_SYSTEM,
+                    Prompts.answerUser(context, answerQuestion))
             } else {
-                answer = answering(ResearchPhase.ANSWERING, Prompts.CLOSED_SYSTEM, question)
+                answer = answering(ResearchPhase.ANSWERING, closedSystem, answerQuestion)
             }
 
             val text = if (check != null) answer + SOURCE_CHECK_HEADING + check else answer
@@ -407,14 +541,19 @@ class ResearchPipeline(
         /**
          * The places route (places.py `lookup` + PLACES_SYSTEM), or null when the question is not
          * about places or names no place the database knows. A "near me" question stays here even
-         * without a position or with nothing found: the Wikipedia pipeline could not place it.
+         * without a position or with nothing found: the Wikipedia pipeline could not place it. A
+         * request for places and nothing more is answered by the list itself; the model writes only
+         * for a question in another language or one that asks for more (advice, a comparison). With
+         * ![allowModel], null (before any event) when the model would be needed.
          */
-        private suspend fun placesRun(): ResearchResult? {
+        suspend fun placesRun(allowModel: Boolean = true): ResearchResult? {
             val t0 = System.nanoTime()
             val (db, ask) = withContext(corpusDispatcher) {
                 val db = corpora.places() ?: return@withContext null
                 db.parse(question)?.let { db to it }
             } ?: return null
+            val listOnly = asked == null && !PlacesText.needsWords(ask)
+            if (!allowModel && !listOnly) return null
             val decision = RouteDecision(Route.PLACES, null)
             val lookup: PlacesLookup?
             if (ask.here) {
@@ -429,7 +568,7 @@ class ResearchPipeline(
                 enter(ResearchPhase.SEARCHING)
             }
             val where = PlacesText.whereText(lookup.total, lookup.radiusKm, lookup.label, ask, lookup.capped)
-            listener.onEvent(ResearchEvent.PlacesFound(where, lookup.total, ask.here))
+            listener.onEvent(ResearchEvent.PlacesFound(where, lookup.total, ask.here, listOnly))
             if (lookup.places.isEmpty()) {
                 // said plainly rather than left to the Wikipedia pipeline, which can only guess at
                 // places (the old route invented restaurants)
@@ -440,9 +579,18 @@ class ResearchPipeline(
             val sources = answer.sources
             listener.onEvent(ResearchEvent.SourcesFound(sources, lookup.total - sources.size))
             completed(t0)
+            if (listOnly) {
+                val text = PlacesText.listText(where, lookup.places, lookup.origin)
+                listener.onEvent(ResearchEvent.AnswerCompleted(text))
+                val result = ResearchResult(question, emptyList(), decision, sources, lookup.total - sources.size,
+                    text, null, text, timings.toList())
+                listener.onEvent(ResearchEvent.Completed(result))
+                enter(ResearchPhase.DONE)
+                return result
+            }
             val lines = answer.modelLines
             val res = generating(
-                ResearchPhase.ANSWERING, PlacesText.PLACES_SYSTEM, PlacesText.placesUser(question, where, lines),
+                ResearchPhase.ANSWERING, PlacesText.PLACES_SYSTEM, PlacesText.placesUser(answerQuestion, where, lines),
                 config.placesTokens,
             ) { listener.onEvent(ResearchEvent.AnswerToken(it)) }
             listener.onEvent(ResearchEvent.AnswerCompleted(res.text))
@@ -451,6 +599,39 @@ class ResearchPipeline(
             listener.onEvent(ResearchEvent.Completed(result))
             enter(ResearchPhase.DONE)
             return result
+        }
+
+        /** The question as asked, when it was translated: the answer is written in its language. */
+        private var asked: String? = null
+
+        /** The question the answering prompts get: in English, with the question as asked after it when translated. */
+        private val answerQuestion: String get() = asked?.let { Prompts.replyIn(question, it) } ?: question
+
+        /** A question in another language translated into English; the run then searches for that. */
+        private suspend fun translate() {
+            val res = generating(ResearchPhase.TRANSLATING, Prompts.TRANSLATE_SYSTEM, question, Translation.MAX_TOKENS) {}
+            val translated = Translation.parse(res.text) ?: return
+            if (translated != question) {
+                asked = question
+                question = translated
+                listener.onEvent(ResearchEvent.Translated(translated))
+            }
+        }
+
+        /** The follow-up rewritten to stand on its own; the run then answers that question. */
+        private suspend fun rewrite(previous: Exchange) {
+            val answer = previous.answer.let {
+                if (it.length <= FollowUp.PREVIOUS_ANSWER_CHARS) it else it.substring(0, FollowUp.PREVIOUS_ANSWER_CHARS) + "\u2026"
+            }
+            val res = generating(
+                ResearchPhase.REWRITING, Prompts.FOLLOWUP_SYSTEM, Prompts.followupUser(previous.question, answer, question),
+                FollowUp.MAX_TOKENS,
+            ) {}
+            val rewritten = FollowUp.parse(res.text) ?: return
+            if (rewritten != question) {
+                question = rewritten
+                listener.onEvent(ResearchEvent.Rewritten(rewritten))
+            }
         }
 
         /** A places answer without the model: why there is no list. */

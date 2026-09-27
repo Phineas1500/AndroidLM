@@ -1,0 +1,8 @@
+{"id": "reason-01", "q": "If I drive from Lisbon to Porto at an average of 100 km/h and leave at 9am, when do I arrive?", "cat": "reason", "check": "~313 km by road -> ~12:10; states distance assumption"}
+{"id": "reason-02", "q": "How many times larger is Jupiter's volume than Earth's?", "cat": "reason", "check": "~1,321 times"}
+{"id": "reason-03", "q": "Which is older, the Great Wall of China or the Colosseum, and by roughly how many years?", "cat": "reason", "check": "Great Wall earliest walls 7th c. BC / Qin 3rd c. BC; Colosseum AD 80; Great Wall older by ~300+ years (Qin) or ~700+ (earliest)"}
+{"id": "reason-04", "q": "A train covers 300 km in 2.5 hours. At the same speed, how long does 720 km take?", "cat": "reason", "check": "6 hours"}
+{"id": "reason-05", "q": "Which is more densely populated, Japan or the Netherlands?", "cat": "reason", "check": "Netherlands (~520/km2) vs Japan (~330/km2)"}
+{"id": "reason-06", "q": "If the Earth were the size of a basketball, how far away would the Moon be?", "cat": "reason", "check": "~30 Earth diameters -> ~7 m (basketball 24 cm)"}
+{"id": "reason-07", "q": "Who was US president when the Berlin Wall fell, and how old was he at the time?", "cat": "reason", "check": "George H. W. Bush, 65 (born June 12, 1924; wall fell Nov 9, 1989)"}
+{"id": "reason-08", "q": "How much is $10,000 after 20 years at 5% annual interest compounded yearly?", "cat": "reason", "check": "$26,533"}

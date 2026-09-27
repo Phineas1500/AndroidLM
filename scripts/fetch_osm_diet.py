@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Fetch OpenStreetMap places that carry diet or vegan/vegetarian cuisine tags, worldwide.
+"""Fetch OpenStreetMap places that carry diet or vegan/vegetarian cuisine tags, and pharmacies,
+ATMs and money changers, worldwide.
 
 The places database (build_places.py) takes its places from Overture Maps; OpenStreetMap adds
 what Overture lacks: whether a place serves vegan or vegetarian food (diet:vegan=only/yes/...),
-other diets (gluten-free, halal, kosher), opening hours, and places Overture does not have.
+other diets (gluten-free, halal, kosher), opening hours (a pharmacy open late), and places
+Overture does not have (it has few ATMs).
 Only objects with a diet:* key or a vegan/vegetarian cuisine are fetched (a few hundred
 thousand), in one query to QLever's copy of the OpenStreetMap planet (qlever.dev, University of
 Freiburg), which answers it in about a minute; the public Overpass servers time out on it.
@@ -27,6 +29,7 @@ TAGS = {
     "diet:halal": "halal", "diet:kosher": "kosher", "opening_hours": "hours", "website": "website",
     "contact:website": "contact_website", "phone": "phone", "contact:phone": "contact_phone",
     "addr:street": "street", "addr:housenumber": "housenumber", "addr:city": "city",
+    "operator": "operator", "brand": "brand",
 }
 
 QUERY = """PREFIX osmkey: <https://www.openstreetmap.org/wiki/Key:>
@@ -36,7 +39,9 @@ SELECT ?s ?wkt %s WHERE {
       { ?s osmkey:diet:vegan ?x } UNION { ?s osmkey:diet:vegetarian ?x } UNION
       { ?s osmkey:diet:gluten_free ?x } UNION { ?s osmkey:diet:halal ?x } UNION
       { ?s osmkey:diet:kosher ?x } UNION
-      { ?s osmkey:cuisine ?c . FILTER(CONTAINS(?c, "vegan") || CONTAINS(?c, "vegetarian")) }
+      { ?s osmkey:cuisine ?c . FILTER(CONTAINS(?c, "vegan") || CONTAINS(?c, "vegetarian")) } UNION
+      { ?s osmkey:amenity "pharmacy" } UNION { ?s osmkey:amenity "atm" } UNION
+      { ?s osmkey:amenity "bureau_de_change" }
   } }
   ?s geo:hasGeometry/geo:asWKT ?wkt .
   %s

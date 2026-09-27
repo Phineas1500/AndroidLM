@@ -17,7 +17,7 @@ and the corpus are therefore copied to the phone from a computer.
 | `wiki.db` | 21.3GB | English Wikipedia: text, search index, redirects, pageviews (CC BY-SA 4.0) |
 | `wiki_df.db` | 1.7MB | Word counts for `wiki.db`'s index, so a search does not have to read them from it; optional (same results without it, slower) |
 | `voyage.db` | 0.3GB | English Wikivoyage travel guides, optional (CC BY-SA 4.0) |
-| `places.db` | 1.7GB | 12.6 million places to eat, drink and stay, worldwide, for questions like "vegan restaurants in Lisbon" or "hostels near me"; optional (ODbL: © OpenStreetMap contributors, Overture Maps Foundation, GeoNames) |
+| `places.db` | 2.9GB | 21.1 million places worldwide (to eat, drink and stay, and pharmacies, ATMs, hospitals, supermarkets, stations...), for questions like "vegan restaurants in Lisbon" or "a pharmacy near me"; optional (ODbL: © OpenStreetMap contributors, Overture Maps Foundation, GeoNames) |
 
 ## Steps
 

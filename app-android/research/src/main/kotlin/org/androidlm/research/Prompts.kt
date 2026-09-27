@@ -50,6 +50,45 @@ object Prompts {
         "your answer. Each source is about the subject named in its title; do not attach its facts " +
         "to another subject. Ignore off-topic sources. Do not repeat your answer."
 
+    /**
+     * A follow-up question rewritten to stand on its own (app only; rag.py takes one question at a
+     * time). The earlier exchange fills in what the follow-up refers to.
+     */
+    const val FOLLOWUP_SYSTEM: String =
+        "Rewrite the user's follow-up question as one question that can be understood on its own, " +
+        "using the previous question and answer only to fill in what the follow-up refers to (a " +
+        "person, a place, a thing, a list). Keep the user's wording and intent and do not answer it. " +
+        "If the follow-up already stands on its own, repeat it unchanged. Output only the question."
+
+    /** The translation of a question in another language (ResearchPipeline Translation). */
+    const val TRANSLATE_SYSTEM: String =
+        "Translate the user's question into English, writing the names of places and people as they " +
+        "are usually written in English. Keep its meaning and do not answer it. Output only the English question."
+
+    /** A translated question for the answering prompts: the answer is written in the language it was asked in. */
+    fun replyIn(question: String, asked: String): String =
+        question + "\n\nAnswer in the language of the question as it was asked: " + asked
+
+    /** User message of the follow-up rewrite: the previous exchange (its answer cut short) and the follow-up. */
+    fun followupUser(previousQuestion: String, previousAnswer: String, followUp: String): String =
+        "Previous question: " + previousQuestion + "\n\nPrevious answer: " + previousAnswer + "\n\nFollow-up: " + followUp
+
+    /** rag.py WORKED_SYSTEM: a question that needs a calculation, with a few lines of working first. */
+    const val WORKED_SYSTEM: String =
+        "You are an offline research assistant. This question needs a calculation. First work it out in " +
+        "a few short lines: the facts and numbers you use (say which are approximate) and each step of " +
+        "the arithmetic. Then give the result on a last line starting with 'Answer:'. If you are unsure " +
+        "of a number, say so instead of guessing. No preamble, no LaTeX, no citations or reference " +
+        "lists."
+
+    /** rag.py WORKED_SOURCES_SYSTEM: the same with the sources in context (retrieval first). */
+    const val WORKED_SOURCES_SYSTEM: String =
+        "You are an offline research assistant. This question needs a calculation. Use your own " +
+        "knowledge together with the numbered sources from an offline copy of Wikipedia, citing a source " +
+        "like [1] where it gives a number you use. First work it out in a few short lines: the facts and " +
+        "numbers (say which are approximate) and each step of the arithmetic. Then give the result on a " +
+        "last line starting with 'Answer:'. Ignore sources that are off-topic. No preamble, no LaTeX."
+
     /** Follow-up user turn of the continued source check: rag.py `check_followup_user`. */
     fun checkFollowupUser(context: String): String = CHECK_FOLLOWUP + "\n\nSources:\n\n" + context
 
@@ -136,3 +175,16 @@ internal object Lexicon {
         "trek", "trip", "try", "visit",
     )
 }
+
+/** rag.py `needs_working`: a question whose answer is a calculation (WORKED_SYSTEM). */
+object Worked {
+    private val WORDS = Regex("\\b(how many times|times (larger|bigger|smaller|more|heavier|longer|farther)|times as (big|large|heavy|long|far|many)|how old (was|is|were|will)|by (roughly |about |approximately )?how (many|much)|percent|per ?cent|compound|interest rate|average speed)\\b|%", RegexOption.IGNORE_CASE)
+    private val WITH_NUMBER = Regex("\\b(how (long|far|much|many|fast)|what time|when (do|will|would|should) (i|we|you)|arrive)\\b", RegexOption.IGNORE_CASE)
+    private val IF = Regex("(^|\\b)if (the|i|we|you|a|an)\\b.*\\bhow (far|long|big|much|many|fast|heavy)\\b", RegexOption.IGNORE_CASE)
+    private val DIGIT = Regex("\\d")
+
+    fun needs(question: String): Boolean =
+        WORDS.containsMatchIn(question) || IF.containsMatchIn(question) ||
+            (DIGIT.containsMatchIn(question) && WITH_NUMBER.containsMatchIn(question))
+}
+

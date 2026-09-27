@@ -1,0 +1,72 @@
+{"id": "poi-01", "q": "Where can I find a pharmacy in Lisbon that's open late?", "cat": "poi", "check": "Real pharmacies or the 'farmácia de serviço' rota system; no invented names"}
+{"id": "poi-02", "q": "Is there a good coworking space in Chiang Mai?", "cat": "poi", "check": "Real coworking spaces (e.g. Punspace, CAMP at Maya); no invented names"}
+{"id": "poi-03", "q": "Where can I buy a SIM card in Tbilisi?", "cat": "poi", "check": "Magti/Silknet/Cellfie (Beeline) shops or airport; passport needed"}
+{"id": "poi-04", "q": "Which hospitals in Medellín are good for foreigners?", "cat": "poi", "check": "Real hospitals (Pablo Tobón Uribe, San Vicente Fundación, Clínica Las Américas...)"}
+{"id": "poi-05", "q": "Where can I withdraw cash in Buenos Aires without paying huge fees?", "cat": "poi", "check": "ATM limits/fees, Western Union/blue dollar context; honest about volatility"}
+{"id": "poi-06", "q": "What are the best museums in Madrid?", "cat": "poi", "check": "Prado, Reina Sofía, Thyssen-Bornemisza"}
+{"id": "poi-07", "q": "Is there a supermarket near the old town in Kraków?", "cat": "poi", "check": "Real chains (Carrefour Express, Żabka, Biedronka), Galeria Krakowska"}
+{"id": "poi-08", "q": "Where can I do laundry in Bangkok?", "cat": "poi", "check": "Laundromats / wash-and-fold shops common; honest"}
+{"id": "trav-01", "q": "How do I get from Lisbon airport to the city centre?", "cat": "trav", "check": "Metro red line (change to green/blue), Aerobus, taxi/Uber; ~20-30 min"}
+{"id": "trav-02", "q": "Do US citizens need a visa for Vietnam?", "cat": "trav", "check": "e-visa (up to 90 days) since 2023; not visa-free"}
+{"id": "trav-03", "q": "Is it customary to tip in Japan?", "cat": "trav", "check": "No, tipping not customary, can be seen as rude"}
+{"id": "trav-04", "q": "Can I drink the tap water in Mexico City?", "cat": "trav", "check": "No, drink bottled/filtered water"}
+{"id": "trav-05", "q": "What's the emergency number in Thailand?", "cat": "trav", "check": "191 police, 1669 medical, 1155 tourist police"}
+{"id": "trav-06", "q": "What scams should I watch out for in Istanbul?", "cat": "trav", "check": "Shoe-shine scam, bar/club scam, taxi meter, carpet shops"}
+{"id": "trav-07", "q": "Which neighbourhood should I stay in in Tokyo as a first-time visitor?", "cat": "trav", "check": "Shinjuku, Shibuya, Ginza/Tokyo Station, Asakusa; why"}
+{"id": "trav-08", "q": "What are good day trips from Kyoto?", "cat": "trav", "check": "Nara, Osaka, Arashiyama (in Kyoto), Himeji, Uji, Kobe"}
+{"id": "trav-09", "q": "When is the best time to visit Georgia the country?", "cat": "trav", "check": "Late spring (May-June) and autumn (Sep-Oct)"}
+{"id": "trav-10", "q": "How does public transport work in Seoul, what card should I get?", "cat": "trav", "check": "T-money card, subway + buses, transfers"}
+{"id": "trav-11", "q": "What plug type and voltage does Argentina use?", "cat": "trav", "check": "Type I (and C), 220 V 50 Hz"}
+{"id": "trav-12", "q": "Is Medellín safe for tourists at night?", "cat": "trav", "check": "Mostly in El Poblado/Laureles with care; avoid some areas; scopolamine/dating app warnings"}
+{"id": "trav-13", "q": "How much does a taxi cost in Bangkok?", "cat": "trav", "check": "Meter starts 35 baht; insist on meter; Grab"}
+{"id": "trav-14", "q": "What etiquette should I follow when visiting temples in Chiang Mai?", "cat": "trav", "check": "Cover shoulders/knees, remove shoes, don't touch monks (women), don't point feet"}
+{"id": "place-03", "q": "romantic restaurant for dinner in Paris", "cat": "place", "check": "Real restaurants; no invented ratings"}
+{"id": "place-05", "q": "vegan restaurants in Canggu", "cat": "place", "check": "Neighbourhood not in GeoNames: expect fallback"}
+{"id": "place-06", "q": "best vegan restaurants in Shoreditch", "cat": "place", "check": "London neighbourhood"}
+{"id": "tech-01", "q": "Which signature algorithms are quantum resistant?", "cat": "tech", "check": "ML-DSA (Dilithium), SLH-DSA (SPHINCS+), FN-DSA (Falcon); hash-based (XMSS, LMS); ECDSA/RSA are not"}
+{"id": "tech-02", "q": "How does a zk-SNARK work?", "cat": "tech", "check": "Arithmetic circuit -> constraints (R1CS/QAP), polynomial commitments, trusted setup (for some), succinct proof, verifier checks without learning witness"}
+{"id": "tech-03", "q": "Explain proposer-builder separation in Ethereum", "cat": "tech", "check": "Builders assemble blocks, proposers (validators) pick highest bid; MEV-Boost relays; enshrined PBS (ePBS) proposal; censorship concerns"}
+{"id": "tech-04", "q": "What is account abstraction in Ethereum (ERC-4337)?", "cat": "tech", "check": "Smart contract wallets; UserOperations, bundlers, EntryPoint contract, paymasters; no protocol change"}
+{"id": "tech-05", "q": "What's the difference between optimistic rollups and zk rollups?", "cat": "tech", "check": "Fraud proofs + challenge period (~7 days) vs validity proofs; withdrawal times; examples"}
+{"id": "tech-06", "q": "How does Shor's algorithm threaten elliptic curve cryptography?", "cat": "tech", "check": "Solves discrete log in polynomial time on a quantum computer; breaks ECDSA/ECDH; needs ~thousands of logical qubits"}
+{"id": "tech-07", "q": "Explain how the Lightning Network works", "cat": "tech", "check": "Payment channels, HTLCs, routing, off-chain, on-chain settlement"}
+{"id": "tech-08", "q": "What is a Verkle tree and why does Ethereum want to use them?", "cat": "tech", "check": "Vector commitments, smaller witnesses than Merkle-Patricia, enables stateless clients"}
+{"id": "tech-09", "q": "How does RSA key generation work?", "cat": "tech", "check": "Two primes p,q, n=pq, phi, choose e, d = e^-1 mod phi"}
+{"id": "tech-10", "q": "What is the CAP theorem?", "cat": "tech", "check": "Consistency, availability, partition tolerance; can't have all three during partition; Brewer"}
+{"id": "reason-01", "q": "If I drive from Lisbon to Porto at an average of 100 km/h and leave at 9am, when do I arrive?", "cat": "reason", "check": "~313 km by road -> ~12:10; states distance assumption"}
+{"id": "reason-02", "q": "How many times larger is Jupiter's volume than Earth's?", "cat": "reason", "check": "~1,321 times"}
+{"id": "reason-03", "q": "Which is older, the Great Wall of China or the Colosseum, and by roughly how many years?", "cat": "reason", "check": "Great Wall earliest walls 7th c. BC / Qin 3rd c. BC; Colosseum AD 80; Great Wall older by ~300+ years (Qin) or ~700+ (earliest)"}
+{"id": "reason-04", "q": "A train covers 300 km in 2.5 hours. At the same speed, how long does 720 km take?", "cat": "reason", "check": "6 hours"}
+{"id": "reason-05", "q": "Which is more densely populated, Japan or the Netherlands?", "cat": "reason", "check": "Netherlands (~520/km2) vs Japan (~330/km2)"}
+{"id": "reason-06", "q": "If the Earth were the size of a basketball, how far away would the Moon be?", "cat": "reason", "check": "~30 Earth diameters -> ~7 m (basketball 24 cm)"}
+{"id": "reason-07", "q": "Who was US president when the Berlin Wall fell, and how old was he at the time?", "cat": "reason", "check": "George H. W. Bush, 65 (born June 12, 1924; wall fell Nov 9, 1989)"}
+{"id": "reason-08", "q": "How much is $10,000 after 20 years at 5% annual interest compounded yearly?", "cat": "reason", "check": "$26,533"}
+{"id": "fact-01", "q": "What is the population of Nigeria?", "cat": "fact", "check": "~220-230 million (2023-2025)"}
+{"id": "fact-02", "q": "Who wrote One Hundred Years of Solitude and when was it published?", "cat": "fact", "check": "Gabriel García Márquez, 1967"}
+{"id": "fact-03", "q": "What is the tallest mountain in Africa and how high is it?", "cat": "fact", "check": "Kilimanjaro, 5,895 m"}
+{"id": "fact-04", "q": "When did Ethereum switch to proof of stake?", "cat": "fact", "check": "The Merge, 15 September 2022"}
+{"id": "fact-05", "q": "How long is the Danube?", "cat": "fact", "check": "~2,850 km"}
+{"id": "fact-06", "q": "What year did the Byzantine Empire fall?", "cat": "fact", "check": "1453 (Constantinople); Trebizond 1461"}
+{"id": "fact-07", "q": "What is the capital of Kazakhstan?", "cat": "fact", "check": "Astana"}
+{"id": "fact-08", "q": "Who discovered penicillin?", "cat": "fact", "check": "Alexander Fleming, 1928"}
+{"id": "broad-01", "q": "Tell me about Japan", "cat": "broad", "check": "Capital Tokyo, ~124M people, constitutional monarchy, economy, history highlights; accurate numbers"}
+{"id": "broad-02", "q": "Tell me about Georgia", "cat": "broad", "check": "Should ask/handle ambiguity (country vs US state)"}
+{"id": "broad-03", "q": "Explain the causes of World War I", "cat": "broad", "check": "Militarism, alliances, imperialism, nationalism; assassination of Franz Ferdinand 1914"}
+{"id": "broad-04", "q": "Tell me about Mercury", "cat": "broad", "check": "Ambiguous: planet, element, god; handle"}
+{"id": "hum-01", "q": "What did the Stoics believe about emotions?", "cat": "hum", "check": "Passions from false judgments; apatheia; eupatheiai; Epictetus/Seneca/Marcus Aurelius"}
+{"id": "hum-02", "q": "Compare Confucius and Laozi", "cat": "hum", "check": "Confucian ritual/virtue/social order vs Daoist wu wei/nature; texts Analects vs Tao Te Ching"}
+{"id": "hum-03", "q": "What was the significance of the Peace of Westphalia?", "cat": "hum", "check": "1648, ended Thirty Years' War, state sovereignty principle"}
+{"id": "fresh-01", "q": "Who is the current president of Argentina?", "cat": "fresh", "check": "Javier Milei (since Dec 2023); note data date"}
+{"id": "fresh-02", "q": "What's the exchange rate from US dollars to euros?", "cat": "fresh", "check": "Can't know live; give approximate as of data date"}
+{"id": "fresh-03", "q": "What's the price of Bitcoin right now?", "cat": "fresh", "check": "Can't know offline; say so"}
+{"id": "fresh-04", "q": "Who won the most recent FIFA World Cup?", "cat": "fresh", "check": "Argentina (2022); note next is 2026"}
+{"id": "zh-01", "q": "推荐里斯本最好的素食餐厅", "cat": "zh", "check": "Chinese: vegan restaurants in Lisbon"}
+{"id": "zh-02", "q": "墨子的兼爱思想是什么？", "cat": "zh", "check": "Chinese: Mozi's universal love"}
+{"id": "zh-03", "q": "日本的人口是多少？", "cat": "zh", "check": "Chinese: Japan population ~124M"}
+{"id": "zh-04", "q": "什么是零知识证明？", "cat": "zh", "check": "Chinese: zero-knowledge proof explanation"}
+{"id": "health-01", "q": "What should I do if I get altitude sickness in Cusco?", "cat": "health", "check": "Rest, hydrate, descend if severe, coca tea, acetazolamide, symptoms of HAPE/HACE -> seek care"}
+{"id": "health-02", "q": "What are the symptoms of dengue fever and what should I do?", "cat": "health", "check": "Fever, severe headache, pain behind eyes, joint/muscle pain, rash; paracetamol not NSAIDs; warning signs -> hospital"}
+{"id": "health-03", "q": "How do I treat a jellyfish sting?", "cat": "health", "check": "Rinse with seawater/vinegar (for box jellyfish), remove tentacles, hot water immersion; no fresh water/urine"}
+{"id": "edge-01", "q": "Japan", "cat": "edge", "check": "One word"}
+{"id": "edge-02", "q": "What is the capital of Atlantis?", "cat": "edge", "check": "Fictional: say so"}
+{"id": "edge-04", "q": "what is ethereum", "cat": "edge", "check": "lowercase, short"}

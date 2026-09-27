@@ -56,15 +56,32 @@ QUESTIONS = [
     "Tell me the best vegan restaurants in Bali",
     "vegan restaurants in Texas",
     "best vegan restaurants in DC",
+    "romantic restaurant for dinner in Buenos Aires",
+    "I'm going to be in London for three days next week. What should I see, what should I eat, and how do I get around?",
+    "What is the oldest restaurant in London?",
+    "a hotel in Buenos Aires",
+    "Where can I find a pharmacy in Buenos Aires?",
+    "ATMs in London",
+    "Is there a supermarket near Covent Garden in London?",
+    "What are the best museums in London?",
+    "Where can I buy a SIM card in Buenos Aires?",
+    "Which hospitals in Buenos Aires are good for foreigners?",
+    "Is there a coworking space in London?",
+    "a pharmacy near my hotel in London",
+    "restaurant near the museum in London",
+    "Where can I exchange money in Buenos Aires?",
+    "Which vegan restaurants in Buenos Aires are open on Sunday?",
+    "Best vegan restaurants in Buenos Aires, and how much should I tip?",
 ]
 HERE = (-34.6, -58.4)
 NORM = ["Lisboa", "São Paulo", "Zürich", "Kraków", "Straße", "Ærøskøbing", "İstanbul", "Hà Nội",
         "Paris, Texas", "  St. John's  ", "Москва", "東京", "Tromsø", "Łódź", "Reykjavík"]
 
 
-def place_json(p, i, origin):
+def place_json(p, i, origin, hours):
     return {"id": p.id, "tier": p.tier, "score": p.score, "km": p.km, "why": p.why,
-            "line": P.describe(p, i, None, origin)}
+            "line": P.describe(p, i, None, origin),
+            "model_line": P.describe(p, i, None, origin, brief=True, hours=hours)}
 
 
 def main():
@@ -77,14 +94,15 @@ def main():
         case = {"question": q, "ask": None, "candidates": [list(c) for c in P.place_candidates(q)]}
         if ask is not None:
             case["ask"] = {"group": ask.group, "diet": ask.diet, "sub": ask.sub, "price": ask.price,
-                           "here": ask.here, "restaurant": ask.restaurant}
+                           "here": ask.here, "restaurant": ask.restaurant,
+                           "asks_hours": P.asks_hours(ask), "needs_words": P.needs_words(ask)}
             lk = P.lookup(db, ask, HERE)
             if lk is not None:
                 case["lookup"] = {
                     "label": lk.label, "radius_km": lk.radius_km, "total": lk.total, "capped": lk.capped, "origin": lk.origin,
                     "city": lk.city.id if lk.city else None,
                     "where": P.where_text(lk.total, lk.radius_km, lk.label, ask, lk.capped),
-                    "places": [place_json(p, i, lk.origin) for i, p in enumerate(lk.places, 1)],
+                    "places": [place_json(p, i, lk.origin, P.asks_hours(ask)) for i, p in enumerate(lk.places, 1)],
                 }
         cases.append(case)
     golden = {

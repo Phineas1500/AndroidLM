@@ -22,7 +22,7 @@ for line in open(qfile):
             cur = None
             t, msg = int(tm.group(1)), tm.group(2)
             if msg.startswith("route="):
-                rec["route"] = "plan" if "RETRIEVAL_FIRST" in msg else "verify"
+                rec["route"] = "plan" if "RETRIEVAL_FIRST" in msg else "places" if "PLACES" in msg else "verify"
             elif msg.startswith("planned="):
                 rec["titles"] = msg[len("planned=["):-1].split(", ")
             elif msg.startswith("sources="):

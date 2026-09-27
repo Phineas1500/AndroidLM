@@ -66,6 +66,36 @@ CLOSED_SYSTEM = (
     "visible deliberation. Be concise."
 )
 
+# A question that needs arithmetic (a travel time, "how many times larger", an age at a date,
+# interest): answering in the first line before working it out gave wrong results ("arrive at
+# 3 PM", then 12:06 worked out below it). These prompts put a few lines of working first.
+WORKED_SYSTEM = (
+    "You are an offline research assistant. This question needs a calculation. First work it out in "
+    "a few short lines: the facts and numbers you use (say which are approximate) and each step of the "
+    "arithmetic. Then give the result on a last line starting with 'Answer:'. If you are unsure of a "
+    "number, say so instead of guessing. No preamble, no LaTeX, no citations or reference lists."
+)
+
+WORKED_SOURCES_SYSTEM = (
+    "You are an offline research assistant. This question needs a calculation. Use your own knowledge "
+    "together with the numbered sources from an offline copy of Wikipedia, citing a source like [1] "
+    "where it gives a number you use. First work it out in a few short lines: the facts and numbers "
+    "(say which are approximate) and each step of the arithmetic. Then give the result on a last line "
+    "starting with 'Answer:'. Ignore sources that are off-topic. No preamble, no LaTeX."
+)
+
+WORKED_WORDS = re.compile(
+    r"\b(how many times|times (larger|bigger|smaller|more|heavier|longer|farther)|times as (big|large|heavy|long|far|many)|"
+    r"how old (was|is|were|will)|by (roughly |about |approximately )?how (many|much)|percent|per ?cent|compound|interest rate|average speed)\b|%", re.I)
+WORKED_WITH_NUMBER = re.compile(r"\b(how (long|far|much|many|fast)|what time|when (do|will|would|should) (i|we|you)|arrive)\b", re.I)
+WORKED_IF = re.compile(r"(^|\b)if (the|i|we|you|a|an)\b.*\bhow (far|long|big|much|many|fast|heavy)\b", re.I)
+
+
+def needs_working(question):
+    """A question whose answer is a calculation (WORKED_SYSTEM)."""
+    return bool(WORKED_WORDS.search(question) or WORKED_IF.search(question)
+                or (re.search(r"\d", question) and WORKED_WITH_NUMBER.search(question)))
+
 # Round three's wording plus two guards. Two stricter rewrites were tried in round four and
 # graded worse: a "Corrected answer:" headline made the model invent corrections, and a
 # conservative "most drafts need no correction" version threw away the useful additions.
@@ -527,8 +557,11 @@ def answer(corpus, args, question):
                 and any(st in TRAVEL_STEMS for st, _ in corpus.stems(question)):
             mode = "plan"
         rec.update(route=mode, route_views=views)
+    worked = getattr(args, "worked", False) and needs_working(question)
+    closed = WORKED_SYSTEM if worked else CLOSED_SYSTEM
+    rec["worked"] = worked
     if mode == "verify":
-        draft = chat(args.url, CLOSED_SYSTEM, question, args.max_tokens)
+        draft = chat(args.url, closed, question, args.max_tokens)
         rec.update(draft=draft["text"], draft_s=draft["wall_s"], draft_tokens=draft["gen_tokens"],
                    draft_finish=draft["finish"])
     t0 = time.time()
@@ -547,7 +580,7 @@ def answer(corpus, args, question):
     elif draft is not None and context:
         if args.check_continue:
             res = chat_messages(args.url, [
-                {"role": "system", "content": CLOSED_SYSTEM}, {"role": "user", "content": question},
+                {"role": "system", "content": closed}, {"role": "user", "content": question},
                 {"role": "assistant", "content": draft["text"]},
                 {"role": "user", "content": check_followup_user(context)}], 260)
         else:
@@ -561,10 +594,11 @@ def answer(corpus, args, question):
         res = {k: v for k, v in draft.items() if k != "text"}
         rec["answer"] = draft["text"]
     elif context:
-        res = chat(args.url, ANSWER_SYSTEM, f"Sources:\n\n{context}\n\nQuestion: {question}", args.max_tokens)
+        res = chat(args.url, WORKED_SOURCES_SYSTEM if worked else ANSWER_SYSTEM,
+                   f"Sources:\n\n{context}\n\nQuestion: {question}", args.max_tokens)
         rec["answer"] = res.pop("text")
     else:
-        res = chat(args.url, CLOSED_SYSTEM, question, args.max_tokens)
+        res = chat(args.url, closed, question, args.max_tokens)
         rec["answer"] = res.pop("text")
     rec.update(res)
     return rec, context
@@ -588,6 +622,8 @@ def main():
                     help="answer-first questions: ask for the source check as a follow-up turn of the draft")
     ap.add_argument("--rewrite", action="store_true",
                     help="answer-first questions: revise the draft with the sources instead of appending a source check")
+    ap.add_argument("--worked", action="store_true",
+                    help="questions that need a calculation get a few lines of working before the answer")
     ap.add_argument("--travel-route", action="store_true",
                     help="auto mode: travel questions about a place with a Wikivoyage guide go retrieval-first")
     ap.add_argument("--voyage-db", help="Wikivoyage corpus database; adds travel-guide sections")

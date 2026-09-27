@@ -11,11 +11,14 @@ Sources, merged into one SQLite file the app opens read-only:
       kosher, cuisine and opening hours, merged into the Overture place they match (same name
       within 120 m) or added. ODbL 1.0, so places.db as a whole is offered under the ODbL.
   GeoNames cities1000 (with country and region names): resolves the city a question names. CC BY 4.0.
-  Wikivoyage (voyage.db): Eat, Drink and Sleep listings matched to places by name near the guide's
-      city, so a place the travel guide recommends ranks first. Only the listing's name and where
-      it is are stored; its text stays in voyage.db (CC BY-SA).
+  Wikivoyage (voyage.db): Eat, Drink, Sleep, See, Do and Buy listings matched to places by name
+      near the guide's city, so a place the travel guide recommends ranks first. Only the listing's
+      name and where it is are stored; its text stays in voyage.db (CC BY-SA).
+  Wikipedia (wiki.db, --wiki): a place whose own name is an article title (or redirect) gets that
+      article's monthly views as its fame ("the best museums in Madrid": the Prado), when the name
+      is not a chain's, not a city's and not shared by many places.
 
-    python scripts/build_places.py --overture DIR --osm osm-diet.json --geonames DIR --voyage voyage.db \
+    python scripts/build_places.py --overture DIR --osm osm-diet.json --geonames DIR --voyage voyage.db --wiki wiki.db \
         --work DIR --out places.db [--bbox S,W,N,E]
 
 --bbox keeps only the places in one box (small test databases); cities are kept worldwide.
@@ -23,6 +26,7 @@ Needs duckdb and zstandard. The full build reads ~11 GB of Overture parquet; --w
 DuckDB's intermediate tables and spill files.
 """
 import argparse
+import glob
 import json
 import math
 import os
@@ -76,15 +80,29 @@ def norm_key(s):
 # ---- build-only ------------------------------------------------------------------------------
 
 TOP = ("food_and_drink", "lodging")
+# what else a traveller looks for (a category and everything under it); these need an existence
+# confidence of MIN_CONF_OTHER, there being far more of them
+TRAVEL = ("pharmacy_and_drug_store", "hospital", "emergency_or_urgent_care_facility", "primary_care_or_general_clinic",
+          "dental_clinic", "atm", "bank_or_credit_union", "currency_exchange", "grocery_store", "convenience_store",
+          "shopping_mall", "market", "mobile_phone_store", "telecommunications_company", "laundromat", "laundry_service",
+          "coworking_space", "shared_office_space", "post_office", "police_station", "embassy", "museum", "art_gallery",
+          "zoo", "aquarium", "amusement_park", "theatre_venue", "monument", "historic_site", "castle", "palace", "fort",
+          "religious_landmark", "botanical_garden", "park", "national_park", "beach", "public_plaza", "hiking_trail",
+          "gym", "train_station", "bus_station", "metro_station", "airport", "car_rental_service", "bike_rental",
+          "scooter_rental", "ferry_service")
 MIN_CONF = 0.3
+MIN_CONF_OTHER = 0.5
 MATCH_M = 120  # OSM place to Overture place
 GENERIC = ("restaurant restaurante ristorante restaurace ravintola cafe caffe coffee bar the and "
-           "y e et und de del da do das dos di du la le les el il lo los las shop house kitchen").split()
+           "y e et und de del da do das dos di du la le les el il lo los las shop house kitchen "
+           "museum museo musee museu hotel hostel").split()
 FOOD_AMENITY = {"restaurant": "restaurant", "cafe": "cafe", "fast_food": "fast_food_restaurant",
                 "bar": "bar", "pub": "pub", "biergarten": "beer_garden", "ice_cream": "ice_cream_shop",
                 "food_court": "food_court"}
 FOOD_SHOP = {"bakery": "bakery", "pastry": "patisserie", "confectionery": "candy_store",
              "deli": "delicatessen", "ice_cream": "ice_cream_shop"}
+# OpenStreetMap's own coverage of these is better than Overture's (ATMs), or has opening hours (pharmacies)
+UTIL_AMENITY = {"pharmacy": "pharmacy", "atm": "atm", "bureau_de_change": "currency_exchange"}
 
 
 def log(*a):
@@ -120,16 +138,18 @@ def load_overture(con, pattern, bbox):
                addresses[1].country as country, websites[1] as website, phones[1] as phone,
                brand.names.primary as brand
         from read_parquet('{pattern}')
-        where taxonomy.hierarchy[1] in {TOP}
+        where ((taxonomy.hierarchy[1] in {TOP} and confidence >= {MIN_CONF})
+               or (list_has_any(taxonomy.hierarchy, {list(TRAVEL)}) and confidence >= {MIN_CONF_OTHER}))
           and coalesce(operating_status, '') <> 'permanently_closed'
-          and names.primary is not null and length(trim(names.primary)) > 1
-          and confidence >= {MIN_CONF} {where}""")
+          and names.primary is not null and length(trim(names.primary)) > 1 {where}""")
     log("overture:", con.execute("select count(*) from ov").fetchone()[0], "places")
 
 
 def osm_kind(tags, known):
     cuisines = [c.strip().lower() for c in tags.get("cuisine", "").replace(",", ";").split(";") if c.strip()]
     am, shop = tags.get("amenity"), tags.get("shop")
+    if am in UTIL_AMENITY:
+        return UTIL_AMENITY[am] if UTIL_AMENITY[am] in known else None
     if am in FOOD_AMENITY:
         base = FOOD_AMENITY[am]
     elif shop in FOOD_SHOP:
@@ -173,6 +193,10 @@ def load_osm(con, osm_json, bbox, known):
             continue
         seen.add(osm_id)
         name = t.get("name") or t.get("name_en")
+        if not name and t.get("amenity") in UTIL_AMENITY:
+            # an ATM or a pharmacy is often tagged by its operator or brand only
+            who = t.get("brand") or t.get("operator")
+            name = (who + " " if who else "") + {"atm": "ATM", "pharmacy": "pharmacy", "bureau_de_change": "money exchange"}[t["amenity"]]
         pt = wkt_point(t["wkt"])
         if not name or pt is None:
             continue
@@ -274,7 +298,7 @@ def city_radius_km(pop):
 # ---- Wikivoyage listings -----------------------------------------------------------------------
 
 LISTING = re.compile(r"^- - (.+?)(?::\s|$)(.*)")
-SECTIONS = {"eat": "Eat", "drink": "Drink", "sleep": "Sleep"}
+SECTIONS = {"eat": "Eat", "drink": "Drink", "sleep": "Sleep", "see": "See", "do": "Do", "buy": "Buy"}
 
 
 def voyage_articles(path):
@@ -284,8 +308,9 @@ def voyage_articles(path):
     for title, bid, off, ln in c.execute("select title, block_id, off, len from articles order by block_id"):
         if bid not in cache:
             cache.clear()
-            cache[bid] = d.decompress(c.execute("select zdata from blocks where id=?", (bid,)).fetchone()[0]).decode("utf-8")
-        yield title, cache[bid][off:off + ln]
+            cache[bid] = d.decompress(c.execute("select zdata from blocks where id=?", (bid,)).fetchone()[0])
+        # off and len are a byte range in the decompressed block
+        yield title, cache[bid][off:off + ln].decode("utf-8")
 
 
 def listings(text):
@@ -338,7 +363,8 @@ def match_guide(con, voyage_path, names, cities_by_id, region_keys, bbox):
         r = city_radius_km(pop) + (3.0 if "/" in title else 0.0)
         for section, tier, name, rest in ls:
             n_listings += 1
-            digits = " ".join(re.findall(r"\d+", rest[:80]))
+            # the house number, from the address that starts the listing (not its bus lines or prices)
+            digits = " ".join(re.findall(r"\d+", rest.split(". ")[0][:60]))
             rows.append((title, section, tier, name, lat, lon, r, digits))
     con.execute("""create or replace table vl(article varchar, section varchar, tier varchar, listing varchar,
         clat double, clon double, r double, digits varchar)""")
@@ -364,14 +390,18 @@ def match_guide(con, voyage_path, names, cities_by_id, region_keys, bbox):
     con.execute(f"""
         create or replace table guide_match as
         with near as (
-            select l.lid, p.pid, l.n as a, p.n as b, l.nf = p.nf as same, l.digits, p.street,
+            select l.lid, p.pid, l.n as a, p.n as b, l.nf as nfa, p.nf as nfb, l.nf = p.nf as same, l.digits, p.street,
                    sqrt(pow((p.lat - l.clat) * 110.54, 2) + pow((p.lon - l.clon) * 111.32 * cos(radians(l.clat)), 2)) as km, l.r,
                    jaro_winkler_similarity(p.n, l.n) as jw
             from vlc c join pln p on p.gy = c.gy2 and p.gx = c.gx2 and p.p3 = c.p3
             join vln l on l.lid = c.lid
-            -- Eat and Drink listings are food places, Sleep listings lodging
-            where (case when l.section = 'Sleep' then p.top = 'lodging' else p.top = 'food_and_drink' end)
-              and (p.nf = l.nf or p.n = l.n or jaro_winkler_similarity(p.n, l.n) >= 0.88)
+            -- Eat and Drink listings are food places, Sleep listings lodging, See, Do and Buy the rest
+            where (case when l.section = 'Sleep' then p.top = 'lodging'
+                        when l.section in ('Eat', 'Drink') then p.top = 'food_and_drink'
+                        else p.top not in ('lodging', 'food_and_drink') end)
+              and (p.nf = l.nf or p.n = l.n or jaro_winkler_similarity(p.n, l.n) >= 0.88
+                   or list_has_all(string_split(p.nf, ' '), string_split(l.nf, ' '))
+                   or list_has_all(string_split(l.nf, ' '), string_split(p.nf, ' ')))
         ), scored as (
             select *, (digits <> '' and street is not null and
                        list_has_any(string_split(digits, ' '), regexp_extract_all(street, '\\d+')))::int as num
@@ -379,16 +409,24 @@ def match_guide(con, voyage_path, names, cities_by_id, region_keys, bbox):
         ), ok as (
             -- the full name, or the name without generic words when it is long enough to be
             -- distinctive, or a near-identical long name, or a similar one at the same house number
-            select * from scored
+            select *, (len(string_split(nfa, ' ')) >= 2 and len(string_split(nfb, ' ')) >= 2
+                       and (list_has_all(string_split(nfb, ' '), string_split(nfa, ' '))
+                            or list_has_all(string_split(nfa, ' '), string_split(nfb, ' '))))::int as subset
+            from scored
             where same or (a = b and length(a) >= 4) or (jw >= 0.95 and length(a) >= 6) or (num = 1 and jw >= 0.88)
+               -- every word of the one name in the other ("Museo del Prado", "Museo Nacional del Prado")
+               or (len(string_split(nfa, ' ')) >= 2 and len(string_split(nfb, ' ')) >= 2
+                   and (list_has_all(string_split(nfb, ' '), string_split(nfa, ' '))
+                        or list_has_all(string_split(nfa, ' '), string_split(nfb, ' '))))
         ), best as (
-            select *, row_number() over (partition by lid order by num desc, same desc, (a = b) desc, jw desc, km) as rk,
+            -- names that agree as well: the nearer (another "British Museum" 16 km out of town)
+            select *, row_number() over (partition by lid order by (same or a = b) desc, num desc, subset desc, jw desc, km) as rk,
                    count(*) over (partition by lid) as nc
             from ok
         )
         select v.article, v.section, v.tier, v.listing, b.pid
         from best b join vln v using (lid)
-        where rk = 1 and (nc = 1 or num = 1 or same)""")
+        where rk = 1 and (nc = 1 or num = 1 or same or (a = b and length(a) >= 6) or subset = 1)""")
     log("guide listings matched to places:", con.execute("select count(*) from guide_match").fetchone()[0])
 
 
@@ -398,6 +436,7 @@ def main():
     ap.add_argument("--osm", help="fetch_osm_diet.py's JSON")
     ap.add_argument("--geonames", required=True)
     ap.add_argument("--voyage")
+    ap.add_argument("--wiki", help="wiki.db: fame from article views")
     ap.add_argument("--work", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--bbox")
@@ -408,9 +447,25 @@ def main():
     con.execute(f"set temp_directory='{os.path.join(a.work, 'spill')}'; set preserve_insertion_order=false; "
                 "set memory_limit='7GB'")
 
-    load_overture(con, os.path.join(a.overture, "*.parquet"), bbox)
+    # the loads take minutes; a rebuild with the same inputs reuses the tables of the last one
+    def cached(name, key, load):
+        con.execute("create table if not exists build_cache(name varchar primary key, key varchar)")
+        row = con.execute("select key from build_cache where name = ?", (name,)).fetchone()
+        exists = con.execute("select count(*) from information_schema.tables where table_name = ?", (name,)).fetchone()[0]
+        if row and row[0] == key and exists:
+            log(f"{name}: reusing the table of the last build")
+            return
+        load()
+        con.execute("insert or replace into build_cache values (?, ?)", (name, key))
+
+    def stamp(path):
+        return f"{path}:{os.path.getsize(path)}:{int(os.path.getmtime(path))}" if path and os.path.exists(path) else str(path)
+
+    pattern = os.path.join(a.overture, "*.parquet")
+    cached("ov", f"{pattern}:{bbox}:{TOP}:{TRAVEL}:{MIN_CONF}:{MIN_CONF_OTHER}:{len(glob.glob(pattern))}",
+           lambda: load_overture(con, pattern, bbox))
     known = {r[0] for r in con.execute("select distinct cat from ov where cat is not null").fetchall()}
-    load_osm(con, a.osm, bbox, known)
+    cached("osm", f"{stamp(a.osm)}:{bbox}:{UTIL_AMENITY}:{FOOD_AMENITY}:{FOOD_SHOP}", lambda: load_osm(con, a.osm, bbox, known))
     match_osm(con)
 
     # one table of places: Overture, with the matched OSM place's diet, hours and cuisine; plus
@@ -427,11 +482,34 @@ def main():
                    coalesce(v.website, o.website) as website, o.hours, o.cuisine
             from ov v left join pairs p on p.oid = v.oid left join osm o on o.osm_id = p.osm_id
             union all
-            select o.lat, o.lon, o.name, o.kind, 'food_and_drink', null, o.diet, {SRC_OSM}, 60, 0, o.street, o.locality,
+            select o.lat, o.lon, o.name, o.kind, coalesce(k.top, 'food_and_drink'), null, o.diet, {SRC_OSM}, 60, 0, o.street, o.locality,
                    o.phone, o.website, o.hours, o.cuisine
             from osm o anti join pairs p on p.osm_id = o.osm_id
+            left join (select cat, any_value(hier[1]) as top from ov group by cat) k on k.cat = o.kind
         )""")
     log("merged:", con.execute("select count(*) from merged").fetchone()[0], "places")
+    # Overture has several records of many places (the Louvre has five): one per name and kind within
+    # about 300 m, the most certain, with the others' sources, diet tags and details
+    con.execute("""
+        create or replace table merged as
+        with g as (
+            select *, lower(regexp_replace(trim(name), '\\s+', ' ', 'g')) as nk,
+                   cast(round(lat * 300) as bigint) as gy, cast(round(lon * 300) as bigint) as gx
+            from merged
+        ), r as (
+            select *, row_number() over (partition by nk, gy, gx, top order by conf desc, pid) as rn,
+                   bit_or(src) over w as src_all, bit_or(diet) over w as diet_all,
+                   max(hours) over w as hours_any, max(cuisine) over w as cuisine_any, max(website) over w as web_any,
+                   max(phone) over w as phone_any, max(street) over w as street_any
+            from g
+            window w as (partition by nk, gy, gx, top)
+        )
+        select pid, lat, lon, name, cat, top, alt, diet_all as diet, src_all as src, conf, chain,
+               coalesce(street, street_any) as street, locality, coalesce(phone, phone_any) as phone,
+               coalesce(website, web_any) as website, coalesce(hours, hours_any) as hours,
+               coalesce(cuisine, cuisine_any) as cuisine
+        from r where rn = 1""")
+    log("merged, duplicates folded:", con.execute("select count(*) from merged").fetchone()[0], "places")
 
     countries, regions, cities = load_geonames(a.geonames)
     names = {}
@@ -454,14 +532,162 @@ def main():
     else:
         con.execute("create or replace table guide_match(article varchar, section varchar, tier varchar, listing varchar, pid bigint)")
 
+    if a.wiki:
+        big = {norm_key(c[1]) for c in cities if c[8] >= 15000} | {c[1].lower() for c in cities if c[8] >= 15000}
+        match_fame(con, a.wiki, sorted(big))
+    else:
+        con.execute("create or replace table fame(pid bigint, views bigint)")
+
     write_sqlite(con, a.out, countries, regions, cities, names)
 
 
-def static_rank(src, conf, chain, website):
+def fame_bonus(views):
+    """places.py's score for a place with its own Wikipedia article of [views] monthly views."""
+    return min(3.0, math.log10(1 + views / 100.0)) if views else 0.0
+
+
+def static_rank(src, conf, chain, website, fame=0):
     """The part of places.py's score that does not depend on the question, times 100: a lookup
     without a diet takes its candidates in this order."""
-    return (conf + (200 if src & SRC_GUIDE else 0) + (50 if src & SRC_OSM and src & SRC_OVERTURE else 0)
-            + (20 if website else 0) - (100 if chain else 0))
+    return (conf + (150 if src & SRC_GUIDE else 0) + (50 if src & SRC_OSM and src & SRC_OVERTURE else 0)
+            + (20 if website else 0) - (100 if chain else 0) + round(100 * fame_bonus(fame)))
+
+
+# Wikipedia title qualifiers that say the article is about a place of this kind
+QUALIFIERS = {"restaurant", "cafe", "café", "bar", "pub", "hotel", "museum", "gallery", "art gallery", "hospital",
+              "market", "bakery", "brewery", "building", "castle", "palace", "church", "cathedral", "temple",
+              "mosque", "park", "zoo", "aquarium", "theatre", "theater", "monument", "shop", "store", "department store"}
+
+
+# what an article about a place says it is, early on ("... is a sushi restaurant in Ginza", "... is
+# an art museum in Madrid"); an article about a dish, a TV show or a city says something else
+PLACE_TYPES = re.compile(
+    r"\b(restaurant|museum|gallery|hotel|hostel|pizzeria|trattoria|bar|pub|caf[e\u00e9]|coffeehouse|tea ?house|"
+    r"bakery|patisserie|brewery|winery|distillery|food hall|hospital|clinic|pharmacy|market|park|garden|palace|"
+    r"castle|church|basilica|cathedral|chapel|temple|shrine|mosque|synagogue|monastery|abbey|convent|monument|"
+    r"memorial|mausoleum|building|skyscraper|zoo|aquarium|theatre|theater|opera house|concert hall|stadium|arena|"
+    r"square|plaza|bridge|tower|library|station|airport|shop|store|department store|mall|shopping (centre|center)|"
+    r"nightclub|club|venue|landmark|ship|fort|fortress|citadel|ruins|archaeological site|beach|resort|spa|inn|"
+    r"cemetery|observatory|planetarium|amusement park|theme park)\b", re.I)
+
+
+FOOD_TYPES = re.compile(r"\b(restaurant|pizzeria|trattoria|bar|pub|caf[e\u00e9]|coffeehouse|tea ?house|bakery|patisserie|"
+                        r"brewery|winery|distillery|food hall|nightclub)\b", re.I)
+LODGING_TYPES = re.compile(r"\b(hotel|hostel|inn|resort|guest ?house|motel)\b", re.I)
+
+
+def lead_kinds(text):
+    """What the article's first sentence says the place is: a subset of {"food", "lodging",
+    "other"} ("The British Museum is a public museum ..." -> other), empty when it is not a place
+    ("The European Union is a supranational political and economic union ...", "... is an American
+    luxury hotel chain"). An article starts with its infobox ("Key facts: ...") and then a
+    "# Title" line; the lead follows that."""
+    m = re.search(r"^# [^\n]*\n+", text, re.M)
+    lead = text[m.end():] if m else text
+    first = re.split(r"(?<=[a-z0-9)\]])\.(\s|$)", lead[:600], maxsplit=1)[0]
+    if re.search(r"\b(chain|brand|franchise|company)\b", first):
+        return set()
+    kinds = set()
+    for m in PLACE_TYPES.finditer(first):
+        w = m.group(0)
+        kinds.add("food" if FOOD_TYPES.fullmatch(w) else "lodging" if LODGING_TYPES.fullmatch(w) else "other")
+    return kinds
+
+
+COORDS = re.compile(r"(\d+(?:\.\d+)?)\s*°\s*([NS])\W{1,6}(\d+(?:\.\d+)?)\s*°\s*([EW])")
+
+
+def article_coords(text):
+    """The decimal coordinates in an article's infobox ("35.6726611°N 139.7640389°E"), or None."""
+    for m in COORDS.finditer(text):
+        if "." not in m.group(1):
+            continue  # degrees-minutes-seconds come first; the decimal pair follows
+        lat = float(m.group(1)) * (1 if m.group(2) == "N" else -1)
+        lon = float(m.group(3)) * (1 if m.group(4) == "E" else -1)
+        return lat, lon
+    return None
+
+
+def match_fame(con, wiki_path, big_city_names):
+    """fame(pid, views): places whose own name is a Wikipedia article about a place (or a
+    redirect to one), with that article's monthly views. The article's title must be a proper
+    name ("White pizza" is not), a redirect must share a distinctive word with it ("Las Vegan" is
+    a misspelling of Las Vegas), and the article's first lines must name a kind of place (a TV show
+    called "Sunday Brunch" is not a restaurant)."""
+    con.execute("install sqlite; load sqlite")
+    con.execute(f"attach '{wiki_path}' as w (type sqlite, read_only)")
+    con.execute("""
+        create or replace table wt as
+        with t as (
+            select a.title as t, a.id as aid, a.title as target from w.articles a
+            union all
+            select r.title, a.id, a.title from w.redirects r join w.articles a on a.id = r.article_id
+        )
+        select lower(t) as t, aid, lower(target) as target,
+               len(regexp_extract_all(target, '(^|\\s)\\p{Lu}')) as caps
+        from t""")
+    con.execute("create or replace table wa as select id as aid, views, block_id, off, len from w.articles")
+    con.execute("detach w")
+    con.execute("create or replace temp table big_city(n varchar)")
+    con.executemany("insert into big_city values (?)", [(n,) for n in big_city_names])
+    quals = "(" + ",".join("'" + q.replace("'", "''") + "'" for q in QUALIFIERS) + ")"
+    generic = "[" + ",".join("'" + g + "'" for g in GENERIC) + "]"
+    words = "list_filter(string_split(regexp_replace({x}, '[^a-z0-9]+', ' ', 'g'), ' '), w -> length(w) >= 5 and not list_contains(" + generic + ", w))"
+    con.execute(f"""
+        create or replace table fame_cand as
+        with names as (
+            select pid, lower(trim(name)) as n, chain from merged
+        ), counts as (
+            -- in how many places around the world (0.1-degree cells) the name is found: Overture has
+            -- several records of the Louvre, all in one place; a chain is in many
+            select n, count(distinct cast(floor(lat * 10) as bigint) * 4000 + cast(floor(lon * 10) as bigint)) as c
+            from (select lower(trim(name)) as n, lat, lon from merged) group by n
+        ), cand as (
+            select m.pid, m.n, c.c from names m join counts c using (n)
+            where m.chain = 0 and c.c <= 5 and m.n not in (select n from big_city)
+        ), plain as (
+            -- the name is the article's title, a proper name of two words or more, or a redirect
+            -- to one that shares a distinctive word with it
+            select cand.pid, wt.aid from cand join wt on wt.t = cand.n
+            where strpos(cand.n, ' ') > 0 and wt.caps >= least(2, len(string_split(wt.target, ' ')))
+              and (wt.t = wt.target or list_has_any({words.format(x='wt.target')}, {words.format(x='cand.n')}))
+        ), qualified as (
+            -- "Noma (restaurant)"
+            select cand.pid, wt.aid from cand join wt on wt.t like cand.n || ' (%)'
+            where regexp_extract(wt.t, '\\(([^)]*)\\)$', 1) in {quals}
+        )
+        select distinct pid, aid from (select * from plain union all select * from qualified)""")
+    aids = [r[0] for r in con.execute("select distinct aid from fame_cand").fetchall()]
+    log("fame: candidate articles", len(aids))
+    # the lead of each candidate article, block by block
+    wiki = sqlite3.connect(f"file:{wiki_path}?mode=ro", uri=True)
+    zd = zstandard.ZstdDecompressor()
+    rows = con.execute(f"select aid, block_id, off, len from wa where aid in (select distinct aid from fame_cand) order by block_id").fetchall()
+    good, block_id, raw = set(), None, None
+    for aid, bid, off, ln in rows:
+        if bid != block_id:
+            raw = zd.decompress(wiki.execute("select zdata from blocks where id = ?", (bid,)).fetchone()[0])
+            block_id = bid
+        head = raw[off:off + min(ln, 4000)].decode("utf-8", "ignore")
+        at = article_coords(head)
+        for k in lead_kinds(head):
+            good.add((aid, k, at[0] if at else None, at[1] if at else None))
+    con.execute("create or replace temp table fame_good(aid bigint, kind varchar, alat double, alon double)")
+    con.executemany("insert into fame_good values (?, ?, ?, ?)", sorted(good, key=lambda g: (g[0], g[1])))
+    # the article is about this kind of place: a restaurant's about a restaurant (not "Amber
+    # Palace", a restaurant, and Amber Fort), a hotel's about lodging, the rest about neither
+    con.execute("""
+        create or replace table fame as
+        select c.pid, max(a.views) as views
+        from fame_cand c join merged m using (pid) join fame_good g using (aid) join wa a using (aid)
+        where g.kind = case m.top when 'food_and_drink' then 'food' when 'lodging' then 'lodging' else 'other' end
+          -- where the article puts it: not a record of "Chateau de Versailles" in central Paris, nor a
+          -- London hotel with the New York Waldorf Astoria's article
+          and (g.alat is null or sqrt(pow((m.lat - g.alat) * 110.54, 2)
+                                      + pow((m.lon - g.alon) * 111.32 * cos(radians(m.lat)), 2)) <= 10)
+        group by c.pid""")
+    log("places with a Wikipedia article of their own:", con.execute("select count(*) from fame").fetchone()[0],
+        "of", len(aids), "candidate articles", len({g[0] for g in good}), "about a place")
 
 
 def clean_website(w):
@@ -486,7 +712,7 @@ def write_sqlite(con, out, countries, regions, cities, names):
             lon5 INTEGER NOT NULL, name TEXT NOT NULL, kind INTEGER NOT NULL, alt TEXT,
             diet INTEGER NOT NULL, src INTEGER NOT NULL, conf INTEGER NOT NULL, chain INTEGER NOT NULL,
             street TEXT, locality TEXT, phone TEXT, website TEXT, hours TEXT, cuisine TEXT,
-            rank INTEGER NOT NULL);
+            rank INTEGER NOT NULL, fame INTEGER NOT NULL);
         CREATE TABLE guide(place INTEGER NOT NULL, article TEXT NOT NULL, section TEXT NOT NULL,
             tier TEXT, listing TEXT NOT NULL);
         CREATE TABLE cities(id INTEGER PRIMARY KEY, name TEXT NOT NULL, country TEXT NOT NULL,
@@ -512,8 +738,9 @@ def write_sqlite(con, out, countries, regions, cities, names):
     for article, section, tier, listing, pid in con.execute("select article, section, tier, listing, pid from guide_match").fetchall():
         guide.setdefault(pid, []).append((article, section, tier, listing))
     cur = con.execute(f"""
-        select pid, lat, lon, name, cat, alt, diet, src, conf, chain, street, locality, phone, website, hours, cuisine
-        from merged
+        select pid, lat, lon, name, cat, alt, diet, src, conf, chain, street, locality, phone, website, hours, cuisine,
+               coalesce(fame.views, 0) as fame
+        from merged left join fame using (pid)
         order by cast(floor((lat + 90.0) * 20.0) as bigint) * {CELL_COLS} + cast(floor((lon + 180.0) * 20.0) as bigint), pid""")
     n = 0
     new_id = 0
@@ -522,7 +749,7 @@ def write_sqlite(con, out, countries, regions, cities, names):
         if not batch:
             break
         prow, grow = [], []
-        for (pid, lat, lon, name, cat, alt, diet, src, conf, chain, street, locality, phone, website, hours, cuisine) in batch:
+        for (pid, lat, lon, name, cat, alt, diet, src, conf, chain, street, locality, phone, website, hours, cuisine, fame) in batch:
             new_id += 1
             gl = guide.get(pid)
             if gl:
@@ -531,8 +758,8 @@ def write_sqlite(con, out, countries, regions, cities, names):
             web = clean_website(website)
             prow.append((new_id, cell_of(lat, lon), round(lat * 1e5), round(lon * 1e5), name.strip(), kind_id[cat],
                          alt or None, diet, src, conf, chain, street, locality, phone, web,
-                         hours, cuisine, static_rank(src, conf, chain, web)))
-        db.executemany("insert into places values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", prow)
+                         hours, cuisine, static_rank(src, conf, chain, web, fame), fame))
+        db.executemany("insert into places values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", prow)
         db.executemany("insert into guide values (?,?,?,?,?)", grow)
         n += len(prow)
         log(f"  wrote {n} places")
@@ -556,7 +783,7 @@ def write_sqlite(con, out, countries, regions, cities, names):
         rn.add((key, cc, ""))
     db.executemany("insert or ignore into region_names values (?,?,?)", [r for r in rn if r[0]])
     meta = {
-        "format": "2",
+        "format": "3",
         "built": time.strftime("%Y-%m-%d"),
         "cell_deg": str(CELL_DEG),
         "sources": "Overture Maps places 2026-09-23.1 (CDLA-Permissive-2.0; Foursquare records Apache-2.0; "

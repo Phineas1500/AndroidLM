@@ -55,6 +55,22 @@ fun cleanCheck(text: String): String {
     return Py.strip(kept.joinToString("\n"))
 }
 
+/**
+ * The source check says the draft got something wrong: it has a "Corrections:" part, and that
+ * part is not "No corrections", "None" or the like. The app then says so above the answer, which
+ * a reader might otherwise take as it stands.
+ */
+fun checkCorrects(check: String): Boolean {
+    val at = check.indexOf("Corrections:", ignoreCase = true)
+    if (at < 0) return false
+    var body = check.substring(at + "Corrections:".length)
+    body.indexOf("Additions:", ignoreCase = true).let { if (it >= 0) body = body.substring(0, it) }
+    body = body.trim().trimStart('*', '-', '\u2022', ' ', '\n').lowercase(java.util.Locale.ROOT)
+    return body.isNotEmpty() && NO_CORRECTIONS.none { body.startsWith(it) } && "no corrections" !in body.take(60)
+}
+
+private val NO_CORRECTIONS = listOf("no correction", "none", "nothing to correct", "no errors", "there are no", "n/a")
+
 private val DELIBERATION_STARTS =
     listOf("But wait", "Wait,", "Wait.", "Wait ", "Hmm", "Let me", "Let's", "Actually,", "On second thought")
 

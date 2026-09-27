@@ -33,6 +33,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.androidlm.research.BackgroundSearch
 import org.androidlm.research.Engine
+import org.androidlm.research.Exchange
 import org.androidlm.research.Generation
 import org.androidlm.research.PlacesAnswer
 import org.androidlm.research.ResearchConfig
@@ -123,6 +124,8 @@ class RunService : Service() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     @Volatile private var researchJob: Job? = null
+    /** A question being answered without the model, before a session is loaded for it (main thread). */
+    private var listOnlyJob: Job? = null
     private val researchRuns = AtomicInteger(0)
 
     // A question supplied with START_SESSION starts its research run at READY (cf. [pending]).
@@ -195,7 +198,8 @@ class RunService : Service() {
             ACTION_GENERATE -> sendGenerate(reqFrom(intent))
             ACTION_RESEARCH -> startResearch(intent.getStringExtra(EXTRA_QUESTION) ?: "")
             // Cancelling the research coroutine reaches the process through the engine adapter.
-            ACTION_CANCEL -> researchJob?.takeIf { it.isActive }?.cancel() ?: send(CANCEL_JSON)
+            ACTION_CANCEL -> listOnlyJob?.takeIf { it.isActive }?.cancel()
+                ?: researchJob?.takeIf { it.isActive }?.cancel() ?: send(CANCEL_JSON)
             ACTION_SHUTDOWN -> shutdownSession()
             else -> startSession(intent)
         }
@@ -219,6 +223,38 @@ class RunService : Service() {
             if (question != null) startResearch(question) else if (req != null) sendGenerate(req)
             return
         }
+        if (question != null) {
+            // A question the places list answers by itself needs no model: it is answered first,
+            // and the model is loaded only when the question turns out to need it.
+            startForeground(NOTIF_ID, buildNotification("Looking up places…"))
+            listOnlyJob?.cancel()
+            val job = scope.launch(start = CoroutineStart.LAZY) {
+                val me = coroutineContext.job
+                var answered = false
+                try {
+                    answered = answerWithoutModel(question)
+                } finally {
+                    val cancelled = me.isCancelled
+                    main.post {
+                        if (listOnlyJob !== me) return@post // a newer question took over
+                        listOnlyJob = null
+                        if (!answered && !cancelled) loadSession(model, argv, sig, req, question)
+                        else if (proc == null) {
+                            stopForegroundCompat()
+                            stopSelf()
+                        }
+                    }
+                }
+            }
+            listOnlyJob = job
+            job.start()
+            return
+        }
+        loadSession(model, argv, sig, req, null)
+    }
+
+    /** Loads [model] in a new engine process (replacing the running one), then runs [question] or [req] on it. */
+    private fun loadSession(model: String, argv: ArrayList<String>, sig: String?, req: Req?, question: String?) {
         researchJob?.cancel() // a run on the session being replaced
         // Different model/settings (or nothing running): tear down and start fresh. A fresh session
         // has an empty KV, so its first turn always clears; and the conversation starts over.
@@ -251,7 +287,8 @@ class RunService : Service() {
             // incoming session reports its own at BMOE_READY.
             it.copy(state = EngineState.LOADING, error = null, sessionSig = sig, answer = "", summary = "",
                 transcript = emptyList(), streaming = streaming, ioMode = null, thinkControl = null,
-                research = question?.let { q -> ResearchUi(q) })
+                research = question?.let { q -> ResearchUi(q) },
+                researchHistory = if (question != null) withFinished(it) else it.researchHistory)
         }
 
         thread(name = "bmoe-session") { runSession(argv, model, myEpoch, dying) }
@@ -802,6 +839,33 @@ class RunService : Service() {
     }
 
     /**
+     * A question the places list answers by itself ([ResearchPipeline.runWithoutModel]), answered
+     * without the model, loaded or not; false when it needs the model (or the lookup failed).
+     */
+    private suspend fun answerWithoutModel(question: String): Boolean {
+        val runId = researchRuns.incrementAndGet()
+        return try {
+            val files = withContext(Dispatchers.IO) { CorpusLocator.find(this@RunService) } ?: return false
+            val open = withContext(corpusDispatcher) { corporaFor(files) }
+            // (the run on screen goes to the history first: a follow-up reads it from there)
+            RunBus.update { it.copy(research = ResearchUi(question, runId = runId), researchHistory = withFinished(it)) }
+            ResearchPipeline(engine, open, corpusDispatcher, researchConfig(), null, AndroidLocator(this@RunService))
+                .runWithoutModel(question, researchListener(runId), previousExchange()) != null
+        } catch (e: CancellationException) {
+            throw e
+        } catch (t: Throwable) {
+            Log.w(LOG_TAG, "run=$runId places without the model failed", t)
+            false
+        }
+    }
+
+    /** The research method's options (preferences of the method, not of the session: read per run, never in the argv). */
+    private fun researchConfig(): ResearchConfig {
+        val prefs = AppSettings.load(this)
+        return ResearchConfig(travelRoute = prefs.researchTravelRoute, checkContinue = prefs.researchCheckContinue, worked = true)
+    }
+
+    /**
      * Run the research pipeline on [question] against the loaded session. The foreground
      * service is already up (the session owns it); the wakelock is taken for the whole run and
      * the idle unload is held off, because the searches between generations are part of it.
@@ -817,6 +881,7 @@ class RunService : Service() {
             // (a places list shown while the model loaded stays until the run replaces it)
             val preview = it.research?.takeIf { r -> r.question == question && r.runId == 0 && r.route?.route == Route.PLACES }
             it.copy(state = EngineState.GENERATING, research = (preview ?: ResearchUi(question)).copy(runId = runId),
+                researchHistory = if (preview == null) withFinished(it) else it.researchHistory,
                 transcript = emptyList(), answer = "", reasoning = "", summary = "", error = null)
         }
         val job = scope.launch(start = CoroutineStart.LAZY) {
@@ -826,11 +891,12 @@ class RunService : Service() {
                 val open = withContext(corpusDispatcher) { corporaFor(files) }
                 val searchOpen = withContext(searchDispatcher) { searchCorporaFor(files) }
                 val background = BackgroundSearch(searchOpen, searchDispatcher, ::setSearchPriority)
-                // (a preference of the method, not of the session: read per run, never in the argv)
-                val prefs = AppSettings.load(this@RunService)
-                val config = ResearchConfig(travelRoute = prefs.researchTravelRoute, checkContinue = prefs.researchCheckContinue)
-                ResearchPipeline(engine, open, corpusDispatcher, config, background, AndroidLocator(this@RunService))
-                    .run(question, researchListener(runId))
+                val pipeline = ResearchPipeline(engine, open, corpusDispatcher, researchConfig(), background,
+                    AndroidLocator(this@RunService))
+                // a places question the list answers by itself does not take the model
+                val listener = researchListener(runId)
+                val previous = previousExchange()
+                pipeline.runWithoutModel(question, listener, previous) ?: pipeline.run(question, listener, previous)
             } catch (e: CancellationException) {
                 publishResearch(runId) { if (it.running) it.copy(phase = ResearchPhase.CANCELLED) else it }
                 throw e
@@ -870,6 +936,25 @@ class RunService : Service() {
         }
     }
 
+    /** The history with the finished run on screen added (it is about to be replaced). */
+    private fun withFinished(ui: UiState): List<ResearchUi> {
+        val r = ui.research ?: return ui.researchHistory
+        if (r.running || r.answer.isEmpty()) return ui.researchHistory
+        return (ui.researchHistory + r).takeLast(HISTORY_MAX)
+    }
+
+    /**
+     * The last answered question, when it was answered within [FOLLOW_UP_MS]: a follow-up to it
+     * ("what about Porto?") is rewritten to stand on its own. "Clear the answer" clears it.
+     */
+    private fun previousExchange(): Exchange? {
+        val ui = RunBus.state.value
+        val last = ui.researchHistory.lastOrNull() ?: return null
+        val at = last.finishedAt ?: return null
+        if (SystemClock.elapsedRealtime() - at > FOLLOW_UP_MS || last.answer.isEmpty()) return null
+        return Exchange(last.askedAs ?: last.translatedAs ?: last.question, last.answer)
+    }
+
     private fun publishResearch(runId: Int, block: (ResearchUi) -> ResearchUi) = RunBus.update {
         val r = it.research
         if (r != null && r.runId == runId) it.copy(research = block(r)) else it
@@ -896,6 +981,8 @@ class RunService : Service() {
             is ResearchEvent.SourcesFound ->
                 log("sources=${e.sources.size} dropped=${e.dropped} [" + e.sources.joinToString(" | ") { "${it.title} — ${it.section}" } + "]")
             is ResearchEvent.PlacesFound -> log("places=${e.total} here=${e.here} where=${e.where}")
+            is ResearchEvent.Translated -> log("translated=${e.question}")
+            is ResearchEvent.Rewritten -> log("rewritten=${e.question}")
             is ResearchEvent.AnswerToken -> if (!sawAnswer) { sawAnswer = true; log("first_answer_token") }
             is ResearchEvent.CheckToken -> if (!sawCheck) { sawCheck = true; log("first_check_token") }
             is ResearchEvent.PhaseCompleted -> e.timing.let { tm ->
@@ -913,14 +1000,17 @@ class RunService : Service() {
         when (e) {
             is ResearchEvent.PhaseChanged -> {
                 publishResearch(runId) {
-                    it.copy(phase = e.phase, check = if (e.phase == ResearchPhase.CHECKING) "" else it.check)
+                    it.copy(phase = e.phase, check = if (e.phase == ResearchPhase.CHECKING) "" else it.check,
+                        finishedAt = if (e.phase == ResearchPhase.DONE) SystemClock.elapsedRealtime() else it.finishedAt)
                 }
                 researchNotice(e.phase)?.let { text -> main.post { notify(text) } }
             }
             is ResearchEvent.Planned -> publishResearch(runId) { it.copy(titles = e.titles) }
             is ResearchEvent.Routed -> publishResearch(runId) { it.copy(route = e.decision, routeThreshold = e.threshold) }
             is ResearchEvent.SourcesFound -> publishResearch(runId) { it.copy(sources = e.sources, sourcesDropped = e.dropped) }
-            is ResearchEvent.PlacesFound -> publishResearch(runId) { it.copy(placesWhere = e.where) }
+            is ResearchEvent.PlacesFound -> publishResearch(runId) { it.copy(placesWhere = e.where, placesListOnly = e.listOnly) }
+            is ResearchEvent.Translated -> publishResearch(runId) { it.copy(translatedAs = e.question) }
+            is ResearchEvent.Rewritten -> publishResearch(runId) { it.copy(askedAs = e.question) }
             is ResearchEvent.AnswerToken -> if (textFrameDue()) telemetry.current.text.let { text -> publishResearch(runId) { it.copy(answer = text) } }
             is ResearchEvent.AnswerCompleted -> publishResearch(runId) { it.copy(answer = e.text) }
             is ResearchEvent.CheckToken -> if (textFrameDue()) telemetry.current.text.let { text -> publishResearch(runId) { it.copy(check = text) } }
@@ -933,6 +1023,8 @@ class RunService : Service() {
     }
 
     private fun researchNotice(phase: ResearchPhase): String? = when (phase) {
+        ResearchPhase.TRANSLATING -> "Research: translating the question…"
+        ResearchPhase.REWRITING -> "Research: reading the follow-up…"
         ResearchPhase.PLANNING -> "Research: planning lookups…"
         ResearchPhase.SEARCHING -> "Research: searching the corpus…"
         ResearchPhase.DRAFTING -> "Research: drafting an answer…"
@@ -1112,7 +1204,12 @@ class RunService : Service() {
 
         // Free the model after this long with no generation, so an idle session does not hold
         // ~model-sized RAM and a foreground service indefinitely. The next prompt reloads.
-        private const val IDLE_UNLOAD_MS = 10 * 60 * 1000L
+        // Research questions come in bursts with reading in between; reloading the model costs
+        // about 30 s, so it stays loaded for half an hour after the last one.
+        private const val IDLE_UNLOAD_MS = 30 * 60 * 1000L
+        /** A question within this long of the last answer may be a follow-up to it. */
+        private const val FOLLOW_UP_MS = 30 * 60 * 1000L
+        private const val HISTORY_MAX = 20
 
         // How long a session gets to honour `close` and tear down cleanly before it is killed.
         private const val FORCE_KILL_MS = 1500L

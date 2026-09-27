@@ -164,6 +164,8 @@ class ResearchPipelineTest {
                     is ResearchEvent.Routed -> "routed:" + e.decision.route
                     is ResearchEvent.SourcesFound -> "sources"
                     is ResearchEvent.PlacesFound -> "places"
+                    is ResearchEvent.Rewritten -> "rewritten"
+                    is ResearchEvent.Translated -> "translated"
                     is ResearchEvent.AnswerToken -> "answer-tokens"
                     is ResearchEvent.AnswerCompleted -> "answer"
                     is ResearchEvent.CheckToken -> "check-tokens"
@@ -990,13 +992,48 @@ class ResearchPipelineTest {
         }
     }
 
-    private fun runWith(engine: Engine, corpora: CorpusProvider, question: String, rec: Recorder, locator: Locator?): ResearchResult =
-        runBlocking { withTimeout(60_000) { ResearchPipeline(engine, corpora, corpusThread, ResearchConfig(), null, locator).run(question, rec) } }
+    private fun runWith(
+        engine: Engine, corpora: CorpusProvider, question: String, rec: Recorder, locator: Locator?, previous: Exchange? = null,
+    ): ResearchResult = runBlocking {
+        withTimeout(60_000) { ResearchPipeline(engine, corpora, corpusThread, ResearchConfig(), null, locator).run(question, rec, previous) }
+    }
 
     @Test
-    fun aPlacesQuestionIsAnsweredFromThePlacesDatabase() {
+    fun aPlacesQuestionIsAnsweredByTheListWithoutTheModel() {
         val question = "Tell me the best vegan restaurants in Buenos Aires"
-        val answer = "- Lotos [1]: a long-running vegan restaurant on Avenida Córdoba."
+        val engine = FakeEngine(emptyList())
+        val rec = Recorder()
+
+        val result = runWith(engine, placesProvider(), question, rec, null)
+
+        // no generation at all: the list is the answer
+        assertEquals(0, engine.calls.size)
+        assertEquals(Route.PLACES, result.route.route)
+        assertEquals(12, result.sources.size)
+        assertEquals("Lotos", result.sources[0].title)
+        assertEquals("places", result.sources[0].via)
+        assertTrue(result.sources[0].section.startsWith("vegan restaurant · Av. Córdoba 1583 · 1.9 km from the centre"))
+        assertNotNull(result.sources[0].lat)
+        assertEquals(184 - 12, result.sourcesDropped)
+        assertTrue(result.answer.startsWith("184 vegan places to eat within 16 km of Buenos Aires, Argentina, best matches first:\n\n" +
+            "[1] Lotos: vegan restaurant; Av. Córdoba 1583, Buenos Aires; 1.9 km from the centre."))
+        assertEquals(PlacesText.MODEL_PLACES, result.answer.lines().count { Regex("^\\[\\d+] ").containsMatchIn(it) })
+        assertEquals(result.answer, result.text)
+        assertNull(result.check)
+        assertEquals(
+            listOf("routed:PLACES", "phase:SEARCHING", "places", "sources", "completed:SEARCHING", "answer", "result", "phase:DONE"),
+            rec.shape(),
+        )
+        val found = rec.all<ResearchEvent.PlacesFound>().single()
+        assertEquals("184 vegan places to eat within 16 km of Buenos Aires, Argentina", found.where)
+        assertTrue(found.listOnly)
+        assertCorpusThreadOnly()
+    }
+
+    @Test
+    fun aPlacesQuestionThatAsksForMoreIsAnsweredByTheModelFromTheList() {
+        val question = "Best vegan restaurants in Buenos Aires, and how much should I tip?"
+        val answer = "Tipping 10% is usual. - Lotos [1]: a long-running vegan restaurant."
         val engine = FakeEngine(listOf(answer))
         val rec = Recorder()
 
@@ -1005,21 +1042,13 @@ class ResearchPipelineTest {
         // one generation, over the list; no plan, no Wikipedia search
         assertEquals(1, engine.calls.size)
         val prompt = engine.calls[0].prompt
-        assertTrue(prompt.startsWith(PlacesText.PLACES_SYSTEM + "\n\nPlaces (185 vegan places to eat within 16 km of Buenos Aires, Argentina):\n\n[1] Lotos: "))
+        assertTrue(prompt.startsWith(PlacesText.PLACES_SYSTEM + "\n\nPlaces (184 vegan places to eat within 16 km of Buenos Aires, Argentina):\n\n[1] Lotos: "))
         assertTrue(prompt.endsWith("\n\nQuestion: " + question))
         assertEquals(PlacesText.MODEL_PLACES, prompt.lines().count { Regex("^\\[\\d+] ").containsMatchIn(it) })
         assertEquals(360, engine.calls[0].nPredict)
-
         assertEquals(Route.PLACES, result.route.route)
-        assertEquals(12, result.sources.size)
-        assertEquals("Lotos", result.sources[0].title)
-        assertEquals("places", result.sources[0].via)
-        assertTrue(result.sources[0].section.startsWith("vegan restaurant · Av. Córdoba 1583 · 1.9 km from the centre"))
-        assertNotNull(result.sources[0].lat)
-        assertEquals(185 - 12, result.sourcesDropped)
         assertEquals(answer, result.answer)
-        assertEquals(answer, result.text)
-        assertNull(result.check)
+        assertFalse(rec.all<ResearchEvent.PlacesFound>().single().listOnly)
         assertEquals(
             listOf(
                 "routed:PLACES", "phase:SEARCHING", "places", "sources", "completed:SEARCHING",
@@ -1027,8 +1056,30 @@ class ResearchPipelineTest {
             ),
             rec.shape(),
         )
-        assertEquals("185 vegan places to eat within 16 km of Buenos Aires, Argentina", rec.all<ResearchEvent.PlacesFound>().single().where)
-        assertCorpusThreadOnly()
+    }
+
+    @Test
+    fun onlyAQuestionTheListAnswersRunsWithoutTheModel() {
+        fun without(question: String, previous: Exchange? = null): Pair<ResearchResult?, Recorder> = runBlocking {
+            val rec = Recorder()
+            val pipeline = ResearchPipeline(FakeEngine(emptyList()), placesProvider(), corpusThread, ResearchConfig(), null, null)
+            withTimeout(60_000) { pipeline.runWithoutModel(question, rec, previous) } to rec
+        }
+        val (plain, rec) = without("Tell me the best vegan restaurants in Buenos Aires")
+        assertEquals(Route.PLACES, plain!!.route.route)
+        assertEquals("phase:DONE", rec.shape().last())
+        val previous = Exchange("Tell me the best vegan restaurants in Buenos Aires", "[1] Lotos")
+        for ((q, prev) in listOf(
+            "Best vegan restaurants in Buenos Aires, and how much should I tip?" to null,
+            "布宜诺斯艾利斯最好的素食餐厅有哪些？" to null,
+            "what about London?" to previous,
+            "What is the capital of Argentina?" to null,
+            "best vegan restaurants in Qwertyland" to null,
+        )) {
+            val (r, events) = without(q, prev)
+            assertNull(q, r)
+            assertTrue(q, events.events.isEmpty())
+        }
     }
 
     @Test
@@ -1066,13 +1117,14 @@ class ResearchPipelineTest {
 
     @Test
     fun nearMeUsesThePhonesPosition() {
-        val engine = FakeEngine(listOf("- Lotos [1]"))
+        val engine = FakeEngine(emptyList())
         val rec = Recorder()
 
-        val result = runWith(engine, placesProvider(), "Best vegan restaurants near me", rec) { -34.6 to -58.4 }
+        val result = runWith(engine, placesProvider(), "Best vegan restaurants near me", rec, Locator { -34.6 to -58.4 })
 
         assertEquals(Route.PLACES, result.route.route)
-        assertTrue(engine.calls[0].prompt.contains("Places (35 vegan places to eat within 2 km of your position):"))
+        assertEquals(0, engine.calls.size)
+        assertTrue(result.answer.startsWith("35 vegan places to eat within 2 km of your position, best matches first:"))
         assertTrue(result.sources[0].section.contains("km from you"))
         assertEquals(listOf("routed:PLACES", "phase:SEARCHING", "places", "sources"), rec.shape().take(4))
     }
@@ -1082,7 +1134,7 @@ class ResearchPipelineTest {
         val engine = FakeEngine(emptyList())
         val rec = Recorder()
 
-        val result = runWith(engine, placesProvider(), "Best vegan restaurants near me", rec) { null }
+        val result = runWith(engine, placesProvider(), "Best vegan restaurants near me", rec, Locator { null })
 
         assertEquals(0, engine.calls.size)
         assertEquals(Route.PLACES, result.route.route)
@@ -1103,6 +1155,139 @@ class ResearchPipelineTest {
 
         assertEquals(Prompts.PLAN_SYSTEM + "\n\n" + question, engine.calls[0].prompt)
         assertTrue(result.route.route != Route.PLACES)
+    }
+
+    // ── follow-ups ──
+
+    @Test
+    fun aFollowUpIsRewrittenFromThePreviousExchange() {
+        val previous = Exchange("Tell me the best vegan restaurants in Buenos Aires", "[1] Lotos: a vegan restaurant on Av. Córdoba.")
+        val rewritten = "What are the best vegan restaurants in London?"
+        val engine = FakeEngine(listOf("\"$rewritten\"\n"))
+        val rec = Recorder()
+
+        val result = runWith(engine, placesProvider(), "what about London?", rec, null, previous)
+
+        assertEquals(
+            Prompts.FOLLOWUP_SYSTEM + "\n\n" + Prompts.followupUser(previous.question, previous.answer, "what about London?"),
+            engine.calls[0].prompt,
+        )
+        assertEquals(FollowUp.MAX_TOKENS, engine.calls[0].nPredict)
+        assertEquals(rewritten, rec.all<ResearchEvent.Rewritten>().single().question)
+        assertEquals(rewritten, result.question)
+        assertEquals(Route.PLACES, result.route.route)
+        assertEquals(1, engine.calls.size) // the rewritten question is answered by the list
+        assertTrue(result.answer.contains(" vegan places to eat within 18 km of London, United Kingdom, best matches first:"))
+        assertEquals(listOf("phase:REWRITING", "completed:REWRITING", "rewritten", "routed:PLACES"), rec.shape().take(4))
+    }
+
+    @Test
+    fun aQuestionThatStandsAloneIsNotRewritten() {
+        val previous = Exchange("Tell me the best vegan restaurants in Buenos Aires", "[1] Lotos")
+        val question = "Is it safe to drink the tap water in Mexico City?"
+        val engine = FakeEngine(listOf("Mexico City\n", "Bottled water is safer.", "No corrections."))
+
+        val result = runWith(engine, placesProvider(), question, Recorder(), null, previous)
+
+        assertEquals(Prompts.PLAN_SYSTEM + "\n\n" + question, engine.calls[0].prompt)
+        assertEquals(question, result.question)
+    }
+
+    // ── questions in other languages ──
+
+    @Test
+    fun aQuestionInAnotherLanguageIsSearchedInEnglishAndAnsweredInItsOwn() {
+        val question = "布宜诺斯艾利斯最好的素食餐厅有哪些？"
+        val english = "What are the best vegan restaurants in Buenos Aires?"
+        val engine = FakeEngine(listOf("$english\n", "- Lotos [1]"))
+        val rec = Recorder()
+
+        val result = runWith(engine, placesProvider(), question, rec, null)
+
+        assertEquals(Prompts.TRANSLATE_SYSTEM + "\n\n" + question, engine.calls[0].prompt)
+        assertEquals(Translation.MAX_TOKENS, engine.calls[0].nPredict)
+        assertEquals(english, rec.all<ResearchEvent.Translated>().single().question)
+        assertEquals(english, result.question)
+        assertEquals(Route.PLACES, result.route.route)
+        assertTrue(engine.calls[1].prompt.contains("vegan places to eat within 16 km of Buenos Aires, Argentina"))
+        assertTrue(engine.calls[1].prompt.contains(Prompts.replyIn(english, question)))
+        assertEquals(listOf("phase:TRANSLATING", "completed:TRANSLATING", "translated", "routed:PLACES"), rec.shape().take(4))
+    }
+
+    @Test
+    fun aTranslatedQuestionIsPlannedInEnglish() {
+        val question = "日本的首都是哪里？"
+        val english = "What is the capital of Japan?"
+        val engine = FakeEngine(listOf(english, "Tokyo\n", "东京。", "No corrections."))
+
+        val result = runWith(engine, sampleProvider(), question, Recorder(), null)
+
+        assertEquals(Prompts.PLAN_SYSTEM + "\n\n" + english, engine.calls[1].prompt)
+        assertTrue(engine.calls.drop(2).all { it.prompt.contains(Prompts.replyIn(english, question)) || it.prompt.startsWith(Prompts.CHECK_FOLLOWUP) })
+        assertEquals(english, result.question)
+    }
+
+    @Test
+    fun translationDetection() {
+        for (q in listOf("布宜诺斯艾利斯最好的素食餐厅有哪些？", "Tokyo最好的拉面店在哪里", "東京のおすすめのヴィーガンレストランは？",
+            "서울 근처 채식 식당", "Какие лучшие вегетарианские рестораны в Лиссабоне?",
+            "¿Cuáles son los mejores restaurantes veganos en Lisboa?", "Quais são os melhores restaurantes veganos em Lisboa?",
+            "Quels sont les meilleurs restaurants végans à Lisbonne ?", "Was sind die besten veganen Restaurants in Lissabon?",
+        )) assertTrue(q, Translation.needed(q))
+        for (q in listOf("Tell me the best vegan restaurants in Lisbon", "What are the best restaurants in Rio de Janeiro?",
+            "Cheap hotels in Las Vegas", "Who is the son of El Cid?", "Where is the Museo del Prado?", "Kyoto temples",
+            "Is Buenos Aires or Rio de Janeiro better for food?", "What does 'que sera sera' mean?",
+        )) assertFalse(q, Translation.needed(q))
+        assertTrue(Translation.mentionsHere("我附近有什么好的素食餐厅？"))
+        assertFalse(Translation.mentionsHere("北京最好的烤鸭店"))
+    }
+
+    @Test
+    fun correctionsAreDetected() {
+        // source checks from eval/answers_vm_redteam.jsonl
+        for (c in listOf(
+            "Corrections:\n*   The Moon would be approximately 7.3 meters away, not 10 meters [3].\n\nAdditions:\n*   The Moon orbits at 384,399 km [3].",
+            "Corrections: Japan\u2019s population is over 123 million as of 2025, not approximately 125 million [1].",
+            "Corrections: The distance is approximately 280 km, not 310 km [3]. Additions: Train travel takes 2 hr 46 min [2].",
+        )) assertTrue(c, checkCorrects(c))
+        for (c in listOf(
+            "Corrections: No corrections. The sources confirm the war's duration (1914\u20131918) [1].",
+            "Corrections: None.\n\nAdditions: Georgia hosts the world's earliest known sites of winemaking [1].",
+            "No corrections. The calculation of speed as distance divided by time aligns with [1] and [2].",
+            "Corrections:\n\nAdditions: The euro is the second-most traded currency [1].",
+            "Corrections: There are no corrections to make. Additions: none.",
+        )) assertFalse(c, checkCorrects(c))
+    }
+
+    @Test
+    fun workedDetection() {
+        // the questions rag.py's needs_working picks from eval/questions_redteam.jsonl, and some it leaves
+        for (q in listOf(
+            "If I drive from Lisbon to Porto at an average of 100 km/h and leave at 9am, when do I arrive?",
+            "How many times larger is Jupiter's volume than Earth's?",
+            "Which is older, the Great Wall of China or the Colosseum, and by roughly how many years?",
+            "A train covers 300 km in 2.5 hours. At the same speed, how long does 720 km take?",
+            "If the Earth were the size of a basketball, how far away would the Moon be?",
+            "Who was US president when the Berlin Wall fell, and how old was he at the time?",
+            "How much is \$10,000 after 20 years at 5% annual interest compounded yearly?",
+        )) assertTrue(q, Worked.needs(q))
+        for (q in listOf("How many people live in Tokyo?", "How long is the Danube?", "What is the population of Nigeria?",
+            "Which is more densely populated, Japan or the Netherlands?", "Tell me the best vegan restaurants in Lisbon",
+        )) assertFalse(q, Worked.needs(q))
+    }
+
+    @Test
+    fun followUpDetection() {
+        for (q in listOf("what about London?", "And in Porto?", "in Porto?", "How old was he?", "which of those is open late?",
+            "Tell me more about the second one", "why?", "is it expensive?", "when did he win the Nobel prize?",
+            "What did she say about Paris?")) assertTrue(q, FollowUp.looksLike(q))
+        for (q in listOf("Is it safe to drink the tap water in Mexico City?", "Why is the sky blue and the sea salty in summer?",
+            "Tell me the best vegan restaurants in Lisbon", "Who was US president when the Berlin Wall fell?",
+            "In which country is Timbuktu, and what is it known for today?", "How old was Obama when he became president?",
+            "Who wrote One Hundred Years of Solitude?", "Why did Caesar cross the Rubicon and what did he gain?",
+        )) assertFalse(q, FollowUp.looksLike(q))
+        assertEquals("What are the best vegan restaurants in London?", FollowUp.parse("\n\"What are the best vegan restaurants in London?\"\nextra"))
+        assertNull(FollowUp.parse("  \n "))
     }
 
     companion object {

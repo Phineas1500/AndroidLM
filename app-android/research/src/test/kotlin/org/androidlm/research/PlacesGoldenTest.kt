@@ -52,6 +52,8 @@ class PlacesGoldenTest {
             assertEquals(q, str(want, "price"), ask.price)
             assertEquals(q, want.get("here").asBoolean, ask.here)
             assertEquals(q, want.get("restaurant").asBoolean, ask.restaurant)
+            assertEquals(q, want.get("asks_hours").asBoolean, PlacesText.asksHours(ask))
+            assertEquals(q, want.get("needs_words").asBoolean, PlacesText.needsWords(ask))
             val lk = places.lookup(ask, here)
             if (!c.has("lookup")) {
                 assertNull(q, lk)
@@ -77,6 +79,8 @@ class PlacesGoldenTest {
                 assertEquals(at, w.get("km").asDouble, p.km, 1e-9)
                 assertEquals(at, w.getAsJsonArray("why").map { it.asString }, p.why)
                 assertEquals(at, w.get("line").asString, PlacesText.describe(p, i + 1, null, lk.origin))
+                assertEquals(at, w.get("model_line").asString,
+                    PlacesText.describe(p, i + 1, null, lk.origin, brief = true, hours = PlacesText.asksHours(ask)))
             }
         }
     }
