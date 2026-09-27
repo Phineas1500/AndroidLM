@@ -536,7 +536,7 @@ def main():
         big = {norm_key(c[1]) for c in cities if c[8] >= 15000} | {c[1].lower() for c in cities if c[8] >= 15000}
         match_fame(con, a.wiki, sorted(big))
     else:
-        con.execute("create or replace table fame(pid bigint, views bigint)")
+        con.execute("create or replace table fame(pid bigint, views bigint, title varchar)")
 
     write_sqlite(con, a.out, countries, regions, cities, names)
 
@@ -568,12 +568,33 @@ PLACE_TYPES = re.compile(
     r"memorial|mausoleum|building|skyscraper|zoo|aquarium|theatre|theater|opera house|concert hall|stadium|arena|"
     r"square|plaza|bridge|tower|library|station|airport|shop|store|department store|mall|shopping (centre|center)|"
     r"nightclub|club|venue|landmark|ship|fort|fortress|citadel|ruins|archaeological site|beach|resort|spa|inn|"
-    r"cemetery|observatory|planetarium|amusement park|theme park)\b", re.I)
+    r"cemetery|observatory|planetarium|amusement park|theme park|coffee ?house|memorial|site|amphitheat(re|er)|"
+    r"gate|arch|statue|sculpture|lighthouse|pier|fountain|waterfall|lake|canyon|cave|volcano|glacier|island)s?\b", re.I)
+# what a subject is when it is not a place, though its description may name one ("a 2014 comedy
+# film" about a hotel, "a professional football club", "a rock band")
+NOT_PLACE = re.compile(
+    r"\b(film|movie|band|duo|trio|series|sitcom|television|novel|book|album|song|video game|company|corporation|"
+    r"brand|chain|franchise|league|competition|tournament|championship|musician|singer|actor|actress|rapper|"
+    r"footballer|politician|character|magazine|newspaper|website|list of|club competition|dealer|historian|writer|"
+    r"author|broadcaster|artist|chef|businessman|businesswoman|entrepreneur|architect|"
+    r"(football|soccer|basketball|rugby|cricket|hockey|baseball|sports|athletic|multi-sport) (club|team|franchise))s?\b",
+    re.I)
+# a description that ends in a kind of town or region is about one ("a cathedral city", "a desert
+# resort city"), not about a place to go to
+ADMIN_END = re.compile(r"\b(city|town|village|state|province|county|municipality|borough|suburb|neighbou?rhood|"
+                       r"region|country|nation|capital)s?\W*$", re.I)
+# the words after the first "is"/"are" of the first sentence, up to where the description of what
+# the subject is ends ("a sushi restaurant| in Ginza", "one of the oldest coffeehouses| in Paris";
+# not at a comma: "a 102-story, Art Deco-style supertall skyscraper| in")
+PREDICATE = re.compile(r"\b(is|are)\s+(.*)", re.I | re.S)
+HEAD_END = re.compile(r"\s(?:in|on|at|from|located|based|near|that|which|who|whose|where|by|built|founded|opened|designed|"
+                      r"owned|operated|formed|created|written|directed|released|established|spanning|covering|serving|"
+                      r"bordering|comprising|consisting)\s|[;:]")
 
 
 FOOD_TYPES = re.compile(r"\b(restaurant|pizzeria|trattoria|bar|pub|caf[e\u00e9]|coffeehouse|tea ?house|bakery|patisserie|"
-                        r"brewery|winery|distillery|food hall|nightclub)\b", re.I)
-LODGING_TYPES = re.compile(r"\b(hotel|hostel|inn|resort|guest ?house|motel)\b", re.I)
+                        r"brewery|winery|distillery|food hall|nightclub|coffee ?house)s?\b", re.I)
+LODGING_TYPES = re.compile(r"\b(hotel|hostel|inn|resort|guest ?house|motel)s?\b", re.I)
 
 
 def lead_kinds(text):
@@ -584,11 +605,32 @@ def lead_kinds(text):
     "# Title" line; the lead follows that."""
     m = re.search(r"^# [^\n]*\n+", text, re.M)
     lead = text[m.end():] if m else text
+    lead = lead[:1500]
+    lines = lead.split("\n")
+    while lines and "\u00b0" in lines[0] and len(lines[0]) < 80:  # a line of coordinates
+        lines.pop(0)
+    lead = "\n".join(lines)
+    for _ in range(2):  # names in other scripts and pronunciations, which can hold an "is"
+        lead = re.sub(r"\s*\([^()]*\)", "", lead)
     first = re.split(r"(?<=[a-z0-9)\]])\.(\s|$)", lead[:600], maxsplit=1)[0]
     if re.search(r"\b(chain|brand|franchise|company)\b", first):
         return set()
+    p = PREDICATE.search(first)
+    if not p:
+        return set()
+    # an article about a kind of thing, not one place: "A World Heritage Site is a landmark ...",
+    # "World Heritage Sites are landmarks ..." (but "The Petronas Towers are twin skyscrapers")
+    title = m.group(0)[2:].strip() if m else ""
+    subject = first[:p.start()].strip()
+    if re.match(r"(a|an)\s", subject, re.I) and not re.match(r"(a|an)\s", title, re.I):
+        return set()
+    if p.group(1).lower() == "are" and not re.match(r"the\s", subject, re.I):
+        return set()
+    head = HEAD_END.split(p.group(2), maxsplit=1)[0]
+    if NOT_PLACE.search(head) or any(ADMIN_END.search(part) for part in re.split(r",|\sand\s", head)):
+        return set()
     kinds = set()
-    for m in PLACE_TYPES.finditer(first):
+    for m in PLACE_TYPES.finditer(head):
         w = m.group(0)
         kinds.add("food" if FOOD_TYPES.fullmatch(w) else "lodging" if LODGING_TYPES.fullmatch(w) else "other")
     return kinds
@@ -626,7 +668,7 @@ def match_fame(con, wiki_path, big_city_names):
         select lower(t) as t, aid, lower(target) as target,
                len(regexp_extract_all(target, '(^|\\s)\\p{Lu}')) as caps
         from t""")
-    con.execute("create or replace table wa as select id as aid, views, block_id, off, len from w.articles")
+    con.execute("create or replace table wa as select id as aid, title, views, block_id, off, len from w.articles")
     con.execute("detach w")
     con.execute("create or replace temp table big_city(n varchar)")
     con.executemany("insert into big_city values (?)", [(n,) for n in big_city_names])
@@ -678,7 +720,7 @@ def match_fame(con, wiki_path, big_city_names):
     # Palace", a restaurant, and Amber Fort), a hotel's about lodging, the rest about neither
     con.execute("""
         create or replace table fame as
-        select c.pid, max(a.views) as views
+        select c.pid, max(a.views) as views, arg_max(a.title, a.views) as title
         from fame_cand c join merged m using (pid) join fame_good g using (aid) join wa a using (aid)
         where g.kind = case m.top when 'food_and_drink' then 'food' when 'lodging' then 'lodging' else 'other' end
           -- where the article puts it: not a record of "Chateau de Versailles" in central Paris, nor a
@@ -712,7 +754,7 @@ def write_sqlite(con, out, countries, regions, cities, names):
             lon5 INTEGER NOT NULL, name TEXT NOT NULL, kind INTEGER NOT NULL, alt TEXT,
             diet INTEGER NOT NULL, src INTEGER NOT NULL, conf INTEGER NOT NULL, chain INTEGER NOT NULL,
             street TEXT, locality TEXT, phone TEXT, website TEXT, hours TEXT, cuisine TEXT,
-            rank INTEGER NOT NULL, fame INTEGER NOT NULL);
+            rank INTEGER NOT NULL, fame INTEGER NOT NULL, wiki TEXT);
         CREATE TABLE guide(place INTEGER NOT NULL, article TEXT NOT NULL, section TEXT NOT NULL,
             tier TEXT, listing TEXT NOT NULL);
         CREATE TABLE cities(id INTEGER PRIMARY KEY, name TEXT NOT NULL, country TEXT NOT NULL,
@@ -739,7 +781,7 @@ def write_sqlite(con, out, countries, regions, cities, names):
         guide.setdefault(pid, []).append((article, section, tier, listing))
     cur = con.execute(f"""
         select pid, lat, lon, name, cat, alt, diet, src, conf, chain, street, locality, phone, website, hours, cuisine,
-               coalesce(fame.views, 0) as fame
+               coalesce(fame.views, 0) as fame, fame.title as wiki
         from merged left join fame using (pid)
         order by cast(floor((lat + 90.0) * 20.0) as bigint) * {CELL_COLS} + cast(floor((lon + 180.0) * 20.0) as bigint), pid""")
     n = 0
@@ -749,7 +791,7 @@ def write_sqlite(con, out, countries, regions, cities, names):
         if not batch:
             break
         prow, grow = [], []
-        for (pid, lat, lon, name, cat, alt, diet, src, conf, chain, street, locality, phone, website, hours, cuisine, fame) in batch:
+        for (pid, lat, lon, name, cat, alt, diet, src, conf, chain, street, locality, phone, website, hours, cuisine, fame, wiki) in batch:
             new_id += 1
             gl = guide.get(pid)
             if gl:
@@ -758,8 +800,8 @@ def write_sqlite(con, out, countries, regions, cities, names):
             web = clean_website(website)
             prow.append((new_id, cell_of(lat, lon), round(lat * 1e5), round(lon * 1e5), name.strip(), kind_id[cat],
                          alt or None, diet, src, conf, chain, street, locality, phone, web,
-                         hours, cuisine, static_rank(src, conf, chain, web, fame), fame))
-        db.executemany("insert into places values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", prow)
+                         hours, cuisine, static_rank(src, conf, chain, web, fame), fame, wiki))
+        db.executemany("insert into places values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", prow)
         db.executemany("insert into guide values (?,?,?,?,?)", grow)
         n += len(prow)
         log(f"  wrote {n} places")
@@ -783,12 +825,13 @@ def write_sqlite(con, out, countries, regions, cities, names):
         rn.add((key, cc, ""))
     db.executemany("insert or ignore into region_names values (?,?,?)", [r for r in rn if r[0]])
     meta = {
-        "format": "3",
+        "format": "4",
         "built": time.strftime("%Y-%m-%d"),
         "cell_deg": str(CELL_DEG),
         "sources": "Overture Maps places 2026-09-23.1 (CDLA-Permissive-2.0; Foursquare records Apache-2.0; "
                    "AllThePlaces CC0-1.0); OpenStreetMap diet-tagged places (ODbL 1.0); GeoNames cities1000 "
-                   "(CC BY 4.0); Wikivoyage listing names (voyage.db)",
+                   "(CC BY 4.0); Wikivoyage listing names (voyage.db); English Wikipedia article titles and "
+                   "Wikimedia pageviews (wiki.db)",
         "license": "ODbL-1.0",
         "attribution": "(c) OpenStreetMap contributors; Overture Maps Foundation; GeoNames; Wikivoyage",
     }

@@ -999,41 +999,9 @@ class ResearchPipelineTest {
     }
 
     @Test
-    fun aPlacesQuestionIsAnsweredByTheListWithoutTheModel() {
+    fun aPlacesQuestionIsAnsweredFromThePlacesDatabase() {
         val question = "Tell me the best vegan restaurants in Buenos Aires"
-        val engine = FakeEngine(emptyList())
-        val rec = Recorder()
-
-        val result = runWith(engine, placesProvider(), question, rec, null)
-
-        // no generation at all: the list is the answer
-        assertEquals(0, engine.calls.size)
-        assertEquals(Route.PLACES, result.route.route)
-        assertEquals(12, result.sources.size)
-        assertEquals("Lotos", result.sources[0].title)
-        assertEquals("places", result.sources[0].via)
-        assertTrue(result.sources[0].section.startsWith("vegan restaurant · Av. Córdoba 1583 · 1.9 km from the centre"))
-        assertNotNull(result.sources[0].lat)
-        assertEquals(184 - 12, result.sourcesDropped)
-        assertTrue(result.answer.startsWith("184 vegan places to eat within 16 km of Buenos Aires, Argentina, best matches first:\n\n" +
-            "[1] Lotos: vegan restaurant; Av. Córdoba 1583, Buenos Aires; 1.9 km from the centre."))
-        assertEquals(PlacesText.MODEL_PLACES, result.answer.lines().count { Regex("^\\[\\d+] ").containsMatchIn(it) })
-        assertEquals(result.answer, result.text)
-        assertNull(result.check)
-        assertEquals(
-            listOf("routed:PLACES", "phase:SEARCHING", "places", "sources", "completed:SEARCHING", "answer", "result", "phase:DONE"),
-            rec.shape(),
-        )
-        val found = rec.all<ResearchEvent.PlacesFound>().single()
-        assertEquals("184 vegan places to eat within 16 km of Buenos Aires, Argentina", found.where)
-        assertTrue(found.listOnly)
-        assertCorpusThreadOnly()
-    }
-
-    @Test
-    fun aPlacesQuestionThatAsksForMoreIsAnsweredByTheModelFromTheList() {
-        val question = "Best vegan restaurants in Buenos Aires, and how much should I tip?"
-        val answer = "Tipping 10% is usual. - Lotos [1]: a long-running vegan restaurant."
+        val answer = "- Lotos [1]: a vegan restaurant."
         val engine = FakeEngine(listOf(answer))
         val rec = Recorder()
 
@@ -1046,9 +1014,17 @@ class ResearchPipelineTest {
         assertTrue(prompt.endsWith("\n\nQuestion: " + question))
         assertEquals(PlacesText.MODEL_PLACES, prompt.lines().count { Regex("^\\[\\d+] ").containsMatchIn(it) })
         assertEquals(360, engine.calls[0].nPredict)
+
         assertEquals(Route.PLACES, result.route.route)
+        assertEquals(12, result.sources.size)
+        assertEquals("Lotos", result.sources[0].title)
+        assertEquals("places", result.sources[0].via)
+        assertTrue(result.sources[0].section.startsWith("vegan restaurant · Av. Córdoba 1583 · 1.9 km from the centre"))
+        assertNotNull(result.sources[0].lat)
+        assertEquals(184 - 12, result.sourcesDropped)
         assertEquals(answer, result.answer)
-        assertFalse(rec.all<ResearchEvent.PlacesFound>().single().listOnly)
+        assertEquals(answer, result.text)
+        assertNull(result.check)
         assertEquals(
             listOf(
                 "routed:PLACES", "phase:SEARCHING", "places", "sources", "completed:SEARCHING",
@@ -1056,30 +1032,8 @@ class ResearchPipelineTest {
             ),
             rec.shape(),
         )
-    }
-
-    @Test
-    fun onlyAQuestionTheListAnswersRunsWithoutTheModel() {
-        fun without(question: String, previous: Exchange? = null): Pair<ResearchResult?, Recorder> = runBlocking {
-            val rec = Recorder()
-            val pipeline = ResearchPipeline(FakeEngine(emptyList()), placesProvider(), corpusThread, ResearchConfig(), null, null)
-            withTimeout(60_000) { pipeline.runWithoutModel(question, rec, previous) } to rec
-        }
-        val (plain, rec) = without("Tell me the best vegan restaurants in Buenos Aires")
-        assertEquals(Route.PLACES, plain!!.route.route)
-        assertEquals("phase:DONE", rec.shape().last())
-        val previous = Exchange("Tell me the best vegan restaurants in Buenos Aires", "[1] Lotos")
-        for ((q, prev) in listOf(
-            "Best vegan restaurants in Buenos Aires, and how much should I tip?" to null,
-            "布宜诺斯艾利斯最好的素食餐厅有哪些？" to null,
-            "what about London?" to previous,
-            "What is the capital of Argentina?" to null,
-            "best vegan restaurants in Qwertyland" to null,
-        )) {
-            val (r, events) = without(q, prev)
-            assertNull(q, r)
-            assertTrue(q, events.events.isEmpty())
-        }
+        assertEquals("184 vegan places to eat within 16 km of Buenos Aires, Argentina", rec.all<ResearchEvent.PlacesFound>().single().where)
+        assertCorpusThreadOnly()
     }
 
     @Test
@@ -1117,14 +1071,13 @@ class ResearchPipelineTest {
 
     @Test
     fun nearMeUsesThePhonesPosition() {
-        val engine = FakeEngine(emptyList())
+        val engine = FakeEngine(listOf("- Lotos [1]"))
         val rec = Recorder()
 
         val result = runWith(engine, placesProvider(), "Best vegan restaurants near me", rec, Locator { -34.6 to -58.4 })
 
         assertEquals(Route.PLACES, result.route.route)
-        assertEquals(0, engine.calls.size)
-        assertTrue(result.answer.startsWith("35 vegan places to eat within 2 km of your position, best matches first:"))
+        assertTrue(engine.calls[0].prompt.contains("Places (35 vegan places to eat within 2 km of your position):"))
         assertTrue(result.sources[0].section.contains("km from you"))
         assertEquals(listOf("routed:PLACES", "phase:SEARCHING", "places", "sources"), rec.shape().take(4))
     }
@@ -1163,7 +1116,7 @@ class ResearchPipelineTest {
     fun aFollowUpIsRewrittenFromThePreviousExchange() {
         val previous = Exchange("Tell me the best vegan restaurants in Buenos Aires", "[1] Lotos: a vegan restaurant on Av. Córdoba.")
         val rewritten = "What are the best vegan restaurants in London?"
-        val engine = FakeEngine(listOf("\"$rewritten\"\n"))
+        val engine = FakeEngine(listOf("\"$rewritten\"\n", "- Vantra [1]"))
         val rec = Recorder()
 
         val result = runWith(engine, placesProvider(), "what about London?", rec, null, previous)
@@ -1176,8 +1129,7 @@ class ResearchPipelineTest {
         assertEquals(rewritten, rec.all<ResearchEvent.Rewritten>().single().question)
         assertEquals(rewritten, result.question)
         assertEquals(Route.PLACES, result.route.route)
-        assertEquals(1, engine.calls.size) // the rewritten question is answered by the list
-        assertTrue(result.answer.contains(" vegan places to eat within 18 km of London, United Kingdom, best matches first:"))
+        assertTrue(engine.calls[1].prompt.contains("vegan places to eat within 18 km of London, United Kingdom"))
         assertEquals(listOf("phase:REWRITING", "completed:REWRITING", "rewritten", "routed:PLACES"), rec.shape().take(4))
     }
 

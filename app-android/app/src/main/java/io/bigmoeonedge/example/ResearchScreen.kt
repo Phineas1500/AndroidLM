@@ -97,10 +97,7 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
 
         if (r.sources != null && r.route?.route == Route.PLACES) {
             if (r.sources.isNotEmpty()) {
-                val counted = "(${r.sources.size}" + (if (r.sourcesDropped > 0) " of ${r.sources.size + r.sourcesDropped}" else "") + ")"
-                // a plain request for places: the list is the answer, ranked by the diet, the travel
-                // guide and how well known a place is
-                Labeled((if (r.placesListOnly) "Best matches first " else "Places ") + counted + " · tap one for details") {
+                Labeled("Places (${r.sources.size}" + (if (r.sourcesDropped > 0) " of ${r.sources.size + r.sourcesDropped}" else "") + ") · tap one for details") {
                     r.sources.forEach { s -> key(r.runId, s.number) { PlaceRow(s) } }
                     Hint(PLACES_CREDIT)
                 }
@@ -119,8 +116,6 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
             }
         }
 
-        // (a list that is the answer is not repeated as text: its text is for the history and follow-ups)
-        val listIsAnswer = r.placesListOnly && !r.sources.isNullOrEmpty()
         if (r.answer.isNotEmpty() && r.check != null && checkCorrects(r.check)) {
             Surface(
                 color = MaterialTheme.colorScheme.errorContainer,
@@ -132,7 +127,7 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
             }
         }
-        if (r.answer.isNotEmpty() && !listIsAnswer) {
+        if (r.answer.isNotEmpty()) {
             Labeled(
                 when (r.route?.route) {
                     Route.ANSWER_FIRST -> "Answer, from the model's own knowledge"

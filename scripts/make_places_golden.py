@@ -74,6 +74,21 @@ QUESTIONS = [
     "Best vegan restaurants in Buenos Aires, and how much should I tip?",
 ]
 HERE = (-34.6, -58.4)
+# starts of Wikipedia articles as wiki.db has them (infobox facts, then "# Title")
+LEADS = [
+    ("Key facts: Established 1753\n# British Museum\n\nThe British Museum is a public museum dedicated to human history, "
+     "art and culture located in the Bloomsbury area of London. Its permanent collection of eight million works is the "
+     "largest in the world. It documents the story of human culture.\n\n## History\nMore.", 200),
+    ("# Café de Flore\n48°51′15″N 2°19′57.5″E\ufeff / \ufeff48.85417°N 2.332639°E\nCafé de Flore (French pronunciation: "
+     "[kafe də flɔʁ]) is one of the oldest coffeehouses in Paris, known for its emblematic shopfront.", 200),
+    ("# Louvre\nThe Louvre (French: Musée du Louvre [myze dy luvʁ] ⓘ), is a national art museum (the largest (by area) "
+     "in the world) in Paris.\u00a0It opened in 1793. It is huge.", 80),
+    ("Sukiyabashi Jiro (すきやばし次郎, Sukiyabashi Jirō) is a sushi restaurant in Ginza, Chūō, Tokyo, owned by Jiro Ono. "
+     "Ono previously operated as the head chef, but stepped aside in favor of his son in 2023 due to ill health.", 200),
+    ("# A very long one\n" + "word " * 80 + "end.", 120),
+    ("", 200),
+    ("# Only a title\n\n", 200),
+]
 NORM = ["Lisboa", "São Paulo", "Zürich", "Kraków", "Straße", "Ærøskøbing", "İstanbul", "Hà Nội",
         "Paris, Texas", "  St. John's  ", "Москва", "東京", "Tromsø", "Łódź", "Reykjavík"]
 
@@ -81,7 +96,8 @@ NORM = ["Lisboa", "São Paulo", "Zürich", "Kraków", "Straße", "Ærøskøbing"
 def place_json(p, i, origin, hours):
     return {"id": p.id, "tier": p.tier, "score": p.score, "km": p.km, "why": p.why,
             "line": P.describe(p, i, None, origin),
-            "model_line": P.describe(p, i, None, origin, brief=True, hours=hours)}
+            "model_line": P.describe(p, i, None, origin, brief=True, hours=hours),
+            "model_line_wiki": P.describe(p, i, None, origin, brief=True, hours=hours, wiki_text="An article's start.")}
 
 
 def main():
@@ -95,7 +111,7 @@ def main():
         if ask is not None:
             case["ask"] = {"group": ask.group, "diet": ask.diet, "sub": ask.sub, "price": ask.price,
                            "here": ask.here, "restaurant": ask.restaurant,
-                           "asks_hours": P.asks_hours(ask), "needs_words": P.needs_words(ask)}
+                           "asks_hours": P.asks_hours(ask)}
             lk = P.lookup(db, ask, HERE)
             if lk is not None:
                 case["lookup"] = {
@@ -110,6 +126,7 @@ def main():
         "cases": cases,
         "norm_key": {s: norm_key(s) for s in NORM},
         "prompt": P.PLACES_SYSTEM,
+        "lead": [[t, n, P.lead_text(t, n)] for t, n in LEADS],
         "clip": [[t, n, P._clip(t, n)] for t, n in [("short", 10), ("a b c d e f g h i j k l", 9),
                                                    ("abcdefghijklmnop qr", 12), ("naïve café au lait, très bon", 14)]],
     }

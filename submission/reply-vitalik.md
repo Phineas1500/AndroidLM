@@ -23,9 +23,9 @@ ATMs, hospitals, supermarkets, stations. Overture Maps places + OpenStreetMap di
 (vegan/vegetarian/halal/kosher/gluten-free, opening hours) + GeoNames cities + Wikivoyage's own
 recommendations matched to them. "Near me" uses GPS, no network.
 
-3/ The ranked list is the answer, in about 0.1 s on a Pixel 8 Pro, without even loading the
-model. The model only writes when the question asks for more ("...and how much should I tip?")
-or is in another language (Chinese works). Tested on 14 cities (Lisbon, Berlin, Chiang Mai,
+3/ The ranked list is on screen in about 0.1 s on a Pixel 8 Pro; the model then recommends from
+it, using only what the list says (the travel guide's listing, the place's own Wikipedia article
+when it has one). Chinese works too. Tested on 14 cities (Lisbon, Berlin, Chiang Mai,
 Tbilisi, Mexico City, Cape Town, Seoul...) and ramen/coffee/hostels/halal/kosher/tapas questions.
 
 4/ Which phone were you on? Your source check ran at 1.1 tok/s, a quarter of what the Pixel 8

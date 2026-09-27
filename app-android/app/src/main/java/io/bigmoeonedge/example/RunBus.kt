@@ -38,7 +38,6 @@ data class ResearchUi(
     val sources: List<ResearchSource>? = null, // null until the search is done
     val sourcesDropped: Int = 0,
     val placesWhere: String? = null,       // the places route: what was searched, e.g. "185 vegan places to eat within 16 km of …"
-    val placesListOnly: Boolean = false,   // the places list is the answer (the model wrote nothing)
     val translatedAs: String? = null,      // a question in another language, as it was searched for in English
     val askedAs: String? = null,           // a follow-up rewritten to stand on its own (what the run answered)
     val finishedAt: Long? = null,          // SystemClock.elapsedRealtime() when the run was done

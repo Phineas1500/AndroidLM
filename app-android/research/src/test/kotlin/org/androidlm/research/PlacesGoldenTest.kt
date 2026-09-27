@@ -32,6 +32,13 @@ class PlacesGoldenTest {
         }
     }
 
+    @Test fun lead() {
+        for (c in golden.getAsJsonArray("lead")) {
+            val a = c.asJsonArray
+            assertEquals(a[0].asString, if (a[2].isJsonNull) null else a[2].asString, PlacesText.leadText(a[0].asString, a[1].asInt))
+        }
+    }
+
     @Test fun questions() {
         val here = golden.getAsJsonArray("here").let { it[0].asDouble to it[1].asDouble }
         for (e in golden.getAsJsonArray("cases")) {
@@ -53,7 +60,6 @@ class PlacesGoldenTest {
             assertEquals(q, want.get("here").asBoolean, ask.here)
             assertEquals(q, want.get("restaurant").asBoolean, ask.restaurant)
             assertEquals(q, want.get("asks_hours").asBoolean, PlacesText.asksHours(ask))
-            assertEquals(q, want.get("needs_words").asBoolean, PlacesText.needsWords(ask))
             val lk = places.lookup(ask, here)
             if (!c.has("lookup")) {
                 assertNull(q, lk)
@@ -81,6 +87,9 @@ class PlacesGoldenTest {
                 assertEquals(at, w.get("line").asString, PlacesText.describe(p, i + 1, null, lk.origin))
                 assertEquals(at, w.get("model_line").asString,
                     PlacesText.describe(p, i + 1, null, lk.origin, brief = true, hours = PlacesText.asksHours(ask)))
+                assertEquals(at, w.get("model_line_wiki").asString,
+                    PlacesText.describe(p, i + 1, null, lk.origin, brief = true, hours = PlacesText.asksHours(ask),
+                        wikiText = "An article's start."))
             }
         }
     }

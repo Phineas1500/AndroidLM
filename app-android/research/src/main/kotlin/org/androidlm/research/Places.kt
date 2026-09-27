@@ -86,6 +86,8 @@ class Place(
     val cuisine: String?,
     /** Monthly views of the place's own Wikipedia article. */
     val fame: Int = 0,
+    /** That article's title. */
+    val wiki: String? = null,
 ) {
     var km = 0.0
     var tier = 9
@@ -413,13 +415,6 @@ object PlacesText {
         "favou?rite|near|nearby)\\b")
     private val PLACE_NOUNS = Regex(U + "\\b(restaurants?|cafes?|cafés?|coffee shops?|bars?|pubs?|hotels?|hostels?|bakery|bakeries|eatery|eateries|guest ?houses?|bistros?|brewery|breweries|pharmacy|pharmacies|chemists?|hospitals?|clinics?|dentists?|atms?|banks?|supermarkets?|groceries|grocery stores?|museums?|galleries|gallery|beaches|beach|parks?|gyms?|laundromats?|laundry|coworking|embassy|embassies|markets?|malls?)\\b")
     private val LATE = Regex(U + "\\b(open late|late at night|late night|late-night|24 hours|24/7|all night|open now|tonight|after midnight|at night)\\b")
-    // places.py ADVICE: a question that asks for more than the places
-    private val ADVICE = Regex(U + "\\b(safe|safety|dangerous|danger|scams?|costs?|prices?|pricey|how much|fees?|tips?|tipping|worth|" +
-        "which one|which is|compare|comparison|versus|vs|difference|better|advice|etiquette|" +
-        "reservations?|book|booking|romantic|views?|kids?|child|children|family|families|date|quiet|lively|" +
-        "authentic|locals?|touristy|tourist trap|avoid|foreigners?|english|speaks?|wifi|wi-fi|dress|cards?|" +
-        "payment|pay|menu|order|open on|opening hours|clos(es|ing)|monday|tuesday|wednesday|thursday|" +
-        "friday|saturday|sunday)\\b")
     private val HOURS = Regex(U + "\\b(open|opening|hours|clos(e|es|ed|ing)|late|tonight|now|today|tomorrow|morning|breakfast|" +
         "monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekends?|24/7)\\b")
     private val LATE_HOURS = Regex("24/7|-\\s*(2[2-4]|0[0-5])[:.]")
@@ -697,32 +692,56 @@ object PlacesText {
         return (listOf(kindLabel(p.kind)) + why).toMutableList()
     }
 
-    /** places.py `needs_words`: the question asks for more than a list of places, so the model answers it from the list. */
-    fun needsWords(ask: PlaceAsk): Boolean = ADVICE.containsMatchIn(ask.question.lowercase(Locale.ROOT))
-
-    /**
-     * The answer of a question the list answers by itself: what was found, and its best places as
-     * the list shows them (for the history and a follow-up; the app shows the list itself).
-     */
-    fun listText(where: String, places: List<Place>, origin: String): String =
-        where.replaceFirstChar { it.uppercase(Locale.ROOT) } + ", best matches first:\n\n" +
-            places.take(MODEL_PLACES).mapIndexed { i, p -> describe(p, i + 1, null, origin) }.joinToString("\n")
-
     /** places.py `asks_hours`: the question is about when places are open. */
     fun asksHours(ask: PlaceAsk): Boolean = ask.late || HOURS.containsMatchIn(ask.question.lowercase(Locale.ROOT))
 
-    /** places.py `describe`: [brief] the model's line (no street), [hours] with the opening hours. */
+    /**
+     * places.py `describe`: [brief] the model's line (no street, the cuisine), [hours] with the
+     * opening hours, [wikiText] the start of the place's own Wikipedia article.
+     */
     fun describe(p: Place, n: Int? = null, guideText: String? = null, origin: String = "the centre",
-                 brief: Boolean = false, hours: Boolean = true): String {
+                 brief: Boolean = false, hours: Boolean = true, wikiText: String? = null): String {
         val head = if (n != null) "[$n] " else ""
         val bits = kindBits(p)
+        if (brief && !p.cuisine.isNullOrEmpty()) {
+            val c = p.cuisine.split(";").map { it.trim() }.filter { it.isNotEmpty() }.map { it.replace("_", " ") }
+            if (c.isNotEmpty()) bits.add("cuisine: " + c.joinToString(", "))
+        }
         if (!p.street.isNullOrEmpty() && !brief) bits.add(p.street + (if (!p.locality.isNullOrEmpty()) ", " + p.locality else ""))
         bits.add(String.format(Locale.US, "%.1f km from %s", p.km, origin))
         if (!p.hours.isNullOrEmpty() && hours) bits.add("hours: " + p.hours)
         var line = head + p.name + ": " + bits.joinToString("; ") + "."
         if (!guideText.isNullOrEmpty()) line += " The travel guide says: $guideText"
+        if (!wikiText.isNullOrEmpty()) line += " Wikipedia: $wikiText"
         return line
     }
+
+    /**
+     * places.py `lead_text`: the start of a Wikipedia article for the model: after its "# Title"
+     * line, without a line of coordinates and without parentheses (pronunciations, names in other
+     * scripts), whole sentences up to [n] characters (at least the first, clipped).
+     */
+    fun leadText(text: String, n: Int): String? {
+        val m = Regex("^# [^\n]*\n+", RegexOption.MULTILINE).find(text)
+        val lead = if (m != null) text.substring(m.range.last + 1) else text
+        val lines = lead.split("\n").filter { it.isNotBlank() }.toMutableList()
+        while (lines.isNotEmpty() && '\u00b0' in lines[0] && lines[0].length < 80) lines.removeAt(0)
+        var para = lines.firstOrNull() ?: ""
+        repeat(2) { para = PARENS.replace(para, "") }
+        para = SPACES.replace(para, " ").trim()
+        var out = ""
+        for (piece in SENTENCE_END.split(para)) {
+            if (piece.trim('.', ' ').isEmpty()) continue
+            val sent = piece.trimEnd('.') + "."
+            if (out.isNotEmpty() && out.length + 1 + sent.length > n) break
+            out = (out + " " + sent).trim()
+        }
+        return if (out.isNotEmpty()) clip(out, n) else null
+    }
+
+    private val PARENS = Regex(U + "\\s*\\([^()]*\\)")
+    private val SPACES = Regex(U + "\\s+")
+    private val SENTENCE_END = Regex(U + "(?<=[a-z0-9)\\]])\\.\\s+")
 
     /** The line under a place's name in the app's list: what it is, how far, whether the guide lists it. */
     fun summary(p: Place, origin: String): String {
@@ -734,7 +753,7 @@ object PlacesText {
     }
 
     /** Everything known about a place, for the app's pop-up (the model reads [describe]). */
-    fun details(p: Place, guideText: String?, origin: String): String {
+    fun details(p: Place, guideText: String?, origin: String, wikiText: String? = null): String {
         val lines = ArrayList<String>()
         lines.add(kindBits(p).joinToString(" · "))
         if (!p.street.isNullOrEmpty()) lines.add(p.street + (if (!p.locality.isNullOrEmpty()) ", " + p.locality else ""))
@@ -746,6 +765,7 @@ object PlacesText {
             val head = "Wikivoyage, " + g.article + (if (!g.tier.isNullOrEmpty()) " (" + g.tier + ")" else "")
             lines.add(if (guideText.isNullOrEmpty()) head else "$head: $guideText")
         }
+        if (!wikiText.isNullOrEmpty()) lines.add("Wikipedia, " + p.wiki + ": " + wikiText)
         val from = ArrayList<String>()
         if (p.src and SRC_OVERTURE != 0) from.add("Overture Maps")
         if (p.src and SRC_OSM != 0) from.add("OpenStreetMap")
@@ -781,17 +801,20 @@ object PlacesText {
 
     const val PLACES_SYSTEM: String =
         "You are an offline travel assistant. The question comes with a numbered list of places from " +
-        "offline map data (OpenStreetMap and Overture Maps) and the Wikivoyage travel guide, best matches " +
-        "first; the app shows the list, with each place's address, distance and hours, next to your answer. " +
-        "First answer what the question asks beyond the places (costs, tipping, safety, which one suits), in " +
-        "a sentence or two, from what you know and from the list. Then name the three to five places that " +
-        "best answer it, one line each: its name and number like [2], what kind of place it is, and what the " +
-        "list says about it that matters for the question (the travel guide's words when quoted, hours when " +
-        "asked about). Say nothing about a place that the list does not say: no praise, popularity, ratings, " +
-        "atmosphere, dishes, prices or neighbourhoods, unless it is a famous place you know well. No " +
-        "introduction, no closing remarks, no LaTeX, no visible deliberation."
+        "offline map data (OpenStreetMap and Overture Maps), the Wikivoyage travel guide and Wikipedia, " +
+        "best matches first; the app shows the list, with each place's address, distance and hours, next " +
+        "to your answer. If the question asks for more than places (costs, tipping, safety, which one " +
+        "suits), answer that first in a sentence or two, from what you know and from the list. Then " +
+        "recommend the three to five places that best answer the question, one line each, starting with " +
+        "its number and name like \"[2] Name:\", then what kind of place it is and what the list says about " +
+        "it that matters (the travel guide's and Wikipedia's words when quoted, hours when asked about). Say " +
+        "nothing about a place that the list does not say: no praise, popularity, ratings, atmosphere, " +
+        "dishes, prices or neighbourhoods, unless it is a famous place you know well. Never describe the " +
+        "list itself or what it lacks. No introduction, no closing remarks, no LaTeX, no visible " +
+        "deliberation."
     const val MODEL_PLACES = 6
     const val GUIDE_CHARS = 180
+    const val WIKI_CHARS = 200
 
     /** places.py `what_text`. */
     fun whatText(ask: PlaceAsk): String {
@@ -847,6 +870,10 @@ class Places(private val db: SqlDatabase) {
         kinds = k
         categories = k.values.map { it.first }
     }
+
+    /** The places' Wikipedia titles: the `wiki` column (places.db format 4), or none in an older file. */
+    private val wikiColumn: String =
+        if (db.query("select count(*) from pragma_table_info('places') where name = 'wiki'").first()[0] as Long > 0) "wiki" else "null"
 
     fun parse(question: String): PlaceAsk? = PlacesText.parse(question, categories)
 
@@ -932,7 +959,8 @@ class Places(private val db: SqlDatabase) {
         // tapas_bar is a casual eatery, not a bar)
         val wanted = kinds.filter { PlacesText.inGroup(ask, it.value.second) || (ask.sub != null && ask.sub in it.value.second) }.keys.toList()
         val sql = StringBuilder(
-            "select id, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine, fame " +
+            "select id, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine, fame, " +
+                wikiColumn + " " +
                 "from places where cell in (" + cells.joinToString(",") { "?" } + ") and kind in (" + wanted.joinToString(",") { "?" } + ")",
         )
         val args = ArrayList<Any?>(cells + wanted)
@@ -1026,7 +1054,7 @@ class Places(private val db: SqlDatabase) {
                 r[0] as Long, r[1] as String, kname, kpath, r[3] as String?, (r[4] as Long).toInt(), (r[5] as Long).toInt(),
                 (r[6] as Long).toInt(), (r[7] as Long).toInt(), (r[8] as Long) / 1e5, (r[9] as Long) / 1e5,
                 r[10] as String?, r[11] as String?, r[12] as String?, r[13] as String?, r[14] as String?, r[15] as String?,
-                (r[16] as Long).toInt(),
+                (r[16] as Long).toInt(), r[17] as String?,
             )
             p.km = PlacesText.distanceKm(lat, lon, p.lat, p.lon)
             if (p.km > radiusKm) continue
@@ -1092,7 +1120,7 @@ class PlacesAnswer(
     val modelLines: List<String>,
 ) {
     companion object {
-        fun of(ask: PlaceAsk, lookup: PlacesLookup, voyage: Corpus?): PlacesAnswer {
+        fun of(ask: PlaceAsk, lookup: PlacesLookup, voyage: Corpus?, wiki: Corpus? = null): PlacesAnswer {
             // the travel guide's words on each listed place, from the Wikivoyage corpus
             val guide = lookup.places.map { p ->
                 p.guide.firstOrNull()?.let { g ->
@@ -1101,13 +1129,20 @@ class PlacesAnswer(
                     }
                 }
             }
+            // the start of each well-known place's own Wikipedia article
+            val lead = lookup.places.map { p ->
+                p.wiki?.let { t ->
+                    wiki?.resolveTitle(t, fuzzy = false)?.let { aid -> PlacesText.leadText(wiki.article(aid).text.value, PlacesText.WIKI_CHARS) }
+                }
+            }
             val sources = lookup.places.mapIndexed { i, p ->
-                ResearchSource(i + 1, p.name, PlacesText.summary(p, lookup.origin), PlacesText.details(p, guide[i], lookup.origin),
-                    "places", p.lat, p.lon)
+                ResearchSource(i + 1, p.name, PlacesText.summary(p, lookup.origin),
+                    PlacesText.details(p, guide[i], lookup.origin, lead[i]), "places", p.lat, p.lon)
             }
             val hours = PlacesText.asksHours(ask)
             val lines = lookup.places.take(PlacesText.MODEL_PLACES).mapIndexed { i, p ->
-                PlacesText.describe(p, i + 1, PlacesText.clip(guide[i], PlacesText.GUIDE_CHARS), lookup.origin, brief = true, hours = hours)
+                PlacesText.describe(p, i + 1, PlacesText.clip(guide[i], PlacesText.GUIDE_CHARS), lookup.origin,
+                    brief = true, hours = hours, wikiText = lead[i])
             }
             val where = PlacesText.whereText(lookup.total, lookup.radiusKm, lookup.label, ask, lookup.capped)
             return PlacesAnswer(ask, lookup, where, sources, lines)
@@ -1121,7 +1156,7 @@ class PlacesAnswer(
             val db = corpora.places() ?: return null
             val ask = db.parse(question)?.takeIf { !it.here } ?: return null
             val lookup = db.lookup(ask)?.takeIf { it.places.isNotEmpty() } ?: return null
-            return of(ask, lookup, corpora.voyage())
+            return of(ask, lookup, corpora.voyage(), corpora.wiki())
         }
     }
 }

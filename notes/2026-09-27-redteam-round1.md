@@ -22,7 +22,7 @@ the Pixel.
 | Calculations went wrong: Bush's age when the Wall fell (64, he was 65), $10,000 at 5% for 20 years ($16,386, it is $26,533), the Moon at basketball scale (10 m, it is 7.3 m), Lisbon to Porto at 100 km/h from 9am ("3 PM") | a question that needs a calculation gets a few lines of working first (`WORKED_SYSTEM`); on the VM all four came out right, in the same time (below) |
 | Follow-ups were read as new questions ("what about Porto?", "when did he win the Nobel prize?") | a follow-up is rewritten from the previous question and answer; on the phone "what about Porto?" became "Tell me the best vegan restaurants in Porto" and "when did he win the Nobel prize?" became "When did Gabriel García Márquez win the Nobel Prize?" (15-17 s) |
 | A wrong draft corrected only at the bottom of the source check (the World Cup winner) is easy to read as the answer | when the check lists corrections, a banner above the answer says so |
-| The places answer took 60-110 s for what the list already said, and a shorter prompt made the model praise places it knew nothing about ("top-rated", "cozy setting") | a plain request for places is answered by the ranked list, without the model (below); the model writes only for a question that asks for more (tipping, safety, a comparison, opening days) or is in another language, and may not describe a place beyond what the list says |
+| The places answer took 60-110 s for what the list already said, and a shorter prompt made the model praise places it knew nothing about ("top-rated", "cozy setting") | the model reads more about each place (its Wikipedia article's start, its cuisine) and may not describe a place beyond that (below) |
 | Vegan places were labelled "vegetarian restaurant" in answers to vegetarian questions | labelled vegan |
 | A neighbourhood or a village ("Shoreditch", "Canggu") is not a city in GeoNames' list, so the question still goes to Wikipedia | open (a gazetteer of well-known neighbourhoods is the next step) |
 | The source check is slow: 70-85 s of a 100-140 s answer-first question, mostly reading about 1,100 tokens of sources | open |
@@ -50,24 +50,34 @@ line starting "Answer:". The 8 calculation questions, before and after:
 
 Time to the finished answer is the same (65-89 s on the VM for both).
 
-## Places: the list is the answer
+## Places: the model writes from a richer list
 
-A request for places and nothing more ("Tell me the best vegan restaurants in Lisbon", "a
-pharmacy near me", "cheap hostels in Berlin") is answered by the ranked list itself: the app looks
-it up before loading the model, and does not load it. The answer's text (for the history and a
-follow-up) is the list's first six places as the list shows them. The model is used when the
-question needs words: it is in another language, or it asks for more than places (`ADVICE` in
-`places.py`: costs, tipping, safety, a comparison, a quality such as romantic or quiet, opening
-days). Measured on the Pixel 8 Pro:
+The first answer to "the model takes 60-110 s to repeat what the list says" was to let the list
+be the answer for a plain request, without the model: 24 of 24 places questions were then done a
+median 78 ms after the question from a cold start (`eval/answers_phone_places_listonly.jsonl`).
+That was reversed the same day: this is an AI research app, a list with no model in it reads as a
+map search, and the rule that decided when the model wrote was one more hand-written word list.
+The model now writes every places answer again; the list is still on screen in about 0.1 s (while
+the model loads, on a cold start), and the model's lines follow.
 
-- "Tell me the best vegan restaurants in Lisbon" from a cold start: done 61 ms after the question
-  (the app's start and the lookup's first file reads came before it), no model loaded.
-- The 24 questions of `eval/questions_places.jsonl` (all plain requests), each from a cold start
-  (`scripts/phone_eval.sh`, `eval/answers_phone_places_listonly.jsonl`): all 24 on the places
-  route, done a median 78 ms after the question (42-143 ms), none loading the model. Before: the
-  model's picks were done after a median 68 s.
-- "what about Porto?" after it: the model loads (about 20 s), the rewrite takes 15.6 s, then the
-  Porto list.
+What changed is what the model reads, so that it has something true to say: besides the kind of
+place, the diet, the distance and the travel guide's words, each of the six places it reads now
+has its cuisine (from OpenStreetMap) and, for a place with its own Wikipedia article, the start
+of that article ("Sushi Yoshitake is a Michelin 3-star sushi restaurant in Ginza ..."; places.db
+format 4 stores the article's title in `places.wiki`). The prompt forbids saying anything about
+a place that the list does not say (no praise, ratings, atmosphere, dishes, prices), except for a
+famous place the model knows well; with it the model stopped inventing "top-rated" and "cozy".
+
+Adding the articles showed that the check deciding whether an article is about a place looked at
+the whole first sentence: a place called "Linkin Park" got the band's article ("park"), a "Grand
+Budapest Hotel" the film's, "Real Madrid" the football club's. It now reads only what the
+sentence says the subject is ("is a sushi restaurant", up to "in", "located", "founded" and the
+like) and rejects films, bands, series, people and sports clubs; the Colosseum, the Empire State
+Building and Hyde Park, which the old check missed, now count.
+
+Measured on the Pixel 8 Pro (other runs):
+
+- "what about Porto?" after the Lisbon question: the rewrite takes 15.6 s, then the Porto list.
 - "Best vegan restaurants in Lisbon, and how much should I tip?": the tipping advice (5-10%, not
   mandatory) and three places, done 44 s after the question, including the model's load.
 - "里斯本最好的素食餐厅有哪些？": translated in 4 s, answered in Chinese, done in 37 s.

@@ -124,8 +124,6 @@ class RunService : Service() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     @Volatile private var researchJob: Job? = null
-    /** A question being answered without the model, before a session is loaded for it (main thread). */
-    private var listOnlyJob: Job? = null
     private val researchRuns = AtomicInteger(0)
 
     // A question supplied with START_SESSION starts its research run at READY (cf. [pending]).
@@ -198,8 +196,7 @@ class RunService : Service() {
             ACTION_GENERATE -> sendGenerate(reqFrom(intent))
             ACTION_RESEARCH -> startResearch(intent.getStringExtra(EXTRA_QUESTION) ?: "")
             // Cancelling the research coroutine reaches the process through the engine adapter.
-            ACTION_CANCEL -> listOnlyJob?.takeIf { it.isActive }?.cancel()
-                ?: researchJob?.takeIf { it.isActive }?.cancel() ?: send(CANCEL_JSON)
+            ACTION_CANCEL -> researchJob?.takeIf { it.isActive }?.cancel() ?: send(CANCEL_JSON)
             ACTION_SHUTDOWN -> shutdownSession()
             else -> startSession(intent)
         }
@@ -223,34 +220,7 @@ class RunService : Service() {
             if (question != null) startResearch(question) else if (req != null) sendGenerate(req)
             return
         }
-        if (question != null) {
-            // A question the places list answers by itself needs no model: it is answered first,
-            // and the model is loaded only when the question turns out to need it.
-            startForeground(NOTIF_ID, buildNotification("Looking up places…"))
-            listOnlyJob?.cancel()
-            val job = scope.launch(start = CoroutineStart.LAZY) {
-                val me = coroutineContext.job
-                var answered = false
-                try {
-                    answered = answerWithoutModel(question)
-                } finally {
-                    val cancelled = me.isCancelled
-                    main.post {
-                        if (listOnlyJob !== me) return@post // a newer question took over
-                        listOnlyJob = null
-                        if (!answered && !cancelled) loadSession(model, argv, sig, req, question)
-                        else if (proc == null) {
-                            stopForegroundCompat()
-                            stopSelf()
-                        }
-                    }
-                }
-            }
-            listOnlyJob = job
-            job.start()
-            return
-        }
-        loadSession(model, argv, sig, req, null)
+        loadSession(model, argv, sig, req, question)
     }
 
     /** Loads [model] in a new engine process (replacing the running one), then runs [question] or [req] on it. */
@@ -838,27 +808,6 @@ class RunService : Service() {
         inflight?.done?.completeExceptionally(IllegalStateException(msg))
     }
 
-    /**
-     * A question the places list answers by itself ([ResearchPipeline.runWithoutModel]), answered
-     * without the model, loaded or not; false when it needs the model (or the lookup failed).
-     */
-    private suspend fun answerWithoutModel(question: String): Boolean {
-        val runId = researchRuns.incrementAndGet()
-        return try {
-            val files = withContext(Dispatchers.IO) { CorpusLocator.find(this@RunService) } ?: return false
-            val open = withContext(corpusDispatcher) { corporaFor(files) }
-            // (the run on screen goes to the history first: a follow-up reads it from there)
-            RunBus.update { it.copy(research = ResearchUi(question, runId = runId), researchHistory = withFinished(it)) }
-            ResearchPipeline(engine, open, corpusDispatcher, researchConfig(), null, AndroidLocator(this@RunService))
-                .runWithoutModel(question, researchListener(runId), previousExchange()) != null
-        } catch (e: CancellationException) {
-            throw e
-        } catch (t: Throwable) {
-            Log.w(LOG_TAG, "run=$runId places without the model failed", t)
-            false
-        }
-    }
-
     /** The research method's options (preferences of the method, not of the session: read per run, never in the argv). */
     private fun researchConfig(): ResearchConfig {
         val prefs = AppSettings.load(this)
@@ -893,10 +842,7 @@ class RunService : Service() {
                 val background = BackgroundSearch(searchOpen, searchDispatcher, ::setSearchPriority)
                 val pipeline = ResearchPipeline(engine, open, corpusDispatcher, researchConfig(), background,
                     AndroidLocator(this@RunService))
-                // a places question the list answers by itself does not take the model
-                val listener = researchListener(runId)
-                val previous = previousExchange()
-                pipeline.runWithoutModel(question, listener, previous) ?: pipeline.run(question, listener, previous)
+                pipeline.run(question, researchListener(runId), previousExchange())
             } catch (e: CancellationException) {
                 publishResearch(runId) { if (it.running) it.copy(phase = ResearchPhase.CANCELLED) else it }
                 throw e
@@ -1008,7 +954,7 @@ class RunService : Service() {
             is ResearchEvent.Planned -> publishResearch(runId) { it.copy(titles = e.titles) }
             is ResearchEvent.Routed -> publishResearch(runId) { it.copy(route = e.decision, routeThreshold = e.threshold) }
             is ResearchEvent.SourcesFound -> publishResearch(runId) { it.copy(sources = e.sources, sourcesDropped = e.dropped) }
-            is ResearchEvent.PlacesFound -> publishResearch(runId) { it.copy(placesWhere = e.where, placesListOnly = e.listOnly) }
+            is ResearchEvent.PlacesFound -> publishResearch(runId) { it.copy(placesWhere = e.where) }
             is ResearchEvent.Translated -> publishResearch(runId) { it.copy(translatedAs = e.question) }
             is ResearchEvent.Rewritten -> publishResearch(runId) { it.copy(askedAs = e.question) }
             is ResearchEvent.AnswerToken -> if (textFrameDue()) telemetry.current.text.let { text -> publishResearch(runId) { it.copy(answer = text) } }

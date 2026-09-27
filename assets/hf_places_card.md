@@ -20,7 +20,7 @@ phone with no network. It is an ordinary SQLite file (2.9GB) that any SQLite bui
 
 | Table | Contents |
 |---|---|
-| `places` | name, category, position (degrees × 10^5), a 0.05-degree grid `cell` for lookups, diet tags (bit flags: vegan only/yes/limited/no, vegetarian only/yes/limited, gluten-free, halal, kosher), street, locality, phone, website, opening hours, cuisine, which sources it came from, Overture's existence confidence, whether it is a chain, a static rank, and `fame`: the monthly views of the place's own English Wikipedia article, when it has one (80,049 places) |
+| `places` | name, category, position (degrees × 10^5), a 0.05-degree grid `cell` for lookups, diet tags (bit flags: vegan only/yes/limited/no, vegetarian only/yes/limited, gluten-free, halal, kosher), street, locality, phone, website, opening hours, cuisine, which sources it came from, Overture's existence confidence, whether it is a chain, a static rank, and for a place with its own English Wikipedia article (57,781 places) the article's title (`wiki`) and monthly views (`fame`) |
 | `kinds` | Overture's categories (434) with the categories above each |
 | `guide` | Wikivoyage Eat, Drink, Sleep, See, Do and Buy listings matched to places (132,361 listings, 129,695 places): the guide article, section, price tier and the listing's name. The listing text itself is in Wikivoyage |
 | `cities`, `city_names` | GeoNames cities of 1,000 people or more (171,075) and their names, including Latin-script alternate names for cities of 15,000 or more |
@@ -40,9 +40,11 @@ Built by `scripts/build_places.py` in the AndroidLM repository from:
   and kind within about 300 m are folded into one (21,225,505 before, 21,132,717 after).
 - **GeoNames** cities1000, admin1 codes and country information.
 - **Wikivoyage** listings (English, September 2026), matched by name near the guide's city.
-- **Wikipedia** (English, FineWiki August 2025) and Wikimedia pageviews: a place whose name is an
-  article about that kind of place, near the article's coordinates, gets that article's monthly
-  views as `fame` (the Louvre, the British Museum). Only the number is stored.
+- **Wikipedia** (English, FineWiki August 2025) and Wikimedia pageviews: a place whose name is the
+  title of an article about that kind of place (its first sentence says the subject is a museum,
+  a restaurant, a hotel...; not a film, a band or a football club), near the article's
+  coordinates, gets that article's title and monthly views (the Louvre, the British Museum,
+  Sukiyabashi Jiro). The article text itself is not included.
 
 ## Licence and attribution
 
@@ -53,7 +55,7 @@ This database contains data from OpenStreetMap and is made available under the
 - Overture Maps Foundation places: CDLA-Permissive-2.0; records from Foursquare Open Source Places
   are Apache-2.0 and records from AllThePlaces are CC0-1.0 (https://docs.overturemaps.org/attribution/).
 - GeoNames (https://www.geonames.org), CC BY 4.0.
-- Wikivoyage listing names and article titles: Wikivoyage contributors, CC BY-SA 4.0.
+- Wikivoyage listing names and article titles, Wikipedia article titles: Wikivoyage and Wikipedia contributors, CC BY-SA 4.0.
 - Wikimedia pageviews (the `fame` numbers): CC0.
 
 Map data has no ratings and places close: the app says so with every list.

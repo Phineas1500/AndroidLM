@@ -149,14 +149,6 @@ PLACE_NOUNS = re.compile(r"\b(restaurants?|cafes?|caf\u00e9s?|coffee shops?|bars
                          r"embassy|embassies|markets?|malls?)\b")
 # a question about opening hours late in the day
 LATE = re.compile(r"\b(open late|late at night|late night|late-night|24 hours|24/7|all night|open now|tonight|after midnight|at night)\b")
-# a question that asks for more than the places (advice, a comparison, a quality the map data does
-# not record): the model answers it from the list; a plain request is answered by the list itself
-ADVICE = re.compile(r"\b(safe|safety|dangerous|danger|scams?|costs?|prices?|pricey|how much|fees?|tips?|tipping|worth|"
-                    r"which one|which is|compare|comparison|versus|vs|difference|better|advice|etiquette|"
-                    r"reservations?|book|booking|romantic|views?|kids?|child|children|family|families|date|quiet|lively|"
-                    r"authentic|locals?|touristy|tourist trap|avoid|foreigners?|english|speaks?|wifi|wi-fi|dress|cards?|"
-                    r"payment|pay|menu|order|open on|opening hours|clos(es|ing)|monday|tuesday|wednesday|thursday|"
-                    r"friday|saturday|sunday)\b")
 HOURS = re.compile(r"\b(open|opening|hours|clos(e|es|ed|ing)|late|tonight|now|today|tomorrow|morning|breakfast|"
                    r"monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekends?|24/7)\b")
 LATE_HOURS = re.compile(r"24/7|-\s*(2[2-4]|0[0-5])[:.]")
@@ -403,6 +395,7 @@ class Place:
     hours: str
     cuisine: str
     fame: int = 0         # monthly views of the place's own Wikipedia article
+    wiki: str = None      # that article's title
     km: float = 0.0
     tier: int = 9
     score: float = 0.0
@@ -511,7 +504,8 @@ def find(db, ask, lat, lon, radius_km, limit=12):
     # the group's categories, and the one kind of place asked for wherever it sits ("tapas bars":
     # tapas_bar is a casual eatery, not a bar)
     wanted = [i for i, (name, path) in kinds.items() if in_group(ask, path) or (ask.sub and ask.sub in path)]
-    sql = (f"select id, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine, fame "
+    sql = (f"select id, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine, fame, "
+           f"{_wiki_column(db)} "
            f"from places where cell in ({','.join('?' * len(cells))}) and kind in ({','.join('?' * len(wanted))})")
     args = cells + wanted
     if ask.diet:
@@ -611,18 +605,24 @@ def overrule_branches(out, diet):
                 m.tier = 2
 
 
+def _wiki_column(db):
+    """The places' Wikipedia titles: the `wiki` column (places.db format 4), or none in an older file."""
+    cols = {r[1] for r in db.execute("pragma table_info(places)")}
+    return "wiki" if "wiki" in cols else "null"
+
+
 def _places(db, sql, args, ask, kinds, lat, lon, radius_km, sub_rx):
     """The rows of [sql] as places within the radius that serve the diet asked for, with their
     tier; and how many rows there were."""
     out = []
     rows = db.execute(sql, args).fetchall()
     crypto_ok = CRYPTO.search(ask.question) is not None
-    for (pid, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine, fame) in rows:
+    for (pid, name, kind, alt, diet, src, conf, chain, lat5, lon5, street, locality, phone, website, hours, cuisine, fame, wiki) in rows:
         kname, kpath = kinds[kind]
         if ask.group == "money" and not crypto_ok and CRYPTO.search(name):
             continue  # a bitcoin ATM is not where to withdraw cash
         p = Place(pid, name, kname, kpath, alt, diet, src, conf, chain, lat5 / 1e5, lon5 / 1e5, street, locality,
-                  phone, website, hours, cuisine, fame)
+                  phone, website, hours, cuisine, fame, wiki)
         p.km = distance_km(lat, lon, p.lat, p.lon)
         if p.km > radius_km:
             continue
@@ -701,20 +701,50 @@ def kind_bits(p):
     return [kind_label(p.kind)] + why
 
 
-def describe(p, n=None, guide_text=None, origin="the centre", brief=False, hours=True):
+def describe(p, n=None, guide_text=None, origin="the centre", brief=False, hours=True, wiki_text=None):
     """One place as the model and the list show it. [brief]: the model's line, without the street
-    (the app shows it); [hours]: with the opening hours (the model gets them when asked about)."""
+    (the app shows it) and with the cuisine; [hours]: with the opening hours (the model gets them
+    when asked about); [wiki_text]: the start of the place's own Wikipedia article."""
     head = f"[{n}] " if n is not None else ""
     bits = kind_bits(p)
     if p.street and not brief:
         bits.append(p.street + (f", {p.locality}" if p.locality else ""))
+    cuisines = [c.strip().replace("_", " ") for c in (p.cuisine or "").split(";") if c.strip()]
+    if brief and cuisines:
+        bits.append("cuisine: " + ", ".join(cuisines))
     bits.append(f"{p.km:.1f} km from {origin}")
     if p.hours and hours:
         bits.append(f"hours: {p.hours}")
     line = f"{head}{p.name}: " + "; ".join(bits) + "."
     if guide_text:
         line += f" The travel guide says: {guide_text}"
+    if wiki_text:
+        line += f" Wikipedia: {wiki_text}"
     return line
+
+
+def lead_text(text, n):
+    """The start of a Wikipedia article for the model: after its "# Title" line, without a line of
+    coordinates and without parentheses (pronunciations, names in other scripts), whole sentences
+    up to [n] characters (at least the first, clipped)."""
+    m = re.search(r"^# [^\n]*\n+", text, re.M)
+    lead = text[m.end():] if m else text
+    lines = [l for l in lead.split("\n") if l.strip()]
+    while lines and "\u00b0" in lines[0] and len(lines[0]) < 80:
+        lines.pop(0)
+    para = lines[0] if lines else ""
+    for _ in range(2):
+        para = re.sub(r"\s*\([^()]*\)", "", para)
+    para = re.sub(r"\s+", " ", para).strip()
+    out = ""
+    for sent in re.split(r"(?<=[a-z0-9)\]])\.\s+", para):
+        if not sent.strip(". "):
+            continue
+        sent = sent.rstrip(".") + "."
+        if out and len(out) + 1 + len(sent) > n:
+            break
+        out = (out + " " + sent).strip()
+    return _clip(out, n) if out else None
 
 
 def guide_text(voyage, p):
@@ -778,18 +808,21 @@ def lookup(db, ask, here=None):
 
 PLACES_SYSTEM = (
     "You are an offline travel assistant. The question comes with a numbered list of places from "
-    "offline map data (OpenStreetMap and Overture Maps) and the Wikivoyage travel guide, best matches "
-    "first; the app shows the list, with each place's address, distance and hours, next to your answer. "
-    "First answer what the question asks beyond the places (costs, tipping, safety, which one suits), in "
-    "a sentence or two, from what you know and from the list. Then name the three to five places that "
-    "best answer it, one line each: its name and number like [2], what kind of place it is, and what the "
-    "list says about it that matters for the question (the travel guide's words when quoted, hours when "
-    "asked about). Say nothing about a place that the list does not say: no praise, popularity, ratings, "
-    "atmosphere, dishes, prices or neighbourhoods, unless it is a famous place you know well. No "
-    "introduction, no closing remarks, no LaTeX, no visible deliberation."
+    "offline map data (OpenStreetMap and Overture Maps), the Wikivoyage travel guide and Wikipedia, "
+    "best matches first; the app shows the list, with each place's address, distance and hours, next "
+    "to your answer. If the question asks for more than places (costs, tipping, safety, which one "
+    "suits), answer that first in a sentence or two, from what you know and from the list. Then "
+    "recommend the three to five places that best answer the question, one line each, starting with "
+    "its number and name like \"[2] Name:\", then what kind of place it is and what the list says about "
+    "it that matters (the travel guide's and Wikipedia's words when quoted, hours when asked about). Say "
+    "nothing about a place that the list does not say: no praise, popularity, ratings, atmosphere, "
+    "dishes, prices or neighbourhoods, unless it is a famous place you know well. Never describe the "
+    "list itself or what it lacks. No introduction, no closing remarks, no LaTeX, no visible "
+    "deliberation."
 )
 MODEL_PLACES = 6     # places the model reads (the list shows up to find()'s limit)
 GUIDE_CHARS = 180    # of each travel-guide listing
+WIKI_CHARS = 200     # of the start of a place's own Wikipedia article
 
 
 def what_text(ask):
@@ -808,19 +841,20 @@ def places_user(question, where, lines):
     return "Places (" + where + "):\n\n" + "\n".join(lines) + "\n\nQuestion: " + question
 
 
-def needs_words(ask):
-    """The question asks for more than a list of places: the model writes the answer from it."""
-    return ADVICE.search(ask.question.lower()) is not None
-
-
 def asks_hours(ask):
     """The question is about when places are open: the model's lines then give their hours."""
     return ask.late or HOURS.search(ask.question.lower()) is not None
 
 
-def context_lines(places, voyage, origin, hours=True):
-    return [describe(p, i, _clip(guide_text(voyage, p), GUIDE_CHARS), origin, brief=True, hours=hours)
-            for i, p in enumerate(places[:MODEL_PLACES], 1)]
+def context_lines(places, voyage, origin, hours=True, wiki=None):
+    """The model's lines: the first MODEL_PLACES places, with the travel guide's words and the start
+    of each one's own Wikipedia article ([voyage], [wiki]: title -> text readers)."""
+    out = []
+    for i, p in enumerate(places[:MODEL_PLACES], 1):
+        wt = wiki(p.wiki) if wiki and p.wiki else None
+        out.append(describe(p, i, _clip(guide_text(voyage, p), GUIDE_CHARS), origin, brief=True, hours=hours,
+                            wiki_text=lead_text(wt, WIKI_CHARS) if wt else None))
+    return out
 
 
 def _clip(text, n):
@@ -850,6 +884,7 @@ def main():
     ap.add_argument("db")
     ap.add_argument("question")
     ap.add_argument("--voyage")
+    ap.add_argument("--wiki", help="wiki.db: the start of each place's own Wikipedia article")
     ap.add_argument("--here", help="lat,lon for 'near me'")
     a = ap.parse_args()
     db = sqlite3.connect(f"file:{a.db}?mode=ro", uri=True)
@@ -865,8 +900,9 @@ def main():
         return
     print("city:", lk.city)
     voyage = voyage_reader(a.voyage) if a.voyage else None
+    wiki = voyage_reader(a.wiki) if a.wiki else None
     print(places_user(a.question, where_text(lk.total, lk.radius_km, lk.label, ask, lk.capped),
-                      context_lines(lk.places, voyage, lk.origin, asks_hours(ask))))
+                      context_lines(lk.places, voyage, lk.origin, asks_hours(ask), wiki)))
 
 
 if __name__ == "__main__":

@@ -23,9 +23,9 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
   stations, sights). Overture Maps places merged with OpenStreetMap's diet tags and opening hours,
   GeoNames cities, the Wikivoyage listings matched to them, and how widely read each place's
   Wikipedia article is. A question like "the best vegan restaurants in Lisbon" or "a pharmacy near
-  me" (GPS, no network) is answered by a ranked list of real places in about 0.1 s, without the
-  model; the model writes only when the question asks for more (tipping, safety, a comparison)
-  or is in another language ([`notes/2026-09-27-places.md`](notes/2026-09-27-places.md)).
+  me" (GPS, no network) gets a ranked list of real places in about 0.1 s, then the model's
+  recommendations from it, written from the places' travel-guide listings and the start of their
+  own Wikipedia articles ([`notes/2026-09-27-places.md`](notes/2026-09-27-places.md)).
 - **Pipeline:** the model names the Wikipedia articles it wants; titles are resolved through
   redirects; a router sends little-read subjects retrieval-first (the model's memory of them is
   unreliable) and everything else answer-first, followed by a source check that cites passages.
@@ -45,7 +45,7 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 | Model load | about 28 s on app start |
 | Answer-first question | first words after about 18 s; answer plus cited source check in about 3 min (medians over 5 questions) |
 | Retrieval-first question | cited answer in about 1.6 min (median 98 s over 19 questions; first words after 44-70 s) |
-| Places question ("best vegan restaurants in Lisbon") | answered by the ranked list 0.08 s after the question (median over 24 questions, at most 0.14 s), without loading the model; one that asks for more ("...and how much should I tip?") or is in another language gets the model's answer from the list in 35-45 s |
+| Places question ("best vegan restaurants in Lisbon") | list of places on screen after about 0.1 s; the model's recommendations from it done 28-77 s after the question (Lisbon from a cold start 28 s, luxury hotels in London 68 s, sushi in Tokyo 77 s) |
 
 Against Qwen3-1.7B answering the same 72 questions from memory, graded 0-10 by Claude with one
 rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-model-comparison.md)):

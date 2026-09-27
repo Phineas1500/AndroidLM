@@ -271,7 +271,7 @@ sealed class ResearchEvent {
      * The places route found where to look: [where] says what was searched ("186 vegan places to
      * eat within 16 km of Buenos Aires, Argentina"); the places follow as [SourcesFound].
      */
-    data class PlacesFound(val where: String, val total: Int, val here: Boolean, val listOnly: Boolean = false) : ResearchEvent()
+    data class PlacesFound(val where: String, val total: Int, val here: Boolean) : ResearchEvent()
 
     /** Streamed text of the answer (the draft, on the answer-first route). */
     data class AnswerToken(val text: String) : ResearchEvent()
@@ -355,26 +355,6 @@ class ResearchPipeline(
      * cancelled (after `PhaseChanged(CANCELLED)`), and rethrows any failure (after `Failed` and
      * `PhaseChanged(FAILED)`).
      */
-    /**
-     * A places question that the list answers by itself (in English, not a follow-up to rewrite,
-     * asking for nothing beyond the places): answered without the model, which need not even be
-     * loaded. Null, before any event, when the question needs the model; [run] then answers it.
-     */
-    suspend fun runWithoutModel(question: String, listener: ResearchListener, previous: Exchange? = null): ResearchResult? {
-        if (Translation.needed(question) || previous != null && FollowUp.looksLike(question)) return null
-        val run = Run(question, listener, previous)
-        try {
-            return run.placesRun(allowModel = false)
-        } catch (e: CancellationException) {
-            listener.onEvent(ResearchEvent.PhaseChanged(ResearchPhase.CANCELLED))
-            throw e
-        } catch (e: Throwable) {
-            listener.onEvent(ResearchEvent.Failed(run.phase, e.message ?: e.toString()))
-            listener.onEvent(ResearchEvent.PhaseChanged(ResearchPhase.FAILED))
-            throw e
-        }
-    }
-
     suspend fun run(question: String, listener: ResearchListener, previous: Exchange? = null): ResearchResult {
         val run = Run(question, listener, previous)
         try {
@@ -541,19 +521,14 @@ class ResearchPipeline(
         /**
          * The places route (places.py `lookup` + PLACES_SYSTEM), or null when the question is not
          * about places or names no place the database knows. A "near me" question stays here even
-         * without a position or with nothing found: the Wikipedia pipeline could not place it. A
-         * request for places and nothing more is answered by the list itself; the model writes only
-         * for a question in another language or one that asks for more (advice, a comparison). With
-         * ![allowModel], null (before any event) when the model would be needed.
+         * without a position or with nothing found: the Wikipedia pipeline could not place it.
          */
-        suspend fun placesRun(allowModel: Boolean = true): ResearchResult? {
+        private suspend fun placesRun(): ResearchResult? {
             val t0 = System.nanoTime()
             val (db, ask) = withContext(corpusDispatcher) {
                 val db = corpora.places() ?: return@withContext null
                 db.parse(question)?.let { db to it }
             } ?: return null
-            val listOnly = asked == null && !PlacesText.needsWords(ask)
-            if (!allowModel && !listOnly) return null
             val decision = RouteDecision(Route.PLACES, null)
             val lookup: PlacesLookup?
             if (ask.here) {
@@ -568,26 +543,17 @@ class ResearchPipeline(
                 enter(ResearchPhase.SEARCHING)
             }
             val where = PlacesText.whereText(lookup.total, lookup.radiusKm, lookup.label, ask, lookup.capped)
-            listener.onEvent(ResearchEvent.PlacesFound(where, lookup.total, ask.here, listOnly))
+            listener.onEvent(ResearchEvent.PlacesFound(where, lookup.total, ask.here))
             if (lookup.places.isEmpty()) {
                 // said plainly rather than left to the Wikipedia pipeline, which can only guess at
                 // places (the old route invented restaurants)
                 return placesNotice(t0, decision, String.format(java.util.Locale.US, NOTHING_FOUND,
                     PlacesText.whatText(ask), lookup.radiusKm, lookup.label))
             }
-            val answer = withContext(corpusDispatcher) { PlacesAnswer.of(ask, lookup, corpora.voyage()) }
+            val answer = withContext(corpusDispatcher) { PlacesAnswer.of(ask, lookup, corpora.voyage(), corpora.wiki()) }
             val sources = answer.sources
             listener.onEvent(ResearchEvent.SourcesFound(sources, lookup.total - sources.size))
             completed(t0)
-            if (listOnly) {
-                val text = PlacesText.listText(where, lookup.places, lookup.origin)
-                listener.onEvent(ResearchEvent.AnswerCompleted(text))
-                val result = ResearchResult(question, emptyList(), decision, sources, lookup.total - sources.size,
-                    text, null, text, timings.toList())
-                listener.onEvent(ResearchEvent.Completed(result))
-                enter(ResearchPhase.DONE)
-                return result
-            }
             val lines = answer.modelLines
             val res = generating(
                 ResearchPhase.ANSWERING, PlacesText.PLACES_SYSTEM, PlacesText.placesUser(answerQuestion, where, lines),
