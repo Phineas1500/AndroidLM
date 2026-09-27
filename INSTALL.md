@@ -5,9 +5,9 @@ and the corpus are therefore copied to the phone from a computer.
 
 ## What you need
 
-- An Android phone with 12GB of RAM, arm64, Android 10 or newer, and about 38GB free.
+- An Android phone with 12GB of RAM, arm64, Android 10 or newer, and about 39GB free.
   Developed for a Pixel 8 Pro; nothing here needs Google Play Services.
-- A computer with about 37GB free, `adb` (Android platform-tools), `curl` and `python3`.
+- A computer with about 38GB free, `adb` (Android platform-tools), `curl` and `python3`.
 - A USB data cable, and USB debugging enabled on the phone
   (Settings > About phone > tap Build number 7 times, then Developer options > USB debugging).
 
@@ -23,11 +23,11 @@ and the corpus are therefore copied to the phone from a computer.
 
 ```sh
 git clone https://github.com/Phineas1500/AndroidLM && cd AndroidLM
-# the signed app from the v1.0.0 release (or build it yourself: app-android/README.md)
-curl -L -o androidlm-1.0.0.apk \
-  https://github.com/Phineas1500/AndroidLM/releases/download/v1.0.0/androidlm-1.0.0.apk
-shasum -a 256 androidlm-1.0.0.apk   # 246bd4ee2ed7049d63b2b5ec926ca3efab29ea677d9c7f817a16a5e1bb4fc013
-scripts/install.sh --apk androidlm-1.0.0.apk
+# the signed app from the v1.1.0 release (or build it yourself: app-android/README.md)
+curl -L -o androidlm-1.1.0.apk \
+  https://github.com/Phineas1500/AndroidLM/releases/download/v1.1.0/androidlm-1.1.0.apk
+shasum -a 256 androidlm-1.1.0.apk   # 143c4de65f72e2ab4547046c9bd9447f520e40c497764c8ff6fbfaad7adea435
+scripts/install.sh --apk androidlm-1.1.0.apk
 ```
 
 The script downloads the model and corpus files into `./assets-cache` (resumable; run it again
@@ -38,13 +38,15 @@ The APK is signed with the project's release key (certificate SHA-256
 its package is `io.github.phineas1500.androidlm.dev`, the build that reads the model and corpus
 from `/data/local/tmp`. An earlier build of that package signed with another key has to be
 uninstalled first (see below).
-Pushing 36GB over USB takes roughly 15-40 minutes depending on the cable and port.
+Pushing 37GB over USB takes roughly 15-40 minutes depending on the cable and port.
 
 Then, on the phone: turn on airplane mode, open AndroidLM (it finds the model and the corpus by
 itself; if it was open during the install, tap Refresh; on first launch Android asks whether it
 may show notifications, which the app uses for its progress while it works), leave Research
 switched on, type a question and tap Research. The first question loads the model, about 30 s;
-later questions reuse it.
+later questions reuse it. A question about places near you ("vegan food near me") asks for
+location access the first time; the position comes from GPS, and the app still has no network
+access.
 
 ## Without the script
 
@@ -53,7 +55,7 @@ adb shell mkdir -p /data/local/tmp/bmoe/corpus
 adb push Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf /data/local/tmp/bmoe/
 adb push wiki.db wiki_df.db voyage.db places.db /data/local/tmp/bmoe/corpus/
 adb shell 'chmod 755 /data/local/tmp/bmoe /data/local/tmp/bmoe/corpus; chmod 644 /data/local/tmp/bmoe/*.gguf /data/local/tmp/bmoe/corpus/*.db'
-adb install -r androidlm-1.0.0.apk
+adb install -r androidlm-1.1.0.apk
 ```
 
 `/data/local/tmp` is used because the app can open files there in place, without a storage

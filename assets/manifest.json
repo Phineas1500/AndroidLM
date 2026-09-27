@@ -44,7 +44,7 @@
       "role": "places",
       "bytes": 2900869120,
       "sha256": "110751c3f32bb651a16c71d7ef9c832c70babff831c38281806677cd9facb396",
-      "url": "",
+      "url": "https://huggingface.co/datasets/rammingaway/androidlm-places/resolve/main/places.db",
       "device_path": "corpus/places.db",
       "license": "ODbL 1.0 (OpenStreetMap contributors; Overture Maps Foundation places, CDLA-Permissive-2.0; GeoNames, CC BY 4.0)"
     }

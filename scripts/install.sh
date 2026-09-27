@@ -47,14 +47,20 @@ for f in json.load(open(sys.argv[1]))["files"]:
 EOF
 )
 
+remote_size() { adb shell "stat -c %s '$1' 2>/dev/null" </dev/null | tr -d '\r' || true; }
+
+# only what is not on the phone yet needs room (an update from an earlier release pushes only
+# the files that changed); a file that replaces an older copy frees that copy's space
 need=0
 while IFS='|' read -r -u 3 name role bytes sha url dpath; do
   [ "$role" = corpus-optional ] && [ $VOYAGE = 0 ] && continue
   [ "$role" = places ] && [ $PLACES = 0 ] && continue
-  need=$((need + bytes))
+  have=$(remote_size "$DEVICE_ROOT/$dpath")
+  [ "$have" = "$bytes" ] && continue
+  need=$((need + bytes - ${have:-0}))
 done 3<<< "$FILES"
 free_kb=$(adb shell df /data | awk 'NR==2{print $4}')
-echo "assets: $((need / 1000000000)) GB; free on the phone's /data: $((free_kb / 1000000)) GB"
+echo "to push: $((need / 1000000000)) GB; free on the phone's /data: $((free_kb / 1000000)) GB"
 [ $((free_kb * 1024)) -gt $((need + 2000000000)) ] || die "not enough free space on the phone"
 
 # fd 3, because adb and curl inside the loop read stdin and would eat the remaining lines
@@ -75,8 +81,7 @@ while IFS='|' read -r -u 3 name role bytes sha url dpath; do
     echo "warning: no published SHA-256 for $name yet; size checked only"
   fi
   remote=$DEVICE_ROOT/$dpath
-  remote_size=$(adb shell "stat -c %s '$remote' 2>/dev/null" | tr -d '\r' || true)
-  if [ "$remote_size" = "$bytes" ]; then
+  if [ "$(remote_size "$remote")" = "$bytes" ]; then
     echo "$name is already on the phone"
   else
     adb shell "mkdir -p '$(dirname "$remote")'"

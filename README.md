@@ -74,7 +74,7 @@ in-app import).
 
 ## Install
 
-The signed APK is in the [v1.0.0 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.0.0).
+The signed APK is in the [v1.1.0 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.1.0).
 [`INSTALL.md`](INSTALL.md): `scripts/install.sh` downloads the model and corpus on a computer,
 checks their SHA-256, pushes them to the phone over USB and installs the APK. Building the app:
 [`app-android/README.md`](app-android/README.md). Testing it: [`TESTING.md`](TESTING.md).
@@ -102,7 +102,9 @@ checks their SHA-256, pushes them to the phone over USB and installs the APK. Bu
 
 The built corpus is published at
 [rammingaway/androidlm-corpus](https://huggingface.co/datasets/rammingaway/androidlm-corpus)
-(CC BY-SA 4.0); `scripts/install.sh` downloads it.
+(CC BY-SA 4.0), and the places database at
+[rammingaway/androidlm-places](https://huggingface.co/datasets/rammingaway/androidlm-places)
+(ODbL 1.0); `scripts/install.sh` downloads them.
 
 ## Reproducing the corpus
 
