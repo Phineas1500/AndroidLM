@@ -810,7 +810,8 @@ object PlacesText {
         "it that matters (the travel guide's and Wikipedia's words when quoted, hours when asked about). Say " +
         "nothing about a place that the list does not say: no praise, popularity, ratings, atmosphere, " +
         "dishes, prices or neighbourhoods, unless it is a famous place you know well. Never describe the " +
-        "list itself or what it lacks. No introduction, no closing remarks, no LaTeX, no visible " +
+        "list itself or what it lacks. Unless the question asks for more than places, the answer's first " +
+        "characters are the first place's number, like \"[1]\". No closing remarks, no LaTeX, no visible " +
         "deliberation."
     const val MODEL_PLACES = 6
     const val GUIDE_CHARS = 180

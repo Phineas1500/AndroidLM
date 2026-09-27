@@ -45,7 +45,7 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 | Model load | about 28 s on app start |
 | Answer-first question | first words after about 18 s; answer plus cited source check in about 3 min (medians over 5 questions) |
 | Retrieval-first question | cited answer in about 1.6 min (median 98 s over 19 questions; first words after 44-70 s) |
-| Places question ("best vegan restaurants in Lisbon") | list of places on screen after about 0.1 s; the model's recommendations from it done 28-77 s after the question (Lisbon from a cold start 28 s, luxury hotels in London 68 s, sushi in Tokyo 77 s) |
+| Places question ("best vegan restaurants in Lisbon") | list of places on screen after 0.15 s; the model's recommendations from it start after 18 s and are done after 52 s (medians over 24 questions; 30-117 s) |
 
 Against Qwen3-1.7B answering the same 72 questions from memory, graded 0-10 by Claude with one
 rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-model-comparison.md)):

@@ -75,7 +75,19 @@ sentence says the subject is ("is a sushi restaurant", up to "in", "located", "f
 like) and rejects films, bands, series, people and sports clubs; the Colosseum, the Empire State
 Building and Hyde Park, which the old check missed, now count.
 
-Measured on the Pixel 8 Pro (other runs):
+Measured on the Pixel 8 Pro, the 24 questions of `eval/questions_places.jsonl`
+(`eval/answers_phone_places_v18.jsonl`): all on the places route; the list on screen after a
+median 0.15 s; the model's first words after 17.5 s and its answer done after 52 s (30-117 s),
+reading a median 468 prompt tokens and writing 139 (v1.1: done after 68 s, 581 and 169). Where
+the list has more to say, so does the answer (Chiang Mai: "Mr Green Restaurant: ... all vegan,
+high quality Thai dishes, main dishes are all 68 baht"; London's hotels, Tokyo's sushi); where it
+has only the kind and the distance (Lisbon's vegan places, Buenos Aires' kosher ones), so has the
+answer. In 5 of the 24 the model opened with a sentence about the list ("The list provides several
+vegan options ...") or praise it had no ground for ("highly rated"); the prompt now makes an
+answer to a plain request begin with the first place, and asked again
+(`eval/answers_phone_places_v18_recheck.jsonl`) all 7 of those and Lisbon did.
+
+Other runs:
 
 - "what about Porto?" after the Lisbon question: the rewrite takes 15.6 s, then the Porto list.
 - "Best vegan restaurants in Lisbon, and how much should I tip?": the tipping advice (5-10%, not
