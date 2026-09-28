@@ -236,6 +236,8 @@ class RunService : Service() {
         shuttingDown = false
         pending = if (question == null) req?.copy(clearKv = true) else null
         pendingResearch = question
+        // nothing to run: the model is loaded ahead of the first question (the app was opened)
+        val preload = question == null && req == null
         staleId = 0
         sessionSig = sig
         main.removeCallbacks(idleUnload)
@@ -257,7 +259,8 @@ class RunService : Service() {
             // incoming session reports its own at BMOE_READY.
             it.copy(state = EngineState.LOADING, error = null, sessionSig = sig, answer = "", summary = "",
                 transcript = emptyList(), streaming = streaming, ioMode = null, thinkControl = null,
-                research = question?.let { q -> ResearchUi(q) },
+                // (a load ahead of the first question keeps the research on screen and its history)
+                research = if (preload) it.research else question?.let { q -> ResearchUi(q) },
                 researchHistory = if (question != null) withFinished(it) else it.researchHistory)
         }
 
@@ -832,6 +835,14 @@ class RunService : Service() {
                 running.join()
                 main.post { startResearch(question) }
             }
+            return
+        }
+        if (RunBus.state.value.state == EngineState.LOADING && proc != null) {
+            // the model is still loading (it was loaded when the app opened): the question runs as
+            // soon as it is ready, and a places list goes on screen meanwhile
+            pendingResearch = question
+            RunBus.update { it.copy(research = ResearchUi(question), researchHistory = withFinished(it)) }
+            previewPlaces(question)
             return
         }
         if (procWriter == null) { fail("session not ready"); return }

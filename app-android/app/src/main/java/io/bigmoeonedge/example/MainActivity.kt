@@ -74,6 +74,31 @@ class MainActivity : ComponentActivity() {
         autoResearch(intent)
     }
 
+    override fun onStart() {
+        super.onStart()
+        preloadModel()
+    }
+
+    /**
+     * Loads the model as soon as the app is opened, so the first question does not wait for it
+     * (about 25 s on a Pixel 8 Pro): only in research mode with a corpus, and only when no session
+     * is loaded or loading. A session unloaded after [RunService]'s idle timeout is loaded again
+     * the next time the app comes to the screen.
+     */
+    private fun preloadModel() {
+        val ui = RunBus.state.value
+        if (ui.sessionSig != null || ui.state != EngineState.IDLE) return
+        Thread {
+            val settings = AppSettings.load(this)
+            if (!settings.researchMode || CorpusLocator.find(this) == null) return@Thread
+            val model = ModelManager.listMoeModels(this).firstOrNull() ?: return@Thread
+            runOnUiThread {
+                val now = RunBus.state.value
+                if (now.sessionSig == null && now.state == EngineState.IDLE) preloadSession(this, model, settings)
+            }
+        }.start()
+    }
+
     /** Dev builds: a question sent to the running app (am start --activity-single-top) is a follow-up. */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -365,8 +390,10 @@ private fun MainScreen(
                                     prompt = ""
                                 }
                             },
-                            // (a question asked while only the last answer's source check runs stops the check)
-                            enabled = (!ui.busy || researchOn && research?.checking == true) && models.isNotEmpty() &&
+                            // (a question asked while only the last answer's source check runs stops the check;
+                            // one asked while the model loads runs when it is ready)
+                            enabled = (!ui.busy || researchOn && (research?.checking == true || ui.state == EngineState.LOADING)) &&
+                                models.isNotEmpty() &&
                                 (!researchOn || prompt.isNotBlank()),
                             modifier = Modifier.weight(1f),
                         ) { Text(if (researchOn) "Research" else if (ui.transcript.isNotEmpty()) "Send" else if (ui.ready) "Send" else "Run") }
@@ -791,6 +818,19 @@ private fun MeterRow(label: String, value: Double, total: Double, color: android
  * otherwise the session is (re)started with this configuration and the prompt runs as soon as it
  * reports ready. Per-prompt options (n_predict, thinking) ride the request, not the session.
  */
+/** Starts a session for [model] with nothing to run yet: the model loads ahead of the first question. */
+private fun preloadSession(context: android.content.Context, model: File, settings: AppSettings) {
+    val csv = if (settings.metricsCsv) AppSettings.newMetricsCsvPath(context) else null
+    val argv = ArrayList(settings.sessionArgv(ModelManager.cliPath(context), model.absolutePath, csv))
+    ContextCompat.startForegroundService(
+        context,
+        Intent(context, RunService::class.java)
+            .putExtra(RunService.EXTRA_MODEL, model.absolutePath)
+            .putStringArrayListExtra(RunService.EXTRA_ARGV, argv)
+            .putExtra(RunService.EXTRA_SIG, settings.sessionSignature(model.absolutePath)),
+    )
+}
+
 private fun launchPrompt(
     context: android.content.Context,
     model: File,
