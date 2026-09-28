@@ -215,8 +215,11 @@ class RunService : Service() {
         val req = if (intent.hasExtra(EXTRA_PROMPT)) reqFrom(intent) else null
         val question = intent.getStringExtra(EXTRA_QUESTION)
 
-        // Already running the requested session? Just generate against the warm process.
-        if (proc != null && sig == sessionSig && !shuttingDown) {
+        // Already running (or loading) the requested session? Just generate against it. While it
+        // loads its process may not exist yet (it is started on the session thread): a second start
+        // in that moment, such as the app opening with a question, must not load a second engine.
+        val loading = RunBus.state.value.state == EngineState.LOADING
+        if ((proc != null || loading) && sig == sessionSig && !shuttingDown) {
             if (question != null) startResearch(question) else if (req != null) sendGenerate(req)
             return
         }
@@ -837,7 +840,7 @@ class RunService : Service() {
             }
             return
         }
-        if (RunBus.state.value.state == EngineState.LOADING && proc != null) {
+        if (RunBus.state.value.state == EngineState.LOADING && sessionSig != null && !shuttingDown) {
             // the model is still loading (it was loaded when the app opened): the question runs as
             // soon as it is ready, and a places list goes on screen meanwhile
             pendingResearch = question
