@@ -452,6 +452,78 @@ def build_context(hits, budget_chars, passage_chars=650, lead_chars=1000):
     return "\n\n".join(parts), used_hits
 
 
+# ---- a shorter context for the source check ---------------------------------------------------
+# The check tests the draft's statements, so what it needs are the passages (in the excerpt form,
+# the sentences) that share the draft's names and numbers, and the question's, not six passages in
+# full: on the phone reading them is most of the check's time (about 1,100 tokens at 23/s).
+CHECK_NUMBER = re.compile(r"\d[\d,.]*\d|\d")
+CHECK_WORD = re.compile(r"[^\W\d_][\w'\u2019-]*")
+# a sentence ends after a word of two lowercase letters or a number (not "U.S." or "H. W.")
+CHECK_SENTENCE = re.compile(r"(?<=[a-z0-9)\]][a-z0-9%)\]][.!?])\s+(?=[A-Z\"\u201c(])|\n+")
+
+
+def check_terms(text):
+    """What a check tests in [text], term -> weight: numbers 3 (without thousands commas), words
+    that start with a capital 2, other words of four letters or more 1 (stopwords left out)."""
+    terms = {}
+    for m in CHECK_NUMBER.finditer(text):
+        t = m.group(0).replace(",", "").rstrip(".")
+        terms[t] = max(terms.get(t, 0), 3)
+    for m in CHECK_WORD.finditer(text):
+        w = m.group(0)
+        low = w.lower()
+        if low in STOP or (len(low) < 4 and not w[0].isupper()):
+            continue
+        terms[low] = max(terms.get(low, 0), 2 if w[0].isupper() else 1)
+    return terms
+
+
+def check_overlap(text, terms):
+    """How much of [terms] [text] contains: the weights of the distinct terms it has."""
+    have = set(check_terms(text))
+    return sum(w for t, w in terms.items() if t in have)
+
+
+def check_excerpt(text, terms, limit):
+    """A passage cut to its first sentence and the sentences that share most with [terms], in their
+    order, within [limit] characters."""
+    sents = [x.strip() for x in CHECK_SENTENCE.split(text) if x.strip()]
+    if not sents:
+        return text
+    keep = {0}
+    used = len(sents[0])
+    ranked = sorted(range(1, len(sents)), key=lambda i: (-check_overlap(sents[i], terms), i))
+    for i in ranked:
+        if check_overlap(sents[i], terms) == 0:
+            break
+        if used + 1 + len(sents[i]) > limit:
+            continue
+        keep.add(i)
+        used += 1 + len(sents[i])
+    out, last = [], -1
+    for i in sorted(keep):
+        if last >= 0 and i != last + 1:
+            out.append("…")
+        out.append(sents[i])
+        last = i
+    return " ".join(out)
+
+
+def check_context(hits, draft, question, budget_chars, excerpt=False):
+    """build_context for the source check: the passages that share most with the draft and the
+    question first, within [budget_chars]; with [excerpt], each cut to its sentences that do."""
+    terms = check_terms(draft)
+    for t, w in check_terms(question).items():
+        terms[t] = max(terms.get(t, 0), w)
+    scored = []
+    for i, h in enumerate(hits):
+        text = h["text"]
+        if excerpt:
+            text = check_excerpt(text, terms, 500 if h.get("lead") else 400)
+        scored.append((-check_overlap(text, terms), i, dict(h, text=text)))
+    return build_context([h for _, _, h in sorted(scored, key=lambda x: (x[0], x[1]))], budget_chars)
+
+
 VOYAGE = None  # optional second Corpus built from Wikivoyage (--voyage-db)
 ENGINE = None  # a BmoeSession when --engine-cli is given; otherwise llama-server at --url
 

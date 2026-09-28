@@ -820,7 +820,16 @@ class RunService : Service() {
      * the idle unload is held off, because the searches between generations are part of it.
      */
     private fun startResearch(question: String) {
-        if (researchJob?.isActive == true) return
+        researchJob?.takeIf { it.isActive }?.let { running ->
+            // a new question while the last answer's source check runs: the check stops (the engine
+            // is told to), then the question starts
+            running.cancel()
+            scope.launch {
+                running.join()
+                main.post { startResearch(question) }
+            }
+            return
+        }
         if (procWriter == null) { fail("session not ready"); return }
         val runId = researchRuns.incrementAndGet()
         main.removeCallbacks(idleUnload)

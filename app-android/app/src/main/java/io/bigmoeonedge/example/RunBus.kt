@@ -47,6 +47,8 @@ data class ResearchUi(
     val error: String? = null,
 ) {
     val running get() = phase != ResearchPhase.DONE && phase != ResearchPhase.CANCELLED && phase != ResearchPhase.FAILED
+    /** The answer is written and only its source check is still running: a new question may stop it. */
+    val checking get() = phase == ResearchPhase.CHECKING
 }
 
 /**

@@ -365,7 +365,9 @@ private fun MainScreen(
                                     prompt = ""
                                 }
                             },
-                            enabled = !ui.busy && models.isNotEmpty() && (!researchOn || prompt.isNotBlank()),
+                            // (a question asked while only the last answer's source check runs stops the check)
+                            enabled = (!ui.busy || researchOn && research?.checking == true) && models.isNotEmpty() &&
+                                (!researchOn || prompt.isNotBlank()),
                             modifier = Modifier.weight(1f),
                         ) { Text(if (researchOn) "Research" else if (ui.transcript.isNotEmpty()) "Send" else if (ui.ready) "Send" else "Run") }
 

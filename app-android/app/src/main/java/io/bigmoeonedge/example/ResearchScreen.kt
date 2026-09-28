@@ -137,6 +137,11 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
             ) {
                 SelectionContainer { MarkdownText(r.answer, onCitation = cite) }
             }
+            // the answer is complete while its source check still reads: say so, and that a new
+            // question may be asked now
+            if (r.checking) answeredMs(r)?.let { ms ->
+                Hint("Answered in " + duration(ms) + ". The source check below is still running; a new question stops it.")
+            }
         }
         if (r.check != null && (r.check.isNotEmpty() || r.running)) {
             Surface(
@@ -147,8 +152,11 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
                 Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text("Source check", fontSize = 13.sp, fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSecondaryContainer)
-                    Text("The answer above, checked against the sources", fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer)
+                    Text(
+                        if (r.phase == ResearchPhase.CANCELLED) "Stopped before the end, for the next question"
+                        else "The answer above, checked against the sources",
+                        fontSize = 12.sp, color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
                     if (r.check.isNotEmpty()) {
                         SelectionContainer { MarkdownText(r.check, onCitation = cite, fontSize = 14.sp) }
                     }
@@ -308,10 +316,25 @@ private fun timingSummary(r: ResearchUi): String {
             else -> null
         }
     }
-    val mins = (total / 60).toInt()
-    val head = if (mins > 0) String.format(Locale.US, "Done in %d min %02d s", mins, (total % 60).toInt())
-    else String.format(Locale.US, "Done in %.0f s", total)
+    val answered = answeredMs(r)
+    val head = if (answered != null && r.timings.any { it.phase == ResearchPhase.CHECKING }) {
+        "Answered in " + duration(answered) + ", checked by " + duration((total * 1000).toLong())
+    } else {
+        "Done in " + duration((total * 1000).toLong())
+    }
     return head + " · " + parts.joinToString(" · ")
+}
+
+/** How long an answer-first run took to its answer, before the source check; null on other routes. */
+private fun answeredMs(r: ResearchUi): Long? {
+    if (r.route?.route != Route.ANSWER_FIRST || r.timings.none { it.phase == ResearchPhase.DRAFTING }) return null
+    return r.timings.takeWhile { it.phase != ResearchPhase.CHECKING }.sumOf { it.wallMs }
+}
+
+private fun duration(ms: Long): String {
+    val s = ms / 1000.0
+    val mins = (s / 60).toInt()
+    return if (mins > 0) String.format(Locale.US, "%d min %02d s", mins, (s % 60).toInt()) else String.format(Locale.US, "%.0f s", s)
 }
 
 /** A numbered source; tapping it shows the passage the model was given. */
