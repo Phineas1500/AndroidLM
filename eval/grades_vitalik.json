@@ -1,0 +1,613 @@
+{
+ "cry-001": {
+  "A_errors": [
+   "'LEED' lattice signature scheme does not exist (fabricated)",
+   "Rainbow was a NIST round-3 finalist, never 'selected'",
+   "Presents FALCON as standardized FIPS 206; FN-DSA is still a draft (submitted for approval Aug 2025)"
+  ],
+  "B_errors": [],
+  "A_score": 5.5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B gives the correct NIST names, sizes, status (FN-DSA draft), stateful schemes and explicitly lists what is not quantum resistant; A has a fabricated scheme, a wrong FIPS 206 status and never says RSA/ECDSA fail."
+ },
+ "cry-002": {
+  "A_errors": [
+   "Says SLH-DSA is 'officially known as SPHINCS+' (reversed: SLH-DSA is the official name, derived from SPHINCS+)"
+  ],
+  "B_errors": [],
+  "A_score": 5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B gives exact sizes, speed, parameter sets and when to use which; A only states lattice vs hash with no ML-DSA size or speed comparison."
+ },
+ "cry-003": {
+  "A_errors": [
+   "Claims Grover cuts SHA-256 collision cost to 2^64 (quantum collision search is ~2^85 BHT and not better than classical in practice)",
+   "Calls 2^64 work computationally infeasible"
+  ],
+  "B_errors": [],
+  "A_score": 6,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "Both give Shor vs Grover; A misstates quantum collision security, B is precise and adds accurate current resource estimates."
+ },
+ "cry-004": {
+  "A_errors": [
+   "Says Cancun focused on account abstraction and wallet improvements (it did not)"
+  ],
+  "B_errors": [],
+  "A_score": 6.5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "A covers the basics but omits the separate blob gas market and adds a false Cancun claim; B is complete and accurate through Fusaka/BPO2."
+ },
+ "cry-005": {
+  "A_errors": [],
+  "B_errors": [
+   "Labels Casper FFG as 'probabilistic finality'",
+   "Labels LMD-GHOST as providing 'instant finality'",
+   "Expands LMD as 'Liveness DAG' and says it uses a DAG",
+   "Says checkpoints occur/finalize every 32 epochs (checkpoints are per epoch; finality ~2 epochs)",
+   "Attributes justification/finalization to LMD-GHOST"
+  ],
+  "A_score": 10,
+  "B_score": 1.5,
+  "prefer": "A",
+  "reason": "A correctly explains Gasper, justification/finalization, the 1/3 slashing bound and inactivity leak; B confuses the two components and gets the timing wrong."
+ },
+ "cry-006": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 7.5,
+  "B_score": 9.5,
+  "prefer": "B",
+  "reason": "Both correct; B adds the bisection fault game, trust models, withdrawal times and L2BEAT stages."
+ },
+ "cry-007": {
+  "A_errors": [
+   "Says ERC-4337 'operates as a layer-2 solution' (it is an application-layer standard on L1 and L2s, not an L2)"
+  ],
+  "B_errors": [],
+  "A_score": 5.5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B covers UserOps, alt mempool, bundlers, EntryPoint, paymasters and EIP-7702 correctly; A omits paymasters and 7702 and mislabels 4337 as layer-2."
+ },
+ "cry-008": {
+  "A_errors": [
+   "Says BLS assures a validator 'has verified a transaction' (validators sign attestations/blocks)"
+  ],
+  "B_errors": [],
+  "A_score": 5.5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B explains BLS12-381, sizes, aggregation, PoP, sync committees and quantum vulnerability; A is thin and imprecise."
+ },
+ "cry-009": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 6,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "A gets setup and quantum points but omits proof size and verification cost; B covers all trade-offs with accurate numbers."
+ },
+ "cry-010": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 10,
+  "B_score": 5,
+  "prefer": "A",
+  "reason": "A explains MEV sources, MEV-Boost relays as today's PBS and ePBS status accurately; B is generic and never says PBS today runs through MEV-Boost or that ePBS is not live."
+ },
+ "cry-011": {
+  "A_errors": [
+   "Implies miners get 'a portion of base fees' as revenue; the whole base fee is burned"
+  ],
+  "B_errors": [],
+  "A_score": 7,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "Both give burn and 12.5% adjustment; B adds exact formula, target = half gas limit, tx fields and history, and is error-free."
+ },
+ "cry-012": {
+  "A_errors": [
+   "Says the three added signed fields are chain ID, 'replay-protected nonce' and gas price (they are chainid, 0, 0)"
+  ],
+  "B_errors": [],
+  "A_score": 4.5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B gives the correct field list, v formula and ETH/ETC context; A gets the mechanism wrong and omits v."
+ },
+ "cry-013": {
+  "A_errors": [],
+  "B_errors": [
+   "Expands EOA as 'Account-Optimized'",
+   "Says delegation lasts a single transaction and code is removed afterwards (delegation persists)",
+   "Invents a 'code flag' in account state",
+   "Says Pectra is 'expected in mid-2025' (shipped 7 May 2025)"
+  ],
+  "A_score": 10,
+  "B_score": 1.5,
+  "prefer": "A",
+  "reason": "A is accurate (0x04, authorization tuple, 0xef0100 indicator, persistence, caveats); B describes the wrong, transient mechanism."
+ },
+ "cry-014": {
+  "A_errors": [],
+  "B_errors": [
+   "States max effective balance after EIP-7251 is 32 ETH (it is 2,048 ETH)",
+   "Claims EIP-7251 does not raise the max effective balance",
+   "Says excess balance above 32 ETH earns rewards without counting toward effective balance"
+  ],
+  "A_score": 10,
+  "B_score": 1,
+  "prefer": "A",
+  "reason": "A gives the correct 2,048 ETH with 0x02 credentials and 32 ETH minimum; B's answer is wrong, only the appended source check contradicts it."
+ },
+ "cry-015": {
+  "A_errors": [
+   "Calls the CL-EL interface a 'Payload Delivery API' (it is the Engine API)",
+   "Describes partial withdrawals as validator-initiated (they are an automatic sweep)"
+  ],
+  "B_errors": [],
+  "A_score": 5.5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B explains the push model, no gas, cannot fail, 16 per payload, Gwei amounts and Shapella date; A is vague and has interface errors."
+ },
+ "cry-016": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 10,
+  "B_score": 7,
+  "prefer": "A",
+  "reason": "Both correct; A adds interfaces, ERC-165 and safeTransfer hooks, and a comparison table."
+ },
+ "cry-017": {
+  "A_errors": [
+   "Lists Convex (and Aave natively) as ERC-4626 adopters; Convex vaults are not ERC-4626 and Aave uses wrapper tokens"
+  ],
+  "B_errors": [],
+  "A_score": 7,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "Both get the core purpose; B gives the exact interface, rounding rules, inflation attack and extensions."
+ },
+ "cry-018": {
+  "A_errors": [
+   "States ML-KEM is still conditional on patent agreements with NTRU as fallback (resolved in 2022)"
+  ],
+  "B_errors": [],
+  "A_score": 6.5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "Both answer 'no, a KEM'; B adds FIPS 203 date, parameter sets, deployment and the actual signature standards."
+ },
+ "cry-019": {
+  "A_errors": [
+   "LMS expanded as 'Leighton's Merkle Signature' (Leighton-Micali)",
+   "LMS cited as RFC 8559 (it is RFC 8554)",
+   "Wrong reason for stateful efficiency (not embedding OTS public keys)",
+   "Calls XMSS^MT an OTS variant"
+  ],
+  "B_errors": [],
+  "A_score": 4.5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B is accurate (RFCs, SP 800-208, reuse forgery, operational pitfalls, CNSA 2.0); A has several naming and standard errors and omits SP 800-208."
+ },
+ "cry-020": {
+  "A_errors": [
+   "Says EIP-3675 replaced a 'previous PoS implementation (EIP-3388)' (no such thing)"
+  ],
+  "B_errors": [],
+  "A_score": 4.5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B gives date, TTD, block numbers, header changes and removal of block/ommer rewards; A is generic and includes a fabricated EIP reference."
+ },
+ "dng-001": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 9.5,
+  "B_score": 7.5,
+  "prefer": "A",
+  "reason": "Both safe and correct; A adds wound care, marking swelling with time, a clear walk-out vs wait decision and the pressure-bandage regional note."
+ },
+ "dng-002": {
+  "A_errors": [],
+  "B_errors": [
+   "Calls shivering + confusion + slurred speech the triad of severe hypothermia; shivering usually fades/stops in severe hypothermia (this is mild-moderate)",
+   "Contradictory instruction: under 'if unconscious' says to apply warm packs 'if the person is conscious'"
+  ],
+  "A_score": 9.5,
+  "B_score": 6,
+  "prefer": "A",
+  "reason": "A is complete, correct and well ordered (shelter, insulate, core warming, CPR notes); B mislabels severity and has a self-contradictory step."
+ },
+ "dng-003": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 9.5,
+  "B_score": 8,
+  "prefer": "A",
+  "reason": "Both give correct core first aid; A adds keeping the child warm, pain relief and clear criteria for emergency care."
+ },
+ "dng-004": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 9.5,
+  "B_score": 8,
+  "prefer": "A",
+  "reason": "Both correct; A adds the in-bed case, no-doorway advice, tsunami guidance near the coast and texting over calling."
+ },
+ "dng-005": {
+  "A_errors": [
+   "Says a 1-micron filter handles bacteria; 1 micron removes protozoa but bacteria need ~0.1-0.4 micron"
+  ],
+  "B_errors": [],
+  "A_score": 9,
+  "B_score": 5.5,
+  "prefer": "A",
+  "reason": "A gives bottled water first, correct boil times and CDC bleach doses; B covers boiling only and gives no usable chemical dosing or bottled-water advice."
+ },
+ "food-001": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 7,
+  "B_score": 9,
+  "prefer": "B",
+  "reason": "Both name real Berlin vegan places with correct addresses (checked in OSM: SOY, Oukan, Zerö, Försters, Vegang, Shisomen; Bonvivant fully vegan with a Michelin star, Lucky Leek Michelin-listed, La Stella Nera, doen doen, Vamos Veganos). A's first pick St. Bess rests on a 2018 guide entry that describes pizza with vegetarian or vegan toppings, and A gives almost no detail and no warning that data may be old. B describes each place, organises them usefully, correctly flags FREA as closed and says to check before going."
+ },
+ "food-002": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 9,
+  "B_score": 6,
+  "prefer": "A",
+  "reason": "Both name real vegan places; A describes nine with addresses, areas and dishes, while B's text names only three with distances (addresses only in the list)."
+ },
+ "food-003": {
+  "A_errors": [],
+  "B_errors": [
+   "Green Eat (Florida 428) listed as a vegan restaurant; it is a salad and sandwich chain that serves meat",
+   "Spika Lion Tienda Vegana is a vegan shop, not a restaurant",
+   "Lotos and Naturaleza Sabia are vegetarian, labelled plain 'vegan restaurant'"
+  ],
+  "A_score": 9,
+  "B_score": 6,
+  "prefer": "A",
+  "reason": "A's places check out (Gioia at Palacio Duhau, Donnet in Chacarita, La Reverde at Montevideo 40, Gordo Vegano at Echeverría 3078, Veganius, Let it V at Costa Rica 5865, Craft Vegan Bakery). A describes each one, gives useful tips and says details change. B's picks are mostly real downtown vegan places with addresses, but the text says nothing about the food, and the list includes a non-vegan chain and a shop."
+ },
+ "food-004": {
+  "A_errors": [
+   "Saravana Bhavan (top pick) labelled 'vegan restaurant' in the list; it is a vegetarian Indian chain that uses dairy",
+   "Saravana Bhavan's address differs between the text (84 Syed Alwi Rd) and the list (VivoCity Food Republic stall)",
+   "Annalakshmi labelled 'vegan restaurant'; it is vegetarian Indian and uses dairy"
+  ],
+  "B_errors": [],
+  "A_score": 5,
+  "B_score": 9,
+  "prefer": "B",
+  "reason": "A leads with a dairy-using vegetarian Indian chain. Most of A's list is Chinese vegetarian eateries labelled vegan, and the text has almost no detail. B's places all check out (Whole Earth at 76 Peck Seah St, still Bib Gourmand; Herbivore; Yi Xin; The Kind Bowl on Killiney Rd; nomVnom; Genesis; VeganBurg Eunos, which really is its only Singapore outlet; Pita Bakery). B describes each one, warns about egg and dairy, and says to check before going."
+ },
+ "food-005": {
+  "A_errors": [],
+  "B_errors": [
+   "May Kaidee's Chiang Mai restaurant is on Charoen Muang Rd, not Chang Moi Kao Rd"
+  ],
+  "A_score": 7.5,
+  "B_score": 8.5,
+  "prefer": "B",
+  "reason": "Both are accurate; A gives addresses and hours for five places, B covers nine with areas and what to eat, which is somewhat more useful."
+ },
+ "food-006": {
+  "A_errors": [
+   "List tags Tokyo Jangara (Ueno) and Great Lakes burger as vegan though they are ordinary restaurants with vegan options"
+  ],
+  "B_errors": [],
+  "A_score": 6,
+  "B_score": 9,
+  "prefer": "B",
+  "reason": "B describes nine verified vegan places with locations and dishes plus dashi advice; A's text is five names with distances only."
+ },
+ "food-007": {
+  "A_errors": [
+   "May Veggie Home's main Sukhumvit 101 branch was reported closed in Aug 2026"
+  ],
+  "B_errors": [
+   "May Veggie Home reported closed (Aug 2026) and given an unexpected Ratchadaphisek address"
+  ],
+  "A_score": 8.5,
+  "B_score": 6,
+  "prefer": "A",
+  "reason": "A gives nine real, well-described places across areas with practical tips; B's text is five sparse entries, one of them closed."
+ },
+ "food-008": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 6.5,
+  "B_score": 9,
+  "prefer": "B",
+  "reason": "Both name real places; B organizes eight across both sides of the city with addresses and dishes, while A's text only gives names, cuisine and distance."
+ },
+ "food-009": {
+  "A_errors": [
+   "Yug is vegetarian (uses dairy, vegan items marked), described as without meat or dairy"
+  ],
+  "B_errors": [
+   "Forever (Guanajuato 54) reported closed since Oct 2024",
+   "Los Vegetarianos reported closed since 2021, and it was vegetarian rather than vegan"
+  ],
+  "A_score": 8.5,
+  "B_score": 4.5,
+  "prefer": "A",
+  "reason": "A lists nine real vegan places with addresses and dishes; B's five-item text includes two closed places."
+ },
+ "food-010": {
+  "A_errors": [
+   "摩斯漢堡 (MOS Burger, 中山北路二段) listed as a vegan restaurant; it is a fast-food chain that serves meat",
+   "Original Vegan is in Xindian/Dapinglin, New Taipei, not Taipei proper"
+  ],
+  "B_errors": [],
+  "A_score": 5,
+  "B_score": 8,
+  "prefer": "B",
+  "reason": "A's text names only three places, with nothing but a distance for each. Its longer list includes MOS Burger as 'vegan' and a place outside the city. B's places are real and correctly placed (養心茶樓 at 松江路128, 來欣 dumplings, 無口小廚 near Dihua St, 炒炒 on Da'an Rd Lane 52, 蔬河, Plants, Ooh Cha Cha, The Green Room). B describes the food, explains the 全素/蛋奶素 labels and says details change. Sunami could not be verified."
+ },
+ "food-011": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 9,
+  "B_score": 5.5,
+  "prefer": "A",
+  "reason": "A describes nine verified vegan places by area with dishes and tips; B's text names only three with distances."
+ },
+ "food-012": {
+  "A_errors": [
+   "Forky's closed in 2024"
+  ],
+  "B_errors": [],
+  "A_score": 8,
+  "B_score": 7,
+  "prefer": "A",
+  "reason": "A covers about ten places by area with dishes (one closed); B's five are all real with addresses but less detailed."
+ },
+ "food-013": {
+  "A_errors": [
+   "Living Vino reported closed",
+   "Black Cup is a coffee shop, not a restaurant",
+   "Café Leila labelled a vegetarian restaurant while its own quoted note says pescatarian"
+  ],
+  "B_errors": [
+   "Daner Pizza is at 4 Shota Nishnianidze St (takeaway), not 28 Purtseladze St",
+   "Café Leila called vegetarian though its menu has fish dishes"
+  ],
+  "A_score": 5.5,
+  "B_score": 8.5,
+  "prefer": "B",
+  "reason": "B lists eleven mostly verified places with addresses and what to order in Georgian restaurants; A's five include a closed place and a coffee shop."
+ },
+ "food-014": {
+  "A_errors": [],
+  "B_errors": [
+   "Veg Out tagged as Thai cuisine; it is a vegan café"
+  ],
+  "A_score": 9,
+  "B_score": 6,
+  "prefer": "A",
+  "reason": "A covers shojin temple restaurants and vegan cafés with locations and a dashi warning; B's text names only three places."
+ },
+ "food-015": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 6.5,
+  "B_score": 8.5,
+  "prefer": "B",
+  "reason": "B gives ten real places by neighbourhood with dishes; A's five are real but mostly bare names."
+ },
+ "food-016": {
+  "A_errors": [
+   "List shows a phone number as The Kind Kitchen's address; text skips entry [3]"
+  ],
+  "B_errors": [],
+  "A_score": 5.5,
+  "B_score": 8.5,
+  "prefer": "B",
+  "reason": "B describes nine Cape Town places with addresses and dishes; A's text has only three names with distances."
+ },
+ "food-017": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 5,
+  "B_score": 9,
+  "prefer": "B",
+  "reason": "The question is in Portuguese; B answers in Portuguese with nine real places and addresses, while A answers in English with thinner detail."
+ },
+ "food-018": {
+  "A_errors": [],
+  "B_errors": [
+   "Vegetalia Gòtic (Escudellers 54) reported closed",
+   "Maoz is a vegetarian falafel chain tagged as a vegan restaurant"
+  ],
+  "A_score": 8.5,
+  "B_score": 5.5,
+  "prefer": "A",
+  "reason": "A correctly places the user near Plaça de Catalunya and gives over a dozen vegan places by walking area; B leads with a closed place and has little detail."
+ },
+ "food-019": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 6.5,
+  "B_score": 8.5,
+  "prefer": "B",
+  "reason": "Both give real nearby places; B identifies Central and describes nine with dishes and walking context, while A's text is five bare names (one across the harbour)."
+ },
+ "food-020": {
+  "A_errors": [
+   "Sweetgreen presented as a vegan restaurant",
+   "Native Foods (16th St) listed though its Denver locations appear to have closed"
+  ],
+  "B_errors": [],
+  "A_score": 5,
+  "B_score": 8.5,
+  "prefer": "B",
+  "reason": "B identifies downtown Denver and describes ten places with addresses and whether they are fully vegan; A's text has three places, one of them a non-vegan salad chain."
+ },
+ "mth-001": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 9,
+  "B_score": 9.5,
+  "prefer": "B",
+  "reason": "Both correct at 31.36 mpg; B shows the derivation and adds the correct UK-gallon figure (37.7)."
+ },
+ "mth-002": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 9.5,
+  "B_score": 8.5,
+  "prefer": "A",
+  "reason": "Both compute 5.6 h correctly; A adds practical caveats (breaks, terrain) with correct arithmetic for the group variant."
+ },
+ "mth-003": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 8,
+  "B_score": 9.5,
+  "prefer": "B",
+  "reason": "Both reach $67.12 and $73.84; A omits stating the pre-tip USD clearly in the answer line and adds filler, B adds accurate Thai tipping/service-charge context."
+ },
+ "mth-004": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 9.5,
+  "B_score": 8,
+  "prefer": "A",
+  "reason": "Both correct (18 L, 18 kg); A adds per-person load and useful hydration notes."
+ },
+ "mth-005": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 9.5,
+  "B_score": 6.5,
+  "prefer": "A",
+  "reason": "Both compute 19.25 Wh; B never says power banks must stay in the cabin and are banned from checked bags, the key rule, while A states it plus newer airline restrictions."
+ },
+ "mth-006": {
+  "A_errors": [],
+  "B_errors": [
+   "Claims medical guidelines generally advise against strenuous outdoor activity above 90°F (32°C); no such general guideline"
+  ],
+  "A_score": 9.5,
+  "B_score": 6.5,
+  "prefer": "A",
+  "reason": "Both convert correctly and say it is dangerous; A gives practical precautions and heat exhaustion/stroke signs, B gives none."
+ },
+ "trv-001": {
+  "A_errors": [
+   "Lists 1122 as a Thai National Emergency Response Center number; 1122 is not a Thai emergency number",
+   "Says 191 operators often speak English; English is limited on 191, which is why 1155 is recommended"
+  ],
+  "B_errors": [],
+  "A_score": 7,
+  "B_score": 9.5,
+  "prefer": "B",
+  "reason": "Both give the four key numbers; A adds a fabricated 1122 line, B adds accurate extras (TAT 1672, embassy, Thai-script address)."
+ },
+ "trv-002": {
+  "A_errors": [],
+  "B_errors": [
+   "Lists Salvador as mostly 220 V; Salvador is 127 V (an exception in Bahia)"
+  ],
+  "A_score": 8,
+  "B_score": 8.5,
+  "prefer": "B",
+  "reason": "A is correct but brief; B is much more useful (city examples, device guidance) despite one wrong city example."
+ },
+ "trv-003": {
+  "A_errors": [],
+  "B_errors": [
+   "Says restaurant ice is often made from non-potable water; restaurants in Mexico City almost always use purified commercial ice"
+  ],
+  "A_score": 9.5,
+  "B_score": 7.5,
+  "prefer": "A",
+  "reason": "Both say no; A gives accurate practical alternatives (garrafones, ice, boiling), B overstates the ice risk."
+ },
+ "trv-004": {
+  "A_errors": [],
+  "B_errors": [
+   "Says red line reaches Restauradores; Restauradores is on the blue line and needs a transfer",
+   "Metro fare given as ~1.50 EUR or 0.50 EUR loaded; single is 1.90 EUR, 0.50 EUR is the card itself",
+   "Recommends Aerobus 1/2 with routes and prices; Aerobus has been discontinued (and the two routes are listed identically)",
+   "Says fixed rates apply to airport taxis; Lisbon taxis are metered",
+   "CP train routing via São Sebastião/Saldanha to Rossio is wrong",
+   "Bus list truncated mid-answer"
+  ],
+  "A_score": 9.5,
+  "B_score": 2.5,
+  "prefer": "A",
+  "reason": "A is accurate and current (transfers, 2026 fares, Aerobus gone, P2 ride-hail pickup); B has several wrong, outdated or misleading directions."
+ },
+ "trv-005": {
+  "A_errors": [
+   "Says Tbilisi metro and buses often require cash or a transport card; contactless bank cards work on validators and cash is not accepted"
+  ],
+  "B_errors": [],
+  "A_score": 7.5,
+  "B_score": 9.5,
+  "prefer": "B",
+  "reason": "Both correct on the lari and card acceptance; B is accurate on tapping bank cards on transit and gives better cash/ATM advice, A has a transit error."
+ },
+ "trv-006": {
+  "A_errors": [
+   "Says UK travellers need the 1968-convention IDP; Thailand is party to the 1949 convention, so the 1949 IDP is the one needed"
+  ],
+  "B_errors": [
+   "Attributes left-hand driving to 'historical ties to the British colonial system'; Thailand was never colonised"
+  ],
+  "A_score": 9,
+  "B_score": 6.5,
+  "prefer": "A",
+  "reason": "Both say left and IDP required; A is clearer on motorcycle licence categories, insurance voiding and safety, B has an odd sourcing preamble and a historical error."
+ },
+ "trv-007": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 9.5,
+  "B_score": 8,
+  "prefer": "A",
+  "reason": "Both correct (khrap/kha by speaker's gender); A adds pronunciation, 'very much', casual form and the wai."
+ },
+ "trv-008": {
+  "A_errors": [
+   "Places Yi Peng in December; it coincides with Loy Krathong in November",
+   "Answer is truncated mid-sentence"
+  ],
+  "B_errors": [],
+  "A_score": 5.5,
+  "B_score": 9.5,
+  "prefer": "B",
+  "reason": "B is accurate and complete (festivals, smoke timing, AQI precautions, seasons); A has a festival-date error and is cut off."
+ },
+ "trv-009": {
+  "A_errors": [],
+  "B_errors": [
+   "Says a service charge is often included in Portuguese restaurant bills; it is uncommon"
+  ],
+  "A_score": 9.5,
+  "B_score": 7,
+  "prefer": "A",
+  "reason": "A is accurate and adds the useful couvert tip; B misstates how common included service is."
+ },
+ "trv-010": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 2.5,
+  "B_score": 9,
+  "prefer": "B",
+  "reason": "A never names Grab or Bolt or gives practical usage advice and drifts into taxi regulation history; B is specific and accurate (apps, pricing, surge timing, airport pickup)."
+ }
+}

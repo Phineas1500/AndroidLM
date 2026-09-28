@@ -66,6 +66,26 @@ faster prompt kernels, 6.9 against the earlier phone answers' 7.1, 84 vs 83 key 
 search and writing, 7.2 against 7.0, 84 vs 82
 ([`notes/2026-09-25-search-speed.md`](notes/2026-09-25-search-speed.md)).
 
+The bounty's bar is ">50% as good as internet search + frontier AI models". We measured it on
+61 Vitalik-style questions from Boar's evaluation set: vegan restaurants, post-quantum
+signatures and Ethereum, travel, emergencies and travel arithmetic.
+- The app answered on the phone.
+- A frontier model (Claude Opus 5.5) answered with web search.
+- The answers were graded blind in pairs, 0-10, with the graders checking facts on the web.
+([`notes/2026-09-28-vitalik-bar.md`](notes/2026-09-28-vitalik-bar.md))
+
+| Questions | AndroidLM | Internet + frontier AI | AndroidLM as a share |
+|---|---|---|---|
+| Vegan restaurants (20) | 5.9 | 8.7 | 68% |
+| Post-quantum and Ethereum (20) | 5.2 | 10.0 | 52% |
+| Travel (10) | 6.2 | 9.3 | 67% |
+| Emergencies (5) | 7.0 | 9.4 | 74% |
+| Travel arithmetic (6) | 7.8 | 9.5 | 82% |
+| All (61) | 6.0 | 9.3 | 64% |
+
+The reference was better on every question. The app made 70 factual errors to the reference's
+9, 32 of them on Ethereum and post-quantum questions, where its sources are thinnest.
+
 Measurements, eval rounds and decisions are in [`notes/`](notes/); the Pixel findings are in
 [`notes/2026-09-23-pixel-first-day.md`](notes/2026-09-23-pixel-first-day.md) and
 [`notes/2026-09-24-speed-levers.md`](notes/2026-09-24-speed-levers.md) (which of the phone's

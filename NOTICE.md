@@ -18,6 +18,7 @@ following, each under its own terms.
 | Overture Maps places | https://overturemaps.org (release 2026-09-23.1) | CDLA-Permissive-2.0; Foursquare Open Source Places records Apache-2.0; AllThePlaces records CC0-1.0 | Places to eat, drink and stay in `places.db` |
 | GeoNames | https://www.geonames.org | CC BY 4.0 | City, region and country names in `places.db`, to find the city a question names |
 | Wikivoyage | https://en.wikivoyage.org | CC BY-SA 4.0 | Travel guide text in `voyage.db`; listing names matched to places in `places.db` |
+| Boar's evaluation questions | https://github.com/rferrari/boar-app (pull request #14, `eval/dataset/questions.v2.jsonl`) | MIT (Copyright (c) 2026 aoair contributors; notice in `eval/LICENSE-boar-questions.txt`) | The 61 questions of `eval/questions_vitalik.jsonl`, with our notes on what a good answer holds |
 
 Text derived from Wikipedia must remain under CC BY-SA 4.0 when redistributed, including inside
 a packaged corpus database.
