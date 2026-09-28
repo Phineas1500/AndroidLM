@@ -74,7 +74,7 @@ in-app import).
 
 ## Install
 
-The signed APK is in the [v1.1.0 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.1.0).
+The signed APK is in the [v1.1.1 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.1.1).
 [`INSTALL.md`](INSTALL.md): `scripts/install.sh` downloads the model and corpus on a computer,
 checks their SHA-256, pushes them to the phone over USB and installs the APK. Building the app:
 [`app-android/README.md`](app-android/README.md). Testing it: [`TESTING.md`](TESTING.md).

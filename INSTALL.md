@@ -23,11 +23,11 @@ and the corpus are therefore copied to the phone from a computer.
 
 ```sh
 git clone https://github.com/Phineas1500/AndroidLM && cd AndroidLM
-# the signed app from the v1.1.0 release (or build it yourself: app-android/README.md)
-curl -L -o androidlm-1.1.0.apk \
-  https://github.com/Phineas1500/AndroidLM/releases/download/v1.1.0/androidlm-1.1.0.apk
-shasum -a 256 androidlm-1.1.0.apk   # 143c4de65f72e2ab4547046c9bd9447f520e40c497764c8ff6fbfaad7adea435
-scripts/install.sh --apk androidlm-1.1.0.apk
+# the signed app from the v1.1.1 release (or build it yourself: app-android/README.md)
+curl -L -o androidlm-1.1.1.apk \
+  https://github.com/Phineas1500/AndroidLM/releases/download/v1.1.1/androidlm-1.1.1.apk
+shasum -a 256 androidlm-1.1.1.apk   # e6c8d745118db17fde022c9ee6940d371bf757f5387acc0ea162319be799f9e4
+scripts/install.sh --apk androidlm-1.1.1.apk
 ```
 
 The script downloads the model and corpus files into `./assets-cache` (resumable; run it again
@@ -55,7 +55,7 @@ adb shell mkdir -p /data/local/tmp/bmoe/corpus
 adb push Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf /data/local/tmp/bmoe/
 adb push wiki.db wiki_df.db voyage.db places.db /data/local/tmp/bmoe/corpus/
 adb shell 'chmod 755 /data/local/tmp/bmoe /data/local/tmp/bmoe/corpus; chmod 644 /data/local/tmp/bmoe/*.gguf /data/local/tmp/bmoe/corpus/*.db'
-adb install -r androidlm-1.1.0.apk
+adb install -r androidlm-1.1.1.apk
 ```
 
 `/data/local/tmp` is used because the app can open files there in place, without a storage
