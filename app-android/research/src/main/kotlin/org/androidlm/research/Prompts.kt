@@ -90,7 +90,7 @@ object Prompts {
         "last line starting with 'Answer:'. Ignore sources that are off-topic. No preamble, no LaTeX."
 
     /** Follow-up user turn of the continued source check: rag.py `check_followup_user`. */
-    fun checkFollowupUser(context: String): String = CHECK_FOLLOWUP + "\n\nSources:\n\n" + context
+    fun checkFollowupUser(context: String, followup: String = CHECK_FOLLOWUP): String = followup + "\n\nSources:\n\n" + context
 
     /** User message of the retrieval-first answer: rag.py `f"Sources:\n\n{context}\n\nQuestion: {question}"`. */
     fun answerUser(context: String, question: String): String =

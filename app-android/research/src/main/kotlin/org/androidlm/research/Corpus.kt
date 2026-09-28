@@ -9,10 +9,11 @@ import kotlin.math.max
 data class Stem(val stem: String, val idf: Double)
 
 /**
- * Article identity inside one retrieval: Python uses the bare id for the encyclopedia and the
- * tuple `("v", id)` for the travel guide, so that equal ids in the two databases stay apart.
+ * Article identity inside one retrieval: Python uses the bare id for the encyclopedia, the tuple
+ * `("v", id)` for the travel guide and `("p", id)` for the Ethereum and cryptography pack, so that
+ * equal ids in different databases stay apart.
  */
-data class ArticleRef(val id: Long, val voyage: Boolean = false)
+data class ArticleRef(val id: Long, val voyage: Boolean = false, val pack: Boolean = false)
 
 /**
  * One retrieved passage (rag.py's hit dict). [start] is the chunk's offset in CODE POINTS into
@@ -111,6 +112,14 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor, wo
         val end = minOf(off + length, block.size) // a Python slice clamps
         val text = String(block, off, max(0, end - off), Charsets.UTF_8)
         return Article(row[0] as String, row[1] as Long, PyText(text)).also { articles[aid] = it }
+    }
+
+    /** A value of the database's `meta` table (build parameters, the pack's `as_of`), or null. */
+    fun meta(key: String): String? = when (val v = db.query("select value from meta where key=?", key).firstOrNull()?.get(0)) {
+        is String -> v
+        is ByteArray -> String(v, Charsets.UTF_8)
+        null -> null
+        else -> v.toString()
     }
 
     /** Monthly views of an article, or null when there is no such article (the router's input). */

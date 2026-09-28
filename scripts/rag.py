@@ -127,8 +127,35 @@ CHECK_FOLLOWUP = (
 )
 
 
-def check_followup_user(context):
-    return f"{CHECK_FOLLOWUP}\n\nSources:\n\n{context}"
+def check_followup_user(context, followup=None):
+    return f"{followup or CHECK_FOLLOWUP}\n\nSources:\n\n{context}"
+
+
+# ---- the Ethereum and cryptography pack (--pack-db, scripts/build_pack.py) ---------------------
+# Its sources are Ethereum's specifications and documentation and NIST's post-quantum standards,
+# so the prompts that read them say so, and say when they date from: the model's own memory stops
+# before much of what they record (it called Pectra "expected in mid-2025").
+PACK_LIBRARY = ("an offline library: Ethereum's specifications (EIPs, ERCs, consensus specs) and "
+                "documentation, NIST's cryptography standards, and Wikipedia")
+
+
+def pack_answer_system(as_of):
+    return (
+        "You are an offline research assistant. Answer the question directly and completely, using "
+        f"your own knowledge together with the numbered sources from {PACK_LIBRARY}. The sources date "
+        f"from {as_of}. Cite a source like [1] where it supports a statement. Where a source gives a "
+        "specific name, number, date or status, use it rather than your memory. Ignore sources that are "
+        "off-topic. If something important is not covered by the sources, still answer it from your own "
+        "knowledge. If you are unsure of a specific name, date or number, say so instead of guessing. "
+        "Address every part of the question in the first few lines, then elaborate. No preamble, no "
+        "restating the question, no LaTeX, no visible deliberation. Be concise."
+    )
+
+
+def pack_check_followup(as_of):
+    return CHECK_FOLLOWUP.replace(
+        "these numbered sources from an offline copy of Wikipedia.",
+        f"these numbered sources from {PACK_LIBRARY}, dating from {as_of}.")
 
 
 # headings that answer an aspect the question asks about in other words
@@ -525,6 +552,74 @@ def check_context(hits, draft, question, budget_chars, excerpt=False):
 
 
 VOYAGE = None  # optional second Corpus built from Wikivoyage (--voyage-db)
+PACK = None  # optional Corpus of the Ethereum and cryptography pack (--pack-db)
+
+
+def pack_as_of():
+    row = PACK.db.execute("select value from meta where key='as_of'").fetchone()
+    return row[0] if row else "2026"
+
+
+# Which questions the pack answers: one of the question's words is at least e**3 = 20 times more
+# common in the pack than in Wikipedia (ethereum, eip, rollup, signature, quantum), and less than a
+# quarter of the question's weight is in words the pack uses no more than Wikipedia does ("passport"
+# in "is my passport still valid?", "fish" in "which fork for fish?"). Weights and ratios come from
+# the two indexes' document counts; tuned on the eval sets' 222 questions and 28 probes.
+PACK_MIN_RATIO = 3.0
+PACK_FOREIGN_RATIO = 0.5
+PACK_MAX_FOREIGN = 0.25
+
+
+def pack_affinity(question, wiki_stems):
+    """(largest log ratio, foreign share) of the question's words: a word's log ratio is how much
+    more common it is in the pack than in Wikipedia (ln of the ratio of the shares of chunks that
+    hold it, = Wikipedia idf - pack idf); the foreign share is the Wikipedia-idf weight of the
+    words below PACK_FOREIGN_RATIO or not in the pack, over the weight of all. A word the pack has
+    and Wikipedia has not counts as if Wikipedia had it in one chunk. None when no word is known."""
+    ps = dict(PACK.stems(question))
+    ws = dict(wiki_stems)
+    if not ws and not ps:
+        return None
+    unseen = math.log(WIKI_N_INDEXED[0]) if WIKI_N_INDEXED[0] else 0.0
+    best, foreign, total = None, 0.0, 0.0
+    for s in sorted(set(ws) | set(ps)):
+        widf = ws.get(s, unseen)
+        total += widf
+        if s in ps:
+            lr = widf - ps[s]
+            best = lr if best is None else max(best, lr)
+            if lr < PACK_FOREIGN_RATIO:
+                foreign += widf
+        else:
+            foreign += widf
+    return best, (foreign / total if total else 1.0)
+
+
+def pack_route(question, wiki_stems):
+    """Whether the question goes to the pack (see PACK_MIN_RATIO)."""
+    a = pack_affinity(question, wiki_stems)
+    return a is not None and a[0] is not None and a[0] >= PACK_MIN_RATIO and a[1] < PACK_MAX_FOREIGN
+
+
+WIKI_N_INDEXED = [0]  # the encyclopedia's chunk count, for words it does not have (set in main)
+
+
+def pack_hits(question, n=4):
+    """The pack's best passages for the question (whole-index BM25, at most two per document).
+    A document's key facts (an EIP's status and the network upgrade that shipped it) lead the
+    first passage taken from it."""
+    hits, seen = [], set()
+    for h in PACK.bm25(PACK.stems(question))[:n]:
+        _, _, text = PACK.article(h["aid"])
+        if h["aid"] not in seen and text.startswith("Key facts:"):
+            facts = text.split("\n\n", 1)[0]
+            if facts not in h["text"]:
+                h["text"] = facts + "\n" + h["text"]
+                h["lead"] = True  # build_context's longer limit, so the facts do not crowd out the passage
+        seen.add(h["aid"])
+        h["aid"] = ("p", h["aid"])
+        hits.append(h)
+    return hits
 ENGINE = None  # a BmoeSession when --engine-cli is given; otherwise llama-server at --url
 
 
@@ -629,6 +724,12 @@ def answer(corpus, args, question):
                 and any(st in TRAVEL_STEMS for st, _ in corpus.stems(question)):
             mode = "plan"
         rec.update(route=mode, route_views=views)
+    # the pack's questions: sources first with its passages, or answer first and a check against them
+    route = getattr(args, "pack_route", "off")
+    use_pack = PACK is not None and (route == "always" or (route == "auto" and pack_route(question, corpus.stems(question))))
+    if use_pack:
+        mode = "plan" if args.pack_mode == "sources" else "verify"
+        rec.update(route=mode, pack=True)
     worked = getattr(args, "worked", False) and needs_working(question)
     closed = WORKED_SYSTEM if worked else CLOSED_SYSTEM
     rec["worked"] = worked
@@ -639,6 +740,8 @@ def answer(corpus, args, question):
     t0 = time.time()
     if mode in ("plan", "verify"):
         hits = corpus.retrieve(question, titles, k=args.k, voyage=VOYAGE)
+        if use_pack:
+            hits = pack_hits(question, args.pack_passages) + hits
     elif mode == "bm25":
         hits = corpus.bm25(corpus.stems(question))[:args.k]
     rec["search_ms"] = round((time.time() - t0) * 1000)
@@ -658,7 +761,8 @@ def answer(corpus, args, question):
             res = chat_messages(args.url, [
                 {"role": "system", "content": closed}, {"role": "user", "content": question},
                 {"role": "assistant", "content": draft["text"]},
-                {"role": "user", "content": check_followup_user(context)}], 260)
+                {"role": "user", "content": check_followup_user(
+                    context, pack_check_followup(pack_as_of()) if use_pack else None)}], 260)
         else:
             user = f"Question: {question}\n\nDraft answer:\n{draft['text']}\n\nSources:\n\n{context}"
             res = chat(args.url, VERIFY_SYSTEM, user, 260, temperature=0.0)
@@ -670,8 +774,8 @@ def answer(corpus, args, question):
         res = {k: v for k, v in draft.items() if k != "text"}
         rec["answer"] = draft["text"]
     elif context:
-        res = chat(args.url, WORKED_SOURCES_SYSTEM if worked else ANSWER_SYSTEM,
-                   f"Sources:\n\n{context}\n\nQuestion: {question}", args.max_tokens)
+        system = WORKED_SOURCES_SYSTEM if worked else pack_answer_system(pack_as_of()) if use_pack else ANSWER_SYSTEM
+        res = chat(args.url, system, f"Sources:\n\n{context}\n\nQuestion: {question}", args.max_tokens)
         rec["answer"] = res.pop("text")
     else:
         res = chat(args.url, closed, question, args.max_tokens)
@@ -706,6 +810,14 @@ def main():
     ap.add_argument("--travel-route", action="store_true",
                     help="auto mode: travel questions about a place with a Wikivoyage guide go retrieval-first")
     ap.add_argument("--voyage-db", help="Wikivoyage corpus database; adds travel-guide sections")
+    ap.add_argument("--pack-db", help="the Ethereum and cryptography pack (build_pack.py + build_corpus.py)")
+    ap.add_argument("--pack-route", default="off", choices=["off", "auto", "always"],
+                    help="auto: the questions pack_route picks use the pack; always: every question does "
+                         "(for evaluating it on its own questions)")
+    ap.add_argument("--pack-mode", default="sources", choices=["sources", "check"],
+                    help="sources: answer with the pack's passages in context; check: answer first, then "
+                         "check against them")
+    ap.add_argument("--pack-passages", type=int, default=4, help="pack passages ahead of Wikipedia's")
     ap.add_argument("--engine-cli", help="path to bmoe-cli: stream the model through BigMoeOnEdge "
                     "session mode instead of calling llama-server")
     ap.add_argument("--engine-model")
@@ -720,6 +832,10 @@ def main():
     if args.voyage_db:
         global VOYAGE
         VOYAGE = Corpus(args.voyage_db)
+    if args.pack_db:
+        global PACK
+        PACK = Corpus(args.pack_db)
+        WIKI_N_INDEXED[0] = corpus.n_indexed
 
     if args.questions:
         done = set()

@@ -26,6 +26,13 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
   me" (GPS, no network) gets a ranked list of real places in about 0.1 s, then the model's
   recommendations from it, written from the places' travel-guide listings and the start of their
   own Wikipedia articles ([`notes/2026-09-27-places.md`](notes/2026-09-27-places.md)).
+- **Ethereum and cryptography library:** Ethereum's specifications (all 1,208 EIPs and ERCs, the
+  consensus specs), ethereum.org's documentation, Ben Edgington's *Upgrading Ethereum* and NIST's
+  post-quantum standards, in a 19MB SQLite file inside the APK. Each EIP carries its status and
+  the network upgrade that shipped it ("Pectra, live on Ethereum mainnet since May 7, 2025").
+  A question goes to it when one of its words is at least 20 times more common there than in
+  Wikipedia and few of its words are foreign to it; it is then answered with the library's
+  passages ahead of Wikipedia's.
 - **Pipeline:** the model names the Wikipedia articles it wants; titles are resolved through
   redirects; a router sends little-read subjects retrieval-first (the model's memory of them is
   unreliable) and everything else answer-first, followed by a source check that cites passages.
@@ -108,6 +115,7 @@ checks their SHA-256, pushes them to the phone over USB and installs the APK. Bu
 | `scripts/build_redirects.py` | Adds Wikipedia's redirect table to `wiki.db` |
 | `scripts/build_df.py` | `wiki_df.db`: the index's word counts, so the search can rank a question's words without reading them from the index |
 | `scripts/build_places.py`, `fetch_osm_diet.py` | `places.db`: Overture Maps places, OpenStreetMap diet tags, GeoNames cities, Wikivoyage listings |
+| `scripts/fetch_pack_sources.sh`, `build_pack.py`, `finish_pack.py` | `ethereum.db`: the Ethereum and cryptography library (EIPs, ERCs, consensus specs, ethereum.org, Upgrading Ethereum, NIST) |
 | `scripts/places.py` | Places questions: parsing, finding the city, ranking (prototype of the app's `Places.kt`) |
 | `scripts/rag.py` | The retrieval and answering pipeline (prototype of the on-device logic) |
 | `scripts/eval_models.sh`, `run_eval.py` | Run an eval set against a memory-capped llama-server |
@@ -155,6 +163,18 @@ The places database (about 15GB of downloads, 6 minutes to build on a laptop; ne
 python scripts/fetch_osm_diet.py osm-diet.json          # OpenStreetMap diet tags, one QLever query
 python scripts/build_places.py --overture overture/ --osm osm-diet.json --geonames geonames/ \
        --voyage voyage.db --work work/ --out places.db
+```
+
+The Ethereum and cryptography library (about 500MB of downloads, a minute to build):
+
+```sh
+scripts/fetch_pack_sources.sh src/        # shallow clones of the EIPs, ERCs, consensus specs,
+                                          # ethereum.org and Upgrading Ethereum; NIST's PDFs and pages
+python scripts/build_pack.py --src src --out pack.parquet --views views.tsv --sources sources.tsv
+python scripts/build_corpus.py --out ethereum.db --pageviews views.tsv --full-top 100000 \
+       --min-chars 300 pack.parquet
+python scripts/finish_pack.py ethereum.db sources.tsv "September 2026" src/ethereum-org-website/LICENSE
+# the APK carries it: app-android/app/src/main/assets/ethereum.db, with its SHA-256 in ethereum.db.sha256
 ```
 
 ## Licence and attribution

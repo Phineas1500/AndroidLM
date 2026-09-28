@@ -119,10 +119,11 @@ class ResearchPipelineTest {
     }
 
     /** Opens the databases lazily, on whichever thread first asks (which must be the corpus thread). */
-    private fun provider(wiki: File, voyage: File?): CorpusProvider = object : CorpusProvider {
+    private fun provider(wiki: File, voyage: File?, pack: File? = null): CorpusProvider = object : CorpusProvider {
         private val zstd = JniZstdDecompressor()
         private val wikiCorpus by lazy { open(wiki) }
         private val voyageCorpus by lazy { voyage?.let { open(it) } }
+        private val packCorpus by lazy { pack?.let { open(it) } }
 
         private fun open(f: File): Corpus {
             val db = JdbcSqlDatabase(f).also { opened.add(it) }
@@ -131,6 +132,7 @@ class ResearchPipelineTest {
 
         override fun wiki() = wikiCorpus
         override fun voyage() = voyageCorpus
+        override fun pack() = packCorpus
     }
 
     private fun sampleProvider(withVoyage: Boolean = true) =
@@ -187,6 +189,79 @@ class ResearchPipelineTest {
     private fun assertCorpusThreadOnly() {
         // (compared by identity: in debug mode coroutines rename the thread they run on)
         assertEquals("threads that touched a corpus database", setOf(corpusJavaThread), dbThreads.toSet())
+    }
+
+    // ── the Ethereum and cryptography pack ──
+
+    private val packGolden by lazy { JsonParser.parseString(fixture("pack_golden.json").readText(Charsets.UTF_8)).asJsonObject }
+
+    private fun packCase(questionPrefix: String) =
+        packGolden["cases"].asJsonArray.map { it.asJsonObject }.single { it["question"].asString.startsWith(questionPrefix) }
+
+    private fun packProvider() = provider(fixture("sample_wiki.db"), null, fixture("sample_pack.db"))
+
+    @Test
+    fun packQuestionIsAnsweredWithThePacksPassagesFirst() {
+        val case = packCase("What is the maximum effective balance")
+        assertTrue(case["route"].asBoolean)
+        val question = case["question"].asString
+        val answer = "Since EIP-7251 (Pectra, May 2025) it is 2,048 ETH [1]."
+        val engine = FakeEngine(listOf(case["titles"].asJsonArray.joinToString("\n") { it.asString }, answer))
+        val rec = Recorder()
+
+        val result = run(engine, packProvider(), question, rec, ResearchConfig(pack = true))
+
+        assertEquals(2, engine.calls.size)
+        assertEquals(
+            packGolden["answer_system"].asString + "\n\nSources:\n\n" + case["context"].asString + "\n\nQuestion: " + question,
+            engine.calls[1].prompt,
+        )
+        assertEquals(Route.RETRIEVAL_FIRST, result.route.route)
+        assertTrue(result.route.pack)
+        assertEquals(case["context_used"].asInt, result.sources.size)
+        // the pack's passages lead, numbered as the model sees them
+        val packTitles = case["pack_hits"].asJsonArray.map { it.asJsonObject["title"].asString }
+        assertEquals(packTitles.first(), result.sources[0].title)
+        assertSourcesMatchContext(result.sources, case["context"].asString)
+        assertCorpusThreadOnly()
+    }
+
+    @Test
+    fun packQuestionInCheckModeChecksTheDraftAgainstThePack() {
+        val case = packCase("What does EIP-7702 let")
+        val question = case["question"].asString
+        val draft = case["draft"].asString
+        val check = "Corrections: the delegation persists until it is changed [1]."
+        val engine = FakeEngine(listOf(case["titles"].asJsonArray.joinToString("\n") { it.asString }, draft, check))
+        val rec = Recorder()
+
+        val result = run(engine, packProvider(), question, rec,
+            ResearchConfig(pack = true, packSources = false, checkContinue = true, checkChars = 2000))
+
+        assertEquals(3, engine.calls.size)
+        assertEquals(Prompts.CLOSED_SYSTEM + "\n\n" + question, engine.calls[1].prompt)
+        assertTrue(engine.calls[2].continueChat)
+        assertEquals(packGolden["check_followup"].asString + "\n\nSources:\n\n" + case["check_context"].asString, engine.calls[2].prompt)
+        assertEquals(Route.ANSWER_FIRST, result.route.route)
+        assertTrue(result.route.pack)
+        assertEquals(draft, result.answer)
+        assertEquals(check, result.check)
+        assertCorpusThreadOnly()
+    }
+
+    @Test
+    fun questionThePackDoesNotTakeIsUnchanged() {
+        val case = packCase("What was the Kyoto Protocol")
+        assertFalse(case["route"].asBoolean)
+        val question = case["question"].asString
+        val engine = FakeEngine(listOf("Kyoto Protocol", "The Kyoto Protocol is a 1997 climate treaty.", "No corrections."))
+        val rec = Recorder()
+
+        val result = run(engine, packProvider(), question, rec, ResearchConfig(pack = true))
+
+        assertFalse(result.route.pack)
+        assertTrue(engine.calls.none { it.prompt.contains(Pack.LIBRARY) })
+        assertTrue(result.sources.none { s -> case["pack_hits"].asJsonArray.any { it.asJsonObject["title"].asString == s.title } })
     }
 
     // ── retrieval first ──

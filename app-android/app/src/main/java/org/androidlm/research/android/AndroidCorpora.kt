@@ -3,15 +3,58 @@ package org.androidlm.research.android
 import android.content.Context
 import org.androidlm.research.Corpus
 import org.androidlm.research.CorpusProvider
+import org.androidlm.research.Pack
 import org.androidlm.research.Places
 import java.io.File
+import java.security.MessageDigest
 
 /**
  * The corpus databases found on the device: [wiki] is what research mode needs, [voyage] (the
- * travel guide) and [places] (where to eat, drink and stay) are optional.
+ * travel guide), [places] (where to eat, drink and stay) and [pack] (the Ethereum and
+ * cryptography library) are optional.
  */
-data class CorpusFiles(val wiki: File, val voyage: File?, val places: File? = null) {
-    fun label(): String = listOfNotNull(wiki, voyage, places).joinToString(" + ") { it.name }
+data class CorpusFiles(val wiki: File, val voyage: File?, val places: File? = null, val pack: File? = null) {
+    fun label(): String = listOfNotNull(wiki, voyage, places, pack).joinToString(" + ") { it.name }
+}
+
+/**
+ * The Ethereum and cryptography pack ships inside the APK (assets/ethereum.db, about 23 MB, with
+ * its SHA-256 in assets/ethereum.db.sha256). SQLite needs a file, so the first use copies it to
+ * files/corpus/, and copies it again when the APK carries a different one.
+ */
+object BundledPack {
+    private const val SHA = Pack.FILE + ".sha256"
+
+    /** Blocking: call off the main thread. The pack's file, or null when the APK has none. */
+    @Synchronized
+    fun file(ctx: Context): File? {
+        val sha = runCatching { ctx.assets.open(SHA).use { String(it.readBytes()).trim() } }.getOrNull() ?: return null
+        val dir = File(ctx.filesDir, CorpusLocator.DIR).apply { mkdirs() }
+        val out = File(dir, Pack.FILE)
+        val stamp = File(dir, SHA)
+        if (out.isFile && stamp.isFile && stamp.readText().trim() == sha) return out
+        val tmp = File(dir, Pack.FILE + ".tmp")
+        val digest = MessageDigest.getInstance("SHA-256")
+        ctx.assets.open(Pack.FILE).use { input ->
+            tmp.outputStream().use { output ->
+                val buf = ByteArray(1 shl 16)
+                while (true) {
+                    val n = input.read(buf)
+                    if (n < 0) break
+                    digest.update(buf, 0, n)
+                    output.write(buf, 0, n)
+                }
+            }
+        }
+        val got = digest.digest().joinToString("") { "%02x".format(it) }
+        if (got != sha) {
+            tmp.delete()
+            return null
+        }
+        if (!tmp.renameTo(out)) return null
+        stamp.writeText(sha)
+        return out
+    }
 }
 
 /**
@@ -26,6 +69,7 @@ object CorpusLocator {
     const val WIKI = "wiki.db"
     const val VOYAGE = "voyage.db"
     const val PLACES = "places.db"
+    const val PACK = Pack.FILE
 
     private val TMP_ROOTS = listOf(File("/data/local/tmp/androidlm"), File("/data/local/tmp/bmoe"))
 
@@ -39,7 +83,10 @@ object CorpusLocator {
     fun find(ctx: Context): CorpusFiles? {
         val dirs = dirs(ctx)
         fun first(name: String) = dirs.map { File(it, name) }.firstOrNull { it.isFile && it.canRead() }
-        return CorpusFiles(first(WIKI) ?: return null, first(VOYAGE), first(PLACES))
+        val wiki = first(WIKI) ?: return null
+        // the APK's own pack first: it is the one this version of the app was built and tested with
+        val pack = runCatching { BundledPack.file(ctx) }.getOrNull() ?: first(PACK)
+        return CorpusFiles(wiki, first(VOYAGE), first(PLACES), pack)
     }
 
     /** Where to put the files, for the screen that says research mode is unavailable. */
@@ -68,6 +115,7 @@ class AndroidCorpora(private val files: CorpusFiles) : CorpusProvider, AutoClose
     private var wiki: Corpus? = null
     private var voyage: Corpus? = null
     private var places: Places? = null
+    private var pack: Corpus? = null
 
     private fun open(f: File): Corpus {
         val db = AndroidSqlDatabase(f)
@@ -89,6 +137,11 @@ class AndroidCorpora(private val files: CorpusFiles) : CorpusProvider, AutoClose
         return places ?: Places(AndroidSqlDatabase(f).also { databases.add(it) }).also { places = it }
     }
 
+    override fun pack(): Corpus? {
+        val f = files.pack ?: return null
+        return pack ?: open(f).also { pack = it }
+    }
+
     override fun interrupt() {
         databases.forEach { it.interrupt() }
     }
@@ -99,5 +152,6 @@ class AndroidCorpora(private val files: CorpusFiles) : CorpusProvider, AutoClose
         wiki = null
         voyage = null
         places = null
+        pack = null
     }
 }

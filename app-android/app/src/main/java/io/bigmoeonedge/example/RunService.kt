@@ -820,8 +820,9 @@ class RunService : Service() {
         // the source check reads the 2,000 characters of passages that share most with the draft:
         // as good as reading all of them in a blind A/B (notes/2026-09-28-check-speed.md), about
         // 400 prompt tokens fewer
+        // an Ethereum or cryptography question reads the pack's passages (ethereum.db, in the APK)
         return ResearchConfig(travelRoute = prefs.researchTravelRoute, checkContinue = prefs.researchCheckContinue, worked = true,
-            checkChars = 2000)
+            checkChars = 2000, pack = true, packSources = PACK_SOURCES)
     }
 
     /**
@@ -950,7 +951,7 @@ class RunService : Service() {
         when (e) {
             is ResearchEvent.PhaseChanged -> log("phase=${e.phase}")
             is ResearchEvent.Planned -> log("planned=${e.titles}")
-            is ResearchEvent.Routed -> log("route=${e.decision.route} views=${e.decision.views} travel=${e.decision.travel}")
+            is ResearchEvent.Routed -> log("route=${e.decision.route} views=${e.decision.views} travel=${e.decision.travel} pack=${e.decision.pack}")
             is ResearchEvent.SourcesFound ->
                 log("sources=${e.sources.size} dropped=${e.dropped} [" + e.sources.joinToString(" | ") { "${it.title} — ${it.section}" } + "]")
             is ResearchEvent.PlacesFound -> log("places=${e.total} here=${e.here} where=${e.where}")
@@ -1149,6 +1150,11 @@ class RunService : Service() {
         const val ACTION_RESEARCH = "io.bigmoeonedge.example.RESEARCH"
 
         const val LOG_TAG = "AndroidLM"
+        /**
+         * An Ethereum or cryptography question: true answers it with the pack's passages in context
+         * (sources first), false answers first and checks against them (rag.py --pack-mode).
+         */
+        const val PACK_SOURCES = true
         /** Engine scheduling priority (nice value); see runSession. */
         const val ENGINE_NICE = -16
         /** Let the engine repack the dense weights at load (patches/0006); see runSession. */

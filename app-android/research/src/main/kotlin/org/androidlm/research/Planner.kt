@@ -18,9 +18,10 @@ enum class Route {
 /**
  * [views] is null when the first planned title did not resolve. [travel] is true when the
  * optional travel route decided (rag.py `--travel-route`): the route is then retrieval-first
- * whatever [views] says.
+ * whatever [views] says. [pack] is true when the question goes to the Ethereum and cryptography
+ * pack ([Pack], rag.py `--pack-route auto`): its passages lead the sources.
  */
-data class RouteDecision(val route: Route, val views: Long?, val travel: Boolean = false)
+data class RouteDecision(val route: Route, val views: Long?, val travel: Boolean = false, val pack: Boolean = false)
 
 object Planner {
     const val PLAN_MAX_TOKENS = 60

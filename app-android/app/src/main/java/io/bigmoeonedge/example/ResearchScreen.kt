@@ -213,6 +213,7 @@ private fun StatusLine(r: ResearchUi, loading: Boolean, prefill: Prefill?, telem
             else -> "Choosing Wikipedia articles to look up…"
         }
         ResearchPhase.SEARCHING -> when {
+            r.route?.pack == true -> "Searching the Ethereum and cryptography library and Wikipedia…"
             r.route?.route != Route.PLACES -> "Searching the offline Wikipedia…"
             r.placesWhere == null -> "Finding your position (GPS)…"
             else -> "Looking up places…"
@@ -278,6 +279,12 @@ private fun routeText(r: ResearchUi): String {
     val threshold = String.format(Locale.US, "%,d", r.routeThreshold)
     val views = d.views?.let { String.format(Locale.US, "%,d", it) }
     return when {
+        d.pack && d.route == Route.RETRIEVAL_FIRST ->
+            "Sources first: an Ethereum or cryptography question, answered from the offline library of Ethereum's " +
+                "specifications and documentation and NIST's standards, with Wikipedia."
+        d.pack ->
+            "Answer first, then a source check against the offline library of Ethereum's specifications and " +
+                "documentation and NIST's standards, with Wikipedia."
         d.travel ->
             "Sources first: a travel question, and $subject has a travel guide."
         d.route == Route.RETRIEVAL_FIRST ->

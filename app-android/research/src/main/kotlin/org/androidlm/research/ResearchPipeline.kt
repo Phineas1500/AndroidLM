@@ -57,15 +57,20 @@ interface CorpusProvider {
     /** The optional places database (places.db): where to eat, drink and stay. */
     fun places(): Places? = null
 
+    /** The optional Ethereum and cryptography pack ([Pack], ethereum.db). */
+    fun pack(): Corpus? = null
+
     /** [SqlDatabase.interrupt] on every open database; callable from any thread. */
     fun interrupt() {}
 
     companion object {
-        fun of(wiki: Corpus, voyage: Corpus? = null, places: Places? = null): CorpusProvider = object : CorpusProvider {
-            override fun wiki() = wiki
-            override fun voyage() = voyage
-            override fun places() = places
-        }
+        fun of(wiki: Corpus, voyage: Corpus? = null, places: Places? = null, pack: Corpus? = null): CorpusProvider =
+            object : CorpusProvider {
+                override fun wiki() = wiki
+                override fun voyage() = voyage
+                override fun places() = places
+                override fun pack() = pack
+            }
     }
 }
 
@@ -110,6 +115,15 @@ data class ResearchConfig(
      * working before its answer. Off by default, as in rag.py; the app turns it on.
      */
     val worked: Boolean = false,
+    /**
+     * rag.py `--pack-route auto`: a question [Pack.routes] picks, when there is a pack
+     * ([CorpusProvider.pack]), has the pack's passages ahead of Wikipedia's. With [packSources]
+     * (`--pack-mode sources`) it is answered with them in context; otherwise (`check`) it is
+     * answered first and the source check reads them. Off by default, as in rag.py.
+     */
+    val pack: Boolean = false,
+    val packSources: Boolean = true,
+    val packPassages: Int = Pack.PASSAGES,
 )
 
 enum class ResearchPhase { TRANSLATING, REWRITING, PLANNING, SEARCHING, DRAFTING, ANSWERING, CHECKING, DONE, CANCELLED, FAILED }
@@ -459,10 +473,23 @@ class ResearchPipeline(
             listener.onEvent(ResearchEvent.Planned(titles))
 
             // 2. route (a lookup of a few milliseconds; it has no phase of its own)
-            val decision = withContext(corpusDispatcher) {
+            var decision = withContext(corpusDispatcher) {
                 // the guide is only opened for routing when the travel route is on
                 val voyage = if (config.travelRoute) corpora.voyage() else null
                 Planner.route(corpora.wiki(), titles, config.routeViews, question, voyage, config.travelRoute)
+            }
+            // a question the Ethereum and cryptography pack answers (rag.py --pack-route auto)
+            val pack = if (config.pack) withContext(corpusDispatcher) { corpora.pack() } else null
+            if (pack != null) {
+                val wikiStems = half?.stems?.await() ?: withContext(corpusDispatcher) { corpora.wiki().stems(question) }
+                val affinity = withContext(corpusDispatcher) {
+                    Pack.affinity(pack.stems(question), wikiStems, corpora.wiki().nIndexed)
+                }
+                if (Pack.routes(affinity)) {
+                    decision = RouteDecision(
+                        if (config.packSources) Route.RETRIEVAL_FIRST else Route.ANSWER_FIRST, decision.views, pack = true,
+                    )
+                }
             }
             listener.onEvent(ResearchEvent.Routed(decision, config.routeViews))
 
@@ -487,19 +514,29 @@ class ResearchPipeline(
             }
 
             val searched = searching(titles, half, early)
+            // the pack's passages lead the sources of a question it answers
+            val packHits = if (decision.pack && pack != null) {
+                withContext(corpusDispatcher) { Pack.hits(pack, question, config.packPassages) }
+            } else {
+                null
+            }
+            val hits = if (packHits != null) packHits + searched.hits else searched.hits
             // the source check of a draft reads the passages that share most with it (rag.py
             // check_context), numbered as the sources are shown
             val built = if (draft != null && config.checkChars > 0) {
-                CheckContext.build(searched.hits, draft, question, config.checkChars, config.checkExcerpts)
+                CheckContext.build(hits, draft, question, config.checkChars, config.checkExcerpts)
+            } else if (packHits != null) {
+                buildContext(hits, config.contextChars)
             } else {
                 BuiltContext(searched.context, searched.usedHits)
             }
             // (an excerpt is what the check read; the whole passage is what the source shows)
-            val full = searched.hits.associateBy { it.aid to it.start }
+            val full = hits.associateBy { it.aid to it.start }
             val sources = built.usedHits.mapIndexed { i, h ->
                 ResearchSource(i + 1, h.title, h.section, (full[h.aid to h.start] ?: h).text, h.via)
             }
-            val dropped = searched.hits.size - built.usedHits.size
+            val dropped = hits.size - built.usedHits.size
+            val asOf = if (packHits != null) withContext(corpusDispatcher) { Pack.asOf(pack!!) } else null
             listener.onEvent(ResearchEvent.SourcesFound(sources, dropped))
             val context = built.context
 
@@ -511,7 +548,8 @@ class ResearchPipeline(
                     val onCheckToken: (String) -> Unit = { listener.onEvent(ResearchEvent.CheckToken(it)) }
                     val res = if (config.checkContinue) {
                         // the draft was the engine's last generation, so its conversation is still loaded
-                        continuing(ResearchPhase.CHECKING, Prompts.checkFollowupUser(context), config.checkTokens, onCheckToken)
+                        val followup = asOf?.let { Pack.checkFollowup(it) } ?: Prompts.CHECK_FOLLOWUP
+                        continuing(ResearchPhase.CHECKING, Prompts.checkFollowupUser(context, followup), config.checkTokens, onCheckToken)
                     } else {
                         generating(
                             ResearchPhase.CHECKING, Prompts.VERIFY_SYSTEM,
@@ -523,8 +561,12 @@ class ResearchPipeline(
                     listener.onEvent(ResearchEvent.CheckCompleted(check ?: ""))
                 }
             } else if (context.isNotEmpty()) {
-                answer = answering(ResearchPhase.ANSWERING, if (worked) Prompts.WORKED_SOURCES_SYSTEM else Prompts.ANSWER_SYSTEM,
-                    Prompts.answerUser(context, answerQuestion))
+                val system = when {
+                    worked -> Prompts.WORKED_SOURCES_SYSTEM
+                    asOf != null -> Pack.answerSystem(asOf)
+                    else -> Prompts.ANSWER_SYSTEM
+                }
+                answer = answering(ResearchPhase.ANSWERING, system, Prompts.answerUser(context, answerQuestion))
             } else {
                 answer = answering(ResearchPhase.ANSWERING, closedSystem, answerQuestion)
             }
