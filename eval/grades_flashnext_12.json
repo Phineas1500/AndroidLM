@@ -1,0 +1,152 @@
+{
+  "broad-02": {
+    "A_errors": [
+      "Calls Georgia the first country in the world to adopt Christianity as state religion (Armenia, c. 301, was first)",
+      "Gives Mount Shkhara as 4,860 m (it is about 5,190-5,200 m)",
+      "Describes a presidency strong in foreign policy (since the 2017-18 constitutional reform the president is largely ceremonial)",
+      "Says Abkhazia declared independence in 1992 after a war (the war was 1992-93 and followed the 1992 move; the formal independence act was 1999)"
+    ],
+    "B_errors": [
+      "Lists energy exports as a main pillar of the economy (Georgia is a net energy importer and mainly a transit route)"
+    ],
+    "A_score": 4,
+    "B_score": 6,
+    "prefer": "B",
+    "reason": "Neither answer mentions that Georgia could also mean the US state. A has more detail, but it has several factual errors, including the Christianity 'first' claim and the height of Shkhara, and it is cut off mid-sentence. B is concise and almost entirely correct."
+  },
+  "fact-02": {
+    "A_errors": [],
+    "B_errors": [],
+    "A_score": 10,
+    "B_score": 9,
+    "prefer": "A",
+    "reason": "Both are correct: García Márquez, 1967. A adds accurate context (Editorial Sudamericana in Buenos Aires, Rabassa's translation, Macondo)."
+  },
+  "fact-04": {
+    "A_errors": [],
+    "B_errors": [],
+    "A_score": 10,
+    "B_score": 9,
+    "prefer": "A",
+    "reason": "Both correctly give 15 September 2022 and The Merge. A adds accurate context about the Beacon Chain, which launched in December 2020."
+  },
+  "fact-07": {
+    "A_errors": [
+      "Says the Nur-Sultan name ran until 2023 and was reverted in September 2023 (it was reverted in September 2022)",
+      "Says Akmola was the capital of the Kazakh SSR (Alma-Ata/Almaty was the Soviet-era capital)"
+    ],
+    "B_errors": [],
+    "A_score": 5,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "Both give Astana. A's extra history contains two clear errors, the renaming date and Akmola as the Soviet capital. B is short and fully correct."
+  },
+  "fresh-04": {
+    "A_errors": [],
+    "B_errors": [
+      "Says France (2018) won the most recent World Cup (Argentina won in 2022)",
+      "Says France won the inaugural 1930 tournament (Uruguay did; France's first title was 1998)",
+      "Says the next World Cup is 2022 in Qatar with Argentina as current champion (this is self-contradictory and wrong for 2018)"
+    ],
+    "A_score": 8,
+    "B_score": 1,
+    "prefer": "A",
+    "reason": "A correctly gives Argentina beating France on 18 Dec 2022 in Qatar. It does not note the 2026 tournament or that its knowledge may be out of date. B is outdated and full of errors."
+  },
+  "health-01": {
+    "A_errors": [
+      "Calls Machu Picchu a site higher than Cusco (it is lower, about 2,430 m)",
+      "Says many Cusco hospitals have hyperbaric chambers 'Gamow bags' (Gamow bags are portable field devices, not hospital chambers)"
+    ],
+    "B_errors": [
+      "Lists acetazolamide as an over-the-counter pain reliever (it is a prescription carbonic anhydrase inhibitor)",
+      "Gives the Sacred Valley as about 2,500 m (it is about 2,800-3,000 m)"
+    ],
+    "A_score": 7,
+    "B_score": 6,
+    "prefer": "A",
+    "reason": "A is more complete. It covers HAPE/HACE warning signs, descent thresholds, acetazolamide dosing and coca tea, though it makes the Machu Picchu altitude slip and is cut off at the end. B is sound but thinner, and it misclassifies acetazolamide."
+  },
+  "tech-03": {
+    "A_errors": [
+      "Calls PBS a protocol upgrade implemented in The Merge hard fork 'through EIP-4844' (PBS is out-of-protocol via MEV-Boost; EIP-4844 is blob transactions, shipped in Dencun 2024)",
+      "Says builders send a block header to relays and relays broadcast candidate blocks (builders send full blocks to relays; relays give proposers headers and bids)",
+      "Claims PBS reduces censorship risk because a proposer can pick an uncensored builder (garbled; MEV-Boost PBS raised builder/relay censorship concerns)"
+    ],
+    "B_errors": [
+      "Calls EIP-4844 a future upgrade that PBS is foundational to (EIP-4844 shipped in March 2024 and does not depend on PBS)"
+    ],
+    "A_score": 5,
+    "B_score": 4,
+    "prefer": "A",
+    "reason": "A explains the real mechanics: builders, relays, MEV-Boost and the proposer taking the highest bid. It wrongly presents PBS as enshrined in The Merge via EIP-4844. B is vaguer and makes the same kind of EIP-4844 error. Neither mentions ePBS."
+  },
+  "tech-06": {
+    "A_errors": [
+      "Opens by saying Shor's algorithm does not directly threaten ECC in the same way as RSA (it breaks ECC through the same discrete-log/period-finding approach)",
+      "Claims breaking ECC needs significantly more quantum resources than breaking RSA of equivalent strength (256-bit ECC needs fewer logical qubits, about 2,300, than RSA-3072)",
+      "Says Shor solves discrete logs in any finite group (it applies to abelian groups with efficiently computable operations)"
+    ],
+    "B_errors": [],
+    "A_score": 5,
+    "B_score": 8,
+    "prefer": "B",
+    "reason": "B states the mechanism correctly and concisely: ECDLP in polynomial time on a quantum computer lets an attacker derive the private key. A is longer but opens misleadingly and gets the resource comparison backwards."
+  },
+  "tech-08": {
+    "A_errors": [
+      "Claims Verkle proofs are constant size, a single 128-byte commitment regardless of entries (proofs remain logarithmic, just much smaller)",
+      "Expands KZG as Kate-Zaveruchi-Gasarch (it is Kate, Zaverucha, Goldberg)",
+      "Says Ethereum's Verkle trees use KZG (the Verkle spec uses Pedersen/IPA vector commitments)",
+      "Places Verkle trees under 'The Purge' (they belong to 'The Verge')"
+    ],
+    "B_errors": [
+      "Says Ethereum's Verkle trees use Kate commitments (the spec uses Pedersen/IPA)",
+      "Says proofs are generated by specialized 'stateless' nodes (witnesses come from block producers or stateful nodes)"
+    ],
+    "A_score": 4,
+    "B_score": 7,
+    "prefer": "B",
+    "reason": "B correctly conveys the core idea: vector or polynomial commitments give much smaller witnesses than Merkle-Patricia, which enables statelessness. It has only minor slips. A has several confident errors on proof size, KZG and the roadmap."
+  },
+  "trav-01": {
+    "A_errors": [
+      "Says to take the Red Line toward 'Alameda or Santos' to reach the historic centre (the Red Line runs Aeroporto-São Sebastião, Santos has no metro, and Baixa needs a change of line)",
+      "Invents bus 'Route 700' to Rossio/Praça do Comércio (that service is the Aerobus)"
+    ],
+    "B_errors": [
+      "Says the Red Line reaches Baixa-Chiado and Terreiro do Paço (it does not; a change at Alameda or Saldanha is needed)",
+      "Gives the Red Line direction as São Francisco Xavier (its terminus is São Sebastião)",
+      "Invents stop counts of 5 to Baixa-Chiado and 4 to Terreiro do Paço",
+      "Claims metro ticket machines do not accept cash (they do)",
+      "Lists buses 728 ('728 Cesta') and 756 as airport routes (they do not serve the airport)",
+      "Says an on-board bus ticket costs the same as the metro fare (the on-board fare is higher)"
+    ],
+    "A_score": 4,
+    "B_score": 3,
+    "prefer": "A",
+    "reason": "Both miss that you must change lines to reach Baixa, and neither names the Aerobus. B is more detailed but confidently wrong on directions, stops, payment and bus lines. A's errors are fewer and less misleading."
+  },
+  "trav-11": {
+    "A_errors": [
+      "Describes the plug as two flat parallel pins with a round grounding pin (Type I has three flat pins, two of them angled)",
+      "Claims some older buildings or regions still have 110 V outlets"
+    ],
+    "B_errors": [],
+    "A_score": 4,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "B is exactly right: Types C and I, 220 V 50 Hz. A gets Type I and 220 V/50 Hz right but then contradicts itself on the pin shape, invents 110 V outlets and omits Type C."
+  },
+  "zh-04": {
+    "A_errors": [
+      "Says Monero uses zk-SNARKs/zk-STARKs and implies Zcash uses STARKs (Monero uses ring signatures, RingCT and Bulletproofs; Zcash uses zk-SNARKs)",
+      "Garbles the colour-blind friend and two balls analogy, with the wrong roles and a procedure that does not demonstrate the property"
+    ],
+    "B_errors": [],
+    "A_score": 6,
+    "B_score": 8,
+    "prefer": "B",
+    "reason": "Both give the correct definition and the three properties in clear Chinese. A adds useful detail, but its analogy is garbled and it is wrong about Monero. B is concise and accurate."
+  }
+}

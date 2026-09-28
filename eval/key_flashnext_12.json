@@ -1,0 +1,50 @@
+{
+ "broad-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "fact-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "fact-04": {
+  "A": "first",
+  "B": "second"
+ },
+ "fact-07": {
+  "A": "first",
+  "B": "second"
+ },
+ "fresh-04": {
+  "A": "second",
+  "B": "first"
+ },
+ "health-01": {
+  "A": "first",
+  "B": "second"
+ },
+ "tech-03": {
+  "A": "first",
+  "B": "second"
+ },
+ "tech-06": {
+  "A": "first",
+  "B": "second"
+ },
+ "tech-08": {
+  "A": "first",
+  "B": "second"
+ },
+ "trav-01": {
+  "A": "second",
+  "B": "first"
+ },
+ "trav-11": {
+  "A": "first",
+  "B": "second"
+ },
+ "zh-04": {
+  "A": "first",
+  "B": "second"
+ }
+}
