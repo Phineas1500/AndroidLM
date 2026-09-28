@@ -480,8 +480,9 @@ class ResearchPipeline(
             }
             // a question the Ethereum and cryptography pack answers (rag.py --pack-route auto)
             val pack = if (config.pack) withContext(corpusDispatcher) { corpora.pack() } else null
+            var wikiStems: List<Stem> = emptyList()
             if (pack != null) {
-                val wikiStems = half?.stems?.await() ?: withContext(corpusDispatcher) { corpora.wiki().stems(question) }
+                wikiStems = half?.stems?.await() ?: withContext(corpusDispatcher) { corpora.wiki().stems(question) }
                 val affinity = withContext(corpusDispatcher) {
                     Pack.affinity(pack.stems(question), wikiStems, corpora.wiki().nIndexed)
                 }
@@ -516,7 +517,7 @@ class ResearchPipeline(
             val searched = searching(titles, half, early)
             // the pack's passages lead the sources of a question it answers
             val packHits = if (decision.pack && pack != null) {
-                withContext(corpusDispatcher) { Pack.hits(pack, question, config.packPassages) }
+                withContext(corpusDispatcher) { Pack.hits(pack, question, wikiStems, config.packPassages) }
             } else {
                 null
             }

@@ -59,15 +59,31 @@ object Pack {
     fun routes(a: Affinity?): Boolean = a?.best != null && a.best >= MIN_RATIO && a.foreign < MAX_FOREIGN
 
     /**
-     * rag.py `pack_hits`: the pack's best [n] passages for the question (whole-index BM25, at most
-     * two per document). A document's key facts (an EIP's status and the network upgrade that
-     * shipped it) lead the first passage taken from it, which then counts as a lead (the longer
-     * limit of [buildContext]). [stems] are the question's stems in the pack, when already known.
+     * rag.py `pack_terms`: the pack search's query terms, the question's words rarest in the pack
+     * first, without the ones common in English, which is to say in Wikipedia (more than [maxDf] of
+     * its chunks: "between", "differ", "work"). Unlike [Corpus.queryTerms], a word common only in
+     * the pack stays ("signature" in a question about signatures). Fewer than [keepMin] left: the
+     * [keepMin] rarest in the pack.
      */
-    fun hits(pack: Corpus, question: String, n: Int = PASSAGES, stems: List<Stem>? = null): List<Hit> {
+    fun terms(packStems: List<Stem>, wikiStems: List<Stem>, maxDf: Double = 0.02, keepMin: Int = 3): List<String> {
+        val ws = wikiStems.associate { it.stem to it.idf }
+        val ranked = packStems.sortedWith { a, b -> Py.cmp(-a.idf, -b.idf) } // stable, like sorted()
+        val minIdf = ln(1 / maxDf)
+        val kept = ranked.filter { (ws[it.stem] ?: minIdf) >= minIdf }.map { it.stem }
+        return if (kept.size >= keepMin) kept else ranked.take(keepMin).map { it.stem }
+    }
+
+    /**
+     * rag.py `pack_hits`: the pack's best [n] passages for the question (whole-index BM25 over
+     * [terms], at most two per document). A document's key facts (an EIP's status and the network
+     * upgrade that shipped it) lead the first passage taken from it, which then counts as a lead
+     * (the longer limit of [buildContext]). [wikiStems] are the question's stems in Wikipedia.
+     */
+    fun hits(pack: Corpus, question: String, wikiStems: List<Stem>, n: Int = PASSAGES): List<Hit> {
         val out = ArrayList<Hit>()
         val seen = HashSet<Long>()
-        for (h in pack.bm25(stems ?: pack.stems(question)).take(n)) {
+        val stems = pack.stems(question)
+        for (h in pack.bm25(stems, terms = terms(stems, wikiStems)).take(n)) {
             var hit = h
             val text = pack.article(h.aid.id).text.value
             if (h.aid.id !in seen && text.startsWith("Key facts:")) {

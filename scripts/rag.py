@@ -139,7 +139,19 @@ PACK_LIBRARY = ("an offline library: Ethereum's specifications (EIPs, ERCs, cons
                 "documentation, NIST's cryptography standards, and Wikipedia")
 
 
-def pack_answer_system(as_of):
+def pack_answer_system(as_of, version=1):
+    if version == 2:
+        return (
+            "You are an offline research assistant with expert knowledge of Ethereum and cryptography. Answer "
+            f"the question directly and completely, using your own knowledge together with the numbered sources "
+            f"from {PACK_LIBRARY}. The sources date from {as_of}. Where a source gives a specific name, number, "
+            "date or status, use it rather than your memory, and cite it like [1]. Give the full answer an expert "
+            "would: how it works, the key names and numbers, and where things stand now, from your own knowledge "
+            "where the sources are silent. Never describe the sources or say what they do not contain. Ignore "
+            "sources that are off-topic. If you are unsure of a specific name, date or number, say so instead of "
+            "guessing. Address every part of the question in the first few lines, then elaborate. No preamble, no "
+            "restating the question, no LaTeX, no visible deliberation."
+        )
     return (
         "You are an offline research assistant. Answer the question directly and completely, using "
         f"your own knowledge together with the numbered sources from {PACK_LIBRARY}. The sources date "
@@ -381,9 +393,10 @@ class Corpus:
         hits[0]["lead"] = True
         return hits
 
-    def bm25(self, stems, pool=80, prior=2.0, per_article=2, min_coverage=0.0):
-        """Whole-index BM25 with a popularity prior; passages below `min_coverage` are dropped."""
-        terms = self.query_terms(stems)
+    def bm25(self, stems, pool=80, prior=2.0, per_article=2, min_coverage=0.0, terms=None):
+        """Whole-index BM25 with a popularity prior; passages below `min_coverage` are dropped.
+        `terms` replaces the query terms query_terms would pick."""
+        terms = self.query_terms(stems) if terms is None else terms
         if not terms:
             return []
         rows = self.db.execute(
@@ -604,12 +617,25 @@ def pack_route(question, wiki_stems):
 WIKI_N_INDEXED = [0]  # the encyclopedia's chunk count, for words it does not have (set in main)
 
 
-def pack_hits(question, n=4):
-    """The pack's best passages for the question (whole-index BM25, at most two per document).
-    A document's key facts (an EIP's status and the network upgrade that shipped it) lead the
-    first passage taken from it."""
+def pack_terms(pack_stems, wiki_stems, max_df=0.02, keep_min=3):
+    """The pack search's query terms: the question's words, rarest in the pack first, without the
+    ones common in English, which is to say in Wikipedia (more than max_df of its chunks: "between",
+    "differ", "work"). Unlike query_terms, a word common only in the pack stays ("signature" in a
+    question about signatures). Fewer than keep_min left: the keep_min rarest in the pack."""
+    ws = dict(wiki_stems)
+    ranked = sorted(pack_stems, key=lambda s: -s[1])  # stable, like query_terms
+    min_idf = math.log(1 / max_df)
+    kept = [s for s, _ in ranked if ws.get(s, min_idf) >= min_idf]
+    return kept if len(kept) >= keep_min else [s for s, _ in ranked[:keep_min]]
+
+
+def pack_hits(question, wiki_stems, n=4):
+    """The pack's best passages for the question (whole-index BM25 over pack_terms, at most two
+    per document). A document's key facts (an EIP's status and the network upgrade that shipped
+    it) lead the first passage taken from it."""
     hits, seen = [], set()
-    for h in PACK.bm25(PACK.stems(question))[:n]:
+    stems = PACK.stems(question)
+    for h in PACK.bm25(stems, terms=pack_terms(stems, wiki_stems))[:n]:
         _, _, text = PACK.article(h["aid"])
         if h["aid"] not in seen and text.startswith("Key facts:"):
             facts = text.split("\n\n", 1)[0]
@@ -726,7 +752,8 @@ def answer(corpus, args, question):
         rec.update(route=mode, route_views=views)
     # the pack's questions: sources first with its passages, or answer first and a check against them
     route = getattr(args, "pack_route", "off")
-    use_pack = PACK is not None and (route == "always" or (route == "auto" and pack_route(question, corpus.stems(question))))
+    wiki_stems = corpus.stems(question) if PACK is not None and route != "off" else None
+    use_pack = PACK is not None and (route == "always" or (route == "auto" and pack_route(question, wiki_stems)))
     if use_pack:
         mode = "plan" if args.pack_mode == "sources" else "verify"
         rec.update(route=mode, pack=True)
@@ -741,7 +768,7 @@ def answer(corpus, args, question):
     if mode in ("plan", "verify"):
         hits = corpus.retrieve(question, titles, k=args.k, voyage=VOYAGE)
         if use_pack:
-            hits = pack_hits(question, args.pack_passages) + hits
+            hits = pack_hits(question, wiki_stems, args.pack_passages) + hits
     elif mode == "bm25":
         hits = corpus.bm25(corpus.stems(question))[:args.k]
     rec["search_ms"] = round((time.time() - t0) * 1000)
@@ -774,7 +801,8 @@ def answer(corpus, args, question):
         res = {k: v for k, v in draft.items() if k != "text"}
         rec["answer"] = draft["text"]
     elif context:
-        system = WORKED_SOURCES_SYSTEM if worked else pack_answer_system(pack_as_of()) if use_pack else ANSWER_SYSTEM
+        system = (WORKED_SOURCES_SYSTEM if worked else pack_answer_system(pack_as_of(), args.pack_prompt) if use_pack
+                  else ANSWER_SYSTEM)
         res = chat(args.url, system, f"Sources:\n\n{context}\n\nQuestion: {question}", args.max_tokens)
         rec["answer"] = res.pop("text")
     else:
@@ -818,6 +846,8 @@ def main():
                     help="sources: answer with the pack's passages in context; check: answer first, then "
                          "check against them")
     ap.add_argument("--pack-passages", type=int, default=4, help="pack passages ahead of Wikipedia's")
+    ap.add_argument("--pack-prompt", type=int, default=1, choices=[1, 2],
+                    help="the sources-first answer prompt: 1 as for Wikipedia's sources, 2 asks for an expert's full answer")
     ap.add_argument("--engine-cli", help="path to bmoe-cli: stream the model through BigMoeOnEdge "
                     "session mode instead of calling llama-server")
     ap.add_argument("--engine-model")

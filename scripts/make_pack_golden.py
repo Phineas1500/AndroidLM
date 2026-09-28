@@ -51,7 +51,8 @@ for question, titles, draft in CASES:
         "affinity": None if aff is None else [None if aff[0] is None else round(aff[0], 6), round(aff[1], 6)],
         "route": rag.pack_route(question, ws),
     }
-    hits = rag.pack_hits(question)
+    case["pack_terms"] = rag.pack_terms(ps, ws)
+    hits = rag.pack_hits(question, ws)
     case["pack_hits"] = [{"title": h["title"], "section": h["section"], "start": h["start"], "score": h["score"],
                           "via": h["via"], "text": h["text"], "lead": bool(h.get("lead"))} for h in hits]
     merged = hits + wiki.retrieve(question, titles)

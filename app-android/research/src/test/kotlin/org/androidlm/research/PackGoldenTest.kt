@@ -46,7 +46,8 @@ class PackGoldenTest {
                 assertEquals("$what foreign", ea.asJsonArray[1].asDouble, a.foreign, 1e-5)
             }
             assertEquals("$what route", c["route"].asBoolean, Pack.routes(a))
-            val hits = Pack.hits(pack, q)
+            assertEquals("$what pack terms", c["pack_terms"].asJsonArray.map { it.asString }, Pack.terms(ps, ws))
+            val hits = Pack.hits(pack, q, ws)
             val expected = c["pack_hits"].asJsonArray.map { it.asJsonObject }
             assertEquals("$what pack hits", expected.size, hits.size)
             expected.forEachIndexed { k, e ->

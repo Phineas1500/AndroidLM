@@ -180,7 +180,30 @@ def drop_sections(text, names):
     return "".join(keep).strip()
 
 
+# sections that are lists of links (the pages they name), not facts: they match many topic words
+LINK_SECTIONS = re.compile(r"(?i)^(further reading|related topics|related tutorials|related articles|resources|"
+                           r"more resources|learn more|see also|references|tutorials|tutorials: .*|further reading "
+                           r"and resources|additional reading|videos|copyright)$")
+
+
+def drop_link_sections(text):
+    """Remove the sections (with their subsections) whose heading is a LINK_SECTIONS name."""
+    out, skip = [], None
+    for line in text.split("\n"):
+        m = re.match(r"^(#{2,6})\s+(.*)$", line)
+        if m:
+            level = len(m.group(1))
+            if skip is not None and level <= skip:
+                skip = None
+            if skip is None and LINK_SECTIONS.match(m.group(2).strip()):
+                skip = level
+        if skip is None:
+            out.append(line)
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(out)).strip()
+
+
 def document(title, lead, body):
+    body = drop_link_sections(body)
     return f"# {title}\n\n{lead}\n\n{body}".strip() if lead else f"# {title}\n\n{body}".strip()
 
 

@@ -260,15 +260,19 @@ class Corpus(private val db: SqlDatabase, private val zstd: ZstdDecompressor, wo
         return listOf(hits[0].copy(lead = true)) + hits.drop(1)
     }
 
-    /** Whole-index BM25 with a popularity prior; passages below [minCoverage] are dropped. */
+    /**
+     * Whole-index BM25 with a popularity prior; passages below [minCoverage] are dropped. [terms]
+     * replaces the query terms [queryTerms] would pick.
+     */
     fun bm25(
         stems: List<Stem>,
         pool: Int = 80,
         prior: Double = 2.0,
         perArticle: Int = 2,
         minCoverage: Double = 0.0,
+        terms: List<String>? = null,
     ): List<Hit> {
-        val terms = queryTerms(stems)
+        @Suppress("NAME_SHADOWING") val terms = terms ?: queryTerms(stems)
         if (terms.isEmpty()) return emptyList()
         val rows = db.query(
             "select rowid, bm25(fts, 8.0, 3.0, 1.0) s from fts where fts match ? order by s limit ?",
