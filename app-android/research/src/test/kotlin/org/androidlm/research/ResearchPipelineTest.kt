@@ -1097,7 +1097,7 @@ class ResearchPipelineTest {
     @Test
     fun aPlacesQuestionIsAnsweredFromThePlacesDatabase() {
         val question = "Tell me the best vegan restaurants in Buenos Aires"
-        val answer = "- Lotos [1]: a vegan restaurant."
+        val answer = "- Y la Vaca Chocha [1]: a vegan restaurant."
         val engine = FakeEngine(listOf(answer))
         val rec = Recorder()
 
@@ -1106,16 +1106,17 @@ class ResearchPipelineTest {
         // one generation, over the list; no plan, no Wikipedia search
         assertEquals(1, engine.calls.size)
         val prompt = engine.calls[0].prompt
-        assertTrue(prompt.startsWith(PlacesText.PLACES_SYSTEM + "\n\nPlaces (184 vegan places to eat within 16 km of Buenos Aires, Argentina):\n\n[1] Lotos: "))
+        assertTrue(prompt.startsWith(PlacesText.PLACES_SYSTEM + "\n\nPlaces (184 vegan places to eat within 16 km of Buenos Aires, Argentina):\n\n[1] Y la Vaca Chocha: "))
         assertTrue(prompt.endsWith("\n\nQuestion: " + question))
         assertEquals(PlacesText.MODEL_PLACES, prompt.lines().count { Regex("^\\[\\d+] ").containsMatchIn(it) })
         assertEquals(360, engine.calls[0].nPredict)
 
         assertEquals(Route.PLACES, result.route.route)
         assertEquals(12, result.sources.size)
-        assertEquals("Lotos", result.sources[0].title)
+        // (Lotos, vegan by Overture's category but vegetarian-only in OpenStreetMap, is now vegetarian)
+        assertEquals("Y la Vaca Chocha", result.sources[0].title)
         assertEquals("places", result.sources[0].via)
-        assertTrue(result.sources[0].section.startsWith("vegan restaurant · Av. Córdoba 1583 · 1.9 km from the centre"))
+        assertTrue(result.sources[0].section, result.sources[0].section.startsWith("vegan restaurant · Av. San Juan 409"))
         assertNotNull(result.sources[0].lat)
         assertEquals(184 - 12, result.sourcesDropped)
         assertEquals(answer, result.answer)

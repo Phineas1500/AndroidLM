@@ -510,6 +510,39 @@ def main():
                coalesce(cuisine, cuisine_any) as cuisine
         from r where rn = 1""")
     log("merged, duplicates folded:", con.execute("select count(*) from merged").fetchone()[0], "places")
+    # A lone branch called vegan: when a business has three or more places to eat and fewer than a
+    # third of them are in the vegan category or tagged vegan-only, the one branch's
+    # "vegan_restaurant" is a slip of the data (Saravana Bhavan, Green Eat, Sweetgreen, Freshii),
+    # unless its name says vegan. It takes its branches' usual category and loses the vegan
+    # alternate, but keeps "serves vegan" (diet:vegan=yes): it is still listed for a vegan question,
+    # as having vegan options, below the vegan places (a vegan chain that Overture mostly files as
+    # sushi or fast food, like PLANTA, is not lost). A business is a name with a website domain, or
+    # without one, a name within about 100 km: a common name ("Eden", "Canteen") is many businesses.
+    vegan_before = con.execute("select count(*) from merged where cat = 'vegan_restaurant'").fetchone()[0]
+    con.execute(f"""
+        create or replace table merged as
+        with g as (
+            select *, lower(regexp_replace(trim(name), '\\s+', ' ', 'g')) || '|' || coalesce(
+                       nullif(regexp_extract(lower(website), '^(?:[a-z]+://)?(?:www\\.)?([^/?#:]+)', 1), ''),
+                       cast(round(lat) as varchar) || ',' || cast(round(lon) as varchar)) as biz
+            from merged where top = 'food_and_drink'),
+        s as (
+            select biz, count(*) as n,
+                   count(*) filter (where cat = 'vegan_restaurant' or (diet & {VEGAN_ONLY}) != 0) as veg
+            from g group by biz having count(*) >= 3),
+        m as (select biz, mode(cat) as usual from g where cat != 'vegan_restaurant' group by biz),
+        d as (
+            select g.pid, coalesce(m.usual, 'restaurant') as usual from g join s using (biz) left join m using (biz)
+            where g.cat = 'vegan_restaurant' and (g.diet & {VEGAN_ONLY}) = 0 and s.veg * 3 < s.n
+              and not regexp_matches(g.name, '(?i)\\b(vegan[oa]?s?|v[eé]gane?s?|plant[- ]based)\\b'))
+        select merged.* replace (
+                   coalesce(d.usual, merged.cat) as cat,
+                   case when d.pid is null then merged.diet else merged.diet | {VEGAN_YES} end as diet,
+                   case when d.pid is null then merged.alt
+                        else nullif(regexp_replace(coalesce(merged.alt, ''), '(^|,)vegan_restaurant', '', 'g'), '') end as alt)
+        from merged left join d using (pid)""")
+    log("places in the vegan category:", vegan_before, "->",
+        con.execute("select count(*) from merged where cat = 'vegan_restaurant'").fetchone()[0], "(lone branches taken out)")
 
     countries, regions, cities = load_geonames(a.geonames)
     names = {}

@@ -459,7 +459,10 @@ def diet_tier(p, diet):
     3: limited options; None: not known to serve it."""
     names = (p.kind,) + tuple(a for a in (p.alt or "").split(",") if a)
     if diet == "vegan":
-        if p.diet & VEGAN_ONLY or "vegan_restaurant" in names or VEGAN_NAME.search(p.name):
+        # OpenStreetMap's "vegetarian only" outweighs a vegan category from the other source
+        # (Lotos in Buenos Aires, Pine Tree Cafe in Singapore): the place is vegetarian
+        if p.diet & VEGAN_ONLY or VEGAN_NAME.search(p.name) or \
+                ("vegan_restaurant" in names and not p.diet & VEGETARIAN_ONLY):
             return 0
         if p.diet & VEGAN_NO:
             return None

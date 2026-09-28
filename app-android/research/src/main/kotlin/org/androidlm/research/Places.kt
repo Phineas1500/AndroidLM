@@ -568,7 +568,11 @@ object PlacesText {
         val names = listOf(p.kind) + (p.alt ?: "").split(",").filter { it.isNotEmpty() }
         when (diet) {
             "vegan" -> {
-                if (p.diet and VEGAN_ONLY != 0 || "vegan_restaurant" in names || VEGAN_NAME.containsMatchIn(p.name)) return 0
+                // OpenStreetMap's "vegetarian only" outweighs a vegan category from the other source
+                // (Lotos in Buenos Aires, Pine Tree Cafe in Singapore): the place is vegetarian
+                if (p.diet and VEGAN_ONLY != 0 || VEGAN_NAME.containsMatchIn(p.name) ||
+                    ("vegan_restaurant" in names && p.diet and VEGETARIAN_ONLY == 0)
+                ) return 0
                 if (p.diet and VEGAN_NO != 0) return null
                 if (p.diet and VEGETARIAN_ONLY != 0 || "vegetarian_restaurant" in names || VEGETARIAN_NAME.containsMatchIn(p.name)) return 1
                 if (p.diet and VEGAN_YES != 0) return 2
