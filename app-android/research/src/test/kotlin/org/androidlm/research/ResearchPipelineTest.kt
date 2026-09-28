@@ -273,6 +273,27 @@ class ResearchPipelineTest {
     // ── answer first ──
 
     @Test
+    fun theCheckCanReadOnlyThePassagesThatShareMostWithTheDraft() {
+        // rag.py check_context, as golden.json has it for this case's draft
+        val case = goldenCase("Roughly how many times larger is the population of India")
+        val question = case["question"].asString
+        val draft = case["draft"].asString
+        val context = case["check_excerpts_context"].asString
+        val engine = FakeEngine(listOf("India\nCanada", draft, "No corrections. Supported by [1]."))
+        val rec = Recorder()
+
+        run(engine, sampleProvider(), question, rec, ResearchConfig(checkContinue = true, checkChars = 2000, checkExcerpts = true))
+
+        assertEquals(Prompts.checkFollowupUser(context), engine.calls[2].prompt)
+        assertTrue(context.length < case["hits_voyage_context"].asString.length)
+        // the sources are numbered as the check read them, and show the whole passages
+        val sources = rec.all<ResearchEvent.SourcesFound>().single().sources
+        val heads = Regex("(?m)^\\[(\\d+)] (.+)$").findAll(context).map { it.groupValues[2] }.toList()
+        assertEquals(heads, sources.map { if (it.section.isEmpty()) it.title else it.title + " — " + it.section })
+        assertTrue(sources.all { "\u2026" !in it.text || it.text.length > 400 })
+    }
+
+    @Test
     fun continuedCheckIsAFollowUpTurnOfTheDraft() {
         val case = goldenCase("Roughly how many times larger is the population of India")
         val question = case["question"].asString

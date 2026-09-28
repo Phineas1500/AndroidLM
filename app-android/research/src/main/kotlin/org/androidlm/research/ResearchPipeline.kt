@@ -96,6 +96,13 @@ data class ResearchConfig(
      * engine reads only the sources. Off by default, as in rag.py; the app turns it on.
      */
     val checkContinue: Boolean = false,
+    /**
+     * rag.py `check_context`: the source check of a draft reads at most this many characters of
+     * the passages that share most with the draft and the question (0: the answer's own context,
+     * [contextChars]); with [checkExcerpts], each passage cut to its sentences that do.
+     */
+    val checkChars: Int = 0,
+    val checkExcerpts: Boolean = false,
     /** The places answer: a handful of one-line recommendations from the list. */
     val placesTokens: Int = 360,
     /**
@@ -479,9 +486,20 @@ class ResearchPipeline(
                 draft = answering(ResearchPhase.DRAFTING, closedSystem, answerQuestion)
             }
 
-            val built = searching(titles, half, early)
-            val sources = built.usedHits.mapIndexed { i, h -> ResearchSource(i + 1, h.title, h.section, h.text, h.via) }
-            val dropped = built.dropped
+            val searched = searching(titles, half, early)
+            // the source check of a draft reads the passages that share most with it (rag.py
+            // check_context), numbered as the sources are shown
+            val built = if (draft != null && config.checkChars > 0) {
+                CheckContext.build(searched.hits, draft, question, config.checkChars, config.checkExcerpts)
+            } else {
+                BuiltContext(searched.context, searched.usedHits)
+            }
+            // (an excerpt is what the check read; the whole passage is what the source shows)
+            val full = searched.hits.associateBy { it.aid to it.start }
+            val sources = built.usedHits.mapIndexed { i, h ->
+                ResearchSource(i + 1, h.title, h.section, (full[h.aid to h.start] ?: h).text, h.via)
+            }
+            val dropped = searched.hits.size - built.usedHits.size
             listener.onEvent(ResearchEvent.SourcesFound(sources, dropped))
             val context = built.context
 
@@ -697,18 +715,18 @@ class ResearchPipeline(
                 "wait" to stemsWaitMs + bmWaitMs,
                 "titles" to msSince(t0) - bmWaitMs,
             ))
-            return Searched(built.context, built.usedHits, hits.size - built.usedHits.size)
+            return Searched(built.context, built.usedHits, hits.size - built.usedHits.size, hits)
         }
 
         /** retrieve + pack, on [provider]'s thread (the caller's dispatcher decides which). */
         private suspend fun search(provider: CorpusProvider, p: QuestionSearch?, titles: List<String>): Searched {
             val hits = provider.wiki().retrieve(question, titles, config.k, provider.voyage(), p)
             val built = buildContext(hits, config.contextChars)
-            return Searched(built.context, built.usedHits, hits.size - built.usedHits.size)
+            return Searched(built.context, built.usedHits, hits.size - built.usedHits.size, hits)
         }
     }
 
-    private class Searched(val context: String, val usedHits: List<Hit>, val dropped: Int)
+    private class Searched(val context: String, val usedHits: List<Hit>, val dropped: Int, val hits: List<Hit>)
 
     companion object {
         /** Between the draft and its source check in the final text (rag.py, verbatim). */

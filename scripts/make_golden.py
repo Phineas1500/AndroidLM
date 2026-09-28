@@ -11,7 +11,7 @@ Build golden.json without that file next to sample_wiki.db (the output is the sa
 import json
 import sys
 
-from rag import Corpus, build_context
+from rag import Corpus, build_context, check_context
 
 CASES = [
     ("I am visiting Kyoto for three days. Which districts and sites should I prioritize, and what "
@@ -34,9 +34,31 @@ CASES = [
      ["Georgia (country)", "Kakheti", "A Title That Does Not Exist"]),
 ]
 
+# a draft per case, for the source check's context (check_context): names, numbers, claims
+DRAFTS = [
+    "Prioritize Higashiyama, Gion and Arashiyama. Kiyomizu-dera and Fushimi Inari are the key sites. "
+    "At temples, remove your shoes; at shrines, bow twice and clap twice.",
+    "With 10 hours, see Hagia Sophia, the Blue Mosque and the Grand Bazaar in Sultanahmet. The old city "
+    "sits on a peninsula between the Golden Horn and the Sea of Marmara, 45 km from Istanbul Airport.",
+    "Mehmed II ruled when Constantinople fell in 1453. Hagia Sophia became a mosque, a museum in 1934, "
+    "and a mosque again in 2020.",
+    "Rent control protects tenants from sudden increases but reduces housing supply, according to most "
+    "economists; a 2019 Stanford study of San Francisco found a 15% fall in rental supply.",
+    "Dehydration causes thirst and dark urine; heat stroke is a body temperature above 40 °C with confusion. "
+    "Give fluids for dehydration; cool the body and call emergency services for heat stroke.",
+    "India's population, about 1,428 million, is roughly 36 times Canada's 39 million, while Canada's land "
+    "area of 9.98 million km2 is about three times India's 3.29 million km2.",
+    "Type 1 diabetes is autoimmune, begins in childhood and needs insulin; type 2 comes from insulin "
+    "resistance, usually after 45, and is treated with lifestyle changes and metformin.",
+    "The Provisional IRA bombed Harrods on 17 December 1983, killing six people; a coded warning was "
+    "given 37 minutes before the blast.",
+    "Georgia's regions include Kakheti, known for wine, Svaneti for its towers, and Adjara for Batumi. "
+    "Try khachapuri, khinkali and churchkhela.",
+]
+
 wiki, voyage = Corpus(sys.argv[1]), Corpus(sys.argv[2])
 out = []
-for question, titles in CASES:
+for (question, titles), draft in zip(CASES, DRAFTS):
     stems = wiki.stems(question)
     case = {
         "question": question, "titles": titles,
@@ -52,6 +74,10 @@ for question, titles in CASES:
                        "score": h["score"], "via": h["via"]} for h in hits]
         case[name + "_used"] = len(used)
         case[name + "_context"] = context
+        if v is not None:
+            case["draft"] = draft
+            case["check_passages_context"] = check_context(hits, draft, question, 2000)[0]
+            case["check_excerpts_context"] = check_context(hits, draft, question, 2000, excerpt=True)[0]
     first = wiki.resolve_title(titles[0])
     case["route_views"] = wiki.db.execute("select views from articles where id=?", (first,)).fetchone()[0] if first else None
     out.append(case)

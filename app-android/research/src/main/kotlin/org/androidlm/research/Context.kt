@@ -40,6 +40,77 @@ fun buildContext(
 }
 
 /**
+ * Port of rag.py `check_context` and its helpers: a shorter context for the source check. The
+ * check tests the draft's statements, so it reads the passages (with [excerpt], the sentences)
+ * that share most with the draft's and the question's names and numbers, not six passages in
+ * full; on the phone reading those is most of the check's time.
+ */
+object CheckContext {
+    private val U = if (System.getProperty("java.vm.name") == "Dalvik") "" else "(?U)"
+    private val NUMBER = Regex(U + "\\d[\\d,.]*\\d|\\d")
+    private val WORD = Regex(U + "[^\\W\\d_][\\w'\u2019-]*")
+    // a sentence ends after a word of two lowercase letters or a number (not "U.S." or "H. W.")
+    private val SENTENCE = Regex(U + "(?<=[a-z0-9)\\]][a-z0-9%)\\]][.!?])\\s+(?=[A-Z\"\u201c(])|\\n+")
+
+    /** rag.py `check_terms`: term -> weight (numbers 3, capitalised words 2, other words of 4+ letters 1). */
+    fun terms(text: String): Map<String, Int> {
+        val terms = HashMap<String, Int>()
+        for (m in NUMBER.findAll(text)) {
+            val t = m.value.replace(",", "").trimEnd('.')
+            terms[t] = maxOf(terms[t] ?: 0, 3)
+        }
+        for (m in WORD.findAll(text)) {
+            val w = m.value
+            val low = w.lowercase(java.util.Locale.ROOT)
+            val upper = Character.isUpperCase(w.codePointAt(0))
+            if (low in Lexicon.STOP || (Py.len(low) < 4 && !upper)) continue
+            terms[low] = maxOf(terms[low] ?: 0, if (upper) 2 else 1)
+        }
+        return terms
+    }
+
+    /** rag.py `check_overlap`. */
+    fun overlap(text: String, terms: Map<String, Int>): Int {
+        val have = terms(text).keys
+        return terms.entries.sumOf { (t, w) -> if (t in have) w else 0 }
+    }
+
+    /** rag.py `check_excerpt`. */
+    fun excerpt(text: String, terms: Map<String, Int>, limit: Int): String {
+        val sents = SENTENCE.split(text).map { Py.strip(it) }.filter { it.isNotEmpty() }
+        if (sents.isEmpty()) return text
+        val scores = sents.map { overlap(it, terms) }
+        val keep = sortedSetOf(0)
+        var used = Py.len(sents[0])
+        for (i in (1 until sents.size).sortedWith(compareBy({ -scores[it] }, { it }))) {
+            if (scores[i] == 0) break
+            if (used + 1 + Py.len(sents[i]) > limit) continue
+            keep.add(i)
+            used += 1 + Py.len(sents[i])
+        }
+        val out = ArrayList<String>()
+        var last = -1
+        for (i in keep) {
+            if (last >= 0 && i != last + 1) out.add("\u2026")
+            out.add(sents[i])
+            last = i
+        }
+        return out.joinToString(" ")
+    }
+
+    /** rag.py `check_context`: [buildContext] over the passages that share most with the draft and the question first. */
+    fun build(hits: List<Hit>, draft: String, question: String, budgetChars: Int, excerpt: Boolean): BuiltContext {
+        val terms = HashMap(terms(draft))
+        for ((t, w) in terms(question)) terms[t] = maxOf(terms[t] ?: 0, w)
+        val scored = hits.mapIndexed { i, h ->
+            val text = if (excerpt) excerpt(h.text, terms, if (h.lead) 500 else 400) else h.text
+            Triple(-overlap(text, terms), i, h.copy(text = text))
+        }
+        return buildContext(scored.sortedWith(compareBy({ it.first }, { it.second })).map { it.third }, budgetChars)
+    }
+}
+
+/**
  * Port of rag.py `clean_check`: drop the model's visible second-guessing from a source check.
  * Everything from the first line that starts deliberating is cut, i.e. the first line matching
  * `\s*(?:[-*]\s*)?(?:But wait|Wait[,. ]|Hmm|Let me|Let's|Actually,|On second thought)`

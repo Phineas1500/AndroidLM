@@ -73,6 +73,14 @@ class GoldenChecks(private val golden: JsonArray, private val wiki: Corpus, priv
         val built = buildContext(hits, 4000)
         check(i, "${name}_used", case[name + "_used"].asInt, built.usedHits.size)
         check(i, "${name}_context", case[name + "_context"].asString, built.context)
+        if (v != null) {
+            // rag.py check_context: the source check's shorter, draft-targeted context
+            val draft = case["draft"].asString
+            check(i, "check_passages_context", case["check_passages_context"].asString,
+                CheckContext.build(hits, draft, question(i), 2000, excerpt = false).context)
+            check(i, "check_excerpts_context", case["check_excerpts_context"].asString,
+                CheckContext.build(hits, draft, question(i), 2000, excerpt = true).context)
+        }
     }
 
     fun routeViews(i: Int) {
