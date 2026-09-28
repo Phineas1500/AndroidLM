@@ -811,7 +811,11 @@ class RunService : Service() {
     /** The research method's options (preferences of the method, not of the session: read per run, never in the argv). */
     private fun researchConfig(): ResearchConfig {
         val prefs = AppSettings.load(this)
-        return ResearchConfig(travelRoute = prefs.researchTravelRoute, checkContinue = prefs.researchCheckContinue, worked = true)
+        // the source check reads the 2,000 characters of passages that share most with the draft:
+        // as good as reading all of them in a blind A/B (notes/2026-09-28-check-speed.md), about
+        // 400 prompt tokens fewer
+        return ResearchConfig(travelRoute = prefs.researchTravelRoute, checkContinue = prefs.researchCheckContinue, worked = true,
+            checkChars = 2000)
     }
 
     /**

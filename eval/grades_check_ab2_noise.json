@@ -1,0 +1,646 @@
+{
+ "broad-01": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [
+   "'14,121 smaller islands, not thousands' is a false contrast; the draft's 'thousands' was right",
+   "'Corrects' a military claim the draft never made and misnames the Japan Self-Defense Forces as 'SJDF'"
+  ],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "B",
+  "reason": "A's population update (123M) is fair but it adds two bogus corrections; B adds harmless trivia. Neither fixes 'west of the Sea of Japan' or the nominal-GDP-by-PPP muddle."
+ },
+ "broad-02": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Near-identical correct additions (early winemaking, Treaty of Georgievsk); both miss the false 'first country to adopt Christianity' (Armenia was first) and the wrong Shkhara height."
+ },
+ "broad-03": {
+  "A_effect": "hurt",
+  "B_effect": "hurt",
+  "A_errors": [
+   "States WWI deaths as 30 million military; military deaths were roughly 9-11 million"
+  ],
+  "B_errors": [
+   "States WWI deaths as 30 million military; military deaths were roughly 9-11 million"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Identical content: 'confirms' a false 30-million military death toll and adds material unrelated to the causes."
+ },
+ "broad-04": {
+  "A_effect": "hurt",
+  "B_effect": "helped",
+  "A_errors": [
+   "Presents the 58.65-day sidereal day as correcting the draft's 176-day figure, which was the correct solar day",
+   "Frames 'gravity slightly higher than Mars' as a correction of the correct 38% figure (the two are essentially equal)",
+   "Nonsense 'correction' of 'steep cliffs' with the Caloris Basin"
+  ],
+  "B_errors": [
+   "Frames 'gravity slightly higher than Mars' as correcting the draft's correct size comparison with the Moon",
+   "Says 'not 176 Earth days' for the day length even though it notes 176 is the solar day the draft meant"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "B",
+  "reason": "Both misuse the Corrections section, but A wrongly implies the correct 176-day solar day is an error; B explains it and adds useful facts (3:2 resonance, Caloris size, phases)."
+ },
+ "edge-01": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Same trivia (island count, Article 9, wabi-sabi); both miss that Japan opened to trade (1854) before the Meiji Restoration and that it is no longer the third-largest economy."
+ },
+ "edge-02": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add correct context (allegory on hubris, Solon transmission; A notes Plato likely invented it, B adds Rudbeck's Uppsala claim); neither flags that Plato never names the capital 'Atlantis'."
+ },
+ "edge-04": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both add correct history (2013 conception, 30 July 2015 launch, Yellow Paper, Merge date)."
+ },
+ "fact-01": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [
+   "'Sixth-most populous, not seventh' corrects a claim the draft never made",
+   "Gives an undated 51.7% rural / 48.3% urban split that is out of date (Nigeria is now majority urban)"
+  ],
+  "B_errors": [
+   "'Sixth-most populous, not seventh' corrects a claim the draft never made",
+   "Gives an undated 51.7% rural / 48.3% urban split that is out of date (Nigeria is now majority urban)"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Identical checks: the update to 230M+ is reasonable, but there is a phantom 'not seventh' correction and stale urban/rural data."
+ },
+ "fact-02": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Draft is correct; both just confirm it with minor trivia (A: dates and the Kennedy quote; B: restates the plot and the Boom)."
+ },
+ "fact-03": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "Same correct additions (highest free-standing mountain, national park 1973); B has a visible typo 'Kilimanjjar'."
+ },
+ "fact-04": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [
+   "Says the Merge transition involved the Shapella update; Shapella (April 2023) came after the Merge"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "Draft is correct; A adds harmless detail (Paris, block number), while B wrongly lists Shapella as part of the Merge."
+ },
+ "fact-05": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Draft is correct; both confirm it, A with an extra list of capitals on the river."
+ },
+ "fact-06": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [
+   "Says the siege began 6 April and lasted 55 days; 6 April-29 May is 53 days, as the draft said"
+  ],
+  "B_errors": [
+   "Says the siege began 6 April and lasted 55 days; 6 April-29 May is 53 days, as the draft said"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Same content (Mehmed aged 21, end of the Middle Ages) with an inconsistent 55-day figure; both miss the draft's '1,500 years since 753 BC' error."
+ },
+ "fact-07": {
+  "A_effect": "helped",
+  "B_effect": "hurt",
+  "A_errors": [],
+  "B_errors": [
+   "Wrongly 'corrects' the return to the name Astana to 2023; it happened in September 2022"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "A correctly fixes the 2023->2022 renaming error; B asserts the wrong year. Both miss the false claim that Akmola was the Kazakh SSR capital (it was Almaty)."
+ },
+ "fact-08": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [
+   "Says Fleming identified the mould as Penicillium rubens; he called it P. rubrum (later P. notatum, reclassified as P. rubens only recently)"
+  ],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "B",
+  "reason": "Both add the 1945 Nobel and lysozyme; A misattributes the P. rubens identification to Fleming, while B's benzylpenicillin note is accurate."
+ },
+ "fresh-01": {
+  "A_effect": "helped",
+  "B_effect": "hurt",
+  "A_errors": [],
+  "B_errors": [
+   "Says Alberto Fernandez served two consecutive terms; he served one (2019-2023)"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "Both add correct term rules; B adds a false claim about Fernandez's two terms."
+ },
+ "fresh-02": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [
+   "Says the euro is used by 20 EU states; Bulgaria joined in January 2026, making 21"
+  ],
+  "B_errors": [
+   "Says the euro is used by 20 of 27 EU states; Bulgaria joined in January 2026, making 21"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add general euro trivia that doesn't help with the rate; neither fixes the draft's range (euros per dollar has not been near 1.20 recently; the high is about 1.04)."
+ },
+ "fresh-03": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "The draft correctly declines to give a price; both add generic Bitcoin background."
+ },
+ "fresh-04": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Identical: correctly fixes France/2018 to Argentina/2022 with accurate details; both leave the false 'France won the inaugural 1930 tournament' (it was Uruguay)."
+ },
+ "health-01": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add acclimatization and prevention tips the draft largely covers; neither fixes 'higher sites like Machu Picchu' (it is lower than Cusco)."
+ },
+ "health-02": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both add correct specifics (80% mild or asymptomatic, 4-7 day incubation; A the phases, B plasma leakage)."
+ },
+ "health-03": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [
+   "'Correction' says not to scrape tentacles off with hands or items, contradicting the standard advice (also in the draft) to remove them with tweezers or a card after vinegar"
+  ],
+  "B_errors": [
+   "'Correction' says not to scrape tentacles off with hands or items, contradicting the standard advice (also in the draft) to remove them with tweezers or a card after vinegar"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Near-identical: a confusing pseudo-correction, but a useful caveat that vinegar may not help Portuguese man o' war stings and a note on box-jellyfish antivenom."
+ },
+ "hum-01": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Identical correct additions: the eupatheiai (joy, wish, caution), the cardinal virtues and negative visualization."
+ },
+ "hum-02": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "Similar biographical additions; A also notes the traditional meeting of Laozi and Confucius, which is relevant to a comparison."
+ },
+ "hum-03": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add correct specifics (Osnabruck/Munster, 4.5-8M deaths, a revisionist view of imperial power); neither fixes the claim that Westphalia introduced permanent embassies."
+ },
+ "reason-01": {
+  "A_effect": "hurt",
+  "B_effect": "hurt",
+  "A_errors": [
+   "Says sources confirm a 280-290 km distance, understating the ~313 km road distance and contradicting the draft's 300-320 km while claiming to confirm it"
+  ],
+  "B_errors": [
+   "Says sources confirm a 280-290 km distance, understating the ~313 km road distance and contradicting the draft's 300-320 km while claiming to confirm it"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both endorse the draft (including its wrong '3:00 PM' headline) with a misleading distance and irrelevant train times."
+ },
+ "reason-02": {
+  "A_effect": "neutral",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "B",
+  "reason": "Draft is correct; B usefully sanity-checks it (11^3 ~ 1331), while A adds unrelated Jupiter trivia."
+ },
+ "reason-03": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Identical; confirms the dates and adds trivia (Flavian Amphitheatre, Ming walls)."
+ },
+ "reason-04": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Draft is correct; both just confirm."
+ },
+ "reason-05": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [
+   "Presents 424/km2 for the Netherlands as confirming the draft though it contradicts the draft's 520-530 (424 uses total area including water)"
+  ],
+  "B_errors": [
+   "Presents 424/km2 for the Netherlands as confirming the draft though it contradicts the draft's 520-530 (424 uses total area including water)"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both keep the right conclusion but cite a conflicting density figure as 'confirmation'."
+ },
+ "reason-06": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [
+   "'Corrects' the Moon's diameter from 27% to one-quarter of Earth's, though 27% is accurate"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "Both correctly fix the 10 m headline to 7.3 m; B adds a bogus 27%-vs-quarter correction and irrelevant trivia."
+ },
+ "reason-07": {
+  "A_effect": "hurt",
+  "B_effect": "hurt",
+  "A_errors": [
+   "Confirms Bush was 64; born 12 June 1924, he was 65 on 9 November 1989"
+  ],
+  "B_errors": [
+   "Confirms Bush was 64; born 12 June 1924, he was 65 on 9 November 1989"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both endorse the draft's wrong age."
+ },
+ "reason-08": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both affirm the correct $26,532.98 but never flag the draft's wrong $16,386.19 headline."
+ },
+ "tech-01": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both correctly fix the garbled names (ML-DSA/Dilithium, SLH-DSA/SPHINCS+) with accurate details; neither mentions Falcon/FN-DSA."
+ },
+ "tech-02": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Identical; adds generic points and example constructions without explaining more."
+ },
+ "tech-03": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both say the sources lack PBS info; neither fixes the false claim that PBS shipped with the Merge via EIP-4844."
+ },
+ "tech-04": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "A restates the draft; B is a terse but correct keyword list. Neither adds substance."
+ },
+ "tech-05": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [
+   "Implies zk-rollups provide private (shielded) transactions; rollup proofs are for validity, not privacy"
+  ],
+  "B_errors": [
+   "Implies zk-rollups provide private (shielded) transactions (citing Zerocash/Zcash, which are not rollups)"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add tangential zk-SNARK history and a misleading privacy point; neither fixes the bogus example 'Scalar'."
+ },
+ "tech-06": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Generic ECC facts; neither fixes the draft's reversed claim that breaking ECC needs more quantum resources than RSA (it needs fewer)."
+ },
+ "tech-07": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Identical correct context (Poon and Dryja 2015, Bitcoin throughput limit)."
+ },
+ "tech-08": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both say the sources don't cover Verkle trees; neither fixes KZG (Kate-Zaverucha-Goldberg), the 'constant 128-byte proof' claim or 'The Purge' (it's The Verge)."
+ },
+ "tech-09": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both add the correct lambda(n)/FIPS 186-4 point; the other additions are minor."
+ },
+ "tech-10": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both add correct history (Brewer; Gilbert and Lynch 2002) and PACELC."
+ },
+ "trav-01": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Minor additions; neither fixes the draft's errors (the red line doesn't reach Baixa-Chiado or Terreiro do Paco, its terminus is Sao Sebastiao, the machines do take cash)."
+ },
+ "trav-02": {
+  "A_effect": "helped",
+  "B_effect": "neutral",
+  "A_errors": [
+   "Says 'citizens of Vietnam are exempt from entry visas', which is meaningless and irrelevant"
+  ],
+  "B_errors": [
+   "Says 'citizens of Phu Quoc island' don't need a visa; the 30-day exemption is for foreign visitors to the island"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "A adds the useful 30-day Phu Quoc exemption for US citizens alongside a garbled line; B garbles the Phu Quoc point."
+ },
+ "trav-03": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "B",
+  "reason": "Draft is correct; A adds irrelevant material about other countries, while B stays on point."
+ },
+ "trav-04": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Draft is correct; neither adds anything useful."
+ },
+ "trav-05": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both confirm the numbers and add the Highway Police number (1193)."
+ },
+ "trav-06": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "Both add the classic Taksim bar scam and carpet touts; A also adds the taxi note-switch trick."
+ },
+ "trav-07": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Identical confirmations plus hotel and festival trivia."
+ },
+ "trav-09": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "Neither addresses timing; A at least adds concrete destinations, while B is meta-commentary. Both miss 'Rustavi' (the harvest is Rtveli)."
+ },
+ "trav-11": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add correct Argentine specifics (reversed polarity, upside-down outlets); neither fixes the draft's wrong 'two flat parallel pins and a round ground pin' description."
+ },
+ "trav-12": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both add a relevant homicide-rate context and local safety tips."
+ },
+ "trav-13": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add useful Grab, toll and tuk-tuk information; neither fixes the wrong 6 baht/min waiting charge."
+ },
+ "zh-01": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both say the sources lack restaurant information, so they can't check the draft's apparently invented restaurants and chef."
+ },
+ "zh-02": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Minor background on Mohism in both; nothing that changes the answer."
+ },
+ "zh-03": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Identical; confirms 123M. Neither fixes the false claim that Japan has the smallest population among major economies."
+ },
+ "zh-04": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [
+   "Claims non-transferability distinguishes ZK proofs from standard proofs; non-interactive ZK proofs (e.g. the zk-SNARKs the draft mentions) can be relayed"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "Both add a similar point about non-transferability, but B overgeneralizes it; neither fixes Monero 'using zk-SNARKs/STARKs' or the garbled ball analogy."
+ }
+}

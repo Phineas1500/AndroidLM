@@ -1,0 +1,234 @@
+{
+ "broad-01": {
+  "A": "first",
+  "B": "second"
+ },
+ "broad-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "broad-03": {
+  "A": "first",
+  "B": "second"
+ },
+ "broad-04": {
+  "A": "first",
+  "B": "second"
+ },
+ "edge-01": {
+  "A": "second",
+  "B": "first"
+ },
+ "edge-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "edge-04": {
+  "A": "first",
+  "B": "second"
+ },
+ "fact-01": {
+  "A": "first",
+  "B": "second"
+ },
+ "fact-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "fact-03": {
+  "A": "second",
+  "B": "first"
+ },
+ "fact-04": {
+  "A": "first",
+  "B": "second"
+ },
+ "fact-05": {
+  "A": "first",
+  "B": "second"
+ },
+ "fact-06": {
+  "A": "second",
+  "B": "first"
+ },
+ "fact-07": {
+  "A": "second",
+  "B": "first"
+ },
+ "fact-08": {
+  "A": "first",
+  "B": "second"
+ },
+ "fresh-01": {
+  "A": "second",
+  "B": "first"
+ },
+ "fresh-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "fresh-03": {
+  "A": "first",
+  "B": "second"
+ },
+ "fresh-04": {
+  "A": "first",
+  "B": "second"
+ },
+ "health-01": {
+  "A": "first",
+  "B": "second"
+ },
+ "health-02": {
+  "A": "second",
+  "B": "first"
+ },
+ "health-03": {
+  "A": "second",
+  "B": "first"
+ },
+ "hum-01": {
+  "A": "second",
+  "B": "first"
+ },
+ "hum-02": {
+  "A": "second",
+  "B": "first"
+ },
+ "hum-03": {
+  "A": "second",
+  "B": "first"
+ },
+ "reason-01": {
+  "A": "first",
+  "B": "second"
+ },
+ "reason-02": {
+  "A": "second",
+  "B": "first"
+ },
+ "reason-03": {
+  "A": "second",
+  "B": "first"
+ },
+ "reason-04": {
+  "A": "first",
+  "B": "second"
+ },
+ "reason-05": {
+  "A": "first",
+  "B": "second"
+ },
+ "reason-06": {
+  "A": "first",
+  "B": "second"
+ },
+ "reason-07": {
+  "A": "second",
+  "B": "first"
+ },
+ "reason-08": {
+  "A": "first",
+  "B": "second"
+ },
+ "tech-01": {
+  "A": "second",
+  "B": "first"
+ },
+ "tech-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "tech-03": {
+  "A": "second",
+  "B": "first"
+ },
+ "tech-04": {
+  "A": "second",
+  "B": "first"
+ },
+ "tech-05": {
+  "A": "first",
+  "B": "second"
+ },
+ "tech-06": {
+  "A": "second",
+  "B": "first"
+ },
+ "tech-07": {
+  "A": "first",
+  "B": "second"
+ },
+ "tech-08": {
+  "A": "first",
+  "B": "second"
+ },
+ "tech-09": {
+  "A": "first",
+  "B": "second"
+ },
+ "tech-10": {
+  "A": "second",
+  "B": "first"
+ },
+ "trav-01": {
+  "A": "first",
+  "B": "second"
+ },
+ "trav-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "trav-03": {
+  "A": "first",
+  "B": "second"
+ },
+ "trav-04": {
+  "A": "second",
+  "B": "first"
+ },
+ "trav-05": {
+  "A": "first",
+  "B": "second"
+ },
+ "trav-06": {
+  "A": "second",
+  "B": "first"
+ },
+ "trav-07": {
+  "A": "second",
+  "B": "first"
+ },
+ "trav-09": {
+  "A": "second",
+  "B": "first"
+ },
+ "trav-11": {
+  "A": "first",
+  "B": "second"
+ },
+ "trav-12": {
+  "A": "first",
+  "B": "second"
+ },
+ "trav-13": {
+  "A": "second",
+  "B": "first"
+ },
+ "zh-01": {
+  "A": "second",
+  "B": "first"
+ },
+ "zh-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "zh-03": {
+  "A": "second",
+  "B": "first"
+ },
+ "zh-04": {
+  "A": "second",
+  "B": "first"
+ }
+}

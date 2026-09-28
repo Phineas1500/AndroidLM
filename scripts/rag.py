@@ -642,7 +642,11 @@ def answer(corpus, args, question):
     elif mode == "bm25":
         hits = corpus.bm25(corpus.stems(question))[:args.k]
     rec["search_ms"] = round((time.time() - t0) * 1000)
-    context, used_hits = build_context(hits, args.context_chars)
+    if draft is not None and args.check_chars and not args.rewrite:
+        # the source check of a draft reads the passages that share most with it (the app's default)
+        context, used_hits = check_context(hits, draft["text"], question, args.check_chars)
+    else:
+        context, used_hits = build_context(hits, args.context_chars)
     rec["sources"] = [f"{h['title']} — {h['section']} ({h['via']})" for h in used_hits]
     rec["sources_dropped"] = len(hits) - len(used_hits)
     if draft is not None and context and args.rewrite:
@@ -690,6 +694,9 @@ def main():
     ap.add_argument("--max-tokens", type=int, default=600)
     ap.add_argument("--route-views", type=int, default=5000,
                     help="auto mode: go retrieval-first when the subject article has fewer monthly views")
+    ap.add_argument("--check-chars", type=int, default=0,
+                    help="answer-first questions: the source check reads at most this many characters of the "
+                         "passages that share most with the draft (check_context; the app uses 2000); 0: --context-chars")
     ap.add_argument("--check-continue", action="store_true",
                     help="answer-first questions: ask for the source check as a follow-up turn of the draft")
     ap.add_argument("--rewrite", action="store_true",
