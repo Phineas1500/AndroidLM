@@ -880,13 +880,15 @@ class Places(private val db: SqlDatabase) {
 
     /** places.py `locate`. */
     fun locate(ask: PlaceAsk): City? {
+        // the word the question names its cuisine by is not a place ("thank you in Thai")
+        val cuisine = ask.sub?.let { PlacesText.normKey(PlacesText.subWord(it)) }
         for ((text, anchored) in PlacesText.placeCandidates(ask.question)) {
             val key0 = PlacesText.normKey(text)
             val words = if (key0.isEmpty()) emptyList() else key0.split(" ")
             val capital = text.isNotEmpty() && Character.isUpperCase(text.codePointAt(0))
             for (n in min(words.size, 5) downTo 1) {
                 val key = words.subList(0, n).joinToString(" ")
-                if (!anchored && key in PlacesText.NOT_PLACES) continue
+                if ((!anchored && key in PlacesText.NOT_PLACES) || key == cuisine) continue
                 val ids = db.query("select city from city_names where key = ?", key).map { it[0] as Long }
                 var cities = if (ids.isEmpty()) emptyList() else db.query(
                     "select id, name, country, admin1, lat, lon, population, capital from cities where id in (" +

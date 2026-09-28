@@ -16,6 +16,9 @@ import places as P  # noqa: E402
 from build_places import norm_key  # noqa: E402
 
 QUESTIONS = [
+    "How do I say thank you in Thai, and does it change if I'm a man or a woman?",
+    "My dinner bill is 2,450 Thai baht and 1 US dollar is 36.5 baht. How much is that in dollars, and what is the total with a 10% tip?",
+    "best Thai restaurants in London",
     "Tell me the best vegan restaurants in Buenos Aires",
     "vegan food in buenos aires?",
     "Buenos Aires vegan restaurants",

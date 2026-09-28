@@ -307,13 +307,15 @@ def locate(db, ask):
     After "in/near/around", a state or province counts too, by the people in all of its cities, and
     stands for its largest city ("Bali": Denpasar, not Bāli in West Bengal). National capitals count
     five times their size ("Washington"). A candidate after "in/near/around" is taken when it is capitalised or
-    a city of 100,000 or more; a bare capitalised run only in the latter case."""
+    a city of 100,000 or more; a bare capitalised run only in the latter case. The word the question
+    names its cuisine by is not a place ("thank you in Thai": Thai is also a name of Alor Setar)."""
+    cuisine = norm_key(sub_word(ask.sub)) if ask.sub else None
     for text, anchored in place_candidates(ask.question):
         words = norm_key(text).split()
         capital = text[:1].isupper()
         for n in range(min(len(words), 5), 0, -1):
             key = " ".join(words[:n])
-            if not anchored and key in NOT_PLACES:
+            if (not anchored and key in NOT_PLACES) or key == cuisine:
                 continue
             ids = [r[0] for r in db.execute("select city from city_names where key = ?", (key,))]
             cities = [City(*r) for r in db.execute(
