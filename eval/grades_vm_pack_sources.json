@@ -1,0 +1,187 @@
+{
+ "cry-001": {
+  "A_errors": [
+   "Says only one of NIST's four selected algorithms is a signature scheme; three of the four (Dilithium, Falcon, SPHINCS+) are signatures",
+   "Expands SLH-DSA as 'Secure Hashing-based'; it is 'Stateless Hash-Based'",
+   "Claims ML-DSA/Dilithium is 'standardized as a key encapsulation mechanism in some contexts'; ML-DSA is only a signature standard (FIPS 204)",
+   "Presents Dilithium/ML-DSA as a finalist or alternative candidate instead of a finalized FIPS 204 standard"
+  ],
+  "B_errors": [],
+  "A_score": 2,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B lists every standardized PQ signature (ML-DSA, SLH-DSA, FN-DSA, XMSS/LMS) with correct sizes and status, and names the schemes that are not quantum-resistant. A is confused, omits FN-DSA, and gets several facts wrong."
+ },
+ "cry-002": {
+  "A_errors": [
+   "Calls ML-DSA 'a stateful or stateless scheme'; ML-DSA is stateless",
+   "Says SLH-DSA security relies on hash collision resistance; SPHINCS+/SLH-DSA is designed around second-preimage/PRF-type properties, not collision resistance"
+  ],
+  "B_errors": [],
+  "A_score": 4,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B gives the security basis, exact key/signature sizes, speed and use cases. A leaves out sizes and speed, the key practical differences, and has errors."
+ },
+ "cry-003": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 7,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "Both are correct on Shor vs Grover. B adds collision-attack nuance, Grover's poor parallelism and current resource estimates. A's closing note on SHA-256 weaknesses is tangential."
+ },
+ "cry-004": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 6,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "A is correct but leaves out blob size, KZG commitments and the blob gas mechanics. B covers all of these plus later capacity changes (Pectra, PeerDAS, BPO forks) accurately."
+ },
+ "cry-005": {
+  "A_errors": [],
+  "B_errors": [
+   "Attributes irreversibility of finalized blocks to needing to alter all subsequent blocks and win network consensus (a PoW-style argument); the real guarantee is that reverting needs >=1/3 of stake to be slashable"
+  ],
+  "A_score": 10,
+  "B_score": 4,
+  "prefer": "A",
+  "reason": "A explains Gasper, justification/finalization, the ~2-epoch timing, accountable safety and the inactivity leak correctly. B leaves out the mechanism and timing and partly mis-explains it."
+ },
+ "cry-006": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 6,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "A is correct but thin and never gives the ~7-day challenge window. B covers the window, fault-proof games, trust models, withdrawal times and examples."
+ },
+ "cry-007": {
+  "A_errors": [
+   "Says UserOperations are bundled by validators; they are bundled by bundlers, which submit ordinary transactions to the EntryPoint"
+  ],
+  "B_errors": [],
+  "A_score": 4,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B explains UserOperations, the alt mempool, bundlers, EntryPoint, paymasters and EIP-7702 correctly. A is fragmentary, never explains paymasters or bundlers, and misattributes bundling to validators."
+ },
+ "cry-008": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "A is correct but minimal: no BLS12-381, sizes or quantum caveat. B is thorough and accurate on the curve, aggregation, proof of possession, sync committees and PQ vulnerability."
+ },
+ "cry-009": {
+  "A_errors": [
+   "Says SNARK verification time scales linearly with computation size; SNARK verification is constant/succinct (and quasilinear is not asymptotically better than linear)"
+  ],
+  "B_errors": [],
+  "A_score": 5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B covers setup, cryptographic assumptions, proof sizes, verification cost, PQ security and hybrid wrapping. A leaves out proof sizes and misstates SNARK verification scaling."
+ },
+ "cry-010": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 10,
+  "B_score": 5,
+  "prefer": "A",
+  "reason": "A covers MEV sources, MEV-Boost relays as today's PBS, their weaknesses and ePBS status accurately. B never mentions MEV-Boost/relays or that PBS is not yet in-protocol."
+ },
+ "cry-011": {
+  "A_errors": [
+   "Says the base fee rises if the previous block used 'more than 50% of its gas target'; it rises when gas used exceeds the target (which is 50% of the gas limit)"
+  ],
+  "B_errors": [],
+  "A_score": 6,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B states the burn, the tip, the half-limit target and the explicit 1/8 per-block cap, all correctly. A never gives the 12.5% figure and misstates the target condition."
+ },
+ "cry-012": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 6,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "Both identify cross-chain replay. B adds the signed fields, the v = {0,1} + CHAIN_ID*2 + 35 formula, the fork block and its limits, all correctly."
+ },
+ "cry-013": {
+  "A_errors": [],
+  "B_errors": [
+   "Says the 0x04 transaction 'permanently' sets the EOA's code; the delegation persists only until re-delegated or cleared (B itself later says it can be reset)"
+  ],
+  "A_score": 10,
+  "B_score": 7,
+  "prefer": "A",
+  "reason": "A gives the authorization tuple, the exact 0xef0100||address indicator, uses and developer caveats. B is correct in outline but less precise and calls the delegation permanent."
+ },
+ "cry-014": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 10,
+  "B_score": 7,
+  "prefer": "A",
+  "reason": "Both say 2048 ETH correctly. A adds the 32 ETH minimum, 0x02 credentials, consolidation and slashing changes accurately."
+ },
+ "cry-015": {
+  "A_errors": [
+   "Says EIP-4895 adds a new transaction type; the EIP explicitly defines a system-level 'withdrawal operation', not a transaction type",
+   "Says rewards are swept by the validator client; the sweep is part of the beacon-chain state transition"
+  ],
+  "B_errors": [],
+  "A_score": 5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "B describes the push mechanism precisely: 16 per payload, fields in Gwei, withdrawals_root, no gas, cannot fail. A contradicts itself by calling it a new transaction type."
+ },
+ "cry-016": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 10,
+  "B_score": 5,
+  "prefer": "A",
+  "reason": "Both state fungible vs non-fungible. A adds interfaces, tokenId ownership, safeTransferFrom and metadata; B is minimal."
+ },
+ "cry-017": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 6,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "A is correct but brief and never mentions shares. B explains shares, the full interface, typical uses and the inflation-attack and rounding pitfalls."
+ },
+ "cry-018": {
+  "A_errors": [],
+  "B_errors": [
+   "Lists Signal PQXDH and Apple iMessage PQ3 as ML-KEM deployments; both were built on pre-standard CRYSTALS-Kyber rather than FIPS 203 ML-KEM"
+  ],
+  "A_score": 7,
+  "B_score": 9,
+  "prefer": "B",
+  "reason": "Both correctly say ML-KEM is a KEM, not a signature. B adds the FIPS 203 date, Kyber origin, parameter sets, deployments and the actual signature standards."
+ },
+ "cry-019": {
+  "A_errors": [],
+  "B_errors": [],
+  "A_score": 6,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "A explains the state problem correctly but leaves out the Merkle-tree structure, SP 800-208 and quantum resistance. B covers all of these accurately."
+ },
+ "cry-020": {
+  "A_errors": [
+   "Says the Merge required 'a set of deprecated block fields'; it deprecated fields such as difficulty, nonce and ommers by fixing them to constants"
+  ],
+  "B_errors": [],
+  "A_score": 5,
+  "B_score": 10,
+  "prefer": "B",
+  "reason": "A gets the TTD right but leaves out the date and the removed block/ommer rewards. B is complete and accurate: date, TTD, blocks, header changes, rewards, node architecture."
+ }
+}

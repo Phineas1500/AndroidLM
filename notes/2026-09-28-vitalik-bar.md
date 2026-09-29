@@ -137,3 +137,20 @@ and the heat answer cites a guideline that does not exist.
    - Give the model the neighbourhood and cuisine, so it can write more than a restated list.
 3. **Travel:** transport and money facts date quickly. Wikivoyage's "Get in" sections are newer
    than the model's memory. An answer-first travel question could check against them first.
+
+## Follow-up (same day)
+
+- **Crypto:** the library of item 1 is in the app
+  ([2026-09-28-ethereum-pack.md](2026-09-28-ethereum-pack.md)). The crypto share went from 47% to
+  58% and errors from 30 to 6, graded side by side with the earlier answers.
+- **Restaurants:**
+  - *At question time (in the app):* a vegan category from Overture no longer outweighs
+    OpenStreetMap's "vegetarian only".
+  - *At build time (places v21, not yet published):* a lone branch of a business whose other
+    places are not vegan loses its vegan category and keeps "vegan options". This affects 129
+    places worldwide.
+  - *Effect:* on the 20 restaurant questions, 6 lists change. Lotos, Pine Tree Cafe, Los
+    Vegetarianos, Green Eat and Sweetgreen leave them. Saravana Bhavan (two branches in
+    Singapore, below the rule's minimum) and MOS Burger in Taipei (tagged vegan-only in
+    OpenStreetMap itself) stay.
+

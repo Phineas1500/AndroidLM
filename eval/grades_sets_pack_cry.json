@@ -1,0 +1,339 @@
+{
+ "cry-001": {
+  "scores": {
+   "A": 5,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "'LEED' lattice signature scheme is fabricated",
+    "Rainbow was a Round 3 finalist that was broken, never 'initially selected' by NIST",
+    "Says FALCON is standardized as FIPS 206; FN-DSA/FIPS 206 is still not final"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B covers all standardized schemes (ML-DSA, SLH-DSA, FN-DSA draft status, XMSS/LMS via SP 800-208), the ongoing on-ramp, and what is not quantum-resistant. A invents a scheme and misstates Rainbow and FIPS 206 status. C is correct but thin."
+ },
+ "cry-002": {
+  "scores": {
+   "A": 5,
+   "B": 4,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the full trade-off with exact key and signature sizes, speed, parameter sets and use cases. A and B are correct on the math basis but omit the size and speed differences that are the practical point."
+ },
+ "cry-003": {
+  "scores": {
+   "A": 10,
+   "B": 8,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Claims Grover reduces SHA-256 collision search to 2^64 and calls 2^64 infeasible; the best quantum collision attack (BHT) costs about 2^85 and gives no real advantage, and 2^64 would not be a safe margin"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains why Shor exploits algebraic structure and Grover gives only a square-root speedup, handles collisions correctly, and adds accurate resource estimates. C gets the collision bound wrong."
+ },
+ "cry-004": {
+  "scores": {
+   "A": 10,
+   "B": 6,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "KZG expanded as Kate-Zaverucha-'Gaspari' (it is Goldberg)",
+    "Says KZG lets nodes verify blobs without downloading them; under EIP-4844 every node downloads full blobs (sampling came later with PeerDAS)",
+    "Says Cancun/Dencun focused on account abstraction and wallet improvements; that was Pectra (EIP-7702)"
+   ]
+  },
+  "best": "A",
+  "reason": "A is accurate and complete: blob size, type-3 transactions, KZG, point-evaluation precompile, blob gas market, 18-day retention and later capacity changes. B is correct but thin; C has several errors."
+ },
+ "cry-005": {
+  "scores": {
+   "A": 10,
+   "B": 1,
+   "C": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Calls Casper FFG 'probabilistic' finality; FFG provides deterministic economic finality",
+    "Says LMD-GHOST provides 'instant finality'; it is the fork-choice rule and finalizes nothing",
+    "Expands LMD as 'Liveness DAG' and says it uses a DAG; LMD means Latest Message Driven and the chain is not a DAG",
+    "Says checkpoints occur and are finalized 'every 32 epochs'; a checkpoint is every epoch (32 slots)"
+   ],
+   "C": [
+    "Says reversing finality requires 66% of stake; conflicting finality requires at least 1/3 of stake to be slashable"
+   ]
+  },
+  "best": "A",
+  "reason": "A correctly explains Gasper, justification and finalization at a 2/3 threshold, about 2 epochs to finality, the 1/3 slashing bound and the inactivity leak. B is fundamentally wrong and C is vague and misstates the threshold."
+ },
+ "cry-006": {
+  "scores": {
+   "A": 6,
+   "B": 8,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C covers the mechanisms, fault-proof games, the 7-day window, trust assumptions, costs, examples and the convergence trend accurately. B is solid; A omits the 7-day window and is less precise."
+ },
+ "cry-007": {
+  "scores": {
+   "A": 5,
+   "B": 10,
+   "C": 3
+  },
+  "errors": {
+   "A": [
+    "Says ERC-4337 'operates as a layer-2 solution'; it is a contract and off-chain-infrastructure standard on L1 (and L2s), not a layer 2",
+    "Says aggregators reduce gas for multi-sig accounts; they aggregate signatures across many UserOperations (e.g. BLS)"
+   ],
+   "B": [],
+   "C": [
+    "Says validators collect UserOperations into bundles; bundlers do this"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains UserOperations, the alt mempool, bundlers, EntryPoint, paymasters and aggregators, and places EIP-7702 and native AA correctly. A misses paymasters and 7702; C is brief and wrong about who bundles."
+ },
+ "cry-008": {
+  "scores": {
+   "A": 5,
+   "B": 10,
+   "C": 5
+  },
+  "errors": {
+   "A": [
+    "Says BLS assures a validator 'has verified a transaction'; validators sign attestations and blocks"
+   ],
+   "B": [],
+   "C": [
+    "Says signatures are in G1 and public keys in G2; Ethereum uses public keys in G1 (48 bytes) and signatures in G2 (96 bytes)"
+   ]
+  },
+  "best": "B",
+  "reason": "B precisely covers BLS12-381, sizes, the aggregation math, proof-of-possession, attestation and sync-committee use, and quantum vulnerability. A and C are shallower and each has an inaccuracy."
+ },
+ "cry-009": {
+  "scores": {
+   "A": 6,
+   "B": 4,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says STARK proving/verification scales quasilinearly while SNARKs scale linearly and therefore STARKs are faster; quasilinear is not better than linear, and SNARK verification is constant-time"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C accurately compares setup, assumptions, proof sizes, verification cost, prover speed and hybrid wrapping. A omits proof sizes; B garbles the scaling comparison."
+ },
+ "cry-010": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C covers MEV sources, the searcher/builder/proposer roles, MEV-Boost relays and their weaknesses, and ePBS's current Glamsterdam status accurately. A and B are correct but generic and omit how PBS runs today."
+ },
+ "cry-011": {
+  "scores": {
+   "A": 7,
+   "B": 6,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Implies miners get stable revenue from 'a portion of base fees burned'; the whole base fee is burned and producers receive only the tip"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C states the burn, tip to producer, the half-gas-limit target, the 1/8 per-block cap with formula, and the type-2 fields accurately. A omits the 12.5% cap and target; B muddles who gets what."
+ },
+ "cry-012": {
+  "scores": {
+   "A": 10,
+   "B": 5,
+   "C": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Calls EIP-712 a 'Layer 2 scheme' and credits EIP-155 with letting contracts check the chain ID (that is EIP-1344 CHAINID); EIP-712 is typed-data signing"
+   ],
+   "C": [
+    "Says EIP-155 adds the chain ID, 'replay-protected nonce' and gas price to the signed data; the three added fields are chainId, 0, 0, and nonce and gas price were already signed"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains cross-chain replay after the ETH/ETC split, the nine-field signing hash, and the v = {0,1} + 2*chainId + 35 encoding with correct examples. B is vague; C misstates the added fields."
+ },
+ "cry-013": {
+  "scores": {
+   "A": 10,
+   "B": 1,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Expands EOA as 'Account-Optimized'; it is Externally Owned Account",
+    "Says the delegation is transient and cleared after the transaction; under EIP-7702 the delegation indicator persists until changed",
+    "Describes a 'code flag' in account state; the account's code is set to 0xef0100||address"
+   ],
+   "C": [
+    "Calls the delegation indicator 'opcode 0xef'; it is the 0xef0100||address code prefix (0xef is a banned leading byte, not an executed opcode)"
+   ]
+  },
+  "best": "A",
+  "reason": "A accurately covers the type-4 transaction, the authorization tuple, the persistent 0xef0100 delegation, use cases and caveats. B is fundamentally wrong about persistence; C is correct but less complete."
+ },
+ "cry-014": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 1
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "States the maximum effective balance after EIP-7251 is 32 ETH; it is 2,048 ETH",
+    "Says EIP-7251 does not raise the maximum effective balance and that balance above 32 ETH never counts toward effective balance"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives 2,048 ETH with the 32 ETH minimum, 0x02 credentials, consolidation and churn changes. B is correct but brief; C's main answer is wrong (only its source check corrects it)."
+ },
+ "cry-015": {
+  "scores": {
+   "A": 4,
+   "B": 7,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Refers to a 'Payload Delivery API'; the CL-EL interface is the Engine API",
+    "Says validators initiate partial or full withdrawals that are recorded as requests; withdrawals come from an automatic sweep of eligible validators"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C precisely describes the push design: the sweep of up to 16 per block, the withdrawals list and root, amounts in Gwei, no gas, cannot fail, no code runs at the recipient, plus the Shapella date. B is correct but less precise; A has errors and misses the date."
+ },
+ "cry-016": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A gives the fungible vs unique-tokenId distinction with the full interfaces, safe-transfer hooks, metadata and examples. B and C are correct but more superficial."
+ },
+ "cry-017": {
+  "scores": {
+   "A": 5,
+   "B": 10,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Claims the standard provides accounting of liabilities and fees; ERC-4626 defines only asset/share accounting and preview functions"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains the tokenized-vault model and the full interface, plus the rounding and inflation-attack pitfalls and extensions. A is correct but minimal; C is generic with an overclaim."
+ },
+ "cry-018": {
+  "scores": {
+   "A": 7,
+   "B": 8,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "States ML-KEM 'is conditional on patent-related agreements with NTRU as fallback'; those agreements were concluded in 2022 and FIPS 203 is final"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C says no, it is a KEM, and gives FIPS 203 (13 Aug 2024), the Kyber lineage, parameter sets, sizes, deployments and the actual signature standards. B is correct and names the signature standards; A is correct but less specific."
+ },
+ "cry-019": {
+  "scores": {
+   "A": 4,
+   "B": 10,
+   "C": 7
+  },
+  "errors": {
+   "A": [
+    "Expands LMS as 'Leighton's Merkle Signature'; it is Leighton-Micali Signatures",
+    "Cites RFC 8559 for LMS; it is RFC 8554",
+    "Calls XMSS^MT an OTS variant; it is the multi-tree variant of XMSS",
+    "Explains the efficiency of stateful schemes by stateless ones 'embedding the OTS public key in every signature', which is not the reason (stateless schemes need a large hypertree and few-time signatures)"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B accurately covers the OTS plus Merkle construction, SP 800-208, why reuse is catastrophic, how state gets lost in practice, the HSM requirement and CNSA 2.0 usage. C is correct but brief; A has several naming and RFC errors."
+ },
+ "cry-020": {
+  "scores": {
+   "A": 4,
+   "B": 7,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Says EIP-3675 replaced a 'previous PoS implementation (EIP-3388)'; there was no such prior PoS EIP"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the date, TTD, Paris/Bellatrix, last PoW block, header and opcode changes, the removal of block and ommer rewards, and what did not change. B is correct but omits the date and rewards; A lacks TTD and contains a fabricated EIP."
+ }
+}

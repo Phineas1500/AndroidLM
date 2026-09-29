@@ -45,7 +45,7 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 
 | | |
 |---|---|
-| Storage | 36.8GB (model 12.3GB, Wikipedia 21.3GB, places 2.9GB, Wikivoyage 0.3GB) plus the 72MB APK |
+| Storage | 36.8GB (model 12.3GB, Wikipedia 21.3GB, places 2.9GB, Wikivoyage 0.3GB) plus the 69MB APK, which carries the 19MB Ethereum and cryptography library |
 | Memory during a research question | about 7.9GB (engine 5.8GB including a 5GB expert cache, pinned dense weights 2.0GB, app 0.15GB) |
 | Generation speed | 4-6 tokens/s in the app (lower when the phone is hot) |
 | Prompt reading | 24-30 tokens/s in the app (a 1,000-token source prompt in 35-40 s) |
@@ -91,7 +91,17 @@ signatures and Ethereum, travel, emergencies and travel arithmetic.
 | All (61) | 6.0 | 9.3 | 64% |
 
 The reference was better on every question. The app made 70 factual errors to the reference's
-9, 32 of them on Ethereum and post-quantum questions, where its sources are thinnest.
+9, 32 of them on Ethereum and post-quantum questions, where its sources were thinnest.
+
+Since then the app carries an Ethereum and cryptography library, and its crypto questions are
+answered from it. The earlier answers, the new ones and the reference were graded blind side by
+side by one grader:
+- the crypto share went from 47% to 58% of the reference;
+- errors fell from 30 to 6;
+- first words come later, after about a minute rather than 18 s, but the answer is done
+  sooner, a median of 113 s against 124 s.
+
+([`notes/2026-09-28-ethereum-pack.md`](notes/2026-09-28-ethereum-pack.md))
 
 Measurements, eval rounds and decisions are in [`notes/`](notes/); the Pixel findings are in
 [`notes/2026-09-23-pixel-first-day.md`](notes/2026-09-23-pixel-first-day.md) and

@@ -1,0 +1,102 @@
+{
+ "cry-001": {
+  "A": "before",
+  "B": "reference",
+  "C": "library"
+ },
+ "cry-002": {
+  "A": "before",
+  "B": "library",
+  "C": "reference"
+ },
+ "cry-003": {
+  "A": "reference",
+  "B": "library",
+  "C": "before"
+ },
+ "cry-004": {
+  "A": "reference",
+  "B": "library",
+  "C": "before"
+ },
+ "cry-005": {
+  "A": "reference",
+  "B": "before",
+  "C": "library"
+ },
+ "cry-006": {
+  "A": "library",
+  "B": "before",
+  "C": "reference"
+ },
+ "cry-007": {
+  "A": "before",
+  "B": "reference",
+  "C": "library"
+ },
+ "cry-008": {
+  "A": "before",
+  "B": "reference",
+  "C": "library"
+ },
+ "cry-009": {
+  "A": "before",
+  "B": "library",
+  "C": "reference"
+ },
+ "cry-010": {
+  "A": "library",
+  "B": "before",
+  "C": "reference"
+ },
+ "cry-011": {
+  "A": "library",
+  "B": "before",
+  "C": "reference"
+ },
+ "cry-012": {
+  "A": "reference",
+  "B": "library",
+  "C": "before"
+ },
+ "cry-013": {
+  "A": "reference",
+  "B": "before",
+  "C": "library"
+ },
+ "cry-014": {
+  "A": "reference",
+  "B": "library",
+  "C": "before"
+ },
+ "cry-015": {
+  "A": "before",
+  "B": "library",
+  "C": "reference"
+ },
+ "cry-016": {
+  "A": "reference",
+  "B": "before",
+  "C": "library"
+ },
+ "cry-017": {
+  "A": "library",
+  "B": "reference",
+  "C": "before"
+ },
+ "cry-018": {
+  "A": "before",
+  "B": "library",
+  "C": "reference"
+ },
+ "cry-019": {
+  "A": "before",
+  "B": "reference",
+  "C": "library"
+ },
+ "cry-020": {
+  "A": "before",
+  "B": "library",
+  "C": "reference"
+ }
+}

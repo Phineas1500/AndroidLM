@@ -1,0 +1,236 @@
+{
+  "cry-001": {
+    "A_errors": [
+      "Calls ML-DSA 'also known as BLISS-IT/SPHINCS+ variant' (it derives from CRYSTALS-Dilithium)",
+      "Names a nonexistent 'SL-DSA (Simplified Lattice DSA)'; the second standard is SLH-DSA, which is hash-based",
+      "Says SL-DSA is based on Kyber/Dilithium lattices / centered-binomial distributions",
+      "Says standardized in July 2024 (FIPS 204/205 were published August 13, 2024)",
+      "Main body collapses into a contradictory 'No... Wait...' loop and is cut off"
+    ],
+    "B_errors": [],
+    "A_score": 2,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "B lists ML-DSA, SLH-DSA, FN-DSA and XMSS/LMS with correct standards and sizes, and names what is not quantum-resistant. A is garbled, invents SL-DSA, and omits FN-DSA, XMSS/LMS and the non-PQ schemes."
+  },
+  "cry-002": {
+    "A_errors": [
+      "Says both are standardized in FIPS 204 (SLH-DSA is FIPS 205)",
+      "Says SLH-DSA has larger public keys (~1.4 KB); they are 32-64 bytes",
+      "Calls SLH-DSA-SHA2-256s level 1 with ~8.7 KB signatures (256s is category 5, 29,792 bytes)",
+      "Says SLH-DSA signing is very fast (it is much slower than ML-DSA); repeated in the source check",
+      "Says ML-DSA verification is computationally intensive and signing is faster than verification (ML-DSA verification is cheaper than signing)"
+    ],
+    "B_errors": [],
+    "A_score": 3,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "B's sizes, speeds and parameter sets are accurate. A inverts the key-size and speed trade-offs, cites the wrong FIPS and is cut off."
+  },
+  "cry-003": {
+    "A_errors": [
+      "Says RSA relies on discrete logarithms as well as factoring",
+      "Implies SHA-256 drops below 128-bit security and needs SHA-512 to keep it; SHA-256 already keeps ~128-bit preimage security against Grover"
+    ],
+    "B_errors": [],
+    "A_score": 7,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "Both correctly contrast Shor with Grover. B is more precise about collisions (BHT, Bernstein) and resource estimates. A has small inaccuracies about RSA and SHA-256's margin."
+  },
+  "cry-004": {
+    "A_errors": [
+      "Says blob retention is ~65,536 epochs (it is 4,096 epochs, ~18 days)",
+      "Expands KZG as Kate-Zaverucha-Gaspari (it is Goldberg)",
+      "Implies Danksharding's original goals included smart-contract execution"
+    ],
+    "B_errors": [],
+    "A_score": 6,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "B covers blob size, type-3 transactions, KZG, the separate blob fee market, retention and later capacity changes, all correctly. A gets the basics but has a wrong epoch count and KZG name, and leaves the blob gas market out of the main body."
+  },
+  "cry-005": {
+    "A_errors": [],
+    "B_errors": [
+      "'Friendly Friendly Finality Gadget'",
+      "Calls the fork choice 'GHOSTDAG' (that is Kaspa's protocol; Ethereum uses LMD-GHOST)",
+      "Says finality takes ~12.4 minutes (two epochs), with a garbled '6.4 seconds per slot' self-correction; it is ~12.8 min",
+      "Describes PoS reorgs with uncles/orphans and a >51% 'never reverted' rule, which are PoW-style framing"
+    ],
+    "A_score": 10,
+    "B_score": 3,
+    "prefer": "A",
+    "reason": "A explains justification and finalization, the 2/3 threshold, 1/3 accountable safety, slashing and the inactivity leak, all accurately. B is confused, has naming and timing errors, and is cut off."
+  },
+  "cry-006": {
+    "A_errors": [
+      "Gives the challenge window as 7-14 days and implies a user 'initiates' it (it is a fixed ~7-day window on major rollups)"
+    ],
+    "B_errors": [],
+    "A_score": 7,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "Both get the core difference right. B adds accurate detail on bisection fault proofs, withdrawal times, trust models, examples and L2BEAT stages."
+  },
+  "cry-007": {
+    "A_errors": [
+      "Says ERC-4337 'operates at the protocol level' (it is an application/infrastructure-layer standard with no protocol change, as A itself says)"
+    ],
+    "B_errors": [],
+    "A_score": 6,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "B covers UserOperations, the alt mempool, bundlers, EntryPoint, paymasters and EIP-7702, all accurately. A is generic, barely describes UserOperations, and mentions 7702 only in a 'requires' line."
+  },
+  "cry-008": {
+    "A_errors": [
+      "Expands BLS as Boneh-Lynn-Chachan (it is Shacham)",
+      "Explains the 96-byte signature as 32-byte x + 32-byte y (it is a compressed G2 point over Fp2, 2x48 bytes)",
+      "Calls a 96-byte BLS signature 'significantly smaller' than 64-80-byte ECDSA/Ed25519 signatures",
+      "Says public-key aggregation is less commonly used in core consensus (it is used for every aggregate attestation)",
+      "Says aggregate signatures go into the block header (attestations are in the block body)"
+    ],
+    "B_errors": [],
+    "A_score": 4,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "B is accurate on BLS12-381, key and signature groups, aggregation, proof-of-possession, uses and quantum vulnerability. A has several factual errors and mentions quantum vulnerability only in the source check."
+  },
+  "cry-009": {
+    "A_errors": [
+      "Gives Bulletproofs as an example alongside SNARK proof sizes (Bulletproofs are not SNARKs)",
+      "Says STARK proofs are hundreds of KB to megabytes (typically tens to a few hundred KB)"
+    ],
+    "B_errors": [],
+    "A_score": 7,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "Both give the right trade-offs. B is more precise (Groth16 vs PLONK setups, FRI, gas costs, STARK-to-SNARK wrapping) and has no errors."
+  },
+  "cry-010": {
+    "A_errors": [],
+    "B_errors": [
+      "Calls 'MEV-boosters' a class of entities (MEV-Boost is middleware; the actors are searchers and builders)",
+      "Calls PBS an architectural change in Ethereum's consensus mechanism (today it is out-of-protocol via MEV-Boost; ePBS is not live)",
+      "Says MEV arises because transactions 'are not executed atomically'"
+    ],
+    "A_score": 10,
+    "B_score": 5,
+    "prefer": "A",
+    "reason": "A covers MEV sources, MEV-Boost relays and their weaknesses, and ePBS (EIP-7732, Glamsterdam) status accurately. B is shallow, garbles terms and omits ePBS."
+  },
+  "cry-011": {
+    "A_errors": [
+      "Says transactions now specify a base fee (they specify maxFeePerGas and maxPriorityFeePerGas; the protocol sets the base fee)"
+    ],
+    "B_errors": [],
+    "A_score": 6,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "B gives the burn, tip, target of half the gas limit, the 1/8 max change with formula, and the tx format, all correctly. A is thin and never gives the 12.5% bound."
+  },
+  "cry-012": {
+    "A_errors": [
+      "Says EIP-155 shipped in Byzantium (October 2017); it was Spurious Dragon (November 2016)",
+      "Says EIP-155 added v, r, s fields (they already existed; it changed the signed data and v encoding)",
+      "Source check dates Spurious Dragon to September/October 2016 (it was November 22, 2016)",
+      "Source check says EIP-155 addressed DoS with opcode repricing and state debloating (those were other Spurious Dragon EIPs)"
+    ],
+    "B_errors": [],
+    "A_score": 4,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "Both give the replay attack and v formula. B adds the ETH/ETC context, the 9-field signing hash and limits with no errors. A gets the fork wrong and misstates what changed."
+  },
+  "cry-013": {
+    "A_errors": [],
+    "B_errors": [
+      "'Account Owned Account' (it is Externally Owned Account)",
+      "Says delegation is temporary, only for a single transaction (a 7702 delegation persists until changed)",
+      "Says the EOA's code field stays empty (it is set to the 0xef0100||address delegation indicator)",
+      "Invents a 'renewal' authorization"
+    ],
+    "A_score": 10,
+    "B_score": 2,
+    "prefer": "A",
+    "reason": "A accurately describes the 0x04 tx, authorization tuple, delegation indicator, Pectra date, uses and caveats. B describes the mechanism wrongly (temporary, no code set)."
+  },
+  "cry-014": {
+    "A_errors": [],
+    "B_errors": [
+      "Opens by stating the max effective balance is 32 ETH",
+      "Says EIP-7251 activated in Dencun (it was Pectra, May 2025)",
+      "Mentions a nonexistent 'Pectus fork choice update'",
+      "Concludes there is no maximum and it is unbounded (the cap is 2,048 ETH)",
+      "Says excess over 32 ETH was held as pending deposits before 7251 (it was ordinary balance, skimmed by withdrawals)"
+    ],
+    "A_score": 10,
+    "B_score": 2,
+    "prefer": "A",
+    "reason": "A gives 2,048 ETH with the 32 ETH minimum, 0x02 credentials and consolidation, all correctly. B's main answer is wrong and self-contradictory; only its source check gives 2,048."
+  },
+  "cry-015": {
+    "A_errors": [
+      "Calls withdrawals a transaction type 0x04 (EIP-4895 withdrawals are not transactions; 0x04 is EIP-7702)",
+      "Says they were introduced in the Merge (Shanghai/Capella, April 2023)",
+      "Says withdrawals go in the block header / beacon block (they are in the execution payload; the header carries only withdrawals_root)",
+      "Cites engine_newPayloadV1 (withdrawals arrived with engine_newPayloadV2)",
+      "Says the execution engine updates the validator's consensus-side balance"
+    ],
+    "B_errors": [],
+    "A_score": 4,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "B correctly explains the push design, the 16-per-payload sweep, the four fields in Gwei, no gas and cannot fail. A gets the 'system-level, no gas' idea but gets the transaction type, fork, placement and Engine API version wrong."
+  },
+  "cry-016": {
+    "A_errors": [],
+    "B_errors": [
+      "Suggests ERC-721 tokens carry ownership-history metadata (the standard tracks only the current owner; history comes from events)"
+    ],
+    "A_score": 10,
+    "B_score": 8,
+    "prefer": "A",
+    "reason": "Both explain fungible balances vs unique tokenIds. A adds accurate interfaces, ERC-165, safeTransferFrom hooks, history and ERC-1155."
+  },
+  "cry-017": {
+    "A_errors": [
+      "Presents Aave (and Curve) as natively using ERC-4626 vaults for deposits (Aave aTokens are not ERC-4626; only wrappers are)"
+    ],
+    "B_errors": [],
+    "A_score": 7,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "Both identify the tokenized vault standard. B gives the full interface, real examples, rounding rules, the inflation attack and extensions accurately."
+  },
+  "cry-018": {
+    "A_errors": [],
+    "B_errors": [],
+    "A_score": 7,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "Both correctly say it is a KEM, not a signature. B adds FIPS 203 and its date, parameter sets, sizes, deployments and the actual signature standards. A is correct but thin."
+  },
+  "cry-019": {
+    "A_errors": [
+      "Expands LMS as 'Leighton's Merkle Tree Signature' (it is Leighton-Micali Signatures)"
+    ],
+    "B_errors": [],
+    "A_score": 7,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "Both explain one-time keys and why reuse is catastrophic. B adds SP 800-208, RFCs, the Merkle construction, real-world reuse pitfalls and CNSA 2.0 accurately."
+  },
+  "cry-020": {
+    "A_errors": [
+      "Calls deprecating the difficulty bomb the primary technical change (the core change was switching to PoS at the terminal total difficulty)",
+      "Says an attack requires 51% of staked ETH (1/3 can halt finality; thresholds differ from PoW)"
+    ],
+    "B_errors": [],
+    "A_score": 5,
+    "B_score": 10,
+    "prefer": "B",
+    "reason": "B gives the date, TTD, transition blocks, header changes, reward removal and PREVRANDAO correctly. A is generic, puts TTD only in the source check, and omits the removal of block/ommer rewards."
+  }
+}
