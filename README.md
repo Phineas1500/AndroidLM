@@ -52,7 +52,7 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 | Model load | about 28 s on app start |
 | Answer-first question | first words after about 15 s; the answer is done after about 50 s and the cited source check after 103 s (medians over 6 questions; a new question may be asked as soon as the answer is done) |
 | Retrieval-first question | cited answer in about 1.6 min (median 98 s over 19 questions; first words after 44-70 s) |
-| Places question ("best vegan restaurants in Lisbon") | list of places on screen after 0.15 s; the model's recommendations from it start after 18 s and are done after 52 s (medians over 24 questions; 30-117 s) |
+| Places question ("best vegan restaurants in Lisbon") | list of places on screen after 0.2 s; the model's recommendations from it (six to eight places) start after 26 s and are done after 119 s (medians over 20 questions; 88-190 s) |
 
 Against Qwen3-1.7B answering the same 72 questions from memory, graded 0-10 by Claude with one
 rubric ([`notes/2026-09-24-small-model-comparison.md`](notes/2026-09-24-small-model-comparison.md)):
@@ -102,6 +102,12 @@ side by one grader:
   sooner, a median of 113 s against 124 s.
 
 ([`notes/2026-09-28-ethereum-pack.md`](notes/2026-09-28-ethereum-pack.md))
+
+The restaurant answers now name six to eight places, each with what it serves, its street and
+its hours, in the language of the question. Graded the same way on the phone, the restaurant
+share went from 45% to 71% of the reference, and it was better on all 20 questions. The answer
+takes about two minutes instead of forty seconds, and the list is still on screen at once.
+([`notes/2026-09-29-places-answers.md`](notes/2026-09-29-places-answers.md))
 
 Measurements, eval rounds and decisions are in [`notes/`](notes/); the Pixel findings are in
 [`notes/2026-09-23-pixel-first-day.md`](notes/2026-09-23-pixel-first-day.md) and

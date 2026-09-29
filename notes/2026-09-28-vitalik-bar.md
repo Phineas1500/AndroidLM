@@ -153,4 +153,9 @@ and the heat answer cites a guideline that does not exist.
     Vegetarianos, Green Eat and Sweetgreen leave them. Saravana Bhavan (two branches in
     Singapore, below the rule's minimum) and MOS Burger in Taipei (tagged vegan-only in
     OpenStreetMap itself) stay.
+- **Restaurant answers (2026-09-29):** the model now writes six to eight places with what they
+  serve, their street and hours, in the question's language
+  ([2026-09-29-places-answers.md](2026-09-29-places-answers.md)). On the phone, graded side by
+  side with the earlier answers, the share went from 45% to 71% of the reference, and it was
+  better on all 20 questions. An answer now takes about two minutes instead of forty seconds.
 

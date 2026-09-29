@@ -1,0 +1,102 @@
+{
+ "food-001": {
+  "A": "before",
+  "B": "reference",
+  "C": "fuller"
+ },
+ "food-002": {
+  "A": "before",
+  "B": "fuller",
+  "C": "reference"
+ },
+ "food-003": {
+  "A": "reference",
+  "B": "fuller",
+  "C": "before"
+ },
+ "food-004": {
+  "A": "reference",
+  "B": "fuller",
+  "C": "before"
+ },
+ "food-005": {
+  "A": "reference",
+  "B": "before",
+  "C": "fuller"
+ },
+ "food-006": {
+  "A": "fuller",
+  "B": "before",
+  "C": "reference"
+ },
+ "food-007": {
+  "A": "before",
+  "B": "reference",
+  "C": "fuller"
+ },
+ "food-008": {
+  "A": "before",
+  "B": "reference",
+  "C": "fuller"
+ },
+ "food-009": {
+  "A": "before",
+  "B": "fuller",
+  "C": "reference"
+ },
+ "food-010": {
+  "A": "fuller",
+  "B": "before",
+  "C": "reference"
+ },
+ "food-011": {
+  "A": "fuller",
+  "B": "before",
+  "C": "reference"
+ },
+ "food-012": {
+  "A": "reference",
+  "B": "fuller",
+  "C": "before"
+ },
+ "food-013": {
+  "A": "reference",
+  "B": "before",
+  "C": "fuller"
+ },
+ "food-014": {
+  "A": "reference",
+  "B": "fuller",
+  "C": "before"
+ },
+ "food-015": {
+  "A": "before",
+  "B": "fuller",
+  "C": "reference"
+ },
+ "food-016": {
+  "A": "reference",
+  "B": "before",
+  "C": "fuller"
+ },
+ "food-017": {
+  "A": "fuller",
+  "B": "reference",
+  "C": "before"
+ },
+ "food-018": {
+  "A": "before",
+  "B": "fuller",
+  "C": "reference"
+ },
+ "food-019": {
+  "A": "before",
+  "B": "reference",
+  "C": "fuller"
+ },
+ "food-020": {
+  "A": "before",
+  "B": "fuller",
+  "C": "reference"
+ }
+}
