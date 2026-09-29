@@ -37,7 +37,11 @@ Built by `scripts/build_places.py` in the AndroidLM repository from:
   ATMs and money changers, fetched with `scripts/fetch_osm_diet.py` from QLever's copy of the
   planet: 234,174 matched to an Overture place by name within 120 m (adding their diet tags,
   opening hours and cuisine), the rest added as places of their own. Records with the same name
-  and kind within about 300 m are folded into one (21,225,505 before, 21,132,717 after).
+  and kind within about 300 m are folded into one (21,225,510 before, 21,132,720 after). A lone
+  branch that Overture files as a vegan restaurant, of a business (a name with its website's
+  domain, or a name within about 100 km) whose other places to eat are mostly neither vegan by
+  category nor tagged vegan-only, takes the business's usual category and keeps "vegan options"
+  (129 places: Sweetgreen, Freshii, Green Eat...).
 - **GeoNames** cities1000, admin1 codes and country information.
 - **Wikivoyage** listings (English, September 2026), matched by name near the guide's city.
 - **Wikipedia** (English, FineWiki August 2025) and Wikimedia pageviews: a place whose name is the
