@@ -122,6 +122,8 @@ def main():
                     "city": lk.city.id if lk.city else None,
                     "where": P.where_text(lk.total, lk.radius_km, lk.label, ask, lk.capped),
                     "places": [place_json(p, i, lk.origin, P.asks_hours(ask)) for i, p in enumerate(lk.places, 1)],
+                    "model_lines_v2": P.context_lines_v2(lk.places, None, lk.origin),
+                    "list_lines": [P.list_line(p, i, lk.origin) for i, p in enumerate(lk.places, 1)],
                 }
         cases.append(case)
     golden = {
@@ -129,6 +131,7 @@ def main():
         "cases": cases,
         "norm_key": {s: norm_key(s) for s in NORM},
         "prompt": P.PLACES_SYSTEM,
+        "prompt_v2": P.PLACES_SYSTEM_V2,
         "lead": [[t, n, P.lead_text(t, n)] for t, n in LEADS],
         "clip": [[t, n, P._clip(t, n)] for t, n in [("short", 10), ("a b c d e f g h i j k l", 9),
                                                    ("abcdefghijklmnop qr", 12), ("naïve café au lait, très bon", 14)]],

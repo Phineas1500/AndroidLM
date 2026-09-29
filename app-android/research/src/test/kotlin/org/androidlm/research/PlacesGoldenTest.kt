@@ -25,6 +25,8 @@ class PlacesGoldenTest {
 
     @Test fun prompt() = assertEquals(golden.get("prompt").asString, PlacesText.PLACES_SYSTEM)
 
+    @Test fun promptV2() = assertEquals(golden.get("prompt_v2").asString, PlacesText.PLACES_SYSTEM_V2)
+
     @Test fun clip() {
         for (c in golden.getAsJsonArray("clip")) {
             val a = c.asJsonArray
@@ -91,6 +93,11 @@ class PlacesGoldenTest {
                     PlacesText.describe(p, i + 1, null, lk.origin, brief = true, hours = PlacesText.asksHours(ask),
                         wikiText = "An article's start."))
             }
+            // the second version of the model's lines (places.py context_lines_v2), and the app's list
+            assertEquals(q, wl.getAsJsonArray("list_lines").map { it.asString },
+                lk.places.mapIndexed { i, p -> PlacesText.listLine(p, i + 1, lk.origin) })
+            assertEquals(q, wl.getAsJsonArray("model_lines_v2").map { it.asString },
+                PlacesAnswer.of(ask, lk, null, null).modelLines)
         }
     }
 

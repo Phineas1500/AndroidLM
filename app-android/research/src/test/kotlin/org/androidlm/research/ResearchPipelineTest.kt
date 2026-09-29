@@ -1106,10 +1106,10 @@ class ResearchPipelineTest {
         // one generation, over the list; no plan, no Wikipedia search
         assertEquals(1, engine.calls.size)
         val prompt = engine.calls[0].prompt
-        assertTrue(prompt.startsWith(PlacesText.PLACES_SYSTEM + "\n\nPlaces (184 vegan places to eat within 16 km of Buenos Aires, Argentina):\n\n[1] Y la Vaca Chocha: "))
+        assertTrue(prompt.startsWith(PlacesText.PLACES_SYSTEM_V2 + "\n\nPlaces (184 vegan places to eat within 16 km of Buenos Aires, Argentina):\n\n[1] Y la Vaca Chocha: "))
         assertTrue(prompt.endsWith("\n\nQuestion: " + question))
-        assertEquals(PlacesText.MODEL_PLACES, prompt.lines().count { Regex("^\\[\\d+] ").containsMatchIn(it) })
-        assertEquals(360, engine.calls[0].nPredict)
+        assertEquals(PlacesText.MODEL_PLACES_V2, prompt.lines().count { Regex("^\\[\\d+] ").containsMatchIn(it) })
+        assertEquals(800, engine.calls[0].nPredict)
 
         assertEquals(Route.PLACES, result.route.route)
         assertEquals(12, result.sources.size)

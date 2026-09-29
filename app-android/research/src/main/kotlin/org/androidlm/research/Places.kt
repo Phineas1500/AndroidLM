@@ -821,6 +821,48 @@ object PlacesText {
     const val GUIDE_CHARS = 180
     const val WIKI_CHARS = 200
 
+    /**
+     * places.py PLACES_SYSTEM_V2, with [describeV2]'s lines: six to eight places, each with what it
+     * serves, its street and its hours, a line that map data can be out of date, and the answer in
+     * the question's language (the first version gave three to five one-liners, thin next to a web
+     * answer; notes/2026-09-29-places-answers.md).
+     */
+    const val PLACES_SYSTEM_V2: String =
+        "You are an offline travel assistant. The question comes with a numbered list of places from offline " +
+        "map data (OpenStreetMap and Overture Maps), the Wikivoyage travel guide and Wikipedia, best matches " +
+        "first; the app shows the list next to your answer. If the question asks for more than places (costs, " +
+        "tipping, safety, which one suits), answer that first in a sentence or two. Then recommend six to " +
+        "eight places from the list, one or two sentences each, starting with its number and name like \"[2] " +
+        "Name:\". For each, say what kind of place it is and what it serves (from its category and cuisine), " +
+        "its street, and what the travel guide or Wikipedia says about it; give its hours when the list has " +
+        "them. Add no dishes, prices, ratings, praise or remarks about a street or an area that the list does " +
+        "not give, unless it is a famous place you know well. Finish with one short line saying that map data " +
+        "can be out of date, so check a place is open before going. Write the whole answer in the language of " +
+        "the question as it was asked. Never describe the list itself or what it lacks. No LaTeX, no visible " +
+        "deliberation."
+
+    /** places.py MODEL_PLACES_V2. */
+    const val MODEL_PLACES_V2 = 8
+
+    /** One of places.py `context_lines_v2`'s lines. */
+    fun describeV2(p: Place, n: Int, guideText: String?, origin: String, wikiText: String?): String {
+        val bits = kindBits(p)
+        if (!p.cuisine.isNullOrEmpty()) {
+            val c = p.cuisine.split(";").map { it.trim() }.filter { it.isNotEmpty() }.map { it.replace("_", " ") }
+            if (c.isNotEmpty()) bits.add("cuisine: " + c.joinToString(", "))
+        }
+        if (!p.street.isNullOrEmpty()) bits.add("address: " + p.street)
+        bits.add(String.format(Locale.US, "%.1f km from %s", p.km, origin))
+        if (!p.hours.isNullOrEmpty()) bits.add("hours: " + p.hours)
+        var line = "[$n] " + p.name + ": " + bits.joinToString("; ") + "."
+        if (!guideText.isNullOrEmpty()) line += " The travel guide says: $guideText"
+        if (!wikiText.isNullOrEmpty()) line += " Wikipedia: $wikiText"
+        return line
+    }
+
+    /** places.py `list_line`: a place as the app's list shows it. */
+    fun listLine(p: Place, n: Int, origin: String): String = "[$n] " + p.name + " — " + summary(p, origin)
+
     /** places.py `what_text`. */
     fun whatText(ask: PlaceAsk): String {
         var what = GROUP_LABEL.getValue(ask.group)
@@ -1127,6 +1169,7 @@ class PlacesAnswer(
     val modelLines: List<String>,
 ) {
     companion object {
+        /** The model's lines are places.py `context_lines_v2`'s, for [PlacesText.PLACES_SYSTEM_V2]. */
         fun of(ask: PlaceAsk, lookup: PlacesLookup, voyage: Corpus?, wiki: Corpus? = null): PlacesAnswer {
             // the travel guide's words on each listed place, from the Wikivoyage corpus
             val guide = lookup.places.map { p ->
@@ -1146,10 +1189,8 @@ class PlacesAnswer(
                 ResearchSource(i + 1, p.name, PlacesText.summary(p, lookup.origin),
                     PlacesText.details(p, guide[i], lookup.origin, lead[i]), "places", p.lat, p.lon)
             }
-            val hours = PlacesText.asksHours(ask)
-            val lines = lookup.places.take(PlacesText.MODEL_PLACES).mapIndexed { i, p ->
-                PlacesText.describe(p, i + 1, PlacesText.clip(guide[i], PlacesText.GUIDE_CHARS), lookup.origin,
-                    brief = true, hours = hours, wikiText = lead[i])
+            val lines = lookup.places.take(PlacesText.MODEL_PLACES_V2).mapIndexed { i, p ->
+                PlacesText.describeV2(p, i + 1, PlacesText.clip(guide[i], PlacesText.GUIDE_CHARS), lookup.origin, lead[i])
             }
             val where = PlacesText.whereText(lookup.total, lookup.radiusKm, lookup.label, ask, lookup.capped)
             return PlacesAnswer(ask, lookup, where, sources, lines)

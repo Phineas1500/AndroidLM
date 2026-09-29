@@ -108,8 +108,8 @@ data class ResearchConfig(
      */
     val checkChars: Int = 0,
     val checkExcerpts: Boolean = false,
-    /** The places answer: a handful of one-line recommendations from the list. */
-    val placesTokens: Int = 360,
+    /** The places answer: six to eight recommendations from the list, a sentence or two each. */
+    val placesTokens: Int = 800,
     /**
      * rag.py `--worked`: a question that needs a calculation (Worked.needs) gets a few lines of
      * working before its answer. Off by default, as in rag.py; the app turns it on.
@@ -617,7 +617,7 @@ class ResearchPipeline(
             completed(t0)
             val lines = answer.modelLines
             val res = generating(
-                ResearchPhase.ANSWERING, PlacesText.PLACES_SYSTEM, PlacesText.placesUser(answerQuestion, where, lines),
+                ResearchPhase.ANSWERING, PlacesText.PLACES_SYSTEM_V2, PlacesText.placesUser(answerQuestion, where, lines),
                 config.placesTokens,
             ) { listener.onEvent(ResearchEvent.AnswerToken(it)) }
             listener.onEvent(ResearchEvent.AnswerCompleted(res.text))

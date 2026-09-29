@@ -863,6 +863,73 @@ def context_lines(places, voyage, origin, hours=True, wiki=None):
     return out
 
 
+def list_line(p, n, origin):
+    """A place as the app's list shows it (Places.kt `summary`): "[n] Name — what it is · street ·
+    distance · in the travel guide"."""
+    bits = kind_bits(p)
+    if p.street:
+        bits.append(p.street)
+    bits.append(f"{p.km:.1f} km from {origin}")
+    if p.guide:
+        bits.append("in the travel guide")
+    return f"[{n}] {p.name} — " + " · ".join(bits)
+
+
+# ---- the model's lines, second version ---------------------------------------------------------
+# The first version gave the model a place's kind, cuisine and distance, and asked for three to five
+# one-liners that say nothing the list does not: graders found the answers thin next to a web
+# answer (8-11 places, with where each is and what it serves). This one gives eight places, each
+# with its street and opening hours, and asks for six to eight, each with what it serves and where
+# it is (notes/2026-09-29-places-answers.md). A place's area, guessed from the nearest district of
+# the cities table, was tried and dropped: one in twelve was wrong.
+
+MODEL_PLACES_V2 = 8
+
+
+def context_lines_v2(places, voyage, origin, wiki=None):
+    """The model's lines, second version: the first MODEL_PLACES_V2 places, each with its kind,
+    cuisine, street, distance and opening hours, the travel guide's words and the start of its own
+    Wikipedia article."""
+    out = []
+    for i, p in enumerate(places[:MODEL_PLACES_V2], 1):
+        bits = kind_bits(p)
+        cuisines = [c.strip().replace("_", " ") for c in (p.cuisine or "").split(";") if c.strip()]
+        if cuisines:
+            bits.append("cuisine: " + ", ".join(cuisines))
+        if p.street:
+            bits.append("address: " + p.street)
+        bits.append(f"{p.km:.1f} km from {origin}")
+        if p.hours:
+            bits.append("hours: " + p.hours)
+        line = f"[{i}] {p.name}: " + "; ".join(bits) + "."
+        g = _clip(guide_text(voyage, p), GUIDE_CHARS)
+        if g:
+            line += f" The travel guide says: {g}"
+        wt = wiki(p.wiki) if wiki and p.wiki else None
+        lt = lead_text(wt, WIKI_CHARS) if wt else None
+        if lt:
+            line += f" Wikipedia: {lt}"
+        out.append(line)
+    return out
+
+
+PLACES_SYSTEM_V2 = (
+    "You are an offline travel assistant. The question comes with a numbered list of places from "
+    "offline map data (OpenStreetMap and Overture Maps), the Wikivoyage travel guide and Wikipedia, "
+    "best matches first; the app shows the list next to your answer. If the question asks for more than "
+    "places (costs, tipping, safety, which one suits), answer that first in a sentence or two. Then "
+    "recommend six to eight places from the list, one or two sentences each, starting with its number and "
+    "name like \"[2] Name:\". For each, say what kind of place it is and what it serves (from its category "
+    "and cuisine), its street, and what the travel guide or Wikipedia says about it; give its hours when "
+    "the list has them. Add no dishes, prices, ratings, praise or remarks about a street or an area that "
+    "the list does not give, unless it is a famous place you know well. Finish with one short line saying "
+    "that map data can be out of date, so "
+    "check a place is open before going. Write the whole answer in the language of the question as it was "
+    "asked. Never describe the list itself or what it lacks. No LaTeX, no visible deliberation."
+)
+
+
+
 def _clip(text, n):
     if text is None or len(text) <= n:
         return text

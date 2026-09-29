@@ -1,0 +1,346 @@
+{
+ "food-001": {
+  "scores": {
+   "A": 7,
+   "B": 9,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "St. Bess presented as a vegan restaurant; the travel guide describes a pizzeria with vegetarian or vegan toppings, not a confirmed fully vegan place"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B gives a well-chosen, verified spread (Michelin-starred vegan Bonvivant, Lucky Leek, La Stella Nera, Chay Long, vegan döner) with addresses and what to eat; A and C are real but thinner picks from one list, A with a doubtful 'vegan' pizzeria."
+ },
+ "food-002": {
+  "scores": {
+   "A": 7,
+   "B": 7,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "Organi Chiado placed in Baixa (it is in Chiado)",
+    "Green Beans (Rua do Poço dos Negros) placed in Bairro Alto; that street is in the São Bento/Santos area"
+   ],
+   "B": [
+    "Jardim das Cerejas (Calçada do Sacramento, Chiado) described as away from the main tourist hubs"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C names the city's top-rated vegan places (Kong, O Gambuzino, Ao 26, A Minha Avó, Al Sanpietrino, Vegan Nata), all verified, with dishes and areas; A and B are correct but generic list read-outs."
+ },
+ "food-003": {
+  "scores": {
+   "A": 9,
+   "B": 6,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "La Reverde, Konu Bar and Relicioso (San Nicolás) and La Vegana cantina (Monserrat) all placed in Balvanera"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives a strong verified set (Gioia, Donnet, La Reverde parrilla, Gordo Vegano, Veganius, Let it V) with areas, dishes and local tips; B and C list real but mostly minor places with filler descriptions, and C mislabels neighbourhoods."
+ },
+ "food-004": {
+  "scores": {
+   "A": 9,
+   "B": 5,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Saravana Bhavan called a vegan restaurant; it is a vegetarian Indian chain that uses dairy",
+    "Annalakshmi called vegan; it is an Indian vegetarian restaurant that uses dairy",
+    "Saravana Bhavan given two conflicting addresses (VivoCity food-court stall vs 84 Syed Alwi Rd)"
+   ],
+   "C": [
+    "Annalakshmi called vegan; it is Indian vegetarian (dairy)",
+    "nomVnom Bistro (Eu Tong Sen St, Clarke Quay) placed in Bencoolen",
+    "Real Food South Beach (Beach Road) placed in Bugis"
+   ]
+  },
+  "best": "A",
+  "reason": "A's picks (Whole Earth, Herbivore, Yi Xin, The Kind Bowl, nomVnom, Genesis, Pita Bakery) are real and well described with a useful hawker tip; B and C lead with a dairy-using Indian chain and call vegetarian places vegan."
+ },
+ "food-005": {
+  "scores": {
+   "A": 9,
+   "B": 8,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Alchemy Vegan (Thipanet Rd) placed within the Old City walls; it is south of the Old City"
+   ]
+  },
+  "best": "A",
+  "reason": "All three name real vegan places; A covers the most (Reform Kafe, Goodsouls, Rad Rabbit, Asa, May Kaidee, Aum) with dishes and tips, B adds useful hours, C has one location error."
+ },
+ "food-006": {
+  "scores": {
+   "A": 7,
+   "B": 6,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "T's Tantan (Tokyo Station, Marunouchi) placed in Hatchōbori",
+    "Plant Based Tokyo (Yoyogi 2-chome) placed in Kabukicho",
+    "Hemp Cafe Tokyo (Higashi 3-chome, Ebisu) placed in Daikan'yamachō"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives well-known, verified vegan spots (T's Tantan, Saido, Masaka, Nuts Exchange, Ballon, Bon) with dishes and a dashi tip; A and B list real places from one list, and B mislabels several areas."
+ },
+ "food-007": {
+  "scores": {
+   "A": 7,
+   "B": 9,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "May Veggie Home address given as 'Thong Lor Road (Thanon Ratchadaphisek)'; Thong Lor is a different road"
+   ]
+  },
+  "best": "B",
+  "reason": "B covers the standout places (Vegan Mahanakhon, Kem-Kon, May Veggie Home, Broccoli Revolution, Veganerie) with branches, dishes and jay/fish-sauce tips; A and C list real places with little context, and C invents a Thong Lor address."
+ },
+ "food-008": {
+  "scores": {
+   "A": 6,
+   "B": 9,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "Vegan Kasap described as a restaurant; it is a vegan butcher shop"
+   ],
+   "B": [],
+   "C": [
+    "Vegan Kasap described as a restaurant; it is a vegan butcher shop"
+   ]
+  },
+  "best": "B",
+  "reason": "B organises verified places by European and Asian side (Vegan Dükkan, Vegan Istanbul, Vegan Community Kitchen, Vegan Masa, Veganarsist, Kumin) with dishes; A and C are generic list read-outs that skip Cihangir's core."
+ },
+ "food-009": {
+  "scores": {
+   "A": 7,
+   "B": 6,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Yug Vegetariano described as serving food without meat or dairy; it is a vegetarian restaurant that uses dairy"
+   ]
+  },
+  "best": "C",
+  "reason": "C gives the most useful mix (Por Siempre Vegana, Gatorta, Malportaco, Gracias Madre, Na Tlali, La Pitahaya) with dishes and the lard tip; A has real places with accurate hours but a cut-off sentence, and B is a shorter subset."
+ },
+ "food-010": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "Original Vegan placed near Datong Station; its address is in Xindian (New Taipei) near Dapinglin MRT"
+   ],
+   "B": [
+    "Original Vegan said to be near a 'Beixin Station'; it is near Dapinglin MRT in Xindian, New Taipei"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C names verified, well-known places (Yang Shin, Laixin dumplings, Mukuchi, Chao, Vege Creek, Plants) with dishes and a 全素/蛋奶素 tip; A and B are thin list read-outs, including a place outside Taipei."
+ },
+ "food-011": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Huggers address garbled as 'Daegwan-gongwon-ro 6-gil' (it is Daesagwan-ro 6-gil)"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives Seoul's key vegan and temple-food places (Osegye Hyang, correctly noted closed Thursdays; Vegan Insa; Maru kimbap; Balwoo Gongyang) with dishes and tips; A and B list real places with little useful detail."
+ },
+ "food-012": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Veganio (Milady Horákové 119, Prague 6) placed in Malá Strana"
+   ]
+  },
+  "best": "A",
+  "reason": "A's verified picks (Shromáždiště, Palo Verde, Linh's, Dosa Dosa, Eaternia, Lehká Hlava, Maitrea) come with areas and dishes; B and C list real vegan places but with thin descriptions, and C has a location error."
+ },
+ "food-013": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A lists many verified vegan and vegetarian places (Kiwi, Daner Pizza, Stricha, Muhudo, Shpana, Klike's) and explains what to order in Georgian restaurants; B and C give six real places with less guidance."
+ },
+ "food-014": {
+  "scores": {
+   "A": 9,
+   "B": 6,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Gen placed in a non-existent 'Keihai area'"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A covers Kyoto's shojin ryori temples (Shigetsu, Izusen, Ajiro) plus real vegan cafés, with a crucial dashi warning; B and C list real places from one list, with C adding hours."
+ },
+ "food-015": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C groups well-known places by neighbourhood (Helecho, Café Zorba, Las Veganas, Ginger, Lenteja Express) with dishes; A and B list mostly minor places in Belén with little description."
+ },
+ "food-016": {
+  "scores": {
+   "A": 8,
+   "B": 6,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "The Kind Kitchen's 'address' is a phone number (0615261358)",
+    "One Juice (Regent Rd, Sea Point) placed in Green Point"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A gives a broad, mostly verifiable set (Plant, Conscious Kitchen, Romeo and Vero, Pizzasaurus, Prashad) with areas and dishes; B and C are list read-outs with filler, and B passes off a phone number as an address."
+ },
+ "food-017": {
+  "scores": {
+   "A": 6,
+   "B": 9,
+   "C": 7
+  },
+  "errors": {
+   "A": [
+    "Urbã Cozinha Vegana (R. Dona Germaine Burchard) placed in or near Liberdade; it is in Barra Funda/Água Branca"
+   ],
+   "B": [],
+   "C": [
+    "Urbã hours given as lunch Monday to Saturday only; it also opens for Sunday lunch"
+   ]
+  },
+  "best": "B",
+  "reason": "B, in good Portuguese, names verified top places (Banana Verde, Camélia Òdòdó, Sushimar, Pop Vegan, Pratada, Futuro Refeitório, Vila das Rosas) with neighbourhoods and dishes; A and C list real places with less insight, and A misplaces Urbã."
+ },
+ "food-018": {
+  "scores": {
+   "A": 7,
+   "B": 7,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "Vegan Cat Bar (Carrer de la Mercè, Gòtic) placed in Sant Pere, Santa Caterina i La Ribera",
+    "Vegetalia called a vegan restaurant; it is an organic vegetarian place with vegan options"
+   ],
+   "B": [
+    "Vegetalia called a vegan restaurant; it is vegetarian with vegan options"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C identifies Barcelona and Plaça de Catalunya and lists verified nearby vegan places (Velada, The Vegan Corner, Rasoterra, Bubita, Tulsi, Mad Mad Vegan) with walk times; A and B list real places but never name the city, and mislabel Vegetalia."
+ },
+ "food-019": {
+  "scores": {
+   "A": 6,
+   "B": 8,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "JAJA (Hong Kong Arts Centre, Harbour Road) placed in Admiralty; it is in Wan Chai"
+   ],
+   "B": [],
+   "C": [
+    "Loving Hut given two conflicting addresses (256 Hennessy Rd vs Wan Chai Road)"
+   ]
+  },
+  "best": "B",
+  "reason": "B confirms Central, Hong Kong and names mostly verifiable places within walking distance (Root Vegan, Veggie4Love, Treehouse, Yuan, LockCha) with dishes and a closure caveat; A and C give short, generic list read-outs."
+ },
+ "food-020": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "Native Foods at 500 16th Street presented as open; the chain closed in 2023 and its only Colorado restaurant is now in Glendale",
+    "WaterCourse Foods hours wrong (it is closed Mondays, 10:00-21:00 Tue-Sun)",
+    "The Loyal Vegan at 1312 17th St (Denver Milk Market) is not among the market's current vendors; likely closed"
+   ],
+   "B": [
+    "Native Foods at 500 16th Street presented as open; the chain closed in 2023 and its only Colorado restaurant is now in Glendale",
+    "The Loyal Vegan at 1312 17th St (Denver Milk Market) is not among the market's current vendors; likely closed"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C identifies downtown Denver and gives verified places (City O' City, WaterCourse correctly closed Mondays, Corner Beet, Wellness Sushi, Somebody People); A and B include a closed Native Foods, a likely-gone Loyal Vegan, and B adds invented praise."
+ }
+}
