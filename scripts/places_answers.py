@@ -4,7 +4,7 @@ writing them (the app's route: places.py lookup, the model's lines, one generati
 has the answer followed by the list the app shows with it, as app_answer_records.py writes the
 phone's, so the two can be graded the same way.
 
-Usage: places_answers.py places.db voyage.db wiki.db questions.jsonl out.jsonl --variant 1|2 (the first or the second version of the lines and prompt)
+Usage: places_answers.py places.db voyage.db wiki.db questions.jsonl out.jsonl --variant 1|2|3|4 (the first or the second version of the lines and prompt, the second in fewer words, or six places a line each)
        [--url http://127.0.0.1:8091] [--translated ID=English question ...]
   questions: id, q, and gps [lat, lon] for "near me"; --translated gives the English question a
   non-English one is searched with (the app translates it first), the answer is asked in the
@@ -46,7 +46,13 @@ with open(a.out, "w") as f:
         if lk is None or not lk.places:
             continue
         where = P.where_text(lk.total, lk.radius_km, lk.label, ask, lk.capped)
-        if a.variant == 2:
+        if a.variant == 4:
+            lines = P.context_lines_v2(lk.places, voyage, lk.origin, wiki)
+            system, max_tokens = P.PLACES_SYSTEM_SIX, 800
+        elif a.variant == 3:
+            lines = P.context_lines_v2(lk.places, voyage, lk.origin, wiki)
+            system, max_tokens = P.PLACES_SYSTEM_COMPACT, 800
+        elif a.variant == 2:
             lines = P.context_lines_v2(lk.places, voyage, lk.origin, wiki)
             system, max_tokens = P.PLACES_SYSTEM_V2, 800
         else:

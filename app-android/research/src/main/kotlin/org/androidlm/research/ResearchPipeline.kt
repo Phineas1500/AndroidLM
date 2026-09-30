@@ -38,9 +38,14 @@ interface Engine {
     /**
      * One generation. [continueChat] = false starts a new conversation (the engine drops its KV);
      * true sends [prompt] as the next user turn of the current conversation, so the engine keeps
-     * the earlier turns in its KV cache and reads only the new text.
+     * the earlier turns in its KV cache and reads only the new text. [cachePrefix]: how many
+     * leading bytes (UTF-8) of [prompt] are fixed text that other prompts start with too (a system
+     * prompt); an engine with a prefix cache keeps its state after them and reads only the rest
+     * the next time. The generated text does not depend on it.
      */
-    suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean = false): Generation
+    suspend fun generate(
+        prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean = false, cachePrefix: Int = 0,
+    ): Generation
 }
 
 /**
@@ -691,7 +696,10 @@ class ResearchPipeline(
         ): Generation {
             enter(phase)
             val start = System.nanoTime()
-            val res = engine.generate(system + "\n\n" + user, nPredict, onToken)
+            // the system prompt is the same for every question of its kind: the engine keeps its
+            // state after it (engine patch 0007) and reads only the question the next time
+            val head = system + "\n\n"
+            val res = engine.generate(head + user, nPredict, onToken, cachePrefix = head.toByteArray(Charsets.UTF_8).size)
             completed(start, res)
             return res
         }

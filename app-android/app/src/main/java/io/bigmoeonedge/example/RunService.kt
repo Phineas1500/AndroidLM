@@ -118,7 +118,8 @@ class RunService : Service() {
     // The CPU thermal-zone `temp` node, discovered once on the first sample and reused thereafter.
     @Volatile private var cpuThermalZone: File? = null
 
-    private data class Req(val prompt: String, val nPredict: Int, val think: Boolean, val clearKv: Boolean)
+    /** [cachePrefix]: leading bytes of [prompt] that are fixed text (the engine's prefix cache). */
+    private data class Req(val prompt: String, val nPredict: Int, val think: Boolean, val clearKv: Boolean, val cachePrefix: Int = 0)
 
     // ── AndroidLM research mode (see startResearch) ──
 
@@ -750,6 +751,7 @@ class RunService : Service() {
         append(""","n_predict":""").append(req.nPredict)
         append(""","think":""").append(req.think)
         append(""","clear_kv":""").append(req.clearKv)
+        if (req.cachePrefix > 0) append(""","cache_prefix":""").append(req.cachePrefix)
         append(""","prompt":"""").append(jsonEscape(req.prompt)).append("\"}")
     }
 
@@ -784,14 +786,16 @@ class RunService : Service() {
      * next request's result.
      */
     private val engine = object : Engine {
-        override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean): Generation =
+        override suspend fun generate(
+            prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean, cachePrefix: Int,
+        ): Generation =
             engineLock.withLock {
                 val call = EngineCall(nextId.getAndIncrement(), onToken)
                 inflight = call
                 try {
                     // clear_kv=false continues the engine-held conversation: it re-renders the chat
                     // template over the whole history and prefills only what is new
-                    if (!send(generateJson(call.id, Req(prompt, nPredict, think = false, clearKv = !continueChat)))) {
+                    if (!send(generateJson(call.id, Req(prompt, nPredict, think = false, clearKv = !continueChat, cachePrefix = cachePrefix)))) {
                         throw IllegalStateException("the engine session is not running")
                     }
                     call.done.await()

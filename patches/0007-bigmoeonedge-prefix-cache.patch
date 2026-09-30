@@ -1,0 +1,300 @@
+diff --git a/cli/main.cpp b/cli/main.cpp
+index da00304..a1f5145 100644
+--- a/cli/main.cpp
++++ b/cli/main.cpp
+@@ -225,6 +225,7 @@ struct SessionCmd {
+     int n_predict = 128;
+     bool think = true;
+     bool clear_kv = true;
++    int cache_prefix = 0; // AndroidLM: leading bytes of the prompt that are fixed text (prefix cache)
+ };
+ 
+ // Interactive session: keep the model loaded and the expert cache warm across prompts, reading
+@@ -282,6 +283,7 @@ static int run_session_loop(const RunConfig & cfg,
+                 c.n_predict = json_get_int(line, "n_predict", cfg.n_predict);
+                 c.think = json_get_bool(line, "think", cfg.think);
+                 c.clear_kv = json_get_bool(line, "clear_kv", true);
++                c.cache_prefix = json_get_int(line, "cache_prefix", 0);
+             } else {
+                 continue;
+             }
+@@ -318,6 +320,7 @@ static int run_session_loop(const RunConfig & cfg,
+         req.n_predict = cmd.n_predict;
+         req.think = cmd.think;
+         req.clear_kv = cmd.clear_kv;
++        req.cache_prefix_bytes = cmd.cache_prefix;
+         req.render_text = true; // the line protocol carries the parsed answer on every token
+         req.on_prefill = [&](int done, int total) {
+             std::printf("BMOE_PREFILL {\"id\":%d,\"done\":%d,\"total\":%d}\n", cmd.id, done, total);
+@@ -398,6 +401,9 @@ static void print_usage(const char * argv0) {
+         "      --no-think          render the chat template with reasoning disabled\n"
+         "      --progress          emit machine telemetry (one JSON line per token)\n"
+         "      --session           keep the model loaded and serve JSON prompt requests from stdin\n"
++        "      --prefix-cache N    (--session) keep the state after up to N requests' fixed leading text\n"
++        "                          (a request's \"cache_prefix\": that many bytes of its prompt), so a later\n"
++        "                          request starting with the same text decodes only the rest. 0 = off\n"
+         "      --csv PATH          also write per-token metrics as CSV\n"
+         "      --route-trace PATH  diagnostics: write the per-step per-layer MoE routing trace\n"
+         "                          (which experts each layer routed, their weight, cache state).\n"
+@@ -667,6 +673,8 @@ int main(int argc, char ** argv) {
+             cfg.spec.draft_p_min = (float) std::atof(next("--mtp-p-min"));
+         else if (a == "--ngram-min-match")
+             cfg.spec.ngram_min_match = std::atoi(next("--ngram-min-match"));
++        else if (a == "--prefix-cache")
++            cfg.prefix_cache = std::atoi(next("--prefix-cache"));
+         else if (a == "--chatml")
+             cfg.chatml = true;
+         else if (a == "--no-think")
+diff --git a/core/include/bmoe/config.h b/core/include/bmoe/config.h
+index fbed9b6..e541fd3 100644
+--- a/core/include/bmoe/config.h
++++ b/core/include/bmoe/config.h
+@@ -391,6 +391,13 @@ struct RunConfig {
+     SamplingConfig sampling; // greedy by default (temp <= 0); opt-in stochastic decoding
+     MoeStreamConfig moe;
+     SpecConfig spec; // self-speculative decoding (MTP head or n-gram lookup); off by default
++
++    // AndroidLM: snapshots of the model's state after a request's fixed leading text (its
++    // instructions), kept in spare sequences so the next request that starts with the same text
++    // decodes only what follows it. 0 = off. Each snapshot is one sequence's recurrent state
++    // (about 63 MiB on Qwen3.6-35B-A3B) plus its tokens in the KV cache, which becomes unified.
++    // Chat mode only, off with speculation. See GenerateRequest::cache_prefix_bytes.
++    int prefix_cache = 0;
+ };
+ 
+ // Validation result: ok plus a human-readable reason when not.
+diff --git a/core/include/bmoe/session.h b/core/include/bmoe/session.h
+index 6d7a6bb..ede7ae9 100644
+--- a/core/include/bmoe/session.h
++++ b/core/include/bmoe/session.h
+@@ -54,6 +54,8 @@ struct SessionConfig {
+     // open() builds the wider verify batch, and — for the MTP source only — the draft context.
+     // See RunConfig::spec.
+     SpecConfig spec;
++    // AndroidLM: fixed-prefix snapshots (see RunConfig::prefix_cache). 0 = off.
++    int prefix_cache = 0;
+ };
+ 
+ // The RunConfig → SessionConfig mapping, in one place. Both entry points that open a session from a
+@@ -98,6 +100,11 @@ struct GenerateRequest {
+     // new prompt tokens (a reused prefix is not counted). The prompt of a research answer takes
+     // a minute or more to read on a phone, and a UI needs something to show for it.
+     std::function<void(int done, int total)> on_prefill;
++    // AndroidLM: how many leading bytes of `prompt` are fixed text (a system prompt) that other
++    // requests start with too. With a prefix cache and clear_kv, the state after those tokens is
++    // kept, and a later request with the same leading tokens starts from it instead of decoding
++    // them again. 0 = none.
++    int cache_prefix_bytes = 0;
+ };
+ 
+ // Teacher-forced quality measurement. The text is fixed, so every cell scores the SAME token
+diff --git a/core/src/engine/runtime.cpp b/core/src/engine/runtime.cpp
+index 75ef409..00b0cb5 100644
+--- a/core/src/engine/runtime.cpp
++++ b/core/src/engine/runtime.cpp
+@@ -19,6 +19,7 @@ SessionConfig session_config_from(const RunConfig & cfg) {
+     sc.sampling = cfg.sampling; // greedy by default; opt-in stochastic decoding
+     sc.moe = cfg.moe;
+     sc.spec = cfg.spec; // self-speculation (MTP head or n-gram lookup); off by default
++    sc.prefix_cache = cfg.prefix_cache; // AndroidLM: fixed-prefix snapshots; 0 = off
+     return sc;
+ }
+ 
+diff --git a/core/src/engine/session.cpp b/core/src/engine/session.cpp
+index f1cab30..16af402 100644
+--- a/core/src/engine/session.cpp
++++ b/core/src/engine/session.cpp
+@@ -482,6 +482,18 @@ struct Session::Impl {
+     std::vector<common_chat_msg> chat_history;
+     std::vector<llama_token> kv_tokens;
+ 
++    // AndroidLM prefix cache (SessionConfig::prefix_cache): slot s is sequence s + 1 and holds the
++    // state after `key`, the leading tokens of a request whose fixed text they are. `used` orders
++    // the slots for eviction (0 = never used). A slot whose sequence no longer ends where its key
++    // does (a memory clear somewhere) is simply a miss.
++    struct PrefixSlot {
++        std::vector<llama_token> key;
++        uint64_t used = 0;
++    };
++    std::vector<PrefixSlot> prefix_slots;
++    uint64_t prefix_clock = 0;
++    int prefix_hits = 0, prefix_misses = 0;
++
+     // Route trace (diagnostics): null unless requested AND streaming is on — there is no routing
+     // to trace otherwise.
+     IRouteTraceSink * route_trace = nullptr;
+@@ -883,10 +895,20 @@ std::unique_ptr<Session> Session::open(const SessionConfig & cfg,
+     // snapshots the rewind is a cheap restore; without them llama.cpp has to fall back to replaying
+     // the sequence, which would hand back exactly the decode the speculation just saved.
+     if (cfg.spec.enabled()) cparams.n_rs_seq = (uint32_t) cfg.spec.draft_max;
++    // AndroidLM prefix cache: one sequence per snapshot besides the working one (0), sharing one
++    // KV buffer so a snapshot's cells can be copied into sequence 0 without moving any data. The
++    // recurrent state has one cell per sequence: a snapshot restored into sequence 0 stays shared
++    // until sequence 0 decodes, which then copies it to a free cell (copy-on-write).
++    const int n_prefix_slots = cfg.spec.enabled() ? 0 : std::max(0, cfg.prefix_cache);
++    if (n_prefix_slots > 0) {
++        cparams.n_seq_max = (uint32_t) (1 + n_prefix_slots);
++        cparams.kv_unified = true;
++    }
+ 
+     llama_context * ctx = llama_init_from_model(model, cparams);
+     if (!ctx) return fail("failed to create context");
+     im.ctx.reset(ctx);
++    im.prefix_slots.assign((size_t) n_prefix_slots, Impl::PrefixSlot{});
+     llama_set_n_threads(ctx, cfg.n_threads, cfg.n_threads);
+     {
+         ggml_threadpool_params tpp = ggml_threadpool_params_default(cfg.n_threads);
+@@ -1407,7 +1429,9 @@ RunResult Session::generate(const GenerateRequest & req,
+     // clear_kv = "new chat": drop the KV and the engine-held conversation. Otherwise this turn
+     // continues the conversation, reusing the KV prefix already decoded from earlier turns.
+     if (req.clear_kv) {
+-        llama_memory_clear(llama_get_memory(ctx), true);
++        // With a prefix cache only the working sequence goes: the snapshots stay.
++        if (im.prefix_slots.empty() || !llama_memory_seq_rm(llama_get_memory(ctx), 0, -1, -1))
++            llama_memory_clear(llama_get_memory(ctx), true);
+         // The draft context tracks the target's positions and must be dropped with it, or the first
+         // draft of the new conversation is conditioned on the previous one.
+         if (im.ctx_dft) llama_memory_clear(llama_get_memory(im.ctx_dft.get()), true);
+@@ -1515,6 +1539,96 @@ RunResult Session::generate(const GenerateRequest & req,
+             }
+         }
+     }
++    // AndroidLM prefix cache: the tokens of the request's fixed leading text, as the whole prompt
++    // has them (a token can straddle the text's end, so the prefix is where the two tokenizations
++    // stop agreeing). A slot holding exactly those tokens is copied into sequence 0 and the prompt
++    // is decoded from its end; otherwise the prefix is decoded first and snapshotted into the least
++    // recently used slot before the rest follows.
++    int prefix_len = 0;
++    int prefix_snapshot = -1;
++    // (a miss is snapshotted only when at most this many tokens follow the prefix; see below)
++    constexpr int kPrefixSnapshotMaxRest = 256;
++    if (!im.prefix_slots.empty() && chat_on && req.clear_kv && req.cache_prefix_bytes > 0 &&
++        req.cache_prefix_bytes < (int) req.prompt.size()) {
++        const size_t at = prompt.find(req.prompt);
++        if (at != std::string::npos) {
++            const std::string head = prompt.substr(0, at + (size_t) req.cache_prefix_bytes);
++            std::vector<llama_token> ht(head.size() + 8);
++            const int nh = llama_tokenize(im.vocab, head.c_str(), (int) head.size(), ht.data(), (int) ht.size(),
++                                          /*add_special*/ true, /*parse_special*/ true);
++            while (prefix_len < nh && prefix_len < n_prompt - 1 && ht[prefix_len] == tokens[prefix_len]) ++prefix_len;
++        }
++    }
++    if (prefix_len > 0) {
++        llama_memory_t mem = llama_get_memory(ctx);
++        const std::vector<llama_token> key(tokens.begin(), tokens.begin() + prefix_len);
++        int hit = -1;
++        for (size_t s = 0; s < im.prefix_slots.size() && hit < 0; ++s) {
++            if (im.prefix_slots[s].key == key &&
++                llama_memory_seq_pos_max(mem, (llama_seq_id) (s + 1)) == (llama_pos) prefix_len - 1)
++                hit = (int) s;
++        }
++        if (hit >= 0) {
++            llama_memory_seq_cp(mem, (llama_seq_id) (hit + 1), 0, -1, -1);
++            im.kv_tokens = key; // the reuse below then starts decoding at prefix_len
++            im.prefix_slots[(size_t) hit].used = ++im.prefix_clock;
++            ++im.prefix_hits;
++        } else if (n_prompt - prefix_len > kPrefixSnapshotMaxRest) {
++            // Snapshotting means decoding the prefix and the rest as two batches, and with streamed
++            // experts each batch reads most of the expert bank: measured on a Pixel 8 Pro, a
++            // 284 + 526-token places prompt took 38 s against 28 s in one batch. A long rest is
++            // decoded in one batch as before, so it gets no snapshot (and is the same as without
++            // the cache). Short ones (a question after its instructions) split for free.
++            prefix_len = 0;
++        } else {
++            size_t lru = 0;
++            for (size_t s = 1; s < im.prefix_slots.size(); ++s)
++                if (im.prefix_slots[s].used < im.prefix_slots[lru].used) lru = s;
++            prefix_snapshot = (int) lru;
++            // its old snapshot goes now, so its cells are free for the prefix about to be decoded
++            llama_memory_seq_rm(mem, (llama_seq_id) (lru + 1), -1, -1);
++            im.prefix_slots[lru] = Impl::PrefixSlot{};
++            ++im.prefix_misses;
++        }
++        // The snapshots share the KV cells of sequence 0: keep room for this whole turn by dropping
++        // the least recently used other snapshots (the one sequence 0 starts from, or is about to be
++        // copied to, shares its cells and costs nothing).
++        const int keep = hit >= 0 ? hit : prefix_snapshot;
++        auto others = [&]() {
++            size_t n = 0;
++            for (size_t s = 0; s < im.prefix_slots.size(); ++s)
++                if ((int) s != keep) n += im.prefix_slots[s].key.size();
++            return n;
++        };
++        while ((size_t) n_prompt + (size_t) req.n_predict + 8 + others() > (size_t) im.cfg.n_ctx) {
++            int lru = -1;
++            for (size_t s = 0; s < im.prefix_slots.size(); ++s)
++                if ((int) s != keep && !im.prefix_slots[s].key.empty() &&
++                    (lru < 0 || im.prefix_slots[s].used < im.prefix_slots[(size_t) lru].used))
++                    lru = (int) s;
++            if (lru < 0) break;
++            llama_memory_seq_rm(mem, (llama_seq_id) (lru + 1), -1, -1);
++            im.prefix_slots[(size_t) lru] = Impl::PrefixSlot{};
++        }
++    } else if (!im.prefix_slots.empty()) {
++        // a request without a cached prefix (a continued turn, a new chat) still needs its room
++        llama_memory_t mem = llama_get_memory(ctx);
++        const size_t turn = (size_t) n_prompt + (size_t) req.n_predict + 8;
++        for (;;) {
++            size_t held = 0;
++            int lru = -1;
++            for (size_t s = 0; s < im.prefix_slots.size(); ++s) {
++                held += im.prefix_slots[s].key.size();
++                if (!im.prefix_slots[s].key.empty() &&
++                    (lru < 0 || im.prefix_slots[s].used < im.prefix_slots[(size_t) lru].used))
++                    lru = (int) s;
++            }
++            if (turn + held <= (size_t) im.cfg.n_ctx || lru < 0) break;
++            llama_memory_seq_rm(mem, (llama_seq_id) (lru + 1), -1, -1);
++            im.prefix_slots[(size_t) lru] = Impl::PrefixSlot{};
++        }
++    }
++
+     if (n_prompt + req.n_predict + 8 > im.cfg.n_ctx)
+         return fail("prompt + n_predict exceeds the session n_ctx (" + std::to_string(im.cfg.n_ctx) +
+                     "); open the session with a larger n_ctx");
+@@ -1576,8 +1690,13 @@ RunResult Session::generate(const GenerateRequest & req,
+     // tokens we fed, and un-append the user message. Used on cancel so prior turns stay usable.
+     auto rollback_turn = [&]() {
+         if (chat_on) {
+-            if (!llama_memory_seq_rm(llama_get_memory(ctx), 0, (llama_pos) n_common, -1))
+-                llama_memory_clear(llama_get_memory(ctx), true);
++            if (!llama_memory_seq_rm(llama_get_memory(ctx), 0, (llama_pos) n_common, -1)) {
++                // (a recurrent state cannot keep part of a sequence: drop sequence 0 and, with a
++                // prefix cache, nothing else)
++                if (im.prefix_slots.empty() || !llama_memory_seq_rm(llama_get_memory(ctx), 0, -1, -1))
++                    llama_memory_clear(llama_get_memory(ctx), true);
++                n_common = 0;
++            }
+             im.kv_tokens.resize(n_common);
+             if (history_pushed) {
+                 im.chat_history.pop_back();
+@@ -1655,8 +1774,10 @@ RunResult Session::generate(const GenerateRequest & req,
+     // context it never uses.
+     const bool spec_on = im.cfg.spec.enabled();
+     const bool mtp_on = im.mtp != nullptr;
+-    for (int i = (int) n_common; i < n_prompt; i += im.cfg.n_batch) {
+-        const int chunk = std::min(im.cfg.n_batch, n_prompt - i);
++    for (int i = (int) n_common; i < n_prompt;) {
++        int chunk = std::min(im.cfg.n_batch, n_prompt - i);
++        // a missed prefix is decoded on its own, so its state can be snapshotted at its end
++        if (prefix_snapshot >= 0 && i < prefix_len) chunk = std::min(chunk, prefix_len - i);
+         llama_batch pf;
+         if (mtp_on) {
+             // Positions are absolute here — the prompt token at index i sits at position i, reused
+@@ -1684,6 +1805,16 @@ RunResult Session::generate(const GenerateRequest & req,
+         // or the first draft is made from a hidden state that never saw the prompt.
+         if (mtp_on && !common_speculative_process(im.mtp.get(), pf))
+             return fail("MTP draft context failed to process the prefill batch");
++        i += chunk;
++        if (prefix_snapshot >= 0 && i == prefix_len) {
++            llama_memory_t mem = llama_get_memory(ctx);
++            const llama_seq_id sid = (llama_seq_id) (prefix_snapshot + 1);
++            llama_memory_seq_rm(mem, sid, -1, -1);
++            llama_memory_seq_cp(mem, 0, sid, -1, -1);
++            Impl::PrefixSlot & slot = im.prefix_slots[(size_t) prefix_snapshot];
++            slot.key.assign(tokens.begin(), tokens.begin() + prefix_len);
++            slot.used = ++im.prefix_clock;
++        }
+     }
+     if (req.on_prefill) req.on_prefill(n_prompt - (int) n_common, n_prompt - (int) n_common);
+     // The suffix is now in the KV; record it so the next turn can diff against it.

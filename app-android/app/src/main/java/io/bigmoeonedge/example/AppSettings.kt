@@ -175,6 +175,9 @@ data class AppSettings(
             // Nothing here selects a format, so it is correct for every model in the catalog.
             "--chatml",
             "--session",
+            // AndroidLM: keep the state after up to this many system prompts (engine patch 0007),
+            // so each research step reads only its question and sources, not its instructions again
+            "--prefix-cache", PREFIX_CACHE.toString(),
         )
         // Active-expert (top-k) override is a load-time kv_override, valid with or without
         // streaming — so it lives outside the mmap gate below.
@@ -297,6 +300,8 @@ data class AppSettings(
         // long prompt plus the largest practical generation. A request that would overflow it is
         // rejected recoverably by the CLI, leaving the session usable.
         const val SESSION_CTX = 4096
+        /** Engine prefix-cache slots: the plan and the answer-first draft (the engine snapshots only prompts with a short tail). */
+        const val PREFIX_CACHE = 2
 
         // Widest graph computed at once. Compute buffers are RESERVED for it, so leaving it at the
         // context width (the engine's default) hands the whole reservation to a model that only

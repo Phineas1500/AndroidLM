@@ -41,7 +41,7 @@ class ResearchPipelineTest {
 
     // ── scripted engine ──
 
-    private class Call(val prompt: String, val nPredict: Int, val continueChat: Boolean = false)
+    private class Call(val prompt: String, val nPredict: Int, val continueChat: Boolean = false, val cachePrefix: Int = 0)
 
     /**
      * Returns [script]'s texts in order, streaming each in small pieces first. With [hangAt],
@@ -52,9 +52,9 @@ class ResearchPipelineTest {
         val hanging = CompletableDeferred<Unit>()
         @Volatile var cancelledCalls = 0
 
-        override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean): Generation {
+        override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean, cachePrefix: Int): Generation {
             val i = calls.size
-            calls.add(Call(prompt, nPredict, continueChat))
+            calls.add(Call(prompt, nPredict, continueChat, cachePrefix))
             assertTrue("unexpected engine call #$i:\n$prompt", i < script.size)
             val text = script[i]
             text.chunked(7).forEach(onToken)
@@ -285,6 +285,9 @@ class ResearchPipelineTest {
             Prompts.ANSWER_SYSTEM + "\n\nSources:\n\n" + context + "\n\nQuestion: " + question,
             engine.calls[1].prompt,
         )
+        // the system prompts are the fixed prefixes the engine may keep (engine patch 0007)
+        assertEquals((Prompts.PLAN_SYSTEM + "\n\n").toByteArray(Charsets.UTF_8).size, engine.calls[0].cachePrefix)
+        assertEquals((Prompts.ANSWER_SYSTEM + "\n\n").toByteArray(Charsets.UTF_8).size, engine.calls[1].cachePrefix)
         assertEquals(600, engine.calls[1].nPredict)
 
         assertEquals(listOf("Harrods bombing", "Provisional Irish Republican Army"), result.titles)
@@ -770,7 +773,7 @@ class ResearchPipelineTest {
         val question = "Roughly how many times larger is the population of India than that of Canada?"
         val engine = object : Engine {
             var n = 0
-            override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean): Generation {
+            override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean, cachePrefix: Int): Generation {
                 if (n++ == 0) return Generation("India")
                 throw IllegalStateException("prompt exceeds n_ctx")
             }
@@ -1028,7 +1031,7 @@ class ResearchPipelineTest {
         var duringPlan = false
         val engine = object : Engine {
             private var i = 0
-            override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean): Generation {
+            override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean, cachePrefix: Int): Generation {
                 val text = script[i++]
                 text.chunked(7).forEach(onToken)
                 if (i == 1) duringPlan = lookedUp.await(10, TimeUnit.SECONDS)

@@ -1,0 +1,102 @@
+{
+ "food-001": {
+  "A": "current",
+  "B": "reference",
+  "C": "six"
+ },
+ "food-002": {
+  "A": "current",
+  "B": "six",
+  "C": "reference"
+ },
+ "food-003": {
+  "A": "reference",
+  "B": "six",
+  "C": "current"
+ },
+ "food-004": {
+  "A": "reference",
+  "B": "six",
+  "C": "current"
+ },
+ "food-005": {
+  "A": "reference",
+  "B": "current",
+  "C": "six"
+ },
+ "food-006": {
+  "A": "six",
+  "B": "current",
+  "C": "reference"
+ },
+ "food-007": {
+  "A": "current",
+  "B": "reference",
+  "C": "six"
+ },
+ "food-008": {
+  "A": "current",
+  "B": "reference",
+  "C": "six"
+ },
+ "food-009": {
+  "A": "current",
+  "B": "six",
+  "C": "reference"
+ },
+ "food-010": {
+  "A": "six",
+  "B": "current",
+  "C": "reference"
+ },
+ "food-011": {
+  "A": "six",
+  "B": "current",
+  "C": "reference"
+ },
+ "food-012": {
+  "A": "reference",
+  "B": "six",
+  "C": "current"
+ },
+ "food-013": {
+  "A": "reference",
+  "B": "current",
+  "C": "six"
+ },
+ "food-014": {
+  "A": "reference",
+  "B": "six",
+  "C": "current"
+ },
+ "food-015": {
+  "A": "current",
+  "B": "six",
+  "C": "reference"
+ },
+ "food-016": {
+  "A": "reference",
+  "B": "current",
+  "C": "six"
+ },
+ "food-017": {
+  "A": "six",
+  "B": "reference",
+  "C": "current"
+ },
+ "food-018": {
+  "A": "current",
+  "B": "six",
+  "C": "reference"
+ },
+ "food-019": {
+  "A": "current",
+  "B": "reference",
+  "C": "six"
+ },
+ "food-020": {
+  "A": "current",
+  "B": "six",
+  "C": "reference"
+ }
+}
