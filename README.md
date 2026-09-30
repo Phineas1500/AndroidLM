@@ -50,7 +50,7 @@ Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that pho
 | Generation speed | 4-6 tokens/s in the app (lower when the phone is hot) |
 | Prompt reading | 24-30 tokens/s in the app (a 1,000-token source prompt in 35-40 s) |
 | Model load | about 28 s on app start |
-| Answer-first question | first words after about 15 s; the answer is done after about 50 s and the cited source check after 103 s (medians over 6 questions; a new question may be asked as soon as the answer is done) |
+| Answer-first question | first words after about 15 s, and after about 4 s from the second question of a session on (the engine keeps its fixed instructions read: [`notes/2026-09-30-speed.md`](notes/2026-09-30-speed.md)); the answer is done after about 50 s and the cited source check after 103 s (medians over 6 questions; a new question may be asked as soon as the answer is done) |
 | Retrieval-first question | cited answer in about 1.6 min (median 98 s over 19 questions; first words after 44-70 s) |
 | Places question ("best vegan restaurants in Lisbon") | list of places on screen after 0.2 s; the model's recommendations from it (six to eight places) start after 26 s and are done after 119 s (medians over 20 questions; 88-190 s) |
 
@@ -117,7 +117,7 @@ in-app import).
 
 ## Install
 
-The signed APK is in the [v1.2.0 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.2.0).
+The signed APK is in the [v1.2.1 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.2.1).
 [`INSTALL.md`](INSTALL.md): `scripts/install.sh` downloads the model and corpus on a computer,
 checks their SHA-256, pushes them to the phone over USB and installs the APK. Building the app:
 [`app-android/README.md`](app-android/README.md). Testing it: [`TESTING.md`](TESTING.md).
