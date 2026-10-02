@@ -64,7 +64,24 @@ interrupted one may not resume after it.
 
 - **Picker:** the system picker opened on Downloads and took both files with a press and hold
   and a tap.
-- **Not tried:** downloading the files in the phone's browser.
+**End to end with the v1.3.0 APK.** The app was uninstalled, the adb-pushed files moved aside,
+and 1.3.0 installed fresh, then set up from the card as INSTALL describes:
+
+| Step | Time |
+|---|---|
+| Chrome's own first-run screen (accepted by the user), then five downloads started from the card | 1 minute |
+| Downloads, about 8.5 MB/s in total over Wi-Fi (`wiki.db` last, 74 minutes) | 75 minutes |
+| Import of all five, with each download deleted after its copy | 4 min 8 s (140-173 MB/s) |
+
+- **Past the link expiry:** `wiki.db` finished 14 minutes after Hugging Face's link had expired. A
+  connection that stays open is not cut off.
+- **The model from app storage:**
+  - first question: planning 5.8 tokens/s, first words after 14.8 s, as with the adb copy;
+  - second question: planning read 17 tokens (the prefix cache);
+  - a Lisbon restaurant question listed 175 places in 0.15 s.
+- **Free space:** with all five downloads on the phone, the card read "The missing files are
+  36.8 GB; the phone has 29.2 GB free", which looks as if it would not fit. It fits, because each
+  download is deleted as soon as its copy is checked. The card now says so.
 
 ## 2. The route no longer waits behind later titles
 

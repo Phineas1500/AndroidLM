@@ -94,7 +94,20 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                 }
             }
             if (missing.isNotEmpty()) {
-                Hint("The missing files are ${sizeLabel(missing.sumOf { it.file.bytes })}; the phone has ${ModelManager.gbLabel(free)} free.")
+                // downloaded files already take their space, so the import itself needs room for
+                // one copy at a time when each download is deleted after it
+                val need = missing.sumOf { it.file.bytes }
+                val largest = missing.maxOf { it.file.bytes }
+                Hint(
+                    "The missing files are ${sizeLabel(need)}; the phone has ${ModelManager.gbLabel(free)} free." + when {
+                        need <= free -> ""
+                        free >= largest + 500_000_000L ->
+                            " That is enough when they are already in this phone's Downloads and the box below is " +
+                                "ticked: each download is deleted once it is copied, so only one file at a time needs " +
+                                "room (the largest is ${sizeLabel(largest)})."
+                        else -> " The largest needs ${sizeLabel(largest + 500_000_000L)}: free up some space first."
+                    },
+                )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = deleteOriginals, onCheckedChange = { deleteOriginals = it }, enabled = !progress.running)

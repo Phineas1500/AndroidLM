@@ -58,16 +58,24 @@ access.
 
 1. In the phone's browser, open the [latest release](https://github.com/Phineas1500/AndroidLM/releases/latest),
    download the APK and open it to install it (allow the browser to install apps when asked).
-2. Open AndroidLM. Its **Set up** card lists the five files. Tap **Download** next to each one: the
-   browser downloads it (37GB in all, so use Wi-Fi; `wiki.db` alone is 21GB).
+2. Open AndroidLM (allow its notifications: the import shows its progress there). Its **Set up**
+   card lists the five files. Tap **Download** next to each one, coming back to the app after
+   each: the browser downloads them all at once.
+   - The files are 37GB in all, so use Wi-Fi. On Wi-Fi at about 8 MB/s they took 75 minutes;
+     `wiki.db` (21GB) is the last to finish.
+   - A browser opened for the first time shows its own welcome screen first.
+   - Leave the downloads running until they finish. Hugging Face's download links expire after an
+     hour. A download that keeps going finishes past that (`wiki.db` did, 14 minutes after), but
+     one that is interrupted later may have to start again.
 3. When the downloads have finished, tap **Import files…**, open Downloads in the file picker,
    select all five files (press and hold the first, then tap the others) and tap **Select**.
    - The app recognises each file and checks its size and SHA-256 as it copies it into its own
      storage. A damaged or unfinished download is refused, and the card says which.
    - With **Delete each download once it is copied** ticked (the default), each download is
-     deleted once its copy is checked. The phone needs about 59GB free while it imports and 37GB
-     afterwards.
-   - The copy runs with the screen off; a notification shows its progress.
+     deleted once its copy is checked. The phone needs about 59GB free in all: the downloads, plus
+     room for the largest copy while it is written. Afterwards the files take 37GB.
+   - All five took 4 minutes on a Pixel 8 Pro. The copy goes on with the screen off; a
+     notification shows its progress.
 4. Turn on airplane mode and ask a question (see the end of [Steps](#steps)).
 
 **From a USB drive** instead of the browser: on any computer, copy the five files onto a USB-C
@@ -107,10 +115,13 @@ app; the v1.0.0 APK was installed from scratch and answered a research question 
 before it was published. The app has no network permission (`aapt2 dump permissions` lists no
 `android.permission.INTERNET`), so it cannot reach the network even with Wi-Fi on.
 
-The import ("On the phone alone") was tested on the same phone with the files placed in Downloads:
-- `wiki.db` (21.3GB) was copied and checked in 143 s with the screen off, and its download deleted;
-- a damaged file was refused and its download kept;
-- research questions were then answered from the imported files.
+"On the phone alone" was run end to end on the same phone with the v1.3.0 APK, installed fresh
+with no adb-pushed files:
+- Chrome downloaded the five files from the Set up card in 75 minutes over Wi-Fi.
+- The app imported all five in 4 minutes 8 s and deleted the downloads.
+- It then answered research questions, a restaurant question among them, from its own storage at
+  the usual speed (first words after 15 s on the first question).
 
-Downloading the files in the phone's browser was not tried. Hugging Face's download links expire
-after an hour, so an interrupted download of `wiki.db` may have to start again.
+Separately:
+- a damaged file was refused and its download kept;
+- `wiki.db` was imported with the screen off.

@@ -135,8 +135,8 @@ The signed APK is in the [v1.2.1 release](https://github.com/Phineas1500/Android
 [`INSTALL.md`](INSTALL.md) has two routes:
 - **On the phone alone:** install the APK, download the five files with the phone's browser from
   the app's Set up card, then import them. The app checks each file's SHA-256 as it copies it
-  into its storage; a 21GB file takes about 2.5 minutes
-  ([`notes/2026-10-01-setup-import.md`](notes/2026-10-01-setup-import.md)).
+  into its storage. Tested end to end on a fresh install: 75 minutes of downloads over Wi-Fi, then
+  4 minutes of import ([`notes/2026-10-01-setup-import.md`](notes/2026-10-01-setup-import.md)).
 - **From a computer:** `scripts/install.sh` downloads the model and corpus, checks their SHA-256,
   pushes them to the phone over USB and installs the APK.
 
