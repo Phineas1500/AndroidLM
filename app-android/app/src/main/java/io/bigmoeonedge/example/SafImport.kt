@@ -67,7 +67,8 @@ object SafImport {
         }
     }
 
-    private fun queryNameAndSize(ctx: Context, uri: Uri): Pair<String, Long> {
+    /** The picked document's display name and size in bytes (-1 when the provider does not say). */
+    internal fun queryNameAndSize(ctx: Context, uri: Uri): Pair<String, Long> {
         var name = uri.lastPathSegment?.substringAfterLast('/') ?: "model.gguf"
         var size = -1L
         ctx.contentResolver.query(uri, null, null, null, null)?.use { c ->

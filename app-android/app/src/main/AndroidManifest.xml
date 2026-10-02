@@ -49,6 +49,12 @@
             android:name=".RunService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+        <!-- AndroidLM: copies the model and corpus files the user picked into app storage
+             (SetupImport.kt), minutes for a full set, with the screen off. -->
+        <service
+            android:name=".ImportService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
         <!-- Hands a metrics CSV to another app (Drive, Gmail, Files) as a content:// URI with a
              one-shot read grant. A file:// URI would be refused outright since Android 7, and the
              alternative — telling the user to go find the file — is not a feature. Scoped to the

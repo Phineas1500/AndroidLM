@@ -1,15 +1,20 @@
 # Installing AndroidLM on a phone
 
 AndroidLM never uses the network: the app does not declare the INTERNET permission. The model
-and the corpus are therefore copied to the phone from a computer.
+and the corpus reach the phone another way, by one of two routes:
+- **On the phone alone:** download the files with the phone's browser, then import them in the
+  app ([below](#on-the-phone-alone)). No computer and no adb.
+- **From a computer:** `scripts/install.sh` downloads them, checks them and pushes them over USB
+  ([Steps](#steps)).
 
 ## What you need
 
-- An Android phone with 12GB of RAM, arm64, Android 10 or newer, and about 39GB free.
-  Developed for a Pixel 8 Pro; nothing here needs Google Play Services.
-- A computer with about 38GB free, `adb` (Android platform-tools), `curl` and `python3`.
-- A USB data cable, and USB debugging enabled on the phone
-  (Settings > About phone > tap Build number 7 times, then Developer options > USB debugging).
+- An Android phone with 12GB of RAM, arm64, Android 10 or newer, and about 39GB free (about 59GB
+  while the files are imported on the phone alone). Developed for a Pixel 8 Pro; nothing here
+  needs Google Play Services.
+- From a computer: a computer with about 38GB free, `adb` (Android platform-tools), `curl` and
+  `python3`, a USB data cable, and USB debugging enabled on the phone (Settings > About phone >
+  tap Build number 7 times, then Developer options > USB debugging).
 
 | File | Size | What it is |
 |---|---|---|
@@ -49,6 +54,26 @@ later questions reuse it. A question about places near you ("vegan food near me"
 location access the first time; the position comes from GPS, and the app still has no network
 access.
 
+## On the phone alone
+
+1. In the phone's browser, open the [latest release](https://github.com/Phineas1500/AndroidLM/releases/latest),
+   download the APK and open it to install it (allow the browser to install apps when asked).
+2. Open AndroidLM. Its **Set up** card lists the five files. Tap **Download** next to each one: the
+   browser downloads it (37GB in all, so use Wi-Fi; `wiki.db` alone is 21GB).
+3. When the downloads have finished, tap **Import files…**, open Downloads in the file picker,
+   select all five files (press and hold the first, then tap the others) and tap **Select**.
+   - The app recognises each file and checks its size and SHA-256 as it copies it into its own
+     storage. A damaged or unfinished download is refused, and the card says which.
+   - With **Delete each download once it is copied** ticked (the default), each download is
+     deleted once its copy is checked. The phone needs about 59GB free while it imports and 37GB
+     afterwards.
+   - The copy runs with the screen off; a notification shows its progress.
+4. Turn on airplane mode and ask a question (see the end of [Steps](#steps)).
+
+**From a USB drive** instead of the browser: on any computer, copy the five files onto a USB-C
+drive formatted as exFAT (FAT32 cannot hold files over 4GB), plug it into the phone, and pick the
+files on the drive in step 3. The drive is only read, and the phone needs 37GB free.
+
 ## Without the script
 
 ```sh
@@ -66,6 +91,9 @@ picker location at all.
 
 ## Removing it
 
+Uninstalling the app also deletes the files it imported. Files pushed with adb are removed with
+the second line:
+
 ```sh
 adb uninstall io.github.phineas1500.androidlm.dev
 adb shell rm -r /data/local/tmp/bmoe
@@ -77,6 +105,12 @@ The install flow has been run end to end on a Pixel 8 Pro (Android 16): download
 verification, `adb push` of the files and the APK install, followed by research questions in the
 app; the v1.0.0 APK was installed from scratch and answered a research question on that phone
 before it was published. The app has no network permission (`aapt2 dump permissions` lists no
-`android.permission.INTERNET`), so it cannot reach the network even with Wi-Fi on. Known gap: the
-corpus can only be installed with adb (the model can also be imported with the in-app file
-picker).
+`android.permission.INTERNET`), so it cannot reach the network even with Wi-Fi on.
+
+The import ("On the phone alone") was tested on the same phone with the files placed in Downloads:
+- `wiki.db` (21.3GB) was copied and checked in 143 s with the screen off, and its download deleted;
+- a damaged file was refused and its download kept;
+- research questions were then answered from the imported files.
+
+Downloading the files in the phone's browser was not tried. Hugging Face's download links expire
+after an hour, so an interrupted download of `wiki.db` may have to start again.

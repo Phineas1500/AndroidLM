@@ -132,10 +132,9 @@ object ModelManager {
     /** Empty-state guidance, phrased for the current flavor's model-acquisition paths. */
     fun pushHint(): String =
         if (BuildConfig.SHARED_STORAGE) {
-            "No MoE .gguf found. Pick a file below, or adb-push a model to shared storage:\n" +
-                "adb push model.gguf /sdcard/Download/\n" +
+            "No MoE .gguf found. Import it with Set up above, or adb-push it:\n" +
                 "adb push model.gguf /data/local/tmp/bmoe/   (no duplicate, O_DIRECT works)"
         } else {
-            "No MoE .gguf found. Pick a .gguf you already have on the device below."
+            "No MoE .gguf found. Import it with Set up above."
         }
 }

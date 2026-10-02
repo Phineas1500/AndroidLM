@@ -288,6 +288,9 @@ private fun MainScreen(
                         TextButton(onClick = onOpenSettings) { Text("Settings") }
                     }
 
+                    // AndroidLM: the files the app reads, which are missing, and their import
+                    SetupCard(scanning = scanning, onImported = onRefresh)
+
                     val modelNames = remember(models) { friendlyModelNames(models.map { it.name }) }
                     when {
                         scanning -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -304,8 +307,6 @@ private fun MainScreen(
                                 )
                             }
                             TextButton(onClick = { requestSharedStorageAccess(context); onRefresh() }) { Text("Refresh") }
-                            // With no model yet, importing one is the first thing to do, so it is shown here.
-                            AddModelSection(models = models, scanning = scanning, loadedSig = ui.sessionSig, onModelReady = onRefresh)
                         }
                         models.size == 1 -> Text(
                             "Model: " + modelNames[0] + when {

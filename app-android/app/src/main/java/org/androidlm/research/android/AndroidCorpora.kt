@@ -94,7 +94,7 @@ object CorpusLocator {
         val external = ctx.getExternalFilesDir(null)?.let { File(it, DIR).path }
         return buildString {
             append("Research mode needs the offline Wikipedia corpus: $WIKI (and optionally $VOYAGE and $PLACES) in a ")
-            append("\"$DIR\" directory. Push it with adb, then tap Refresh:\n")
+            append("\"$DIR\" directory. Import it with Set up above, or push it with adb and tap Refresh:\n")
             append("adb shell mkdir -p ${TMP_ROOTS[0].path}/$DIR\n")
             append("adb push $WIKI $VOYAGE $PLACES ${TMP_ROOTS[0].path}/$DIR/\n")
             append("adb shell chmod -R a+rX ${TMP_ROOTS[0].path}")
