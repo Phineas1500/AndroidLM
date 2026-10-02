@@ -26,3 +26,6 @@ keystore.properties
 
 # large downloaded assets used by scripts/install.sh
 assets-cache/
+
+# post drafts stay on the author's machine
+submission/*vitalik*
