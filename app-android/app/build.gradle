@@ -57,8 +57,8 @@ android {
         applicationId 'io.github.phineas1500.androidlm'
         minSdk 29
         targetSdk 34
-        versionCode 121
-        versionName '1.2.1'
+        versionCode 130
+        versionName '1.3.0'
         buildConfigField 'String', 'GIT_SHA', "\"${gitSha}\""
         // On-device golden test of the retrieval storage: see research/DEVICE_TESTING.md
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
