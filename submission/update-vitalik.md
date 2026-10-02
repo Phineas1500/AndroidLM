@@ -25,14 +25,17 @@ factual errors 30 -> 8.
 street and its hours, in the language of the question, from 21M places (OpenStreetMap + Overture
 + Wikivoyage). "Near me" uses GPS. Restaurants: 46% -> 72% of the reference, better on 19 of 20.
 
-4/ Faster. The engine keeps its fixed instructions read between questions: from the second
-question on, the first words of an answer come after about 4 s instead of 15 s.
+4/ Set up on the phone alone, no computer or adb: install the APK, tap Download for the five files
+(37GB) in the app, then Import. It checks every file's SHA-256 and still has no internet
+permission. Tested on a fresh install: 75 min of downloads on Wi-Fi, 4 min of import.
+And faster: from the second question on, the first words of an answer come after about 4 s
+instead of 15 s.
 
 5/ Honest limits: the reference still wins every one of the 61 questions. Map data still lists
 places that have closed (the biggest error left in restaurant answers), and a full answer with its
 source check takes 1-2 minutes.
 
-6/ Everything is reproducible: github.com/Phineas1500/AndroidLM, signed APK in the release,
+6/ Everything is reproducible: github.com/Phineas1500/AndroidLM, signed APK in the v1.3.0 release,
 every eval answer and grade in eval/.
 
 ## Notes for the user
@@ -40,7 +43,7 @@ every eval answer and grade in eval/.
 - The graders had no web search left and checked places by fetching OpenStreetMap, HappyCow
   and the restaurants' own sites. A grader that searched more found many more closed places
   (notes, section 2).
-- Setup without a computer (download in the phone's browser, import in the app) is built and
-  passed its phone test, but it is not released. Add it to 4/ only once it ships.
+- Setup without a computer shipped in v1.3.0 and was tested end to end on a fresh install
+  (INSTALL.md, Status). Link the v1.3.0 release.
 - "Graded blind side by side" means one grader per group saw both app versions and the reference
   together. That is not the method behind the 9/28 "64%" in the README.
