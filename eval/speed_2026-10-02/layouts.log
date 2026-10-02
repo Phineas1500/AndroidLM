@@ -1,0 +1,17 @@
+=== A1 mask=1f0 t=5 rc=0 skin=30.475622->37.383118 wall=278s
+BMOE_DONE {"id":1 "tok_s":5.874 "prefill_s":36.335 
+BMOE_DONE {"id":2 "tok_s":4.821 "prefill_s":47.823 
+BMOE_DONE {"id":3 "tok_s":4.497 "prefill_s":51.246 
+=== B mask=0f0 t=4 rc=0 skin=30.493061->37.22533 wall=342s
+BMOE_DONE {"id":1 "tok_s":3.983 "prefill_s":45.454 
+BMOE_DONE {"id":2 "tok_s":3.593 "prefill_s":52.361 
+BMOE_DONE {"id":3 "tok_s":3.662 "prefill_s":61.651 
+=== C mask=1e0 t=4 rc=0 skin=30.482193->37.5096 wall=311s
+BMOE_DONE {"id":1 "tok_s":5.150 "prefill_s":41.901 
+BMOE_DONE {"id":2 "tok_s":4.182 "prefill_s":53.879 
+BMOE_DONE {"id":3 "tok_s":4.017 "prefill_s":56.033 
+=== A2 mask=1f0 t=5 rc=0 skin=30.4832->37.643032 wall=281s
+BMOE_DONE {"id":1 "tok_s":5.908 "prefill_s":36.643 
+BMOE_DONE {"id":2 "tok_s":4.705 "prefill_s":47.945 
+BMOE_DONE {"id":3 "tok_s":4.483 "prefill_s":51.924 
+LAYOUTS_DONE
