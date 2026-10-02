@@ -452,6 +452,46 @@ class ResearchPipelineTest {
     }
 
     @Test
+    fun routeDoesNotWaitForALaterTitlesLookup() {
+        // a lookup queued after the first title's (a full-text title search, seconds on a phone)
+        // holds the corpus thread; the route needs only the first title, so the draft starts while
+        // that lookup still holds it
+        val question = goldenCase("Roughly how many times larger is the population of India")["question"].asString
+        val held = CountDownLatch(1)
+        val holding = CountDownLatch(1) // counted down when the lookup lets go of the thread
+        val heldAtDraft = AtomicInteger(-1)
+        val prompts = Collections.synchronizedList(ArrayList<String>())
+        val engine = object : Engine {
+            override suspend fun generate(prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean, cachePrefix: Int): Generation {
+                val text = when (prompts.size) {
+                    0 -> {
+                        onToken("India\n") // the first title's line: its lookup and route are queued
+                        corpusThread.executor.execute { held.await(5, TimeUnit.SECONDS); holding.countDown() }
+                        onToken("Canada")
+                        "India\nCanada"
+                    }
+                    1 -> {
+                        heldAtDraft.set(holding.count.toInt())
+                        held.countDown()
+                        "India has about 1.4 billion people."
+                    }
+                    else -> "No corrections."
+                }
+                prompts.add(prompt)
+                return Generation(text, tokens = 5, tokensPerSecond = 5.0, promptTokens = 10, wallSeconds = 0.5)
+            }
+        }
+
+        val result = run(engine, sampleProvider(), question, Recorder())
+
+        assertEquals("the corpus thread was still held when the draft started", 1, heldAtDraft.get())
+        assertEquals(RouteDecision(Route.ANSWER_FIRST, 540755L), result.route)
+        assertEquals(Prompts.CLOSED_SYSTEM + "\n\n" + question, prompts[1])
+        assertEquals(3, prompts.size)
+        assertCorpusThreadOnly()
+    }
+
+    @Test
     fun sourceCheckIsCleanedOfDeliberation() {
         val case = goldenCase("Roughly how many times larger is the population of India")
         val question = case["question"].asString

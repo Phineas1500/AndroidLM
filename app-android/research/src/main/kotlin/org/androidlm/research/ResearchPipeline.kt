@@ -439,19 +439,40 @@ class ResearchPipeline(
          * title search, seconds on a phone. Only a head start: the finished plan is parsed again,
          * and a line that turns out not to be a title only costs a lookup. [onToken] is the plan's
          * token callback (one thread, in order).
+         *
+         * The first title's job also works out its route, which depends on that title alone: the
+         * route is then ready when the first title is, and does not wait in the corpus thread's
+         * queue behind the lookups of the titles after it.
          */
         private inner class TitlePrefetch(private val scope: CoroutineScope) {
             private val text = StringBuilder()
             private val requested = HashSet<String>()
+            private var first: Pair<String, Deferred<Result<RouteDecision>>>? = null
 
             fun onToken(piece: String) {
                 text.append(piece)
                 if ('\n' !in piece) return
                 for (title in Planner.parsePlanOutput(text.substring(0, text.lastIndexOf("\n")))) {
                     if (!requested.add(title)) continue
-                    scope.launch(corpusDispatcher) { runCatching { corpora.wiki().resolveTitle(title) } }
+                    if (first == null) {
+                        first = title to scope.async(corpusDispatcher) { runCatching { routeFor(listOf(title)) } }
+                    } else {
+                        scope.launch(corpusDispatcher) { runCatching { corpora.wiki().resolveTitle(title) } }
+                    }
                 }
             }
+
+            /** The route of [titles] when their first title is the one routed here; null otherwise or when that failed. */
+            suspend fun route(titles: List<String>): RouteDecision? {
+                val (title, job) = first ?: return null
+                return if (titles.firstOrNull() == title) job.await().getOrNull() else null
+            }
+        }
+
+        /** [Planner.route] for [titles], on the corpus thread (the guide is only opened for routing when the travel route is on). */
+        private fun routeFor(titles: List<String>): RouteDecision {
+            val voyage = if (config.travelRoute) corpora.voyage() else null
+            return Planner.route(corpora.wiki(), titles, config.routeViews, question, voyage, config.travelRoute)
         }
 
         private suspend fun executeInner(): ResearchResult {
@@ -471,26 +492,32 @@ class ResearchPipeline(
                 QuestionHalf(bg)
             }
 
+            // the pack's half of its routing needs only the question: read on the corpus thread
+            // before the plan's title lookups queue there
+            val scope = CoroutineScope(currentCoroutineContext())
+            val packRead = if (config.pack) {
+                scope.async(corpusDispatcher) {
+                    runCatching { corpora.pack()?.let { PackRead(it, it.stems(question), corpora.wiki().nIndexed) } }
+                }
+            } else {
+                null
+            }
+
             // 1. plan; each title is resolved as soon as its line is written (TitlePrefetch)
-            val prefetch = TitlePrefetch(CoroutineScope(currentCoroutineContext()))
+            val prefetch = TitlePrefetch(scope)
             val plan = generating(ResearchPhase.PLANNING, Prompts.PLAN_SYSTEM, question, config.planTokens, prefetch::onToken)
             val titles = Planner.parsePlanOutput(plan.text)
             listener.onEvent(ResearchEvent.Planned(titles))
 
-            // 2. route (a lookup of a few milliseconds; it has no phase of its own)
-            var decision = withContext(corpusDispatcher) {
-                // the guide is only opened for routing when the travel route is on
-                val voyage = if (config.travelRoute) corpora.voyage() else null
-                Planner.route(corpora.wiki(), titles, config.routeViews, question, voyage, config.travelRoute)
-            }
+            // 2. route (it has no phase of its own): usually ready, worked out with the first title
+            var decision = prefetch.route(titles) ?: withContext(corpusDispatcher) { routeFor(titles) }
             // a question the Ethereum and cryptography pack answers (rag.py --pack-route auto)
-            val pack = if (config.pack) withContext(corpusDispatcher) { corpora.pack() } else null
+            val packed = packRead?.await()?.getOrThrow()
+            val pack = packed?.pack
             var wikiStems: List<Stem> = emptyList()
-            if (pack != null) {
+            if (packed != null) {
                 wikiStems = half?.stems?.await() ?: withContext(corpusDispatcher) { corpora.wiki().stems(question) }
-                val affinity = withContext(corpusDispatcher) {
-                    Pack.affinity(pack.stems(question), wikiStems, corpora.wiki().nIndexed)
-                }
+                val affinity = Pack.affinity(packed.stems, wikiStems, packed.wikiIndexed)
                 if (Pack.routes(affinity)) {
                     decision = RouteDecision(
                         if (config.packSources) Route.RETRIEVAL_FIRST else Route.ANSWER_FIRST, decision.views, pack = true,
@@ -778,6 +805,9 @@ class ResearchPipeline(
     }
 
     private class Searched(val context: String, val usedHits: List<Hit>, val dropped: Int, val hits: List<Hit>)
+
+    /** The pack, the question's stems in it and Wikipedia's [Corpus.nIndexed]: what [Pack.affinity] reads from the databases. */
+    private class PackRead(val pack: Corpus, val stems: List<Stem>, val wikiIndexed: Long)
 
     companion object {
         /** Between the draft and its source check in the final text (rag.py, verbatim). */
