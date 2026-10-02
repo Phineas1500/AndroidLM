@@ -1,0 +1,102 @@
+{
+ "cry-001": {
+  "A": "old",
+  "B": "web",
+  "C": "new"
+ },
+ "cry-002": {
+  "A": "old",
+  "B": "new",
+  "C": "web"
+ },
+ "cry-003": {
+  "A": "web",
+  "B": "new",
+  "C": "old"
+ },
+ "cry-004": {
+  "A": "web",
+  "B": "new",
+  "C": "old"
+ },
+ "cry-005": {
+  "A": "web",
+  "B": "old",
+  "C": "new"
+ },
+ "cry-006": {
+  "A": "new",
+  "B": "old",
+  "C": "web"
+ },
+ "cry-007": {
+  "A": "old",
+  "B": "web",
+  "C": "new"
+ },
+ "cry-008": {
+  "A": "old",
+  "B": "web",
+  "C": "new"
+ },
+ "cry-009": {
+  "A": "old",
+  "B": "new",
+  "C": "web"
+ },
+ "cry-010": {
+  "A": "new",
+  "B": "old",
+  "C": "web"
+ },
+ "cry-011": {
+  "A": "new",
+  "B": "old",
+  "C": "web"
+ },
+ "cry-012": {
+  "A": "web",
+  "B": "new",
+  "C": "old"
+ },
+ "cry-013": {
+  "A": "web",
+  "B": "old",
+  "C": "new"
+ },
+ "cry-014": {
+  "A": "web",
+  "B": "new",
+  "C": "old"
+ },
+ "cry-015": {
+  "A": "old",
+  "B": "new",
+  "C": "web"
+ },
+ "cry-016": {
+  "A": "web",
+  "B": "old",
+  "C": "new"
+ },
+ "cry-017": {
+  "A": "new",
+  "B": "web",
+  "C": "old"
+ },
+ "cry-018": {
+  "A": "old",
+  "B": "new",
+  "C": "web"
+ },
+ "cry-019": {
+  "A": "old",
+  "B": "web",
+  "C": "new"
+ },
+ "cry-020": {
+  "A": "old",
+  "B": "new",
+  "C": "web"
+ }
+}

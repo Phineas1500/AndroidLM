@@ -109,18 +109,38 @@ share went from 45% to 71% of the reference, and it was better on all 20 questio
 takes about two minutes instead of forty seconds, and the list is still on screen at once.
 ([`notes/2026-09-29-places-answers.md`](notes/2026-09-29-places-answers.md))
 
+All 61 questions were asked again on 1.2.1 and graded side by side with the 9/28 answers: for
+each question one blind grader saw both versions and the reference together.
+
+| Questions | 9/28 | 1.2.1 |
+|---|---|---|
+| Vegan restaurants (20) | 46% | 72% (better on 19, worse on none) |
+| Post-quantum and Ethereum (20) | 44% | 54% (errors 30 -> 8) |
+| Travel, emergencies, arithmetic (21) | 68% | 69% |
+| All (61) | 53% | **65%** |
+
+The reference was still the best answer on all 61. Graders differ: graded in pairs as on 9/28
+by another grader, 1.2.1 came to 62%. That grader looked up every place for closures and found
+44 closed ones. Closed places in the map data are the main error left in restaurant answers.
+([`notes/2026-10-01-vitalik-bar-121.md`](notes/2026-10-01-vitalik-bar-121.md))
+
 Measurements, eval rounds and decisions are in [`notes/`](notes/); the Pixel findings are in
 [`notes/2026-09-23-pixel-first-day.md`](notes/2026-09-23-pixel-first-day.md) and
 [`notes/2026-09-24-speed-levers.md`](notes/2026-09-24-speed-levers.md) (which of the phone's
-cores, RAM, GPU and TPU help, and by how much). Known gap: the corpus is installed with adb (no
-in-app import).
+cores, RAM, GPU and TPU help, and by how much).
 
 ## Install
 
 The signed APK is in the [v1.2.1 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.2.1).
-[`INSTALL.md`](INSTALL.md): `scripts/install.sh` downloads the model and corpus on a computer,
-checks their SHA-256, pushes them to the phone over USB and installs the APK. Building the app:
-[`app-android/README.md`](app-android/README.md). Testing it: [`TESTING.md`](TESTING.md).
+[`INSTALL.md`](INSTALL.md) has two routes:
+- **On the phone alone:** install the APK, download the five files with the phone's browser from
+  the app's Set up card, then import them. The app checks each file's SHA-256 as it copies it
+  into its storage; a 21GB file takes about 2.5 minutes
+  ([`notes/2026-10-01-setup-import.md`](notes/2026-10-01-setup-import.md)).
+- **From a computer:** `scripts/install.sh` downloads the model and corpus, checks their SHA-256,
+  pushes them to the phone over USB and installs the APK.
+
+Building the app: [`app-android/README.md`](app-android/README.md). Testing it: [`TESTING.md`](TESTING.md).
 
 ## Layout
 
