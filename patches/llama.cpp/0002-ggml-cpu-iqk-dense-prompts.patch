@@ -1,0 +1,823 @@
+diff --git a/ggml/src/ggml-cpu/iqk-moe.cpp b/ggml/src/ggml-cpu/iqk-moe.cpp
+index aaa6888..f3682a6 100644
+--- a/ggml/src/ggml-cpu/iqk-moe.cpp
++++ b/ggml/src/ggml-cpu/iqk-moe.cpp
+@@ -29,6 +29,7 @@
+ #include <algorithm>
+ #include <array>
+ #include <cassert>
++#include <cmath>
+ #include <cstdlib>
+ #include <cstring>
+ #include <vector>
+@@ -36,6 +37,11 @@
+ #if defined(__aarch64__) && defined(__ARM_NEON) && defined(__ARM_FEATURE_DOTPROD)
+ 
+ #include <arm_neon.h>
++#if defined(__linux__)
++#include <sys/auxv.h>
++#elif defined(__APPLE__)
++#include <sys/sysctl.h>
++#endif
+ 
+ namespace {
+ 
+@@ -538,6 +544,417 @@ void mul_mat_q8_k_r8_q8_k(int n, const void * vx, size_t bx, const DataInfo& inf
+     }
+ }
+ 
++// ---- dense weights: llama.cpp's repacked Q5_K and Q6_K (8 rows interleaved in blocks of B bytes,
++//      repack.h's block_q5_Kx8 and block_q6_Kx8, as make_block_q5_Kx8 / make_block_q6_Kx8 build
++//      them), unpacked once per prompt instead of once per four tokens: the 5- and 6-bit integers
++//      to int8 in Q8_K_R8's order, their own integer scales and mins beside them. The kernels then
++//      do the arithmetic of llama.cpp's Q5_K / Q6_K dot products in integers, nothing is quantized
++//      again:
++//        Q5_K: d*d8*sum_sb(sc*dot(q, x)) - dmin*d8*sum_sb(m*sum(x))   (q 0..31, per 32 weights)
++//        Q6_K: d*d8*sum_j(sc*dot(q - 32, x))                           (per 16 weights)
++
++struct blk_q5_Kx8 {
++    ggml_half d[8];
++    ggml_half dmin[8];
++    uint8_t   scales[96];
++    uint8_t   qh[QK_K];
++    uint8_t   qs[QK_K*4];
++};
++static_assert(sizeof(blk_q5_Kx8) == 16*sizeof(ggml_half) + 96 + 5*QK_K, "must match repack.h's block_q5_Kx8");
++
++struct blk_q6_Kx8 {
++    ggml_half d[8];
++    int8_t    scales[QK_K/16*8];
++    uint8_t   ql[QK_K/2*8];
++    uint8_t   qh[QK_K/4*8];
++};
++static_assert(sizeof(blk_q6_Kx8) == 8*sizeof(ggml_half) + QK_K/16*8 + 3*QK_K/4*8, "must match repack.h's block_q6_Kx8");
++
++// unpacked: 8 rows of 256 weights
++typedef struct {
++    ggml_half d[8];
++    ggml_half dmin[8];
++    uint8_t   sc[8*8];      // sc[8*sb + k]: row k, weights 32*sb ... 32*sb + 31
++    uint8_t   m[8*8];       // the same for the mins
++    int8_t    qs[8*QK_K];   // q in 0..31, in block_q8_k_r8's order
++} block_q5k_u_r8;
++
++typedef struct {
++    ggml_half d[8];
++    int8_t    sc[16*8];     // sc[8*j + k]: row k, weights 16*j ... 16*j + 15 (block_q6_Kx8's order)
++    int8_t    qs[8*QK_K];   // q - 32, in block_q8_k_r8's order
++} block_q6k_u_r8;
++
++inline size_t dense_u_row_size(int type, int n) {
++    return (size_t)(n/QK_K) * (type == GGML_TYPE_Q5_K ? sizeof(block_q5k_u_r8) : sizeof(block_q6k_u_r8))/8;
++}
++
++inline size_t dense_x8_group_size(int type, int n) {
++    return (size_t)(n/QK_K) * (type == GGML_TYPE_Q5_K ? sizeof(blk_q5_Kx8) : sizeof(blk_q6_Kx8));
++}
++
++// byte p of row k's own array, interleaved B bytes at a time over the 8 rows
++template <int B> inline uint8_t ileave(const uint8_t * x, int k, int p) { return x[((p/B)*8 + k)*B + p%B]; }
++
++// 32 int8 values of row k, sub-block ib32, into block_q8_k_r8's order
++inline void store_r8(const int8_t * v, int k, int ib32, int8_t * qs) {
++    uint32_t * q8 = (uint32_t *)qs + k + 64*ib32;
++    for (int l = 0; l < 8; ++l) {
++        uint32_t u;
++        std::memcpy(&u, v + 4*l, 4);
++        q8[8*l] = u;
++    }
++}
++
++// 32 int8 values of row k, sub-block sb, in the order the i8mm kernels read: per sub-block, for
++// each 8 weights (kc) and each row pair (rp), 16 bytes: row 2*rp's 8 weights, then row 2*rp+1's
++inline void store_i8mm(const int8_t * v, int k, int sb, int8_t * qs) {
++    for (int kc = 0; kc < 4; ++kc) std::memcpy(qs + 256*sb + 64*kc + 16*(k/2) + 8*(k%2), v + 8*kc, 8);
++}
++
++template <bool I8> inline void store_q(const int8_t * v, int k, int sb, int8_t * qs) {
++    if constexpr (I8) store_i8mm(v, k, sb, qs); else store_r8(v, k, sb, qs);
++}
++
++template <int B, bool I8>
++void iqk_unpack_q5_k_x8(int n, const void * vx, void * vy) {
++    const int nb = n/QK_K;
++    const blk_q5_Kx8 * x = (const blk_q5_Kx8 *)vx;
++    block_q5k_u_r8 * y = (block_q5k_u_r8 *)vy;
++    int8_t q[QK_K];
++    for (int i = 0; i < nb; ++i) {
++        std::memcpy(y[i].d, x[i].d, sizeof(y[i].d));
++        std::memcpy(y[i].dmin, x[i].dmin, sizeof(y[i].dmin));
++        for (int k = 0; k < 8; ++k) {
++            for (int sb = 0; sb < 8; ++sb) {
++                const uint8_t * s = x[i].scales + (sb < 4 ? 12*sb : 48 + 12*(sb - 4));
++                if (k < 4) {
++                    y[i].sc[8*sb + k] = s[k] & 63;
++                    y[i].m [8*sb + k] = s[4 + k] & 63;
++                } else {
++                    const int j = k - 4;
++                    y[i].sc[8*sb + k] = (s[8 + j] & 15) | ((s[j]     >> 6) << 4);
++                    y[i].m [8*sb + k] = (s[8 + j] >> 4) | ((s[4 + j] >> 6) << 4);
++                }
++            }
++            for (int j = 0; j < 4; ++j) {
++                for (int l = 0; l < 32; ++l) {
++                    const uint8_t qs = ileave<B>(x[i].qs, k, 32*j + l);
++                    const uint8_t qh = ileave<B>(x[i].qh, k, l);
++                    q[64*j + l]      = (int8_t)((qs & 0xF) + (((qh >> (2*j))   & 1) << 4));
++                    q[64*j + 32 + l] = (int8_t)((qs >> 4)  + (((qh >> (2*j+1)) & 1) << 4));
++                }
++            }
++            for (int ib32 = 0; ib32 < 8; ++ib32) store_q<I8>(q + 32*ib32, k, ib32, y[i].qs);
++        }
++    }
++}
++
++template <int B, bool I8>
++void iqk_unpack_q6_k_x8(int n, const void * vx, void * vy) {
++    const int nb = n/QK_K;
++    const blk_q6_Kx8 * x = (const blk_q6_Kx8 *)vx;
++    block_q6k_u_r8 * y = (block_q6k_u_r8 *)vy;
++    int8_t q[QK_K];
++    for (int i = 0; i < nb; ++i) {
++        std::memcpy(y[i].d, x[i].d, sizeof(y[i].d));
++        std::memcpy(y[i].sc, x[i].scales, sizeof(y[i].sc));
++        for (int k = 0; k < 8; ++k) {
++            for (int h = 0; h < 2; ++h) {
++                for (int l = 0; l < 32; ++l) {
++                    const uint8_t ql0 = ileave<B>(x[i].ql, k, 64*h + l);
++                    const uint8_t ql1 = ileave<B>(x[i].ql, k, 64*h + 32 + l);
++                    const uint8_t qh  = ileave<B>(x[i].qh, k, 32*h + l);
++                    q[128*h + l]      = (int8_t)((ql0 & 0xF) | (((qh >> 0) & 3) << 4)) - 32;
++                    q[128*h + 32 + l] = (int8_t)((ql1 & 0xF) | (((qh >> 2) & 3) << 4)) - 32;
++                    q[128*h + 64 + l] = (int8_t)((ql0 >> 4)  | (((qh >> 4) & 3) << 4)) - 32;
++                    q[128*h + 96 + l] = (int8_t)((ql1 >> 4)  | (((qh >> 6) & 3) << 4)) - 32;
++                }
++            }
++            for (int ib32 = 0; ib32 < 8; ++ib32) store_q<I8>(q + 32*ib32, k, ib32, y[i].qs);
++        }
++    }
++}
++
++inline int32x4x2_t widen_u8(const uint8_t * v) {
++    const uint16x8_t w = vmovl_u8(vld1_u8(v));
++    return {vreinterpretq_s32_u32(vmovl_u16(vget_low_u16(w))), vreinterpretq_s32_u32(vmovl_u16(vget_high_u16(w)))};
++}
++inline int32x4x2_t widen_s8(const int8_t * v) {
++    const int16x8_t w = vmovl_s8(vld1_s8(v));
++    return {vmovl_s16(vget_low_s16(w)), vmovl_s16(vget_high_s16(w))};
++}
++
++template <int nrc_y>
++void mul_mat_q5k_u_r8_q8_k(int n, const void * vx, size_t bx, const DataInfo& info, int nrc_x) {
++    GGML_ASSERT(nrc_x%8 == 0);
++    Q8<nrc_y, block_q8_K> q8(info);
++    const int nbl = n / QK_K;
++    float32x4_t acc[2*nrc_y] = {};
++    for (int ix = 0; ix < nrc_x; ix += 8) {
++        const block_q5k_u_r8 * iq = (const block_q5k_u_r8 *)((const char *)vx + ix*bx);
++        for (int ibl = 0; ibl < nbl; ++ibl) {
++            int32x4_t sumi[2*nrc_y] = {}, summ[2*nrc_y] = {};
++            for (int sb = 0; sb < QK_K/32; ++sb) {
++                int32x4_t isum[2*nrc_y] = {};
++                for (int ib = 2*sb; ib < 2*sb + 2; ++ib) {
++                    const auto q1 = vld1q_s8_x4(iq[ibl].qs + 128*ib +  0);
++                    const auto q2 = vld1q_s8_x4(iq[ibl].qs + 128*ib + 64);
++                    for (int iy = 0; iy < nrc_y; ++iy) {
++                        const auto y = vld1q_s8(q8.y[iy][ibl].qs + 16*ib);
++                        isum[2*iy+0] = vdotq_laneq_s32(isum[2*iy+0], q1.val[0], y, 0);
++                        isum[2*iy+1] = vdotq_laneq_s32(isum[2*iy+1], q1.val[1], y, 0);
++                        isum[2*iy+0] = vdotq_laneq_s32(isum[2*iy+0], q1.val[2], y, 1);
++                        isum[2*iy+1] = vdotq_laneq_s32(isum[2*iy+1], q1.val[3], y, 1);
++                        isum[2*iy+0] = vdotq_laneq_s32(isum[2*iy+0], q2.val[0], y, 2);
++                        isum[2*iy+1] = vdotq_laneq_s32(isum[2*iy+1], q2.val[1], y, 2);
++                        isum[2*iy+0] = vdotq_laneq_s32(isum[2*iy+0], q2.val[2], y, 3);
++                        isum[2*iy+1] = vdotq_laneq_s32(isum[2*iy+1], q2.val[3], y, 3);
++                    }
++                }
++                const auto sc = widen_u8(iq[ibl].sc + 8*sb);
++                for (int iy = 0; iy < nrc_y; ++iy) {
++                    sumi[2*iy+0] = vmlaq_s32(sumi[2*iy+0], isum[2*iy+0], sc.val[0]);
++                    sumi[2*iy+1] = vmlaq_s32(sumi[2*iy+1], isum[2*iy+1], sc.val[1]);
++                }
++            }
++            // the mins once per block: sum over the 8 sub-blocks of m * (sum of their 32 activations)
++            for (int iy = 0; iy < nrc_y; ++iy) {
++                const int16x8_t b16 = vpaddq_s16(vld1q_s16(q8.y[iy][ibl].bsums), vld1q_s16(q8.y[iy][ibl].bsums + 8));
++                int16_t bs[8];
++                vst1q_s16(bs, b16);
++                for (int sb = 0; sb < QK_K/32; ++sb) {
++                    const auto mn = widen_u8(iq[ibl].m + 8*sb);
++                    summ[2*iy+0] = vmlaq_n_s32(summ[2*iy+0], mn.val[0], bs[sb]);
++                    summ[2*iy+1] = vmlaq_n_s32(summ[2*iy+1], mn.val[1], bs[sb]);
++                }
++            }
++            const auto d4l = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].d + 0));
++            const auto d4h = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].d + 4));
++            const auto m4l = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].dmin + 0));
++            const auto m4h = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].dmin + 4));
++            for (int iy = 0; iy < nrc_y; ++iy) {
++                const float d8 = q8.scale(iy, ibl);
++                acc[2*iy+0] = vfmaq_f32(acc[2*iy+0], vmulq_n_f32(d4l, d8), vcvtq_f32_s32(sumi[2*iy+0]));
++                acc[2*iy+1] = vfmaq_f32(acc[2*iy+1], vmulq_n_f32(d4h, d8), vcvtq_f32_s32(sumi[2*iy+1]));
++                acc[2*iy+0] = vfmsq_f32(acc[2*iy+0], vmulq_n_f32(m4l, d8), vcvtq_f32_s32(summ[2*iy+0]));
++                acc[2*iy+1] = vfmsq_f32(acc[2*iy+1], vmulq_n_f32(m4h, d8), vcvtq_f32_s32(summ[2*iy+1]));
++            }
++        }
++        for (int iy = 0; iy < nrc_y; ++iy) {
++            info.store(ix+0, iy, acc[2*iy+0]);
++            info.store(ix+4, iy, acc[2*iy+1]);
++            acc[2*iy+0] = acc[2*iy+1] = vdupq_n_f32(0.f);
++        }
++    }
++}
++
++template <int nrc_y>
++void mul_mat_q6k_u_r8_q8_k(int n, const void * vx, size_t bx, const DataInfo& info, int nrc_x) {
++    GGML_ASSERT(nrc_x%8 == 0);
++    Q8<nrc_y, block_q8_K> q8(info);
++    const int nbl = n / QK_K;
++    float32x4_t acc[2*nrc_y] = {};
++    for (int ix = 0; ix < nrc_x; ix += 8) {
++        const block_q6k_u_r8 * iq = (const block_q6k_u_r8 *)((const char *)vx + ix*bx);
++        for (int ibl = 0; ibl < nbl; ++ibl) {
++            int32x4_t sumi[2*nrc_y] = {};
++            for (int ib = 0; ib < QK_K/16; ++ib) {
++                const auto q1 = vld1q_s8_x4(iq[ibl].qs + 128*ib +  0);
++                const auto q2 = vld1q_s8_x4(iq[ibl].qs + 128*ib + 64);
++                const auto sc = widen_s8(iq[ibl].sc + 8*ib);
++                for (int iy = 0; iy < nrc_y; ++iy) {
++                    const auto y = vld1q_s8(q8.y[iy][ibl].qs + 16*ib);
++                    int32x4_t isum0 = vdotq_laneq_s32(vdupq_n_s32(0), q1.val[0], y, 0);
++                    int32x4_t isum1 = vdotq_laneq_s32(vdupq_n_s32(0), q1.val[1], y, 0);
++                    isum0 = vdotq_laneq_s32(isum0, q1.val[2], y, 1);
++                    isum1 = vdotq_laneq_s32(isum1, q1.val[3], y, 1);
++                    isum0 = vdotq_laneq_s32(isum0, q2.val[0], y, 2);
++                    isum1 = vdotq_laneq_s32(isum1, q2.val[1], y, 2);
++                    isum0 = vdotq_laneq_s32(isum0, q2.val[2], y, 3);
++                    isum1 = vdotq_laneq_s32(isum1, q2.val[3], y, 3);
++                    sumi[2*iy+0] = vmlaq_s32(sumi[2*iy+0], isum0, sc.val[0]);
++                    sumi[2*iy+1] = vmlaq_s32(sumi[2*iy+1], isum1, sc.val[1]);
++                }
++            }
++            const auto d4l = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].d + 0));
++            const auto d4h = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].d + 4));
++            for (int iy = 0; iy < nrc_y; ++iy) {
++                const float d8 = q8.scale(iy, ibl);
++                acc[2*iy+0] = vfmaq_f32(acc[2*iy+0], vmulq_n_f32(d4l, d8), vcvtq_f32_s32(sumi[2*iy+0]));
++                acc[2*iy+1] = vfmaq_f32(acc[2*iy+1], vmulq_n_f32(d4h, d8), vcvtq_f32_s32(sumi[2*iy+1]));
++            }
++        }
++        for (int iy = 0; iy < nrc_y; ++iy) {
++            info.store(ix+0, iy, acc[2*iy+0]);
++            info.store(ix+4, iy, acc[2*iy+1]);
++            acc[2*iy+0] = acc[2*iy+1] = vdupq_n_f32(0.f);
++        }
++    }
++}
++
++// ---- the same products with SMMLA (i8mm): a 2x8 block of weights (two rows) times an 8x2 block of
++//      activations (two tokens) per instruction, twice the multiply-adds of SDOT. Compiled for i8mm
++//      here only; off unless GGML_IQK_DENSE_I8MM=1 and the CPU has it (see Config).
++
++#define IQK_I8MM __attribute__((target("i8mm")))
++
++// [x0, x0, x1, x1] for the row pairs (0,1), (2,3) of v
++IQK_I8MM inline int32x4_t pair_lo(int32x4_t v) { return vzip1q_s32(v, v); }
++IQK_I8MM inline int32x4_t pair_hi(int32x4_t v) { return vzip2q_s32(v, v); }
++
++// activations of tokens t0 and t1, weights 32*sb + 8*kc ... + 7: [t0's 8, t1's 8] for kc = 0..3
++IQK_I8MM inline void load_pair(const block_q8_K * y0, const block_q8_K * y1, int sb, int8x16_t * b) {
++    const auto a0 = vreinterpretq_s64_s8(vld1q_s8(y0->qs + 32*sb)), a1 = vreinterpretq_s64_s8(vld1q_s8(y0->qs + 32*sb + 16));
++    const auto c0 = vreinterpretq_s64_s8(vld1q_s8(y1->qs + 32*sb)), c1 = vreinterpretq_s64_s8(vld1q_s8(y1->qs + 32*sb + 16));
++    b[0] = vreinterpretq_s8_s64(vzip1q_s64(a0, c0));
++    b[1] = vreinterpretq_s8_s64(vzip2q_s64(a0, c0));
++    b[2] = vreinterpretq_s8_s64(vzip1q_s64(a1, c1));
++    b[3] = vreinterpretq_s8_s64(vzip2q_s64(a1, c1));
++}
++
++// the 8 rows' results for tokens t0 and t1 from the 4 row-pair accumulators [r0t0, r0t1, r1t0, r1t1]
++IQK_I8MM inline void store_pairs(const DataInfo & info, int ix, int t0, bool has_t1, const float32x4_t * acc) {
++    info.store(ix+0, t0, vuzp1q_f32(acc[0], acc[1]));
++    info.store(ix+4, t0, vuzp1q_f32(acc[2], acc[3]));
++    if (has_t1) {
++        info.store(ix+0, t0 + 1, vuzp2q_f32(acc[0], acc[1]));
++        info.store(ix+4, t0 + 1, vuzp2q_f32(acc[2], acc[3]));
++    }
++}
++
++template <int nrc_y>
++IQK_I8MM void mul_mat_q5k_u_r8_q8_k_i8mm(int n, const void * vx, size_t bx, const DataInfo& info, int nrc_x) {
++    GGML_ASSERT(nrc_x%8 == 0);
++    Q8<nrc_y, block_q8_K> q8(info);
++    constexpr int np = (nrc_y + 1)/2;   // token pairs; an odd last token is paired with itself
++    const int nbl = n / QK_K;
++    for (int ix = 0; ix < nrc_x; ix += 8) {
++        const block_q5k_u_r8 * iq = (const block_q5k_u_r8 *)((const char *)vx + ix*bx);
++        float32x4_t acc[4*np] = {};
++        for (int ibl = 0; ibl < nbl; ++ibl) {
++            int32x4_t sumi[4*np] = {};
++            for (int sb = 0; sb < QK_K/32; ++sb) {
++                int8x16_t w[16];
++                for (int j = 0; j < 16; ++j) w[j] = vld1q_s8(iq[ibl].qs + 256*sb + 16*j);
++                const auto sc = widen_u8(iq[ibl].sc + 8*sb);
++                const int32x4_t scp[4] = {pair_lo(sc.val[0]), pair_hi(sc.val[0]), pair_lo(sc.val[1]), pair_hi(sc.val[1])};
++                for (int p = 0; p < np; ++p) {
++                    int8x16_t b[4];
++                    load_pair(q8.y[2*p] + ibl, q8.y[std::min(2*p + 1, nrc_y - 1)] + ibl, sb, b);
++                    for (int rp = 0; rp < 4; ++rp) {
++                        int32x4_t isum = vmmlaq_s32(vdupq_n_s32(0), w[rp], b[0]);
++                        isum = vmmlaq_s32(isum, w[4 + rp],  b[1]);
++                        isum = vmmlaq_s32(isum, w[8 + rp],  b[2]);
++                        isum = vmmlaq_s32(isum, w[12 + rp], b[3]);
++                        sumi[4*p + rp] = vmlaq_s32(sumi[4*p + rp], isum, scp[rp]);
++                    }
++                }
++            }
++            const auto d4l = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].d + 0));
++            const auto d4h = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].d + 4));
++            const auto m4l = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].dmin + 0));
++            const auto m4h = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].dmin + 4));
++            const float32x4_t dp[4] = {vzip1q_f32(d4l, d4l), vzip2q_f32(d4l, d4l), vzip1q_f32(d4h, d4h), vzip2q_f32(d4h, d4h)};
++            const float32x4_t mp[4] = {vzip1q_f32(m4l, m4l), vzip2q_f32(m4l, m4l), vzip1q_f32(m4h, m4h), vzip2q_f32(m4h, m4h)};
++            for (int p = 0; p < np; ++p) {
++                const int t0 = 2*p, t1 = std::min(2*p + 1, nrc_y - 1);
++                // the mins: sum over the sub-blocks of m * (sum of their 32 activations), per token
++                const int16x8_t bs0 = vpaddq_s16(vld1q_s16(q8.y[t0][ibl].bsums), vld1q_s16(q8.y[t0][ibl].bsums + 8));
++                const int16x8_t bs1 = vpaddq_s16(vld1q_s16(q8.y[t1][ibl].bsums), vld1q_s16(q8.y[t1][ibl].bsums + 8));
++                int16_t b0[8], b1[8];
++                vst1q_s16(b0, bs0);
++                vst1q_s16(b1, bs1);
++                int32x4_t summ[4] = {};
++                for (int sb = 0; sb < QK_K/32; ++sb) {
++                    const auto mn = widen_u8(iq[ibl].m + 8*sb);
++                    const int32x4_t bv = {b0[sb], b1[sb], b0[sb], b1[sb]};
++                    summ[0] = vmlaq_s32(summ[0], pair_lo(mn.val[0]), bv);
++                    summ[1] = vmlaq_s32(summ[1], pair_hi(mn.val[0]), bv);
++                    summ[2] = vmlaq_s32(summ[2], pair_lo(mn.val[1]), bv);
++                    summ[3] = vmlaq_s32(summ[3], pair_hi(mn.val[1]), bv);
++                }
++                const float32x4_t d8 = {q8.scale(t0, ibl), q8.scale(t1, ibl), q8.scale(t0, ibl), q8.scale(t1, ibl)};
++                for (int rp = 0; rp < 4; ++rp) {
++                    acc[4*p + rp] = vfmaq_f32(acc[4*p + rp], vmulq_f32(dp[rp], d8), vcvtq_f32_s32(sumi[4*p + rp]));
++                    acc[4*p + rp] = vfmsq_f32(acc[4*p + rp], vmulq_f32(mp[rp], d8), vcvtq_f32_s32(summ[rp]));
++                }
++            }
++        }
++        for (int p = 0; p < np; ++p) store_pairs(info, ix, 2*p, 2*p + 1 < nrc_y, acc + 4*p);
++    }
++}
++
++template <int nrc_y>
++IQK_I8MM void mul_mat_q6k_u_r8_q8_k_i8mm(int n, const void * vx, size_t bx, const DataInfo& info, int nrc_x) {
++    GGML_ASSERT(nrc_x%8 == 0);
++    Q8<nrc_y, block_q8_K> q8(info);
++    constexpr int np = (nrc_y + 1)/2;
++    const int nbl = n / QK_K;
++    for (int ix = 0; ix < nrc_x; ix += 8) {
++        const block_q6k_u_r8 * iq = (const block_q6k_u_r8 *)((const char *)vx + ix*bx);
++        float32x4_t acc[4*np] = {};
++        for (int ibl = 0; ibl < nbl; ++ibl) {
++            int32x4_t sumi[4*np] = {};
++            for (int sb = 0; sb < QK_K/32; ++sb) {
++                int8x16_t w[16];
++                for (int j = 0; j < 16; ++j) w[j] = vld1q_s8(iq[ibl].qs + 256*sb + 16*j);
++                // the 16-weight groups 2*sb (kc 0, 1) and 2*sb + 1 (kc 2, 3) have their own scales
++                const auto sa = widen_s8(iq[ibl].sc + 8*(2*sb));
++                const auto sz = widen_s8(iq[ibl].sc + 8*(2*sb + 1));
++                const int32x4_t spa[4] = {pair_lo(sa.val[0]), pair_hi(sa.val[0]), pair_lo(sa.val[1]), pair_hi(sa.val[1])};
++                const int32x4_t spz[4] = {pair_lo(sz.val[0]), pair_hi(sz.val[0]), pair_lo(sz.val[1]), pair_hi(sz.val[1])};
++                for (int p = 0; p < np; ++p) {
++                    int8x16_t b[4];
++                    load_pair(q8.y[2*p] + ibl, q8.y[std::min(2*p + 1, nrc_y - 1)] + ibl, sb, b);
++                    for (int rp = 0; rp < 4; ++rp) {
++                        int32x4_t ia = vmmlaq_s32(vdupq_n_s32(0), w[rp], b[0]);
++                        ia = vmmlaq_s32(ia, w[4 + rp], b[1]);
++                        int32x4_t iz = vmmlaq_s32(vdupq_n_s32(0), w[8 + rp], b[2]);
++                        iz = vmmlaq_s32(iz, w[12 + rp], b[3]);
++                        sumi[4*p + rp] = vmlaq_s32(sumi[4*p + rp], ia, spa[rp]);
++                        sumi[4*p + rp] = vmlaq_s32(sumi[4*p + rp], iz, spz[rp]);
++                    }
++                }
++            }
++            const auto d4l = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].d + 0));
++            const auto d4h = vcvt_f32_f16(vld1_f16((const float16_t *)iq[ibl].d + 4));
++            const float32x4_t dp[4] = {vzip1q_f32(d4l, d4l), vzip2q_f32(d4l, d4l), vzip1q_f32(d4h, d4h), vzip2q_f32(d4h, d4h)};
++            for (int p = 0; p < np; ++p) {
++                const int t0 = 2*p, t1 = std::min(2*p + 1, nrc_y - 1);
++                const float32x4_t d8 = {q8.scale(t0, ibl), q8.scale(t1, ibl), q8.scale(t0, ibl), q8.scale(t1, ibl)};
++                for (int rp = 0; rp < 4; ++rp) {
++                    acc[4*p + rp] = vfmaq_f32(acc[4*p + rp], vmulq_f32(dp[rp], d8), vcvtq_f32_s32(sumi[4*p + rp]));
++                }
++            }
++        }
++        for (int p = 0; p < np; ++p) store_pairs(info, ix, 2*p, 2*p + 1 < nrc_y, acc + 4*p);
++    }
++}
++
++bool cpu_has_i8mm() {
++#if defined(__linux__)
++    return (getauxval(AT_HWCAP2) & (1UL << 13)) != 0;   // HWCAP2_I8MM
++#elif defined(__APPLE__)
++    int v = 0;
++    size_t sz = sizeof(v);
++    return sysctlbyname("hw.optional.arm.FEAT_I8MM", &v, &sz, nullptr, 0) == 0 && v != 0;
++#else
++    return false;
++#endif
++}
++
++// one group of 8 rows (n/QK_K repacked blocks) unpacked, in the order the chosen kernel reads
++inline void iqk_unpack_dense_x8(int type, int interleave, bool i8mm, int n, const void * vx, void * vy) {
++    if (type == GGML_TYPE_Q5_K) {
++        if (i8mm) { if (interleave == 4) iqk_unpack_q5_k_x8<4, true >(n, vx, vy); else iqk_unpack_q5_k_x8<8, true >(n, vx, vy); }
++        else      { if (interleave == 4) iqk_unpack_q5_k_x8<4, false>(n, vx, vy); else iqk_unpack_q5_k_x8<8, false>(n, vx, vy); }
++    } else {
++        if (i8mm) { if (interleave == 4) iqk_unpack_q6_k_x8<4, true >(n, vx, vy); else iqk_unpack_q6_k_x8<8, true >(n, vx, vy); }
++        else      { if (interleave == 4) iqk_unpack_q6_k_x8<4, false>(n, vx, vy); else iqk_unpack_q6_k_x8<8, false>(n, vx, vy); }
++    }
++}
++
+ // ---- iqk_mul_mat.cpp: MulMat::mul_mat_NxM and iqk_mul_mat_moe
+ 
+ struct MulMat {
+@@ -595,7 +1012,18 @@ struct Config {
+     int  min_rows         = 1;  // generation too: 6.9 against 6.5 tok/s on a Pixel 8 Pro
+     int  convert_min_rows = 32; // ik converts to Q8_K_R8 from 32 tokens (MulMat::is_dequant_better, aarch64)
+     int  chunk_rows       = 32; // rows per work item, a multiple of 8 (the Q8_K_R8 interleave)
++    bool dense            = true; // repacked Q5_K/Q6_K dense weights through Q8_K_R8 for prompts
++    int  dense_min_rows   = 32;   // from this many tokens
++    int  dense_ny         = 4;    // tokens per kernel call (fewer: less register pressure, more weight reloads)
++    // the SMMLA kernels, only with GGML_IQK_DENSE_I8MM=1 and a CPU that has i8mm: on a Pixel 8 Pro
++    // (Cortex-X3/A715) they read a 1,216-token prompt no faster than the SDOT ones (31.0/32.1 s
++    // against 31.3 s), SMMLA's twice the multiply-adds per instruction at half the rate
++    bool dense_i8mm       = false;
+     Config() {
++        if (const char * e = std::getenv("GGML_IQK_DENSE_I8MM"))           dense_i8mm       = std::atoi(e) != 0 && cpu_has_i8mm();
++        if (const char * e = std::getenv("GGML_IQK_DENSE_NY"))             dense_ny         = std::min(8, std::max(1, std::atoi(e)));
++        if (const char * e = std::getenv("GGML_IQK_DENSE"))                dense            = std::atoi(e) != 0;
++        if (const char * e = std::getenv("GGML_IQK_DENSE_MIN_ROWS"))       dense_min_rows   = std::max(1, std::atoi(e));
+         if (const char * e = std::getenv("GGML_IQK_MOE"))                  enabled          = std::atoi(e) != 0;
+         if (const char * e = std::getenv("GGML_IQK_MOE_MIN_ROWS"))         min_rows         = std::max(1, std::atoi(e));
+         if (const char * e = std::getenv("GGML_IQK_MOE_CONVERT_MIN_ROWS")) convert_min_rows = std::max(1, std::atoi(e));
+@@ -665,8 +1093,57 @@ extern "C" void ggml_iqk_moe_mul_mat(int type, int64_t row_start, int64_t row_en
+     mm.mul_mat_NxM(ne00, (const char *)A + strideA*row_start, strideA, info, nrc_x, Ny);
+ }
+ 
++extern "C" int ggml_iqk_dense_ok(int type, int interleave, int64_t ne00, int64_t nrows, int64_t n_tokens) {
++    const Config & c = config();
++    if (!c.dense || n_tokens < c.dense_min_rows || ne00 % QK_K != 0 || nrows % 8 != 0) return 0;
++    if (type != GGML_TYPE_Q5_K && type != GGML_TYPE_Q6_K) return 0;
++    return interleave == 4 || interleave == 8;
++}
++
++extern "C" void ggml_iqk_dense_mul_mat(int type, int interleave, int64_t row_start, int64_t row_end, int64_t ne00,
++                                       const void * A, const void * B, size_t strideB,
++                                       float * C, size_t nb1, int64_t Ny) {
++    const int nrc_x = (int)(row_end - row_start);
++    if (nrc_x <= 0) return;
++    GGML_ASSERT(row_start % 8 == 0 && nrc_x % 8 == 0);
++    MulMat mm;
++    const bool i8mm = config().dense_i8mm;
++    if (type == GGML_TYPE_Q5_K) {
++        if (i8mm) { IQK_SET_MUL_MAT_FUNCTIONS(mul_mat_q5k_u_r8_q8_k_i8mm, mm.funcs) }
++        else      { IQK_SET_MUL_MAT_FUNCTIONS(mul_mat_q5k_u_r8_q8_k, mm.funcs) }
++    } else {
++        if (i8mm) { IQK_SET_MUL_MAT_FUNCTIONS(mul_mat_q6k_u_r8_q8_k_i8mm, mm.funcs) }
++        else      { IQK_SET_MUL_MAT_FUNCTIONS(mul_mat_q6k_u_r8_q8_k, mm.funcs) }
++    }
++    for (int i = config().dense_ny; i < IQK_MAX_NY; ++i) mm.funcs[i] = nullptr;
++    DataInfo info{C + row_start, (const char *)B, nb1/sizeof(float), strideB, 0, (int)Ny, nullptr, 0};
++    // rows unpacked 32 at a time (4 groups of 8), then multiplied by all the tokens
++    constexpr int k_x_step = 32;
++    const size_t row_size_qx = dense_u_row_size(type, (int)ne00);
++    const size_t group_size = dense_x8_group_size(type, (int)ne00);
++    auto & f = thread_local_work_buffer();
++    for (int ix = 0; ix < nrc_x; ix += k_x_step) {
++        auto this_info = info;
++        this_info.s += ix;
++        const int this_nrc_x = ix + k_x_step <= nrc_x ? k_x_step : nrc_x - ix;
++        if (f.size() < row_size_qx*this_nrc_x) f.resize(row_size_qx*this_nrc_x);
++        for (int g = 0; g < this_nrc_x; g += 8) {
++            const char * a = (const char *)A + ((row_start + ix + g)/8)*group_size;
++            iqk_unpack_dense_x8(type, interleave, i8mm, (int)ne00, a, f.data() + g*row_size_qx);
++        }
++        mm.mul_mat_NxM((int)ne00, f.data(), row_size_qx, this_info, this_nrc_x, (int)Ny);
++    }
++}
++
+ #else
+ 
++extern "C" int ggml_iqk_dense_ok(int, int, int64_t, int64_t, int64_t) { return 0; }
++
++extern "C" void ggml_iqk_dense_mul_mat(int, int, int64_t, int64_t, int64_t, const void *, const void *, size_t,
++                                       float *, size_t, int64_t) {
++    GGML_ABORT("iqk-moe: not built for this target");
++}
++
+ extern "C" int ggml_iqk_moe_chunk_rows(int, int64_t, int64_t, int64_t) { return 0; }
+ 
+ extern "C" void ggml_iqk_moe_mul_mat(int, int64_t, int64_t, int64_t, int64_t, const void *, size_t, const void *, size_t,
+diff --git a/ggml/src/ggml-cpu/iqk-moe.h b/ggml/src/ggml-cpu/iqk-moe.h
+index 6b1087c..9af4c52 100644
+--- a/ggml/src/ggml-cpu/iqk-moe.h
++++ b/ggml/src/ggml-cpu/iqk-moe.h
+@@ -29,6 +29,20 @@ void ggml_iqk_moe_mul_mat(int type, int64_t row_start, int64_t row_end, int64_t
+                           float * c, size_t nb1, size_t nb2,
+                           const void * row_mapping, int64_t n_tokens);
+ 
++// Dense weights llama.cpp has repacked (repack.cpp, 8 rows interleaved in blocks of interleave
++// bytes): nonzero when ggml_iqk_dense_mul_mat takes a Q5_K or Q6_K tensor with this row length and
++// row count for a prompt of n_tokens. Off when GGML_IQK_DENSE=0; prompts of fewer than
++// GGML_IQK_DENSE_MIN_ROWS tokens (default 32) stay on llama.cpp's kernels.
++int ggml_iqk_dense_ok(int type, int interleave, int64_t ne00, int64_t nrows, int64_t n_tokens);
++
++// Rows [row_start, row_end) (multiples of 8) of the repacked tensor a times n_tokens Q8_K
++// activation rows (b, stride_b bytes apart), into c (token t's row at c + t*nb1 bytes). Each 8-row
++// group is converted to ik's Q8_K_R8 (Q5_K through floats, Q6_K as integers times scales) and
++// multiplied with vdotq_laneq_s32.
++void ggml_iqk_dense_mul_mat(int type, int interleave, int64_t row_start, int64_t row_end, int64_t ne00,
++                            const void * a, const void * b, size_t stride_b,
++                            float * c, size_t nb1, int64_t n_tokens);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/ggml/src/ggml-cpu/repack.cpp b/ggml/src/ggml-cpu/repack.cpp
+index 9689ca3..02e8431 100644
+--- a/ggml/src/ggml-cpu/repack.cpp
++++ b/ggml/src/ggml-cpu/repack.cpp
+@@ -17,6 +17,9 @@
+ #include <cstdio>  // for GGML_ASSERT
+ 
+ #include "repack.h"
++#include "iqk-moe.h"
++
++#include <type_traits>
+ 
+ #if defined(__GNUC__)
+ #pragma GCC diagnostic ignored "-Woverlength-strings"
+@@ -4290,10 +4293,26 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS, ggml_type PAR
+ 
+         const ggml_from_float_t from_float = ggml_get_type_traits_cpu(PARAM_TYPE)->from_float;
+ 
++        // AndroidLM: a prompt's repacked Q5_K/Q6_K weights go through ik's Q8_K_R8 kernel
++        // (iqk-moe.cpp), which wants plain Q8_K activation rows
++        int iqk_dense_type = -1;
++        if constexpr ((std::is_same_v<BLOC_TYPE, block_q5_K> || std::is_same_v<BLOC_TYPE, block_q6_K>) &&
++                      NB_COLS == 8 && PARAM_TYPE == GGML_TYPE_Q8_K) {
++            const int type = std::is_same_v<BLOC_TYPE, block_q5_K> ? GGML_TYPE_Q5_K : GGML_TYPE_Q6_K;
++            if (ne12 == 1 && ggml_iqk_dense_ok(type, INTER_SIZE, ne00, ne01, ne11)) {
++                iqk_dense_type = type;
++            }
++        }
++        if (iqk_dense_type >= 0) {
++            for (int64_t i11 = ith; i11 < ne11; i11 += nth) {
++                from_float((float *) ((char *) src1->data + i11 * nb11), (void *) (wdata + i11 * nbw1), ne10);
++            }
++        }
++
+         // INFO: Quantization is done in planes to avoid extra complexity in chunking.
+         // Flattening dimensions not multiple of INTER_SIZE would require extra handling depending on how
+         // the planes are broadcast.
+-        for (int64_t i12 = 0; i12 < ne12; i12++) {
++        for (int64_t i12 = 0; i12 < ne12 && iqk_dense_type < 0; i12++) {
+             char * data_ptr  = (char *) src1->data + i12 * nb12;
+             char * wdata_ptr = wdata + i12 * nbw2;
+ 
+@@ -4377,7 +4396,12 @@ template <typename BLOC_TYPE, int64_t INTER_SIZE, int64_t NB_COLS, ggml_type PAR
+                 continue;
+             }
+ 
+-            forward_mul_mat_one_chunk(params, dst, src0_start, src0_end, src1_start, src1_end);
++            if (iqk_dense_type >= 0) {
++                ggml_iqk_dense_mul_mat(iqk_dense_type, INTER_SIZE, src0_start, src0_end, ne00, src0->data,
++                                       wdata, nbw1, (float *) dst->data, nb1, ne11);
++            } else {
++                forward_mul_mat_one_chunk(params, dst, src0_start, src0_end, src1_start, src1_end);
++            }
+ 
+             current_chunk = ggml_threadpool_chunk_add(params->threadpool, 1);
+         }
+diff --git a/ggml/src/ggml-cpu/test-iqk-dense.cpp b/ggml/src/ggml-cpu/test-iqk-dense.cpp
+new file mode 100644
+index 0000000..b627101
+--- /dev/null
++++ b/ggml/src/ggml-cpu/test-iqk-dense.cpp
+@@ -0,0 +1,217 @@
++// Accuracy of ggml_iqk_dense_mul_mat (iqk-moe.cpp) on repacked Q5_K and Q6_K weights, against a
++// double-precision reference computed from the dequantized weights and the Q8_K activations, next
++// to ggml's own vec_dot on the same data. The weights are random Q5_K / Q6_K rows, repacked here
++// with a verbatim copy of repack.cpp's make_block_q5_Kx8 / make_block_q6_Kx8 (static there).
++// Not part of the CMake build; on an aarch64 machine with dotprod, after a static build in build/:
++//   c++ -O2 -std=c++17 -mcpu=native -Iggml/include -Iggml/src -Iggml/src/ggml-cpu \
++//     ggml/src/ggml-cpu/test-iqk-dense.cpp build/ggml/src/libggml.a build/ggml/src/libggml-cpu.a \
++//     build/ggml/src/libggml-base.a -lpthread -lm -o test-iqk-dense && ./test-iqk-dense
++#define GGML_COMMON_DECL_CPP
++#include "ggml-common.h"
++#include "ggml.h"
++#include "ggml-cpu.h"
++#include "iqk-moe.h"
++
++#include <cmath>
++#include <cstdio>
++#include <cstring>
++#include <random>
++#include <vector>
++
++struct block_q5_Kx8 {
++    ggml_half d[8];
++    ggml_half dmin[8];
++    uint8_t   scales[96];
++    uint8_t   qh[QK_K * 8 / 8];
++    uint8_t   qs[QK_K * 8 / 2];
++};
++struct block_q6_Kx8 {
++    ggml_half d[8];
++    int8_t    scales[QK_K / 16 * 8];
++    uint8_t   ql[QK_K / 2 * 8];
++    uint8_t   qh[QK_K / 4 * 8];
++};
++
++// ---- repack.cpp, verbatim
++static block_q5_Kx8 make_block_q5_Kx8(block_q5_K * in, unsigned int blck_size_interleave) {
++    block_q5_Kx8 out;
++    for (int i = 0; i < 8; i++) out.d[i] = in[i].GGML_COMMON_AGGR_U.GGML_COMMON_AGGR_S.d;
++    for (int i = 0; i < 8; i++) out.dmin[i] = in[i].GGML_COMMON_AGGR_U.GGML_COMMON_AGGR_S.dmin;
++    const int end = QK_K * 4 / blck_size_interleave;
++    for (int i = 0; i < end; ++i) {
++        int src_id = i % 8, src_offset = (i / 8) * blck_size_interleave, dst_offset = i * blck_size_interleave;
++        memcpy(&out.qs[dst_offset], &in[src_id].qs[src_offset], blck_size_interleave);
++    }
++    for (int i = 0; i < end / 4; ++i) {
++        int src_id = i % 8, src_offset = (i / 8) * blck_size_interleave, dst_offset = i * blck_size_interleave;
++        memcpy(&out.qh[dst_offset], &in[src_id].qh[src_offset], blck_size_interleave);
++    }
++    uint8_t s[8], m[8];
++    for (int i = 0; i < 4; i++) {
++        for (int j = 0; j < 8; j++) { s[j] = in[j].scales[i] & 63; m[j] = in[j].scales[i + 4] & 63; }
++        out.scales[i * 12]      = (s[0] & 63) + ((s[4] & 48) << 2);
++        out.scales[i * 12 + 1]  = (s[1] & 63) + ((s[5] & 48) << 2);
++        out.scales[i * 12 + 2]  = (s[2] & 63) + ((s[6] & 48) << 2);
++        out.scales[i * 12 + 3]  = (s[3] & 63) + ((s[7] & 48) << 2);
++        out.scales[i * 12 + 4]  = (m[0] & 63) + ((m[4] & 48) << 2);
++        out.scales[i * 12 + 5]  = (m[1] & 63) + ((m[5] & 48) << 2);
++        out.scales[i * 12 + 6]  = (m[2] & 63) + ((m[6] & 48) << 2);
++        out.scales[i * 12 + 7]  = (m[3] & 63) + ((m[7] & 48) << 2);
++        out.scales[i * 12 + 8]  = (s[4] & 15) + ((m[4] & 15) << 4);
++        out.scales[i * 12 + 9]  = (s[5] & 15) + ((m[5] & 15) << 4);
++        out.scales[i * 12 + 10] = (s[6] & 15) + ((m[6] & 15) << 4);
++        out.scales[i * 12 + 11] = (s[7] & 15) + ((m[7] & 15) << 4);
++    }
++    for (int i = 0; i < 4; i++) {
++        for (int j = 0; j < 8; j++) {
++            s[j] = ((in[j].scales[i] & 192) >> 2) | (in[j].scales[i + 8] & 15);
++            m[j] = ((in[j].scales[i + 4] & 192) >> 2) | ((in[j].scales[i + 8] & 240) >> 4);
++        }
++        out.scales[i * 12 + 48] = (s[0] & 63) + ((s[4] & 48) << 2);
++        out.scales[i * 12 + 49] = (s[1] & 63) + ((s[5] & 48) << 2);
++        out.scales[i * 12 + 50] = (s[2] & 63) + ((s[6] & 48) << 2);
++        out.scales[i * 12 + 51] = (s[3] & 63) + ((s[7] & 48) << 2);
++        out.scales[i * 12 + 52] = (m[0] & 63) + ((m[4] & 48) << 2);
++        out.scales[i * 12 + 53] = (m[1] & 63) + ((m[5] & 48) << 2);
++        out.scales[i * 12 + 54] = (m[2] & 63) + ((m[6] & 48) << 2);
++        out.scales[i * 12 + 55] = (m[3] & 63) + ((m[7] & 48) << 2);
++        out.scales[i * 12 + 56] = (s[4] & 15) + ((m[4] & 15) << 4);
++        out.scales[i * 12 + 57] = (s[5] & 15) + ((m[5] & 15) << 4);
++        out.scales[i * 12 + 58] = (s[6] & 15) + ((m[6] & 15) << 4);
++        out.scales[i * 12 + 59] = (s[7] & 15) + ((m[7] & 15) << 4);
++    }
++    return out;
++}
++
++static block_q6_Kx8 make_block_q6_Kx8(block_q6_K * in, unsigned int blck_size_interleave) {
++    block_q6_Kx8 out;
++    for (int i = 0; i < 8; i++) out.d[i] = in[i].d;
++    const int end_ls = QK_K * 4 / blck_size_interleave;
++    for (int i = 0; i < end_ls; ++i) {
++        int src_id = i % 8, src_offset = (i / 8) * blck_size_interleave, dst_offset = i * blck_size_interleave;
++        memcpy(&out.ql[dst_offset], &in[src_id].ql[src_offset], blck_size_interleave);
++    }
++    const int end_hs = end_ls / 2;
++    for (int i = 0; i < end_hs; ++i) {
++        int src_id = i % 8, src_offset = (i / 8) * blck_size_interleave, dst_offset = i * blck_size_interleave;
++        memcpy(&out.qh[dst_offset], &in[src_id].qh[src_offset], blck_size_interleave);
++    }
++    for (int i = 0; i < 8; i++) for (int j = 0; j < QK_K / 16; j++) out.scales[j * 8 + i] = in[i].scales[j];
++    return out;
++}
++// ----
++
++int main() {
++    setvbuf(stdout, nullptr, _IONBF, 0);
++    ggml_cpu_init();
++    std::mt19937 rng(7);
++    std::normal_distribution<float> nd(0.f, 1.f);
++    std::uniform_int_distribution<int> byte(0, 255);
++    int fails = 0;
++    for (int type : {GGML_TYPE_Q5_K, GGML_TYPE_Q6_K}) {
++        const auto * tt = ggml_get_type_traits((ggml_type) type);
++        const auto * tc = ggml_get_type_traits_cpu((ggml_type) type);
++        const auto * q8 = ggml_get_type_traits_cpu(GGML_TYPE_Q8_K);
++        for (int interleave : {4, 8}) {
++            for (int ne00 : {512, 2048}) {
++                const int Nx = 64, nb = ne00 / QK_K;
++                const size_t ra = ggml_row_size((ggml_type) type, ne00);
++                std::vector<uint8_t> A(Nx * ra);
++                for (auto & b : A) b = byte(rng);
++                for (int r = 0; r < Nx; ++r) {
++                    for (int ib = 0; ib < nb; ++ib) {
++                        uint8_t * blk = A.data() + r * ra + ib * ggml_type_size((ggml_type) type);
++                        ggml_half d = ggml_fp32_to_fp16(0.0005f + 0.002f * std::abs(nd(rng)));
++                        if (type == GGML_TYPE_Q5_K) {
++                            auto * x = (block_q5_K *) blk;
++                            x->GGML_COMMON_AGGR_U.GGML_COMMON_AGGR_S.d = d;
++                            x->GGML_COMMON_AGGR_U.GGML_COMMON_AGGR_S.dmin = ggml_fp32_to_fp16(0.0005f + 0.002f * std::abs(nd(rng)));
++                        } else {
++                            auto * x = (block_q6_K *) blk;
++                            x->d = d;
++                            for (auto & s : x->scales) s = (int8_t) (byte(rng) % 128 - 64);
++                        }
++                    }
++                }
++                std::vector<float> Af(Nx * ne00);
++                for (int r = 0; r < Nx; ++r) tt->to_float(A.data() + r * ra, Af.data() + r * ne00, ne00);
++
++                // repack: groups of 8 rows, each nb blocks
++                std::vector<uint8_t> R;
++                if (type == GGML_TYPE_Q5_K) {
++                    R.resize((Nx / 8) * nb * sizeof(block_q5_Kx8));
++                    auto * dst = (block_q5_Kx8 *) R.data();
++                    for (int g = 0; g < Nx / 8; ++g)
++                        for (int x = 0; x < nb; ++x) {
++                            block_q5_K tmp[8];
++                            for (int i = 0; i < 8; ++i) tmp[i] = ((const block_q5_K *) (A.data() + (8 * g + i) * ra))[x];
++                            *dst++ = make_block_q5_Kx8(tmp, interleave);
++                        }
++                } else {
++                    R.resize((Nx / 8) * nb * sizeof(block_q6_Kx8));
++                    auto * dst = (block_q6_Kx8 *) R.data();
++                    for (int g = 0; g < Nx / 8; ++g)
++                        for (int x = 0; x < nb; ++x) {
++                            block_q6_K tmp[8];
++                            for (int i = 0; i < 8; ++i) tmp[i] = ((const block_q6_K *) (A.data() + (8 * g + i) * ra))[x];
++                            *dst++ = make_block_q6_Kx8(tmp, interleave);
++                        }
++                }
++
++                for (int Ny : {32, 33, 100}) {
++                    std::vector<float> Bf(Ny * ne00);
++                    for (auto & v : Bf) v = nd(rng);
++                    const size_t rb = ggml_row_size(GGML_TYPE_Q8_K, ne00);
++                    std::vector<uint8_t> B(Ny * rb);
++                    for (int t = 0; t < Ny; ++t) q8->from_float(Bf.data() + t * ne00, B.data() + t * rb, ne00);
++                    std::vector<float> Bd(Ny * ne00);
++                    for (int t = 0; t < Ny; ++t) {   // Q8_K has no to_float
++                        const block_q8_K * b = (const block_q8_K *) (B.data() + t * rb);
++                        for (int ib = 0; ib < nb; ++ib)
++                            for (int i = 0; i < QK_K; ++i) Bd[t * ne00 + ib * QK_K + i] = b[ib].d * b[ib].qs[i];
++                    }
++
++                    std::vector<double> ref(Nx * Ny);
++                    double rms = 0;
++                    for (int t = 0; t < Ny; ++t)
++                        for (int r = 0; r < Nx; ++r) {
++                            double s = 0;
++                            for (int i = 0; i < ne00; ++i) s += (double) Af[r * ne00 + i] * Bd[t * ne00 + i];
++                            ref[t * Nx + r] = s;
++                            rms += s * s;
++                        }
++                    rms = std::sqrt(rms / (Nx * Ny));
++
++                    // ggml's vec_dot on the plain rows, for the error floor of the existing path
++                    double err_ggml = 0;
++                    for (int t = 0; t < Ny; ++t)
++                        for (int r = 0; r < Nx; ++r) {
++                            float s;
++                            tc->vec_dot(ne00, &s, 0, A.data() + r * ra, 0, B.data() + t * rb, 0, 1);
++                            err_ggml = std::max(err_ggml, std::abs(s - ref[t * Nx + r]));
++                        }
++
++                    // the dense path: rows handed out in two chunks, as threads would take them
++                    std::vector<float> C(Nx * Ny, NAN);
++                    const size_t nb1 = Nx * sizeof(float);
++                    ggml_iqk_dense_mul_mat(type, interleave, 0, 24, ne00, R.data(), B.data(), rb, C.data(), nb1, Ny);
++                    ggml_iqk_dense_mul_mat(type, interleave, 24, Nx, ne00, R.data(), B.data(), rb, C.data(), nb1, Ny);
++                    double err = 0, e2 = 0;
++                    for (int t = 0; t < Ny; ++t)
++                        for (int r = 0; r < Nx; ++r) {
++                            const double e = std::abs(C[t * Nx + r] - ref[t * Nx + r]);
++                            err = std::max(err, std::isnan(e) ? 1e30 : e);
++                            e2 += e * e;
++                        }
++                    const double rel = err / rms, rel_rms = std::sqrt(e2 / (Nx * Ny)) / rms, rel_ggml = err_ggml / rms;
++                    const bool ok = rel < 2e-5;  // integer arithmetic as in ggml's own dot products: rounding only
++                    fails += !ok;
++                    std::printf("%s interleave %d ne00 %4d Ny %3d: max err %.2e, rms err %.2e of the output RMS (ggml vec_dot max %.2e) %s\n",
++                                type == GGML_TYPE_Q5_K ? "q5_K" : "q6_K", interleave, ne00, Ny, rel, rel_rms, rel_ggml, ok ? "ok" : "FAIL");
++                }
++            }
++        }
++    }
++    std::printf("%s\n", fails ? "FAILED" : "all ok");
++    return fails != 0;
++}

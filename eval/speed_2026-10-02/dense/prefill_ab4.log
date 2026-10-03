@@ -1,0 +1,13 @@
+Failed to write while dumping service thermalservice: Broken pipe
+=== i8mm1 bin=/data/local/tmp/bmoe-dense4  skin=30.82914->35.924892
+"prefill_s":30.991 "n_prompt":1216 "prefill_cpu_s":148.740 "prefill_io_s":22.463 
+text: For a three-day visit to Kyoto,
+=== dot1 bin=/data/local/tmp/bmoe-dense4 GGML_IQK_DENSE_I8MM=0 skin=31.895983->36.70556
+"prefill_s":31.291 "n_prompt":1216 "prefill_cpu_s":150.515 "prefill_io_s":22.402 
+text: For a three-day visit to Kyoto,
+=== i8mm2 bin=/data/local/tmp/bmoe-dense4  skin=31.964703->37.30411
+"prefill_s":32.082 "n_prompt":1216 "prefill_cpu_s":153.379 "prefill_io_s":22.567 
+text: For a three-day visit to Kyoto,
+=== dot2 bin=/data/local/tmp/bmoe-dense4 GGML_IQK_DENSE_I8MM=0 skin=31.998121->37.03659
+"prefill_s":31.075 "n_prompt":1216 "prefill_cpu_s":149.925 "prefill_io_s":22.472 
+text: For a three-day visit to Kyoto,

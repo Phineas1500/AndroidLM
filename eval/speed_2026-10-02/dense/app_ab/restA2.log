@@ -1,0 +1,28 @@
+--------- beginning of main
+10-02 19:31:22.057 32342 32386 I AndroidLM: engine env: {BMOE_REPACK=1, BMOE_CPUMASK=1f0, BMOE_NICE=-16} search priority while overlapping: 10
+10-02 19:31:42.565 32342 32383 I AndroidLM: run=1 t=140ms route=PLACES views=null travel=false pack=false
+10-02 19:31:42.566 32342 32383 I AndroidLM: run=1 t=141ms phase=SEARCHING
+10-02 19:31:42.567 32342 32383 I AndroidLM: run=1 t=142ms places=175 here=false where=175 vegan places to eat within 13 km of Lisbon, Portugal
+10-02 19:31:42.569 32342 32383 I AndroidLM: run=1 t=145ms sources=12 dropped=163 [Vegan Junkies — vegan restaurant · R. Luciano Cordeiro 28 · 0.5 km from the centre | The Green Affair — vegan restaurant · Av. Duque de Ávila 30 A · 1.2 km from the centre | Jardim das Cerejas — vegan restaurant · Calçada do Sacramento 36 · 1.7 km from the centre | Organi Chiado — vegan restaurant · Calçada Nova de São Francisco 2 · 1.9 km from the centre | Legumi Sushi Vegan — vegan restaurant · R. Vicente Borga 75 · 1.9 km from the centre | Ao 26 — vegan restaurant · R. da Horta Seca 5 · 1.7 km from the centre | Green Beans Mercado Vegan — vegan restaurant · R. do Poço dos Negros 15 · 1.6 km from the centre | Escolha Natura — vegan restaurant · Rua António Patrício 13 · 2.8 km from the centre | Kong - Food Made With Compassion — vegan restaurant · Rua do Corpo Santo 2 · 2.1 km from the centre | A Minha Avó — vegan restaurant · Av. António Augusto de Aguiar n74B · 0.7 km from the centre | Lisbon Vegan Restaurante — vegan restaurant · Rua de Arroios 177 · 1.3 km from the centre | Veganeats Caffe — vegan restaurant · R. Cavaleiro de Oliveira 42 · 1.6 km from the centre]
+10-02 19:31:42.570 32342 32383 I AndroidLM: run=1 t=145ms phase_done=SEARCHING wall=118ms 
+10-02 19:31:42.570 32342 32383 I AndroidLM: run=1 t=145ms phase=ANSWERING
+10-02 19:32:08.321 32342 32386 I AndroidLM: run=1 t=25896ms first_answer_token
+10-02 19:33:43.084 32342 32383 I AndroidLM: run=1 t=120659ms phase_done=ANSWERING wall=120513ms tokens=419 tok_s=4.44 prompt_tokens=775
+10-02 19:33:43.085 32342 32383 I AndroidLM: run=1 t=120660ms completed
+10-02 19:33:43.085 32342 32383 I AndroidLM: run=1 text[0]=Here are six highly rated vegan restaurants in Lisbon, selected for their consistent quality and central locations.
+10-02 19:33:43.085 32342 32383 I AndroidLM: 
+10-02 19:33:43.085 32342 32383 I AndroidLM: [1] Vegan Junkies: This is a vegan restaurant located at R. Luciano Cordeiro 28, just 0.5 km from the centre. It is open daily from 12:00 to 23:00.
+10-02 19:33:43.085 32342 32383 I AndroidLM: 
+10-02 19:33:43.085 32342 32383 I AndroidLM: [2] The Green Affair: A vegan restaurant situated at Av. Duque de Ávila 30 A, 1.2 km from the centre. It serves customers daily between 12:00 and 23:00.
+10-02 19:33:43.085 32342 32383 I AndroidLM: 
+10-02 19:33:43.085 32342 32383 I AndroidLM: [3] Jardim das Cerejas: This vegan restaurant is found at Calçada do Sacramento 36, 1.7 km from the centre. It operates from 12:00 to 15:30 and 19:00 to 23:00, Monday to Saturday.
+10-02 19:33:43.085 32342 32383 I AndroidLM: 
+10-02 19:33:43.085 32342 32383 I AndroidLM: [4] Organi Chiado: A vegan restaurant located at Calçada Nova de São Francisco 2, 1.9 km from the centre. It is open daily from 12:00 to 22:00.
+10-02 19:33:43.085 32342 32383 I AndroidLM: 
+10-02 19:33:43.085 32342 32383 I AndroidLM: [5] Legumi Sushi Vegan: This vegan restaurant offers Japanese and Brazilian cuisine at R. Vicente Borga 75, 1.9 km from the centre. It is open Monday to S
+10-02 19:33:43.085 32342 32383 I AndroidLM: run=1 text[1]=aturday from 13:00 to 15:00 and 18:00 to 22:00, and Sunday from 13:00 to 17:00.
+10-02 19:33:43.085 32342 32383 I AndroidLM: 
+10-02 19:33:43.085 32342 32383 I AndroidLM: [6] Ao 26: A vegan restaurant located at R. da Horta Seca 5, 1.7 km from the centre. It serves lunch from 12:30 to 18:00 and dinner from 19:00 to 23:00.
+10-02 19:33:43.085 32342 32383 I AndroidLM: 
+10-02 19:33:43.085 32342 32383 I AndroidLM: Map data can be out of date, so check a place is open before going.
+10-02 19:33:43.085 32342 32383 I AndroidLM: run=1 t=120660ms phase=DONE

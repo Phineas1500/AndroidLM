@@ -1,0 +1,9 @@
+=== ship1 bin=/data/local/tmp/bmoe-prefix  skin=30.495604->36.066067
+"prefill_s":36.339 "n_prompt":1216 "prefill_cpu_s":175.650 "prefill_io_s":22.756 
+text: For a three-day visit to Kyoto,
+=== dense1 bin=/data/local/tmp/bmoe-dense  skin=30.478771->35.22214
+"prefill_s":27.693 "n_prompt":1216 "prefill_cpu_s":132.635 "prefill_io_s":22.414 
+text: For a three-day visit to Kyoto,
+=== dense2 bin=/data/local/tmp/bmoe-dense  skin=30.478662->35.63111
+"prefill_s":27.765 "n_prompt":1216 "prefill_cpu_s":133.200 "prefill_io_s":22.644 
+text: For a three-day visit to Kyoto,

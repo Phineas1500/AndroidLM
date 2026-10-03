@@ -1,0 +1,17 @@
+--------- beginning of main
+10-02 20:06:54.479  4561  4657 I AndroidLM: engine env: {BMOE_REPACK=1, BMOE_CPUMASK=1f0, BMOE_NICE=-16} search priority while overlapping: 10
+10-02 20:07:13.399  4561  4650 I AndroidLM: run=1 t=27ms phase=PLANNING
+10-02 20:07:23.611  4561  4650 I AndroidLM: run=1 t=10240ms phase_done=PLANNING wall=10210ms tokens=23 tok_s=6.24 prompt_tokens=119
+10-02 20:07:23.613  4561  4650 I AndroidLM: run=1 t=10241ms planned=[Post-quantum cryptography, CRYSTALS-Dilithium, SPHINCS+, FALCON]
+10-02 20:07:23.614  4561  4650 I AndroidLM: run=1 t=10243ms route=RETRIEVAL_FIRST views=16241 travel=false pack=true
+10-02 20:07:23.616  4561  4650 I AndroidLM: run=1 t=10244ms phase=SEARCHING
+10-02 20:07:23.734  4561  4650 I AndroidLM: run=1 t=10362ms phase_done=SEARCHING wall=117ms stems=126ms bm25=-1ms bm25_at=-1ms bm25_needed=0ms wait=0ms titles=117ms
+10-02 20:07:23.818  4561  4650 I AndroidLM: run=1 t=10446ms sources=5 dropped=7 [NIST IR 8547 (draft): Transition to Post-Quantum Cryptography Standards — Migration Considerations > PQC-Classical Hybrid Protocols | NIST IR 8547 (draft): Transition to Post-Quantum Cryptography Standards — Background > Cryptographic Standards > Digital Signature Algorithms | NIST: Post-Quantum Cryptography: Additional Digital Signature Schemes — Overview > Background | FIPS 204: Module-Lattice-Based Digital Signature Standard (ML-DSA) — Introduction > Context | SPHINCS+ — ]
+10-02 20:07:23.819  4561  4650 I AndroidLM: run=1 t=10448ms phase=ANSWERING
+10-02 20:07:55.220  4561  4657 I AndroidLM: run=1 t=41848ms first_answer_token
+10-02 20:08:40.071  4561  4650 I AndroidLM: run=1 t=86699ms phase_done=ANSWERING wall=76250ms tokens=194 tok_s=4.33 prompt_tokens=995
+10-02 20:08:40.072  4561  4650 I AndroidLM: run=1 t=86700ms completed
+10-02 20:08:40.072  4561  4650 I AndroidLM: run=1 text[0]=The quantum-resistant digital signature algorithms standardized by NIST are ML-DSA (Module-Lattice-Based Digital Signature Algorithm) and SLH-DSA (Stateless Hash-Based Digital Signature Algorithm) [2]. ML-DSA is specified in FIPS 204 and is derived from CRYSTALS-Dilithium [2], [3]. SLH-DSA is specified in FIPS 205 and is derived from SPHINCS+ [2], [5]. Additionally, FALCON (FN-DSA) was selected by NIST as a quantum-resistant digital signature scheme [3].
+10-02 20:08:40.072  4561  4650 I AndroidLM: 
+10-02 20:08:40.072  4561  4650 I AndroidLM: These algorithms were selected through NIST's Post-Quantum Cryptography Standardization Process initiated in December 2016 to replace classical public-key cryptosystems vulnerable to large-scale quantum computers [3], [4]. ML-DSA and FALCON are based on structured lattices, while SLH-DSA is hash-based [3].
+10-02 20:08:40.072  4561  4650 I AndroidLM: run=1 t=86700ms phase=DONE
