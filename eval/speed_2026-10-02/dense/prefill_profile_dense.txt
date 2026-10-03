@@ -1,0 +1,41 @@
+"prefill_s":37.266 "n_prompt":1216 "prefill_cpu_s":171.695 "prefill_read_mib":9044.1 "prefill_io_s":22.765 "prefill_stall_s":0.009 "prefill_mgmt_s":2.684 
+Cmdline: /system/bin/simpleperf record -p 7035 --duration 45 -f 2000 -o /data/local/tmp/bench_tune/prefill_dense.perf
+Arch: arm64
+Event: cpu-cycles:u (type 0, config 0)
+Samples: 353798
+Event count: 313430296457
+
+Overhead  Shared Object                                Symbol
+21.87%    /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_q5k_u_r8_q8_k<4>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+12.20%    /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_graph_compute_thread
+7.77%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_q8_k_r8_q8_k<8>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+6.05%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_q6k_u_r8_q8_k<4>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+5.52%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_compute_forward_flash_attn_ext
+5.14%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   (anonymous namespace)::convert_to_q8_k_r8(float, int8x16x2_t const*, signed char const*, unsigned int*, unsigned int*)
+4.44%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_compute_forward_gated_delta_net
+3.03%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_vec_dot_f32
+2.80%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_q8_k_r8_q8_k<7>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+2.78%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_vec_dot_iq4_xs_q8_K
+2.07%     /data/local/tmp/bmoe-dfinal/libggml-base.so  quantize_row_q8_K_ref
+1.87%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_qX_K_q8_K_T<(anonymous namespace)::DequantizerIQ2XS, 7>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+1.78%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_compute_forward_mul
+1.77%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_compute_forward_ssm_conv
+1.66%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_compute_forward_add_non_quantized
+1.44%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_qX_K_q8_K_T<(anonymous namespace)::DequantizerIQ2XS, 6>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+1.29%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::tinyBLAS<4, __Float32x4_t, __Float32x4_t, float, float, float>::gemm<4, 6, 4>(long, long, long)
+1.16%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_graph_compute_secondary_thread
+1.14%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_qX_K_q8_K_T<(anonymous namespace)::DequantizerIQ2XS, 8>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+1.09%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_compute_forward_concat
+1.02%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_compute_forward_mul_mat_id
+1.01%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_iqk_moe_mul_mat
+0.98%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   (anonymous namespace)::iqk_unpack_dense_x8(int, int, bool, int, void const*, void*)
+0.90%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_qX_K_q8_K_T<(anonymous namespace)::DequantizerIQ3XXS, 7>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.78%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_gemv_q5_K_8x4_q8_K
+0.75%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_compute_forward_rms_norm_mul_fused
+0.63%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_qX_K_q8_K_T<(anonymous namespace)::DequantizerIQ3XXS, 6>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.60%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_vec_silu_f32
+0.55%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_qX_K_q8_K_T<(anonymous namespace)::DequantizerIQ3XXS, 8>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.54%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_qX_K_q8_K_T<(anonymous namespace)::DequantizerIQ2XS, 1>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.49%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   ggml_vec_swiglu_f32
+0.44%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_qX_K_q8_K_T<(anonymous namespace)::DequantizerIQ2XS, 5>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.43%     /data/local/tmp/bmoe-dfinal/libggml-cpu.so   void (anonymous namespace)::mul_mat_qX_K_q8_K_T<(anonymous namespace)::DequantizerIQ3XXS, 1>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)

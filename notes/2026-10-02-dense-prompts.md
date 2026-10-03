@@ -106,3 +106,45 @@ on:
   - restaurants: 543 tokens against 419, so that answer finished later (142 s against 108-121 s);
   - crypto: 194 against 226 tokens, so it finished sooner (86-87 s against 100 s).
 - **Writing speed is unchanged:** single tokens never take this path.
+
+## 3. Is reading experts from flash the limit now? No
+
+With prompts 14% faster, the next question was whether flash reads had become the limit. If so,
+the work on laying experts out on flash would apply: Apple's "LLM in a Flash", BigMoMo
+(2609.14643) and PowerInfer-2. The engine's own counters answer it. `prefill_stall_s` is the wall
+time during which at least one compute thread was waiting for an expert to arrive from flash.
+
+The 1,216-token prompt, the app's flags, runs from 32 C:
+
+| | 1.3.0 engine | This engine |
+|---|---|---|
+| Prompt read | 36.3 s | 31.1-31.9 s |
+| Read from flash during it | 9,058 MiB | 9,044 MiB |
+| Read lanes busy (4 lanes, summed) | 22.8 s | 22.4-22.8 s |
+| **Compute waiting for flash** | **0.06 s** | **0.01-0.06 s** |
+
+- **Prompts:** the reads stay hidden behind compute. A faster flash path could save at most 0.06 s,
+  so flash-layout work would not shorten prompts.
+- **Writing,** which this change does not touch: in the sustained runs of
+  [2026-10-02-speed-search.md](2026-10-02-speed-search.md), compute waited 0.016-0.019 s per token,
+  about 10% of a token's time. That is the most flash work could save while writing.
+  - The engine's author measured the usual way to recover it on this model and phone class:
+    reading predicted experts ahead. It lost 21% (BigMoeOnEdge `docs/expert-prediction.md`),
+    because the extra reads crowd out the ones needed.
+
+**Where a prompt's CPU time goes now:**
+- **Method:** `simpleperf`, as in the speed-search note (`dense/prefill_prof_dense.sh`, report in
+  `dense/prefill_profile_dense.txt`). Both profiles are grouped the same way (`dense/perf_cats.py`)
+  and scaled to the unprofiled CPU time.
+- **Caveat:** the profiled run took 37.3 s against 31.6 s for an unprofiled run straight after, so
+  only the shares are used.
+
+| Part | 1.3.0 engine | This engine |
+|---|---|---|
+| Dense weights | 40% (70 CPU-s) | 30% (45) |
+| Experts, with their activation quantizing | 26% (45) | 31% (47) |
+| Thread pool loop and barriers | 14% (24) | 13% (20) |
+| Attention, gated delta net, convolution | 10% (17) | 12% (18) |
+| Elementwise ops, norms, copies | 11% (20) | 13% (20) |
+
+- **Prompts are now compute-bound,** with the time spread over several parts and none above a third.
