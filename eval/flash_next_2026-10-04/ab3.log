@@ -1,0 +1,41 @@
+scratchpad/fn/fn_run.sh: 1 file pushed, 0 skipped. 0.6 MB/s (1905 bytes in 0.003s)
+=== fn3dec bin=/data/local/tmp/bmoe-fn3   UB=1280 CACHE=2000 skin=31.959421->38.400528 lowest_MemAvailable_MiB=0
+"tokens":64 "tok_s":1.947 "prefill_s":11.796 "load_s":55.488 "cache_hit_pct":49.7 "n_prompt":58 "compute_s_tok":0.3605 "io_s_tok":0.6611 "read_mib":15471.9 "stall_s_tok":0.0869 "cpu_s_tok":2.2657 "prefill_cpu_s":46.470 "prefill_read_mib":10244.1 "prefill_stall_s":1.425 
+text: The Dead Sea’s extreme salt concentration is primarily due to its unique geogr
+20.72%    /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_vec_dot_q2_0_q8_0
+15.01%    /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_graph_compute_thread
+13.24%    /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_vec_dot_bf16
+11.02%    /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_graph_compute_secondary_thread
+6.51%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_vec_dot_q3_K_q8_K
+4.76%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_vec_dot_iq4_xs_q8_K
+4.45%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_gemv_q5_K_8x4_q8_K
+2.03%     /apex/com.android.runtime/lib64/bionic/libc.so  __memmove_aarch64_simd
+2.00%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_gemv_q4_K_8x4_q8_K
+1.79%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q6k_u_r8_q8_k<4>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+1.79%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_bf16_r8_bf16<6>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+1.75%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         (anonymous namespace)::iqk_unpack_q2_0_r8(int, void const*, unsigned long, void*, int)
+1.01%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_gated_delta_net
+0.98%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_mul_mat_id
+0.80%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<7>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.78%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         (anonymous namespace)::iqk_unpack_bf16_r8(int, void const*, unsigned long, void*, int)
+0.74%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_gemv_q6_K_8x4_q8_K
+0.66%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_mul
+0.63%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_vec_dot_f32
+0.61%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_mul_mat
+0.56%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_get_rows
+0.51%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_gemm_q4_K_8x4_q8_K
+0.47%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<5>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.45%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<8>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.44%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<6>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.44%     /apex/com.android.runtime/lib64/bionic/libm.so  expf
+0.41%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_bf16_r8_bf16<5>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+=== c2800 bin=/data/local/tmp/bmoe-fn3   UB=512 CACHE=2800 skin=31.69796->38.119873 lowest_MemAvailable_MiB=0
+"tokens":32 "tok_s":1.522 "prefill_s":42.159 "load_s":51.690 "cache_hit_pct":24.5 "n_prompt":426 "compute_s_tok":0.4362 "io_s_tok":0.9309 "read_mib":10472.9 "stall_s_tok":0.1033 "cpu_s_tok":2.9718 "prefill_cpu_s":172.706 "prefill_read_mib":20262.0 "prefill_stall_s":0.550 
+text: [1] Vegan Junkies: vegan restaurant located 0.5 km from the centre.\n[2] The Gre
+=== c2000 bin=/data/local/tmp/bmoe-fn3   UB=1280 CACHE=2000 skin=31.961693->38.10881 lowest_MemAvailable_MiB=0
+"tokens":32 "tok_s":1.484 "prefill_s":41.621 "load_s":51.756 "cache_hit_pct":21.6 "n_prompt":426 "compute_s_tok":0.4336 "io_s_tok":1.0251 "read_mib":11624.6 "stall_s_tok":0.1196 "cpu_s_tok":3.0204 "prefill_cpu_s":169.810 "prefill_read_mib":20262.0 "prefill_stall_s":0.480 
+text: [1] Vegan Junkies: vegan restaurant located 0.5 km from the centre.\n[2] The Gre
+=== c2800b bin=/data/local/tmp/bmoe-fn3   UB=512 CACHE=2800 skin=31.959932->38.20068 lowest_MemAvailable_MiB=0
+"tokens":32 "tok_s":1.484 "prefill_s":39.473 "load_s":51.659 "cache_hit_pct":24.5 "n_prompt":426 "compute_s_tok":0.4464 "io_s_tok":0.9611 "read_mib":10472.9 "stall_s_tok":0.1195 "cpu_s_tok":3.0092 "prefill_cpu_s":164.978 "prefill_read_mib":20262.0 "prefill_stall_s":0.523 
+text: [1] Vegan Junkies: vegan restaurant located 0.5 km from the centre.\n[2] The Gre
+AB3_DONE

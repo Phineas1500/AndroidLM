@@ -1,0 +1,30 @@
+scratchpad/fn/fn_run.sh: 1 file pushed, 0 skipped. 0.7 MB/s (1908 bytes in 0.003s)
+=== d4a bin=/data/local/tmp/bmoe-fn4   UB=1280 CACHE=2000 skin=31.945873->37.986034 lowest_MemAvailable_MiB=2042
+"tokens":64 "tok_s":1.881 "prefill_s":12.358 "load_s":52.882 "cache_hit_pct":49.1 "n_prompt":58 "compute_s_tok":0.3565 "io_s_tok":0.6946 "read_mib":15756.3 "stall_s_tok":0.1109 "cpu_s_tok":2.2597 "prefill_cpu_s":47.337 "prefill_read_mib":10217.6 "prefill_stall_s":2.143 
+text: The Dead Sea’s extreme salt concentration is primarily caused by its unique ge
+=== d3a bin=/data/local/tmp/bmoe-fn3   UB=1280 CACHE=2000 skin=31.977911->37.958515 lowest_MemAvailable_MiB=2056
+"tokens":64 "tok_s":1.815 "prefill_s":11.710 "load_s":54.067 "cache_hit_pct":49.7 "n_prompt":58 "compute_s_tok":0.3911 "io_s_tok":0.6900 "read_mib":15471.9 "stall_s_tok":0.0939 "cpu_s_tok":2.4413 "prefill_cpu_s":46.258 "prefill_read_mib":10244.1 "prefill_stall_s":1.558 
+text: The Dead Sea’s extreme salt concentration is primarily due to its unique geogr
+=== d4b bin=/data/local/tmp/bmoe-fn4   UB=1280 CACHE=2000 skin=31.933943->37.850742 lowest_MemAvailable_MiB=2128
+"tokens":64 "tok_s":1.821 "prefill_s":12.322 "load_s":51.659 "cache_hit_pct":49.1 "n_prompt":58 "compute_s_tok":0.3699 "io_s_tok":0.7105 "read_mib":15756.3 "stall_s_tok":0.1117 "cpu_s_tok":2.3375 "prefill_cpu_s":47.724 "prefill_read_mib":10217.6 "prefill_stall_s":1.931 
+text: The Dead Sea’s extreme salt concentration is primarily caused by its unique ge
+=== m2800 bin=/data/local/tmp/bmoe-fn4   UB=512 CACHE=2800 skin=31.947094->37.87311 lowest_MemAvailable_MiB=1364
+"tokens":64 "tok_s":2.016 "prefill_s":12.349 "load_s":51.371 "cache_hit_pct":56.8 "n_prompt":58 "compute_s_tok":0.3560 "io_s_tok":0.5562 "read_mib":11860.9 "stall_s_tok":0.0962 "cpu_s_tok":2.1042 "prefill_cpu_s":46.074 "prefill_read_mib":10217.6 "prefill_stall_s":2.867 
+text: The Dead Sea’s extreme salt concentration is primarily caused by its unique ge
+=== m3300 bin=/data/local/tmp/bmoe-fn4   UB=512 CACHE=3300 skin=31.986542->37.88457 lowest_MemAvailable_MiB=875
+"tokens":64 "tok_s":2.048 "prefill_s":12.295 "load_s":52.393 "cache_hit_pct":59.4 "n_prompt":58 "compute_s_tok":0.3583 "io_s_tok":0.5069 "read_mib":10504.1 "stall_s_tok":0.0884 "cpu_s_tok":2.0844 "prefill_cpu_s":46.088 "prefill_read_mib":10217.6 "prefill_stall_s":2.805 
+text: The Dead Sea’s extreme salt concentration is primarily caused by its unique ge
+Failed to write while dumping service thermalservice: Broken pipe
+=== p512 bin=/data/local/tmp/bmoe-fn4   UB=512 CACHE=2800 skin=31.942692->38.20642 lowest_MemAvailable_MiB=621
+"tokens":8 "tok_s":1.338 "prefill_s":138.460 "load_s":53.251 "cache_hit_pct":3.9 "n_prompt":1216 "compute_s_tok":0.4636 "io_s_tok":1.0577 "read_mib":2730.5 "stall_s_tok":0.1468 "cpu_s_tok":3.2661 "prefill_cpu_s":549.950 "prefill_read_mib":56057.9 "prefill_stall_s":0.565 
+text: For a three-day visit to Kyoto,
+=== k8 bin=/data/local/tmp/bmoe-fn4  --n-expert-used 8 UB=512 CACHE=2800 skin=31.952553->38.001244 lowest_MemAvailable_MiB=1138
+"tokens":32 "tok_s":1.708 "prefill_s":36.182 "load_s":50.468 "cache_hit_pct":23.5 "n_prompt":426 "compute_s_tok":0.3810 "io_s_tok":0.7591 "read_mib":8141.5 "stall_s_tok":0.1188 "cpu_s_tok":2.5254 "prefill_cpu_s":152.082 "prefill_read_mib":18498.4 "prefill_stall_s":0.674 
+text: [1] Vegan Junkies: vegan restaurant located 0.5 km from the centre.\n[2] The Gre
+=== k6 bin=/data/local/tmp/bmoe-fn4  --n-expert-used 6 UB=512 CACHE=2800 skin=31.96861->37.925682 lowest_MemAvailable_MiB=1190
+"tokens":32 "tok_s":1.830 "prefill_s":32.455 "load_s":46.634 "cache_hit_pct":21.4 "n_prompt":426 "compute_s_tok":0.3726 "io_s_tok":0.6164 "read_mib":6148.9 "stall_s_tok":0.1128 "cpu_s_tok":2.3162 "prefill_cpu_s":138.053 "prefill_read_mib":16228.0 "prefill_stall_s":0.965 
+text: [1] Vegan Junkies: vegan restaurant; 0.5 km from the centre.\n[2] The Green Affa
+=== k10 bin=/data/local/tmp/bmoe-fn4   UB=512 CACHE=2800 skin=31.97392->38.17944 lowest_MemAvailable_MiB=1009
+"tokens":32 "tok_s":1.571 "prefill_s":40.103 "load_s":51.870 "cache_hit_pct":24.5 "n_prompt":426 "compute_s_tok":0.3963 "io_s_tok":0.9290 "read_mib":10445.0 "stall_s_tok":0.1239 "cpu_s_tok":2.7813 "prefill_cpu_s":163.850 "prefill_read_mib":20278.0 "prefill_stall_s":0.694 
+text: [1] Vegan Junkies: vegan restaurant located 0.5 km from the centre.\n[2] The Gre
+AB4_DONE

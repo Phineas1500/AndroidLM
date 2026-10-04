@@ -1,0 +1,102 @@
+{
+ "food-001": {
+  "A": "qwen36",
+  "B": "web",
+  "C": "flashnext"
+ },
+ "food-002": {
+  "A": "qwen36",
+  "B": "flashnext",
+  "C": "web"
+ },
+ "food-003": {
+  "A": "web",
+  "B": "flashnext",
+  "C": "qwen36"
+ },
+ "food-004": {
+  "A": "web",
+  "B": "flashnext",
+  "C": "qwen36"
+ },
+ "food-005": {
+  "A": "web",
+  "B": "qwen36",
+  "C": "flashnext"
+ },
+ "food-006": {
+  "A": "flashnext",
+  "B": "qwen36",
+  "C": "web"
+ },
+ "food-007": {
+  "A": "qwen36",
+  "B": "web",
+  "C": "flashnext"
+ },
+ "food-008": {
+  "A": "qwen36",
+  "B": "web",
+  "C": "flashnext"
+ },
+ "food-009": {
+  "A": "qwen36",
+  "B": "flashnext",
+  "C": "web"
+ },
+ "food-010": {
+  "A": "flashnext",
+  "B": "qwen36",
+  "C": "web"
+ },
+ "food-011": {
+  "A": "flashnext",
+  "B": "qwen36",
+  "C": "web"
+ },
+ "food-012": {
+  "A": "web",
+  "B": "flashnext",
+  "C": "qwen36"
+ },
+ "food-013": {
+  "A": "web",
+  "B": "qwen36",
+  "C": "flashnext"
+ },
+ "food-014": {
+  "A": "web",
+  "B": "flashnext",
+  "C": "qwen36"
+ },
+ "food-015": {
+  "A": "qwen36",
+  "B": "flashnext",
+  "C": "web"
+ },
+ "food-016": {
+  "A": "web",
+  "B": "qwen36",
+  "C": "flashnext"
+ },
+ "food-017": {
+  "A": "flashnext",
+  "B": "web",
+  "C": "qwen36"
+ },
+ "food-018": {
+  "A": "qwen36",
+  "B": "flashnext",
+  "C": "web"
+ },
+ "food-019": {
+  "A": "qwen36",
+  "B": "web",
+  "C": "flashnext"
+ },
+ "food-020": {
+  "A": "qwen36",
+  "B": "flashnext",
+  "C": "web"
+ }
+}

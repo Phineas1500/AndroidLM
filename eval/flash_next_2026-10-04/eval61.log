@@ -1,0 +1,294 @@
+##### food-001 start skin=39.718483 05:28:41
+run=1 t=259ms phase_done=SEARCHING wall=239ms 
+run=1 t=484712ms phase_done=ANSWERING wall=484452ms tokens=492 tok_s=1.24 prompt_tokens=810
+run=1 t=484713ms completed
+##### food-002 start skin=39.38612 05:39:57
+run=1 t=155ms phase_done=SEARCHING wall=118ms 
+run=1 t=588276ms phase_done=ANSWERING wall=588117ms tokens=596 tok_s=1.20 prompt_tokens=775
+run=1 t=588276ms completed
+##### food-003 start skin=40.385372 05:52:47
+run=1 t=154ms phase_done=SEARCHING wall=138ms 
+run=1 t=526004ms phase_done=ANSWERING wall=525849ms tokens=529 tok_s=1.19 prompt_tokens=667
+run=1 t=526005ms completed
+##### food-004 start skin=40.69768 06:04:36
+run=1 t=275ms phase_done=SEARCHING wall=227ms 
+run=1 t=481236ms phase_done=ANSWERING wall=480959ms tokens=458 tok_s=1.18 prompt_tokens=774
+run=1 t=481237ms completed
+##### food-005 start skin=40.714314 06:15:44
+run=1 t=201ms phase_done=SEARCHING wall=189ms 
+run=1 t=447244ms phase_done=ANSWERING wall=447041ms tokens=394 tok_s=1.16 prompt_tokens=915
+run=1 t=447245ms completed
+##### food-006 start skin=40.91008 06:26:12
+run=1 t=233ms phase_done=SEARCHING wall=226ms 
+run=1 t=540082ms phase_done=ANSWERING wall=539847ms tokens=528 tok_s=1.17 prompt_tokens=726
+run=1 t=540083ms completed
+##### food-007 start skin=41.03411 06:38:23
+run=1 t=218ms phase_done=SEARCHING wall=210ms 
+run=1 t=537969ms phase_done=ANSWERING wall=537749ms tokens=501 tok_s=1.15 prompt_tokens=743
+run=1 t=537969ms completed
+##### food-008 start skin=40.874554 06:50:28
+run=1 t=186ms phase_done=SEARCHING wall=138ms 
+run=1 t=389685ms phase_done=ANSWERING wall=389497ms tokens=360 tok_s=1.17 prompt_tokens=668
+run=1 t=389686ms completed
+##### food-009 start skin=40.763874 07:00:04
+run=1 t=163ms phase_done=SEARCHING wall=142ms 
+run=1 t=398105ms phase_done=ANSWERING wall=397939ms tokens=364 tok_s=1.17 prompt_tokens=729
+run=1 t=398105ms completed
+##### food-010 start skin=40.672752 07:09:51
+run=1 t=225ms phase_done=SEARCHING wall=221ms 
+run=1 t=531290ms phase_done=ANSWERING wall=531063ms tokens=523 tok_s=1.18 prompt_tokens=684
+run=1 t=531290ms completed
+##### food-011 start skin=40.98045 07:21:42
+run=1 t=164ms phase_done=SEARCHING wall=153ms 
+run=1 t=451472ms phase_done=ANSWERING wall=451305ms tokens=444 tok_s=1.19 prompt_tokens=620
+run=1 t=451472ms completed
+##### food-012 start skin=41.05965 07:32:09
+run=1 t=165ms phase_done=SEARCHING wall=152ms 
+run=1 t=622205ms phase_done=ANSWERING wall=622039ms tokens=594 tok_s=1.16 prompt_tokens=917
+run=1 t=622206ms completed
+##### food-013 start skin=40.996162 07:45:30
+run=1 t=130ms phase_done=SEARCHING wall=115ms 
+run=1 t=424574ms phase_done=ANSWERING wall=424442ms tokens=381 tok_s=1.17 prompt_tokens=806
+run=1 t=424575ms completed
+##### food-014 start skin=40.831852 07:55:39
+run=1 t=183ms phase_done=SEARCHING wall=142ms 
+run=1 t=494247ms phase_done=ANSWERING wall=494062ms tokens=474 tok_s=1.17 prompt_tokens=740
+run=1 t=494248ms completed
+##### food-015 start skin=41.105064 08:06:58
+run=1 t=167ms phase_done=SEARCHING wall=148ms 
+run=1 t=428624ms phase_done=ANSWERING wall=428456ms tokens=406 tok_s=1.16 prompt_tokens=642
+run=1 t=428625ms completed
+##### food-016 start skin=40.80172 08:17:04
+run=1 t=82ms phase_done=SEARCHING wall=66ms 
+run=1 t=360244ms phase_done=ANSWERING wall=360161ms tokens=336 tok_s=1.17 prompt_tokens=574
+run=1 t=360245ms completed
+##### food-017 start skin=40.5323 08:26:10
+run=1 t=25293ms phase_done=TRANSLATING wall=25288ms tokens=10 tok_s=1.23 prompt_tokens=63
+run=1 t=25616ms phase_done=SEARCHING wall=321ms 
+run=1 t=597394ms phase_done=ANSWERING wall=571776ms tokens=551 tok_s=1.20 prompt_tokens=942
+run=1 t=597395ms completed
+##### cry-001 start skin=40.82815 08:39:10
+run=1 t=44811ms phase_done=PLANNING wall=44778ms tokens=25 tok_s=1.30 prompt_tokens=119
+run=1 t=44935ms phase_done=SEARCHING wall=115ms stems=46ms bm25=32856ms bm25_at=32929ms bm25_needed=0ms wait=0ms titles=115ms
+run=1 t=304412ms phase_done=ANSWERING wall=259365ms tokens=160 tok_s=1.17 prompt_tokens=1035
+run=1 t=304413ms completed
+##### cry-002 start skin=40.37775 08:47:15
+run=1 t=36201ms phase_done=PLANNING wall=36178ms tokens=14 tok_s=1.36 prompt_tokens=126
+run=1 t=36354ms phase_done=SEARCHING wall=139ms stems=66ms bm25=10418ms bm25_at=10506ms bm25_needed=0ms wait=0ms titles=138ms
+run=1 t=563486ms phase_done=ANSWERING wall=527035ms tokens=457 tok_s=1.20 prompt_tokens=1249
+run=1 t=563486ms completed
+Failed to write while dumping service thermalservice: Broken pipe
+##### cry-003 start skin=40.815464 08:59:36
+run=1 t=42105ms phase_done=PLANNING wall=42091ms tokens=18 tok_s=1.27 prompt_tokens=128
+run=1 t=42305ms phase_done=SEARCHING wall=193ms stems=77ms bm25=34027ms bm25_at=34116ms bm25_needed=0ms wait=0ms titles=193ms
+run=1 t=502491ms phase_done=ANSWERING wall=460019ms tokens=349 tok_s=1.19 prompt_tokens=1348
+run=1 t=502491ms completed
+##### cry-004 start skin=40.73719 09:10:56
+run=1 t=45639ms phase_done=PLANNING wall=45597ms tokens=24 tok_s=1.35 prompt_tokens=128
+run=1 t=45779ms phase_done=SEARCHING wall=132ms stems=152ms bm25=3353ms bm25_at=3544ms bm25_needed=1ms wait=0ms titles=132ms
+run=1 t=493002ms phase_done=ANSWERING wall=447107ms tokens=342 tok_s=1.16 prompt_tokens=1284
+run=1 t=493003ms completed
+##### cry-005 start skin=40.81319 09:22:16
+run=1 t=43412ms phase_done=PLANNING wall=43349ms tokens=22 tok_s=1.33 prompt_tokens=123
+run=1 t=43652ms phase_done=SEARCHING wall=227ms stems=64ms bm25=26073ms bm25_at=26196ms bm25_needed=0ms wait=0ms titles=226ms
+run=1 t=469275ms phase_done=ANSWERING wall=425495ms tokens=376 tok_s=1.22 prompt_tokens=977
+run=1 t=469276ms completed
+##### cry-006 start skin=40.857563 09:33:07
+run=1 t=42812ms phase_done=PLANNING wall=42764ms tokens=22 tok_s=1.36 prompt_tokens=126
+run=1 t=43737ms phase_done=SEARCHING wall=912ms stems=51ms bm25=7622ms bm25_at=7717ms bm25_needed=1ms wait=0ms titles=912ms
+run=3 t=22357ms phase_done=PLANNING wall=22346ms tokens=22 tok_s=1.53 prompt_tokens=23
+run=3 t=22395ms phase_done=SEARCHING wall=30ms stems=3ms bm25=2812ms bm25_at=2825ms bm25_needed=1ms wait=0ms titles=29ms
+run=3 t=408428ms phase_done=ANSWERING wall=385986ms tokens=398 tok_s=1.40 prompt_tokens=992
+run=3 t=408429ms completed
+##### cry-007 start skin=30.963732 09:48:35
+run=1 t=28517ms phase_done=PLANNING wall=28485ms tokens=13 tok_s=1.79 prompt_tokens=126
+run=1 t=32045ms phase_done=SEARCHING wall=3523ms stems=65ms bm25=31945ms bm25_at=32041ms bm25_needed=1ms wait=3454ms titles=69ms
+run=1 t=320859ms phase_done=ANSWERING wall=288766ms tokens=309 tok_s=1.49 prompt_tokens=966
+run=1 t=320860ms completed
+##### cry-008 start skin=30.31138 09:57:01
+run=1 t=32056ms phase_done=PLANNING wall=32043ms tokens=20 tok_s=1.93 prompt_tokens=127
+run=1 t=32120ms phase_done=SEARCHING wall=62ms stems=99ms bm25=-1ms bm25_at=-1ms bm25_needed=0ms wait=0ms titles=62ms
+run=1 t=220154ms phase_done=ANSWERING wall=187955ms tokens=147 tok_s=1.53 prompt_tokens=1113
+run=1 t=220155ms completed
+##### cry-009 start skin=30.279202 10:03:44
+run=1 t=30449ms phase_done=PLANNING wall=30375ms tokens=18 tok_s=2.01 prompt_tokens=128
+run=1 t=30620ms phase_done=SEARCHING wall=162ms stems=74ms bm25=13587ms bm25_at=13724ms bm25_needed=0ms wait=0ms titles=162ms
+run=1 t=375111ms phase_done=ANSWERING wall=344385ms tokens=396 tok_s=1.50 prompt_tokens=1008
+run=1 t=375112ms completed
+##### cry-010 start skin=30.39564 10:13:01
+run=1 t=26184ms phase_done=PLANNING wall=26166ms tokens=11 tok_s=1.86 prompt_tokens=123
+run=1 t=30711ms phase_done=SEARCHING wall=4520ms stems=56ms bm25=30633ms bm25_at=30705ms bm25_needed=1ms wait=4389ms titles=131ms
+run=1 t=204876ms phase_done=ANSWERING wall=174085ms tokens=178 tok_s=1.52 prompt_tokens=714
+run=1 t=204876ms completed
+##### cry-011 start skin=30.298782 10:19:23
+run=1 t=31324ms phase_done=PLANNING wall=31298ms tokens=18 tok_s=1.92 prompt_tokens=135
+run=1 t=35572ms phase_done=SEARCHING wall=4243ms stems=66ms bm25=35463ms bm25_at=35552ms bm25_needed=1ms wait=4120ms titles=123ms
+run=1 t=253235ms phase_done=ANSWERING wall=217330ms tokens=172 tok_s=1.53 prompt_tokens=1237
+run=1 t=253236ms completed
+##### cry-012 start skin=30.846014 10:26:38
+run=1 t=28699ms phase_done=PLANNING wall=28666ms tokens=14 tok_s=1.85 prompt_tokens=127
+run=1 t=28783ms phase_done=SEARCHING wall=79ms stems=87ms bm25=-1ms bm25_at=-1ms bm25_needed=0ms wait=0ms titles=79ms
+run=1 t=291559ms phase_done=ANSWERING wall=262624ms tokens=219 tok_s=1.49 prompt_tokens=1282
+run=1 t=291560ms completed
+##### cry-013 start skin=30.894932 10:34:33
+run=1 t=33007ms phase_done=PLANNING wall=32971ms tokens=21 tok_s=1.97 prompt_tokens=132
+run=1 t=35321ms phase_done=SEARCHING wall=2308ms stems=75ms bm25=35203ms bm25_at=35314ms bm25_needed=1ms wait=2223ms titles=85ms
+run=1 t=284498ms phase_done=ANSWERING wall=249118ms tokens=201 tok_s=1.48 prompt_tokens=1248
+run=1 t=284500ms completed
+##### cry-014 start skin=30.30698 10:42:18
+##### cry-015 start skin=30.11951 10:52:37
+run=1 t=26203ms phase_done=PLANNING wall=26186ms tokens=7 tok_s=1.77 prompt_tokens=131
+run=1 t=33399ms phase_done=SEARCHING wall=7181ms stems=67ms bm25=33294ms bm25_at=33377ms bm25_needed=1ms wait=7145ms titles=36ms
+run=1 t=258521ms phase_done=ANSWERING wall=224885ms tokens=183 tok_s=1.48 prompt_tokens=1247
+run=1 t=258522ms completed
+##### cry-016 start skin=30.69819 10:59:52
+run=1 t=27125ms phase_done=PLANNING wall=27097ms tokens=10 tok_s=1.78 prompt_tokens=129
+run=1 t=27182ms phase_done=SEARCHING wall=51ms stems=49ms bm25=11718ms bm25_at=11791ms bm25_needed=0ms wait=0ms titles=51ms
+run=1 t=207360ms phase_done=ANSWERING wall=180104ms tokens=115 tok_s=1.47 prompt_tokens=1138
+run=1 t=207361ms completed
+##### cry-017 start skin=30.611351 11:06:17
+run=1 t=23372ms phase_done=PLANNING wall=23356ms tokens=6 tok_s=1.93 prompt_tokens=123
+run=1 t=32442ms phase_done=SEARCHING wall=9057ms stems=50ms bm25=32361ms bm25_at=32426ms bm25_needed=1ms wait=9024ms titles=32ms
+run=1 t=298368ms phase_done=ANSWERING wall=265770ms tokens=204 tok_s=1.46 prompt_tokens=1406
+run=1 t=298369ms completed
+##### cry-018 start skin=30.770851 11:14:21
+run=1 t=30374ms phase_done=PLANNING wall=30300ms tokens=18 tok_s=1.91 prompt_tokens=125
+run=1 t=30560ms phase_done=SEARCHING wall=178ms stems=49ms bm25=28140ms bm25_at=28259ms bm25_needed=0ms wait=0ms titles=178ms
+run=1 t=207373ms phase_done=ANSWERING wall=176746ms tokens=130 tok_s=1.48 prompt_tokens=1041
+run=1 t=207375ms completed
+##### cry-019 start skin=30.611683 11:20:53
+run=1 t=28047ms phase_done=PLANNING wall=28030ms tokens=13 tok_s=1.97 prompt_tokens=135
+run=1 t=32114ms phase_done=SEARCHING wall=4063ms stems=67ms bm25=32031ms bm25_at=32107ms bm25_needed=1ms wait=3953ms titles=110ms
+run=1 t=333630ms phase_done=ANSWERING wall=301437ms tokens=308 tok_s=1.50 prompt_tokens=1119
+run=1 t=333631ms completed
+##### cry-020 start skin=30.637909 11:29:30
+run=1 t=33667ms phase_done=PLANNING wall=33637ms tokens=23 tok_s=1.90 prompt_tokens=128
+run=1 t=33814ms phase_done=SEARCHING wall=140ms stems=88ms bm25=30914ms bm25_at=31028ms bm25_needed=1ms wait=0ms titles=140ms
+run=1 t=219879ms completed
+##### trv-001 start skin=30.457592 11:36:13
+run=1 t=22765ms phase_done=PLANNING wall=22721ms tokens=5 tok_s=1.80 prompt_tokens=121
+run=1 t=144560ms phase_done=DRAFTING wall=117888ms tokens=162 tok_s=1.60 prompt_tokens=100
+run=1 t=144564ms phase_done=SEARCHING wall=0ms work=540ms stems=125ms bm25=40446ms bm25_at=40615ms titles=540ms
+run=1 t=308315ms phase_done=CHECKING wall=163703ms tokens=142 tok_s=1.46 prompt_tokens=654
+run=1 t=308318ms completed
+##### trv-002 start skin=30.381613 11:44:28
+run=1 t=25245ms phase_done=PLANNING wall=25211ms tokens=10 tok_s=1.94 prompt_tokens=121
+run=1 t=66331ms phase_done=DRAFTING wall=36826ms tokens=37 tok_s=1.76 prompt_tokens=100
+run=1 t=66333ms phase_done=SEARCHING wall=0ms work=547ms stems=57ms bm25=30439ms bm25_at=30528ms titles=547ms
+run=1 t=161993ms phase_done=CHECKING wall=95602ms tokens=59 tok_s=1.48 prompt_tokens=541
+run=1 t=161993ms completed
+##### trv-003 start skin=30.362732 11:50:10
+run=1 t=22612ms phase_done=PLANNING wall=22575ms tokens=5 tok_s=1.82 prompt_tokens=122
+run=1 t=108030ms phase_done=DRAFTING wall=85409ms tokens=115 tok_s=1.67 prompt_tokens=101
+run=1 t=108033ms phase_done=SEARCHING wall=0ms work=193ms stems=56ms bm25=43239ms bm25_at=43329ms titles=193ms
+run=1 t=212143ms phase_done=CHECKING wall=104044ms tokens=74 tok_s=1.51 prompt_tokens=538
+run=1 t=212144ms completed
+##### trv-004 start skin=30.35877 11:56:44
+run=1 t=26291ms phase_done=PLANNING wall=26274ms tokens=13 tok_s=2.24 prompt_tokens=124
+run=1 t=182068ms phase_done=DRAFTING wall=155771ms tokens=228 tok_s=1.65 prompt_tokens=103
+run=1 t=182069ms phase_done=SEARCHING wall=0ms work=366ms stems=88ms bm25=43443ms bm25_at=43544ms titles=366ms
+run=1 t=323233ms phase_done=CHECKING wall=141109ms tokens=124 tok_s=1.48 prompt_tokens=559
+run=1 t=323233ms completed
+##### trv-005 start skin=30.376822 12:05:09
+run=1 t=26378ms phase_done=PLANNING wall=26351ms tokens=8 tok_s=2.01 prompt_tokens=133
+run=1 t=26526ms phase_done=SEARCHING wall=145ms stems=96ms bm25=-1ms bm25_at=-1ms bm25_needed=0ms wait=0ms titles=145ms
+run=1 t=349939ms phase_done=ANSWERING wall=323412ms tokens=289 tok_s=1.50 prompt_tokens=1466
+run=1 t=349940ms completed
+##### trv-006 start skin=30.35844 12:14:04
+run=1 t=29903ms phase_done=PLANNING wall=29869ms tokens=15 tok_s=1.89 prompt_tokens=130
+run=1 t=32530ms phase_done=SEARCHING wall=247ms stems=49ms bm25=-1ms bm25_at=-1ms bm25_needed=0ms wait=0ms titles=246ms
+run=1 t=262105ms phase_done=ANSWERING wall=229572ms tokens=205 tok_s=1.46 prompt_tokens=1079
+run=1 t=262106ms completed
+##### trv-007 start skin=30.535242 12:21:27
+run=1 t=25219ms phase_done=PLANNING wall=25161ms tokens=5 tok_s=1.73 prompt_tokens=134
+run=1 t=160095ms phase_done=DRAFTING wall=134866ms tokens=183 tok_s=1.58 prompt_tokens=113
+run=1 t=160096ms phase_done=SEARCHING wall=0ms work=326ms stems=47ms bm25=45842ms bm25_at=45943ms titles=326ms
+run=1 t=290619ms phase_done=CHECKING wall=130474ms tokens=111 tok_s=1.53 prompt_tokens=572
+run=1 t=290619ms completed
+##### trv-008 start skin=30.391542 12:29:23
+run=1 t=26489ms phase_done=PLANNING wall=26458ms tokens=9 tok_s=1.91 prompt_tokens=130
+run=1 t=123030ms phase_done=DRAFTING wall=96535ms tokens=130 tok_s=1.66 prompt_tokens=109
+run=1 t=123032ms phase_done=SEARCHING wall=0ms work=1553ms stems=62ms bm25=34899ms bm25_at=34988ms titles=1553ms
+run=1 t=220399ms phase_done=CHECKING wall=97308ms tokens=47 tok_s=1.50 prompt_tokens=661
+run=1 t=220399ms completed
+##### trv-009 start skin=30.431171 12:35:51
+run=1 t=21451ms phase_done=PLANNING wall=21359ms tokens=2 tok_s=1.73 prompt_tokens=120
+run=1 t=97840ms phase_done=DRAFTING wall=76380ms tokens=97 tok_s=1.61 prompt_tokens=99
+run=1 t=97842ms phase_done=SEARCHING wall=0ms work=345ms stems=57ms bm25=39967ms bm25_at=40108ms titles=345ms
+run=1 t=224768ms phase_done=CHECKING wall=126865ms tokens=92 tok_s=1.47 prompt_tokens=639
+run=1 t=224768ms completed
+##### trv-010 start skin=30.342821 12:42:32
+run=1 t=26046ms phase_done=PLANNING wall=25920ms tokens=9 tok_s=1.87 prompt_tokens=125
+run=1 t=212464ms phase_done=DRAFTING wall=186413ms tokens=280 tok_s=1.66 prompt_tokens=104
+run=1 t=212467ms phase_done=SEARCHING wall=0ms work=524ms stems=67ms bm25=37916ms bm25_at=38108ms titles=524ms
+run=1 t=350626ms phase_done=CHECKING wall=138144ms tokens=124 tok_s=1.54 prompt_tokens=566
+run=1 t=350626ms completed
+##### dng-001 start skin=30.35154 12:51:13
+run=1 t=22606ms phase_done=PLANNING wall=22559ms tokens=2 tok_s=1.71 prompt_tokens=136
+run=1 t=109685ms phase_done=DRAFTING wall=87067ms tokens=118 tok_s=1.70 prompt_tokens=115
+run=1 t=109688ms phase_done=SEARCHING wall=0ms work=100ms stems=59ms bm25=51351ms bm25_at=51454ms titles=100ms
+run=1 t=251730ms phase_done=CHECKING wall=141990ms tokens=139 tok_s=1.59 prompt_tokens=541
+run=1 t=251731ms completed
+##### dng-002 start skin=30.240381 12:58:11
+run=1 t=26121ms phase_done=PLANNING wall=26113ms tokens=7 tok_s=1.91 prompt_tokens=133
+run=1 t=107604ms phase_done=DRAFTING wall=81481ms tokens=110 tok_s=1.75 prompt_tokens=112
+run=1 t=107605ms phase_done=SEARCHING wall=0ms work=167ms stems=56ms bm25=39844ms bm25_at=39906ms titles=167ms
+run=1 t=251404ms phase_done=CHECKING wall=143764ms tokens=129 tok_s=1.54 prompt_tokens=602
+run=1 t=251404ms completed
+##### dng-003 start skin=30.32794 13:04:53
+run=1 t=21432ms phase_done=PLANNING wall=21416ms tokens=1 tok_s=1.58 prompt_tokens=126
+run=1 t=103994ms phase_done=DRAFTING wall=82554ms tokens=114 tok_s=1.76 prompt_tokens=105
+run=1 t=103997ms phase_done=SEARCHING wall=0ms work=84ms stems=62ms bm25=44290ms bm25_at=44367ms titles=84ms
+run=1 t=246029ms phase_done=CHECKING wall=141974ms tokens=135 tok_s=1.54 prompt_tokens=534
+run=1 t=246029ms completed
+##### dng-004 start skin=30.245514 13:11:42
+run=1 t=29705ms phase_done=PLANNING wall=29680ms tokens=16 tok_s=1.90 prompt_tokens=135
+run=1 t=29906ms phase_done=SEARCHING wall=197ms stems=57ms bm25=-1ms bm25_at=-1ms bm25_needed=0ms wait=0ms titles=197ms
+run=1 t=194172ms phase_done=ANSWERING wall=164262ms tokens=135 tok_s=1.49 prompt_tokens=908
+run=1 t=194173ms completed
+##### dng-005 start skin=30.346422 13:17:54
+run=1 t=26642ms phase_done=PLANNING wall=26613ms tokens=9 tok_s=2.05 prompt_tokens=131
+run=1 t=212302ms phase_done=DRAFTING wall=185655ms tokens=279 tok_s=1.67 prompt_tokens=110
+run=1 t=212304ms phase_done=SEARCHING wall=0ms work=209ms stems=107ms bm25=41507ms bm25_at=41641ms titles=209ms
+run=1 t=314905ms phase_done=CHECKING wall=102544ms tokens=64 tok_s=1.49 prompt_tokens=589
+run=1 t=314905ms completed
+##### mth-001 start skin=30.27951 13:25:54
+run=1 t=22353ms phase_done=PLANNING wall=22331ms tokens=2 tok_s=1.69 prompt_tokens=137
+run=1 t=31361ms phase_done=SEARCHING wall=8998ms stems=54ms bm25=31282ms bm25_at=31355ms bm25_needed=1ms wait=8942ms titles=56ms
+run=1 t=209709ms phase_done=ANSWERING wall=178346ms tokens=140 tok_s=1.52 prompt_tokens=1093
+run=1 t=209710ms completed
+##### mth-002 start skin=30.274603 13:32:28
+run=1 t=25069ms phase_done=PLANNING wall=25043ms tokens=5 tok_s=1.80 prompt_tokens=145
+run=1 t=32894ms phase_done=SEARCHING wall=7812ms stems=70ms bm25=32779ms bm25_at=32872ms bm25_needed=1ms wait=7741ms titles=71ms
+run=1 t=206476ms phase_done=ANSWERING wall=173578ms tokens=127 tok_s=1.52 prompt_tokens=1128
+run=1 t=206478ms completed
+##### mth-003 start skin=30.545042 13:38:53
+run=1 t=26041ms phase_done=PLANNING wall=25996ms tokens=5 tok_s=1.74 prompt_tokens=159
+run=1 t=193330ms phase_done=DRAFTING wall=167283ms tokens=237 tok_s=1.62 prompt_tokens=142
+run=1 t=193332ms phase_done=SEARCHING wall=0ms work=244ms stems=55ms bm25=47749ms bm25_at=47848ms titles=244ms
+run=1 t=370219ms phase_done=CHECKING wall=176835ms tokens=157 tok_s=1.52 prompt_tokens=740
+run=1 t=370220ms completed
+##### mth-004 start skin=30.410492 13:48:09
+run=1 t=24507ms phase_done=PLANNING wall=24485ms tokens=4 tok_s=1.64 prompt_tokens=145
+run=1 t=112997ms phase_done=DRAFTING wall=88484ms tokens=110 tok_s=1.59 prompt_tokens=128
+run=1 t=113000ms phase_done=SEARCHING wall=0ms work=342ms stems=141ms bm25=52043ms bm25_at=52201ms titles=342ms
+run=1 t=236340ms phase_done=CHECKING wall=123278ms tokens=105 tok_s=1.49 prompt_tokens=512
+run=1 t=236341ms completed
+##### mth-005 start skin=30.44163 13:54:47
+run=1 t=28470ms phase_done=PLANNING wall=28456ms tokens=12 tok_s=1.98 prompt_tokens=147
+run=1 t=137231ms phase_done=DRAFTING wall=108755ms tokens=140 tok_s=1.57 prompt_tokens=130
+run=1 t=137234ms phase_done=SEARCHING wall=0ms work=255ms stems=62ms bm25=43392ms bm25_at=43467ms titles=255ms
+run=1 t=302956ms phase_done=CHECKING wall=165667ms tokens=160 tok_s=1.56 prompt_tokens=628
+run=1 t=302956ms completed
+##### mth-006 start skin=30.35935 14:02:37
+run=1 t=27519ms phase_done=PLANNING wall=27483ms tokens=11 tok_s=1.97 prompt_tokens=136
+run=1 t=127908ms phase_done=DRAFTING wall=100384ms tokens=136 tok_s=1.65 prompt_tokens=115
+run=1 t=127910ms phase_done=SEARCHING wall=0ms work=165ms stems=52ms bm25=41199ms bm25_at=41282ms titles=165ms
+run=1 t=290268ms phase_done=CHECKING wall=162307ms tokens=160 tok_s=1.49 prompt_tokens=536
+run=1 t=290269ms completed
+PHONE_EVAL_DONE
+##### food-018 places=199 here=true where=199 vegan places to eat within 2 km of your position
+##### food-019 places=46 here=true where=46 vegan places to eat within 2 km of your position
+##### food-020 places=35 here=true where=35 vegan places to eat within 2 km of your position
+LOCATED_DONE
+EVAL61_DONE

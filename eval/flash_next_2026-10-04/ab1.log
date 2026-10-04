@@ -1,0 +1,42 @@
+total 64930867
+-rw-rw-rw- 1 shell shell 37623740192 2026-09-28 03:01 Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf
+-rw-rw-rw- 1 shell shell 28800138432 2026-09-28 03:44 Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf
+drwxr-xr-x 2 shell shell        3452 2026-10-01 21:33 corpus
+=== ship1 bin=/data/local/tmp/bmoe-dfinal   skin=31.332632->37.003952
+"tokens":32 "tok_s":1.039 "prefill_s":141.312 "load_s":54.879 "cache_hit_pct":21.6 "n_prompt":426 "compute_s_tok":0.6654 "io_s_tok":1.1874 "read_mib":11623.2 "stall_s_tok":0.1759 "cpu_s_tok":4.3022 "prefill_cpu_s":669.009 "prefill_read_mib":20299.3 "prefill_stall_s":0.014 
+text: [1] Vegan Junkies: vegan restaurant located 0.5 km from the centre.\n[2] The Gre
+=== fn2a bin=/data/local/tmp/bmoe-fn2   skin=31.953524->37.85491
+"tokens":32 "tok_s":1.325 "prefill_s":69.728 "load_s":51.089 "cache_hit_pct":21.6 "n_prompt":426 "compute_s_tok":0.4842 "io_s_tok":1.0932 "read_mib":11644.4 "stall_s_tok":0.1336 "cpu_s_tok":3.3978 "prefill_cpu_s":315.856 "prefill_read_mib":20254.0 "prefill_stall_s":0.368 
+text: [1] Vegan Junkies: vegan restaurant located 0.5 km from the centre.\n[2] The Gre
+=== fn2prof bin=/data/local/tmp/bmoe-fn2   skin=31.979332->37.82975
+"tokens":8 "tok_s":1.232 "prefill_s":209.636 "load_s":52.257 "cache_hit_pct":6.9 "n_prompt":1216 "compute_s_tok":0.5267 "io_s_tok":1.1574 "read_mib":3017.9 "stall_s_tok":0.1534 "cpu_s_tok":3.6446 "prefill_cpu_s":969.904 "prefill_read_mib":25064.9 "prefill_stall_s":0.018 
+text: For a three-day visit to Kyoto,
+Cmdline: /system/bin/simpleperf record -p 13086 --duration 150 -f 1000 -o /data/local/tmp/bench_fn2/fn2prof.perf
+Arch: arm64
+Event: cpu-cycles:u (type 0, config 0)
+Samples: 694704
+Event count: 1118397680998
+
+Overhead  Shared Object                                   Symbol
+26.06%    /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_vec_dot_bf16
+22.21%    /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_vec_dot_q3_K_q8_K
+11.62%    /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_vec_dot_iq4_xs_q8_K
+7.05%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_vec_dot_q2_0_q8_0
+6.89%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<8>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+3.66%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<7>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+3.04%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_graph_compute_thread
+1.96%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_compute_forward_mul
+1.96%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_iqk_moe_mul_mat
+1.73%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_compute_forward_flash_attn_ext
+1.64%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_compute_forward_gated_delta_net
+1.48%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_gemm_q4_K_8x4_q8_K
+1.11%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_vec_dot_f32
+1.10%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_compute_forward_add_non_quantized
+0.73%     /apex/com.android.runtime/lib64/bionic/libm.so  expf
+0.72%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<6>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.68%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_compute_forward_ssm_conv
+0.66%     /apex/com.android.runtime/lib64/bionic/libc.so  __memmove_aarch64_simd
+0.66%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_compute_forward_mul_mat
+0.63%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_cpu_fp32_to_bf16
+0.43%     /data/local/tmp/bmoe-fn2/libggml-cpu.so         ggml_compute_forward_sigmoid
+AB1_DONE

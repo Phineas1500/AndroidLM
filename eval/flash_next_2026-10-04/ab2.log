@@ -1,0 +1,44 @@
+=== fn3a bin=/data/local/tmp/bmoe-fn3   skin=31.998354->38.525562
+"tokens":32 "tok_s":1.411 "prefill_s":41.861 "load_s":52.247 "cache_hit_pct":21.6 "n_prompt":426 "compute_s_tok":0.4521 "io_s_tok":1.0285 "read_mib":11624.6 "stall_s_tok":0.1002 "cpu_s_tok":3.2434 "prefill_cpu_s":171.070 "prefill_read_mib":20262.0 "prefill_stall_s":0.328 
+text: [1] Vegan Junkies: vegan restaurant located 0.5 km from the centre.\n[2] The Gre
+=== fn2b bin=/data/local/tmp/bmoe-fn2   skin=31.980932->37.789032
+"tokens":32 "tok_s":1.295 "prefill_s":71.019 "load_s":54.594 "cache_hit_pct":21.6 "n_prompt":426 "compute_s_tok":0.4953 "io_s_tok":1.1016 "read_mib":11644.4 "stall_s_tok":0.1300 "cpu_s_tok":3.4876 "prefill_cpu_s":321.236 "prefill_read_mib":20254.0 "prefill_stall_s":0.648 
+text: [1] Vegan Junkies: vegan restaurant located 0.5 km from the centre.\n[2] The Gre
+=== fn3b bin=/data/local/tmp/bmoe-fn3   skin=31.985811->38.18426
+"tokens":32 "tok_s":1.444 "prefill_s":40.232 "load_s":51.559 "cache_hit_pct":21.6 "n_prompt":426 "compute_s_tok":0.4492 "io_s_tok":1.0448 "read_mib":11624.6 "stall_s_tok":0.1248 "cpu_s_tok":3.0940 "prefill_cpu_s":165.483 "prefill_read_mib":20262.0 "prefill_stall_s":0.427 
+text: [1] Vegan Junkies: vegan restaurant located 0.5 km from the centre.\n[2] The Gre
+=== fn3prof bin=/data/local/tmp/bmoe-fn3   skin=31.90595->37.751484
+"tokens":8 "tok_s":1.290 "prefill_s":111.418 "load_s":54.125 "cache_hit_pct":6.9 "n_prompt":1216 "compute_s_tok":0.4868 "io_s_tok":1.1439 "read_mib":3021.9 "stall_s_tok":0.1238 "cpu_s_tok":3.5061 "prefill_cpu_s":494.875 "prefill_read_mib":25087.7 "prefill_stall_s":0.017 
+text: For a three-day visit to Kyoto,
+15.58%    /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<8>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+15.14%    /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_bf16_r8_bf16<6>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+14.01%    /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q6k_u_r8_q8_k<4>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+7.53%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_graph_compute_thread
+6.86%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<7>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+3.72%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         (anonymous namespace)::iqk_unpack_q2_0_r8(int, void const*, unsigned long, void*, int)
+3.58%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_gemm_q4_K_8x4_q8_K
+3.53%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_flash_attn_ext
+3.08%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_mul
+3.04%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_gated_delta_net
+2.17%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_vec_dot_f32
+2.00%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_add_non_quantized
+1.68%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_vec_dot_q2_0_q8_0
+1.52%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_ssm_conv
+1.33%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<6>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+1.30%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_graph_compute_secondary_thread
+1.28%     /apex/com.android.runtime/lib64/bionic/libm.so  expf
+1.06%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_cpu_fp32_to_bf16
+0.93%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_sigmoid
+0.92%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q5k_u_r8_q8_k<4>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.89%     /apex/com.android.runtime/lib64/bionic/libc.so  __memmove_aarch64_simd
+0.88%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_vec_dot_bf16
+0.56%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_concat
+0.50%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void (anonymous namespace)::mul_mat_q2_0_u_r8_q8_0<5>(int, void const*, unsigned long, (anonymous namespace)::DataInfo const&, int)
+0.50%     /data/local/tmp/bmoe-fn3/libggml-base.so        quantize_row_q8_K_ref
+0.43%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_rms_norm
+0.41%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_vec_swiglu_f32
+0.40%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_compute_forward_rms_norm_mul_fused
+0.39%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         ggml_vec_dot_q5_0_q8_0
+0.37%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         quantize_row_q8_0
+0.36%     /data/local/tmp/bmoe-fn3/libggml-cpu.so         void std::__ndk1::__introsort<std::__ndk1::_ClassicAlgPolicy, cmp_argsort<(ggml_sort_order)1>&, int*, false>(int*, int*, cmp_argsort<(ggml_sort_order)1>&, std::__ndk1::iterator_traits<int*>::difference_type, bool)
+AB2_DONE

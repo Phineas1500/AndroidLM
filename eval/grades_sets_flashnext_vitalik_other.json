@@ -1,0 +1,379 @@
+{
+ "dng-001": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 5
+  },
+  "errors": {
+   "A": [
+    "Tells a lone victim to hike out 'as fast as possible'; guidance is to walk out at a calm, steady pace and minimise exertion",
+    "Only calls for help after reaching road/signal; no mention of calling now if there is signal or using satellite SOS",
+    "Omits washing/covering the bite, marking swelling with time, and avoiding NSAIDs"
+   ],
+   "B": [],
+   "C": [
+    "Says walk out 'as quickly as possible' rather than at a calm pace",
+    "Omits ice, alcohol, NSAIDs warnings, washing/covering and marking swelling"
+   ]
+  },
+  "best": "B",
+  "reason": "B covers every key do and don't (rings, neutral limb, wash/cover, mark swelling, no tourniquet/cutting/ice/NSAIDs) plus a sensible walk-out-vs-wait plan; A and C are thinner and push a fast hike-out."
+ },
+ "dng-002": {
+  "scores": {
+   "A": 7,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Contradictory heat advice: recommends warm compresses to the core but then says not to rewarm with heating pads or hot water at all",
+    "Says to begin CPR 'only if you are trained', which discourages lay CPR",
+    "Labels the presentation as severe hypothermia when shivering with confusion is typically moderate"
+   ],
+   "B": [
+    "Omits insulation from the ground, gentle handling, core-first warming and CPR",
+    "Vague escalation: only says call emergency services if unconscious/confused/unable to speak"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives a complete, correct field protocol (shelter, insulate from ground, gentle handling, remove wet clothes, core warming, skin-to-skin, drinks only if alert, CPR guidance); A is good but self-contradictory, B is thin."
+ },
+ "dng-003": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Omits cling film covering, pain relief and keeping the child warm; does not say a child's burn should always be checked"
+   ],
+   "C": [
+    "Cooling time given as 10-20 minutes; guidance is a full 20 minutes",
+    "Opens with 'call 911/go to the ER immediately' for any scald, which may delay the immediate cooling step and over-escalates minor burns"
+   ]
+  },
+  "best": "A",
+  "reason": "A matches NHS/Red Cross guidance exactly (20 min cool running water, cling film, no creams/ice, when to escalate, child-specific advice); B and C are correct in outline but less precise."
+ },
+ "dng-004": {
+  "scores": {
+   "A": 10,
+   "B": 4,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Confusing advice about avoiding beds/sofas with stored items above them; omits 'stay in bed and protect head' guidance",
+    "Omits not running outside, not using doorways, and leaving a damaged building by the stairs; 'have emergency food and water stored' is not post-quake action"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A covers drop-cover-hold-on, in-bed guidance, no doorways/running, aftershocks, damage evacuation, gas, and tsunami triggers; C is solid but less complete; B is thin."
+ },
+ "dng-005": {
+  "scores": {
+   "A": 9,
+   "B": 6,
+   "C": 5
+  },
+  "errors": {
+   "A": [
+    "States 1-micron filters handle bacteria; 1 micron absolute removes parasites but bacteria need ~0.3 micron or finer"
+   ],
+   "B": [
+    "Bleach dose given as 2-4 drops per liter for clear water then doubled for cloudy; CDC is 2 drops/liter clear, 4 for cloudy",
+    "Does not mention bottled water or local boil-water notices",
+    "Irrelevant demineralised-water digression; answer is truncated"
+   ],
+   "C": [
+    "Bleach underdosed: 5-6 drops per gallon (CDC: 8 drops for 5-9% bleach) and 8-10 for cloudy water (CDC: 16)",
+    "Suggests NSF 42/53 filters, which are not microbial-removal certifications (NSF 42 is taste/odour)"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives exact CDC boiling and bleach doses, altitude rule, cloudy-water pre-filtering, chemical-contamination limits and bottled water first; B and C have wrong bleach doses."
+ },
+ "mth-001": {
+  "scores": {
+   "A": 9,
+   "B": 9,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All three get 31.36 mpg; C shows the unit conversion step by step and adds the imperial figure (37.7 mpg) correctly."
+ },
+ "mth-002": {
+  "scores": {
+   "A": 9,
+   "B": 10,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "All correctly compute 5.6 h; B also converts to hours/minutes and adds useful caveats (breaks, terrain, group variant 7.2 h, correct)."
+ },
+ "mth-003": {
+  "scores": {
+   "A": 8,
+   "B": 10,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "Source-check text states the total as $73.83, contradicting the correct $73.84 in the answer"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "All reach $67.12 and $73.84; B is cleanest and adds accurate Thai service-charge/tipping context."
+ },
+ "mth-004": {
+  "scores": {
+   "A": 9,
+   "B": 9,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All give 18 L and ~18 kg; C adds pounds, per-person load and practical water advice."
+ },
+ "mth-005": {
+  "scores": {
+   "A": 7,
+   "B": 7,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Says 'yes, can take it on a plane' without stating power banks are banned from checked baggage"
+   ],
+   "B": [
+    "Says 'yes, can take it on a plane' without stating power banks are banned from checked baggage"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All compute 19.25 Wh, but only C states the key rule that power banks must be in carry-on, never checked, plus the 100/160 Wh tiers and newer airline restrictions."
+ },
+ "mth-006": {
+  "scores": {
+   "A": 7,
+   "B": 8,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All convert to 40 C correctly; C cites the NWS danger threshold and gives practical precautions and heat-illness warning signs."
+ },
+ "trv-001": {
+  "scores": {
+   "A": 10,
+   "B": 3,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Claims 112 is Thailand's primary integrated emergency number (main local numbers are 191/1669/199)",
+    "Gives ambulance as 192 (correct: 1669)",
+    "Gives tourist police as 115 (correct: 1155); corrections appear only in the appended source check, leaving a contradictory answer"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A lists 191, 1669, 199 and 1155 correctly with practical tips (1672 TAT, embassy); C is also correct; B's main answer has wrong numbers."
+ },
+ "trv-002": {
+  "scores": {
+   "A": 8,
+   "B": 7,
+   "C": 4
+  },
+  "errors": {
+   "A": [
+    "Lists Salvador as mostly 220 V; Salvador is 127 V (an exception within Bahia)"
+   ],
+   "B": [],
+   "C": [
+    "Gives the standard voltage as 120 V; Brazil's nominal low voltage is 127 V",
+    "Omits 60 Hz and any device guidance"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains Type N/C, the state-dependent 127/220 V split, 60 Hz and what it means for devices, with one city mislabelled; B is correct but less detailed; C is minimal and slightly off."
+ },
+ "trv-003": {
+  "scores": {
+   "A": 10,
+   "B": 2,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says tap water in Mexico City is generally safe to drink; CDC and standard travel advice is not to drink it"
+   ],
+   "C": [
+    "Says the water is officially 'classified as non-potable'; it is treated to potable standards and contaminated in distribution/storage"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives the correct 'no' with the right reasons (pipes, tinacos) and practical alternatives (garrafones, purified ice); B's bottom line is wrong."
+ },
+ "trv-004": {
+  "scores": {
+   "A": 3,
+   "B": 4,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Says the red line goes directly to Restauradores and Baixa-Chiado; it ends at Sao Sebastiao and needs a transfer",
+    "Recommends the Aerobus, which was discontinued (suspended 2022)",
+    "Card name wrong ('Navegante Oeste'; it is the Navegante occasional card)",
+    "Says taxis have a fixed Zona 1 fare; Lisbon taxis are metered",
+    "Answer is truncated"
+   ],
+   "B": [
+    "Says take the red line towards 'Alameda or Santos'; Santos is not on the line (terminus Sao Sebastiao) and a transfer is needed for the historic centre",
+    "Cites airport bus route 700, which does not serve the airport (e.g. 744/783 do)"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C is accurate and current (red line plus transfer points, 2026 fares, Aerobus gone, T2 shuttle, P2 ride-hail pickup); A and B misdescribe the metro and list wrong bus options."
+ },
+ "trv-005": {
+  "scores": {
+   "A": 10,
+   "B": 8,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Says cash is commonly used for public transport; Tbilisi buses/metro take only Metromoney or contactless cards, not cash"
+   ]
+  },
+  "best": "A",
+  "reason": "A is accurate and practical (lari, contactless everywhere incl. metro, where cash is needed, ATMs, decline DCC); B is correct but more generic; C pads with trivia and has a transport-payment error."
+ },
+ "trv-006": {
+  "scores": {
+   "A": 2,
+   "B": 10,
+   "C": 4
+  },
+  "errors": {
+   "A": [
+    "Says all drivers including tourists must pass a test and get a Thai probationary licence; tourists can drive with home licence plus IDP",
+    "Omits the International Driving Permit and the motorcycle licence/insurance issue"
+   ],
+   "B": [],
+   "C": [
+    "Does not mention that non-ASEAN tourists need an International Driving Permit",
+    "Omits motorcycle licence category and insurance implications"
+   ]
+  },
+  "best": "B",
+  "reason": "B is correct and complete (left side, IDP incl. UK 1968 version, motorcycle endorsement, insurance voiding, safety); A gives wrong licensing rules, C is incomplete."
+ },
+ "trv-007": {
+  "scores": {
+   "A": 8,
+   "B": 8,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Claims Thais casually say just 'khop' (written 'คอบ'), which is not a standard form; casual thanks is 'khop jai'"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All give khop khun + khrap/kha correctly; C adds speaker-gender clarification, tone, 'mak' and 'khop jai' accurately."
+ },
+ "trv-008": {
+  "scores": {
+   "A": 5,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "Places smoky season mid/late March to May with worst air in April and May; it typically runs Feb-April and peaks in March, improving by May"
+   ],
+   "B": [],
+   "C": [
+    "Says smoke peaks in April and runs to May; it usually peaks in March and starts in February"
+   ]
+  },
+  "best": "B",
+  "reason": "B correctly gives Nov-early Feb as best and Feb-April smoke peaking in March, plus accurate festivals and practical AQI advice; A and C shift the smoke season too late."
+ },
+ "trv-009": {
+  "scores": {
+   "A": 6,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Says service charges are typically included in Portuguese bills; this is uncommon",
+    "Calls 5-10% an 'expected' gesture, contradicting 'not mandatory'"
+   ],
+   "B": [
+    "Says service charges are typically included in the bill; this is uncommon in Portugal",
+    "Suggests tipping only for exceptional service (1-2 euros), understating the usual round-up/5-10% practice"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives accurate norms (round up, 5-10%, service charge uncommon) plus the useful couvert tip; A and B wrongly say service is usually included."
+ },
+ "trv-010": {
+  "scores": {
+   "A": 10,
+   "B": 5,
+   "C": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says cash is rarely accepted via the apps; Grab and Bolt in Bangkok widely accept cash payment"
+   ],
+   "C": [
+    "Very thin: no pricing, timing/surge, payment or airport guidance; says drivers 'typically use meters' which is muddled"
+   ]
+  },
+  "best": "A",
+  "reason": "A is accurate and practical (Grab vs Bolt, cash/card, surge timing, airport pickup points, metered taxis); B has a payment error, C says little."
+ }
+}

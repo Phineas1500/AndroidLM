@@ -1,0 +1,273 @@
+{
+ "broad-02": {
+  "scores": {
+   "A": 4,
+   "B": 5,
+   "C": 6,
+   "D": 5
+  },
+  "errors": {
+   "A": [
+    "Neighbor list omits Turkey (presented as complete)",
+    "Says the economy is driven by energy exports; Georgia is a net energy importer"
+   ],
+   "B": [
+    "Neighbor list omits Turkey (presented as complete)"
+   ],
+   "C": [
+    "Neighbor list omits Turkey (presented as complete)"
+   ],
+   "D": [
+    "Mount Shkhara given as 4,860 m (it is about 5,193 m)",
+    "Calls Georgia the first country to adopt Christianity as state religion (Armenia was first, c. 301)",
+    "Claims a strong presidency in foreign policy; since the 2017-18 constitution the president is largely ceremonial",
+    "Truncated mid-sentence"
+   ]
+  },
+  "best": "C",
+  "reason": "None of the four handles the country/US-state ambiguity; C is accurate, names the capital, and covers politics, conflicts and culture, while D has more detail but factual errors and is cut off."
+ },
+ "fact-02": {
+  "scores": {
+   "A": 10,
+   "B": 10,
+   "C": 10,
+   "D": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "tie",
+  "reason": "All correctly give Gabriel Garcia Marquez and 1967; D's extra context (Editorial Sudamericana, Rabassa translation) is accurate but not needed."
+ },
+ "fact-04": {
+  "scores": {
+   "A": 9,
+   "B": 10,
+   "C": 9,
+   "D": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "B",
+  "reason": "All give The Merge on 15 September 2022; B adds accurate context on the Beacon Chain (Dec 2020) merging with the execution layer."
+ },
+ "fact-07": {
+  "scores": {
+   "A": 10,
+   "B": 10,
+   "C": 10,
+   "D": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": [
+    "Says the name reverted from Nur-Sultan to Astana in September 2023 (it was September 2022)",
+    "Says Akmola was the capital of the Kazakh SSR (Alma-Ata/Almaty was)"
+   ]
+  },
+  "best": "B",
+  "reason": "A, B and C are correct; B adds an accurate note on the Nur-Sultan rename (2019) and reversion (2022), while D gets both the year and the Soviet-era capital wrong."
+ },
+ "fresh-04": {
+  "scores": {
+   "A": 3,
+   "B": 3,
+   "C": 1,
+   "D": 3
+  },
+  "errors": {
+   "A": [
+    "Outdated: the most recent World Cup is 2026, won by Spain (1-0 a.e.t. over Argentina, 19 July 2026), not Argentina"
+   ],
+   "B": [
+    "Outdated: the most recent World Cup is 2026, won by Spain (1-0 a.e.t. over Argentina, 19 July 2026), not Argentina"
+   ],
+   "C": [
+    "Says France (2018) won the most recent World Cup; Spain won in 2026 and Argentina in 2022",
+    "Says France won the inaugural 1930 tournament (Uruguay did; France's first title was 1998)",
+    "Says the next World Cup is 2022 in Qatar while calling Argentina current champion (contradictory and outdated)"
+   ],
+   "D": [
+    "Outdated: the most recent World Cup is 2026, won by Spain (1-0 a.e.t. over Argentina, 19 July 2026), not Argentina"
+   ]
+  },
+  "best": "tie",
+  "reason": "As of October 2026 the answer is Spain (2026); A, B and D give the correct 2022 result but miss the 2026 tournament, and C is wrong by two tournaments with further errors."
+ },
+ "health-01": {
+  "scores": {
+   "A": 7,
+   "B": 6,
+   "C": 8,
+   "D": 7
+  },
+  "errors": {
+   "A": [
+    "Sacred Valley given as about 2,500 m (it is about 2,800-3,000 m)"
+   ],
+   "B": [],
+   "C": [],
+   "D": [
+    "Lists Machu Picchu as a higher site than Cusco (it is about 2,430 m, lower)",
+    "Says many hospitals have hyperbaric chambers (Gamow bags); Gamow bags are portable field devices",
+    "Says oxygen only masks symptoms; supplemental oxygen is a standard treatment for AMS/HAPE",
+    "Truncated mid-list"
+   ]
+  },
+  "best": "C",
+  "reason": "C is accurate and clear: rest/hydrate, descend if worse, acetazolamide with a doctor, typical 24-48 h course, and HAPE/HACE warning signs; D is the most thorough but has errors and is cut off, and B is thin."
+ },
+ "tech-03": {
+  "scores": {
+   "A": 4,
+   "B": 5,
+   "C": 6,
+   "D": 4
+  },
+  "errors": {
+   "A": [
+    "Says PBS was implemented in The Merge via EIP-4844; PBS today is out-of-protocol (MEV-Boost) and EIP-4844 is blob transactions (Dencun, 2024)",
+    "Claims PBS/MEV-Boost reduces censorship risk; in practice it raised censorship concerns (OFAC-compliant relays/builders)",
+    "Lists MEV-Boost relays as builders"
+   ],
+   "B": [],
+   "C": [
+    "Defines the proposer as the one who decides which transactions go in the block (that is the builder's role)"
+   ],
+   "D": [
+    "Defines the proposer as the one who selects transactions and builds the block (that is the builder)",
+    "Says in the current model validators build blocks directly; most blocks are built by external builders via MEV-Boost"
+   ]
+  },
+  "best": "C",
+  "reason": "C explains the builder auction and correctly places enshrined PBS on the roadmap, despite a muddled proposer definition; B is vague but error-free, while A and D misstate core facts."
+ },
+ "tech-06": {
+  "scores": {
+   "A": 8,
+   "B": 7,
+   "C": 4,
+   "D": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "D": [],
+   "C": [
+    "Opens by saying Shor does not directly threaten ECC the way it does RSA (misleading)",
+    "Says breaking ECC needs significantly more quantum resources than RSA at equal security; ECC-256 needs fewer logical qubits (~2,300) than RSA-3072 (~6,000)",
+    "Says quantum circuit cost for ECC is higher per bit of security than finite-field DLP (the reverse holds)"
+   ]
+  },
+  "best": "A",
+  "reason": "A correctly explains ECDLP, the polynomial-time quantum attack versus classical Pollard rho, and the post-quantum migration; B and D are correct but shorter, and C has wrong resource comparisons."
+ },
+ "tech-08": {
+  "scores": {
+   "A": 5,
+   "B": 3,
+   "C": 6,
+   "D": 6
+  },
+  "errors": {
+   "A": [
+    "Calls Verkle trees EIP-4488 (that EIP is calldata cost reduction; Verkle is EIP-6800)"
+   ],
+   "B": [
+    "Claims proofs are constant size (a single 128-byte commitment); Verkle proofs are much smaller but still grow with depth",
+    "Expands KZG as Kate-Zaveruchi-Gasarch (it is Kate, Zaverucha, Goldberg)",
+    "Says Ethereum's Verkle design uses KZG; EIP-6800 uses Pedersen commitments with IPA",
+    "Places Verkle in The Purge (it is The Verge)"
+   ],
+   "C": [
+    "Says the proof is a single commitment of constant size regardless of the number of accounts",
+    "Says Ethereum's Verkle design uses Kate (KZG) commitments; EIP-6800 uses Pedersen/IPA"
+   ],
+   "D": [
+    "Says Ethereum's Verkle design uses Kate (KZG) commitments; EIP-6800 uses Pedersen/IPA",
+    "Conflates state with history (nodes not storing full blockchain history is EIP-4444, not Verkle)"
+   ]
+  },
+  "best": "tie",
+  "reason": "C and D both explain vector/polynomial commitments, smaller witnesses and stateless clients with only modest errors; none notes Ethereum's 2025 shift toward a binary tree, and B has several false specifics."
+ },
+ "trav-01": {
+  "scores": {
+   "A": 3,
+   "B": 5,
+   "C": 5,
+   "D": 5
+  },
+  "errors": {
+   "A": [
+    "Says the Red Line runs towards Sao Francisco Xavier (its terminus is Sao Sebastiao)",
+    "Says Baixa-Chiado and Terreiro do Paco are direct Red Line stops; both need a change (Alameda/Sao Sebastiao)",
+    "Says metro machines do not accept cash (they do)",
+    "Bus lines 728/756 and '728 Cesta' are not airport routes",
+    "Truncated"
+   ],
+   "B": [
+    "Recommends the Aerobus with routes A1/A2/A3; the Aerobus has been suspended since 2022 and those routes never existed",
+    "Buses 721/722 to Saldanha/Rossio are not the airport routes"
+   ],
+   "C": [
+    "Recommends the Aerobus, which has been suspended since 2022",
+    "Says the Yellow Line can be reached at Alameda (Alameda is Red/Green only)"
+   ],
+   "D": [
+    "Buses 780/781 do not serve the airport"
+   ]
+  },
+  "best": "tie",
+  "reason": "B, C and D correctly send travellers on the Red Line with a change at Alameda/Saldanha, but each adds bus advice that is wrong or outdated; A wrongly says the Red Line goes straight to Baixa-Chiado."
+ },
+ "trav-11": {
+  "scores": {
+   "A": 9,
+   "B": 10,
+   "C": 3,
+   "D": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "D": [],
+   "C": [
+    "Describes the Argentine plug as two flat parallel pins and a round ground pin (that is Type B; Type I has angled flat pins)",
+    "Claims some buildings/regions still have 110 V (Argentina is 220 V nationwide)",
+    "Says plug shape is consistent nationwide and omits Type C, which is still common"
+   ]
+  },
+  "best": "B",
+  "reason": "A, B and D correctly give Type C and Type I at 220 V 50 Hz; B labels the plug styles helpfully, while C contradicts itself and invents 110 V outlets."
+ },
+ "zh-04": {
+  "scores": {
+   "A": 8,
+   "B": 8,
+   "C": 7,
+   "D": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": [
+    "The colour-blind ball analogy is garbled (roles confused; the protocol as described would not convince anyone)",
+    "Says Monero uses zk-SNARKs/zk-STARKs to hide sender, receiver and amount; Monero uses ring signatures, stealth addresses and RingCT/Bulletproofs"
+   ]
+  },
+  "best": "B",
+  "reason": "A, B and C give correct definitions and the three properties; B adds a concrete password example and applications, while D is fuller but has a broken analogy and a Monero error."
+ }
+}

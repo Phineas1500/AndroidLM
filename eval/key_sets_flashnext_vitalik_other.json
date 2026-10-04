@@ -1,0 +1,107 @@
+{
+ "dng-001": {
+  "A": "qwen36",
+  "B": "web",
+  "C": "flashnext"
+ },
+ "dng-002": {
+  "A": "qwen36",
+  "B": "flashnext",
+  "C": "web"
+ },
+ "dng-003": {
+  "A": "web",
+  "B": "flashnext",
+  "C": "qwen36"
+ },
+ "dng-004": {
+  "A": "web",
+  "B": "flashnext",
+  "C": "qwen36"
+ },
+ "dng-005": {
+  "A": "web",
+  "B": "qwen36",
+  "C": "flashnext"
+ },
+ "mth-001": {
+  "A": "flashnext",
+  "B": "qwen36",
+  "C": "web"
+ },
+ "mth-002": {
+  "A": "qwen36",
+  "B": "web",
+  "C": "flashnext"
+ },
+ "mth-003": {
+  "A": "qwen36",
+  "B": "web",
+  "C": "flashnext"
+ },
+ "mth-004": {
+  "A": "qwen36",
+  "B": "flashnext",
+  "C": "web"
+ },
+ "mth-005": {
+  "A": "flashnext",
+  "B": "qwen36",
+  "C": "web"
+ },
+ "mth-006": {
+  "A": "flashnext",
+  "B": "qwen36",
+  "C": "web"
+ },
+ "trv-001": {
+  "A": "web",
+  "B": "flashnext",
+  "C": "qwen36"
+ },
+ "trv-002": {
+  "A": "web",
+  "B": "qwen36",
+  "C": "flashnext"
+ },
+ "trv-003": {
+  "A": "web",
+  "B": "flashnext",
+  "C": "qwen36"
+ },
+ "trv-004": {
+  "A": "qwen36",
+  "B": "flashnext",
+  "C": "web"
+ },
+ "trv-005": {
+  "A": "web",
+  "B": "qwen36",
+  "C": "flashnext"
+ },
+ "trv-006": {
+  "A": "flashnext",
+  "B": "web",
+  "C": "qwen36"
+ },
+ "trv-007": {
+  "A": "qwen36",
+  "B": "flashnext",
+  "C": "web"
+ },
+ "trv-008": {
+  "A": "qwen36",
+  "B": "web",
+  "C": "flashnext"
+ },
+ "trv-009": {
+  "A": "qwen36",
+  "B": "flashnext",
+  "C": "web"
+ },
+ "trv-010": {
+  "A": "web",
+  "B": "flashnext",
+  "C": "qwen36"
+ }
+}
