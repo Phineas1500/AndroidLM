@@ -125,6 +125,22 @@ object ModelManager {
      */
     fun isAppDeletable(f: File): Boolean = !f.absolutePath.startsWith(TMP_MODEL_DIR.absolutePath)
 
+    // AndroidLM: the model the user picked, by file name, so a second model (Qwen3.8-Flash-Next)
+    // stays chosen across app starts. Without a choice, or when that file is gone: the first.
+    private const val PICK_PREFS = "androidlm_model_pick"
+    private const val PICK_KEY = "model"
+
+    fun preferredIndex(ctx: Context, models: List<File>): Int {
+        val name = ctx.getSharedPreferences(PICK_PREFS, Context.MODE_PRIVATE).getString(PICK_KEY, null)
+        return models.indexOfFirst { it.name == name }.coerceAtLeast(0)
+    }
+
+    fun preferredModel(ctx: Context, models: List<File>): File? = models.getOrNull(preferredIndex(ctx, models))
+
+    fun setPreferred(ctx: Context, fileName: String) {
+        ctx.getSharedPreferences(PICK_PREFS, Context.MODE_PRIVATE).edit().putString(PICK_KEY, fileName).apply()
+    }
+
     /** Absolute path of libbmoe-cli.so inside the app's nativeLibraryDir. */
     fun cliPath(ctx: Context): String =
         File(ctx.applicationInfo.nativeLibraryDir, "libbmoe-cli.so").absolutePath

@@ -91,7 +91,7 @@ class MainActivity : ComponentActivity() {
         Thread {
             val settings = AppSettings.load(this)
             if (!settings.researchMode || CorpusLocator.find(this) == null) return@Thread
-            val model = ModelManager.listMoeModels(this).firstOrNull() ?: return@Thread
+            val model = ModelManager.preferredModel(this, ModelManager.listMoeModels(this)) ?: return@Thread
             runOnUiThread {
                 val now = RunBus.state.value
                 if (now.sessionSig == null && now.state == EngineState.IDLE) preloadSession(this, model, settings)
@@ -107,16 +107,20 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Dev builds only: start a research run on the first model from adb, for scripted timing runs
-     * (phase timings are logged under the AndroidLM tag):
+     * Dev builds only: start a research run from adb, for scripted timing runs (phase timings are
+     * logged under the AndroidLM tag), on the chosen model or the first whose file name contains
+     * the optional research_model extra:
      *   adb shell am start -S -n io.github.phineas1500.androidlm.dev/io.bigmoeonedge.example.MainActivity \
-     *     --es research_question "..."
+     *     --es research_question "..." [--es research_model Flash-Next]
      */
     private fun autoResearch(intent: Intent?) {
         if (!BuildConfig.SHARED_STORAGE) return
         val question = intent?.getStringExtra(EXTRA_AUTO_RESEARCH)?.takeIf { it.isNotBlank() } ?: return
+        val want = intent.getStringExtra(EXTRA_AUTO_MODEL)?.takeIf { it.isNotBlank() }
         Thread {
-            val model = ModelManager.listMoeModels(this).firstOrNull() ?: return@Thread
+            val models = ModelManager.listMoeModels(this)
+            val model = (want?.let { w -> models.firstOrNull { it.name.contains(w) } }
+                ?: ModelManager.preferredModel(this, models)) ?: return@Thread
             val settings = AppSettings.load(this)
             runOnUiThread { launchResearch(this, model, question, settings, RunBus.state.value.sessionSig) }
         }.start()
@@ -124,6 +128,7 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val EXTRA_AUTO_RESEARCH = "research_question"
+        const val EXTRA_AUTO_MODEL = "research_model"
     }
 
     private fun isSystemDark(): Boolean {
@@ -174,7 +179,7 @@ private fun Root() {
         scanning = true
         corpus = withContext(Dispatchers.IO) { CorpusLocator.find(context) }
         models = withContext(Dispatchers.IO) { ModelManager.listMoeModels(context) }
-        if (modelIdx >= models.size) modelIdx = 0
+        modelIdx = ModelManager.preferredIndex(context, models)
         scanning = false
     }
 
@@ -194,7 +199,7 @@ private fun Root() {
             models = models,
             scanning = scanning,
             modelIdx = modelIdx.coerceIn(0, maxOf(0, models.size - 1)),
-            onSelectModel = { modelIdx = it },
+            onSelectModel = { modelIdx = it; models.getOrNull(it)?.let { f -> ModelManager.setPreferred(context, f.name) } },
             onRefresh = { refreshKey++ },
             onOpenSettings = { showSettings = true },
             onOpenMetrics = { showMetrics = true },

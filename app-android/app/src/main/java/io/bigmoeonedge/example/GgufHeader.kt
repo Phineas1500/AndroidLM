@@ -102,6 +102,29 @@ object GgufHeader {
         return false
     }
 
+    /**
+     * AndroidLM: the model's `general.architecture` ("qwen35moe", "qwen4exp", ...), or null when the
+     * header cannot be read. Stops at that key, normally the first, so it reads a few hundred bytes.
+     */
+    fun architecture(f: File): String? =
+        runCatching { f.inputStream().buffered().use { parseArchitecture(Counting(it)) } }.getOrNull()
+
+    private fun parseArchitecture(s: Counting): String? {
+        val magic = ByteArray(4)
+        s.readFully(magic)
+        if (String(magic, Charsets.US_ASCII) != "GGUF" || s.u32() < 2) return null
+        s.u64() // tensor count
+        val kvCount = s.u64()
+        for (i in 0 until kvCount) {
+            val key = readString(s)
+            val type = s.u32()
+            if (key == "general.architecture" && type == T_STRING) return readString(s)
+            skipValue(s, type)
+            if (s.pos > MAX_HEADER_BYTES) return null
+        }
+        return null
+    }
+
     private fun isIntScalar(type: Int): Boolean = when (type) {
         T_UINT8, T_INT8, T_UINT16, T_INT16, T_UINT32, T_INT32, T_UINT64, T_INT64 -> true
         else -> false

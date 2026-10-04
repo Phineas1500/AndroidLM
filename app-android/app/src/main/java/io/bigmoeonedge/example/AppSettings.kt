@@ -187,14 +187,17 @@ data class AppSettings(
         if (metricsCsv && csvPath != null) a += listOf("--csv", csvPath)
         if (!mmap) {
             a += "--moe-stream"
-            if (cacheMb == CACHE_AUTO) {
+            // AndroidLM: a model with more resident weights gets a smaller cache (ModelProfile)
+            val cap = ModelProfile.cacheCapMb(modelPath)
+            if (cacheMb == CACHE_AUTO && cap == null) {
                 a += listOf("--cache-mb", "auto")
                 if (cacheCeilMb > 0) a += listOf("--cache-ceil-mb", cacheCeilMb.toString())
             } else {
-                a += listOf("--cache-mb", cacheMb.toString())
+                val mb = if (cap != null && (cacheMb == CACHE_AUTO || cacheMb > cap)) cap else cacheMb
+                a += listOf("--cache-mb", mb.toString())
                 // The engine refuses a budget under its floor unless told the caller means it; the
                 // small rungs exist precisely to probe that floor, so send the override with them.
-                if (cacheNeedsForce(cacheMb)) a += "--force-cache"
+                if (cacheNeedsForce(mb)) a += "--force-cache"
             }
             a += listOf("--io-threads", ioThreads.toString())
             if (!oDirect) a += "--no-odirect"
@@ -382,8 +385,9 @@ data class AppSettings(
         // memory pressure on devices where free RAM is tight.
         val CACHE_CEIL_CHOICES = intArrayOf(0, 2000, 3000, 4000, 5000, 6000)
         val IO_CHOICES = intArrayOf(1, 2, 4, 8)
-        // 0 = model default (top-k as trained). 6/4/3/2 trade output quality for tok/s (fewer routed experts).
-        val N_EXPERT_CHOICES = intArrayOf(0, 6, 4, 3, 2)
+        // 0 = model default (top-k as trained). 8/6/4/3/2 trade output quality for tok/s (fewer routed
+        // experts). AndroidLM: 8 for Qwen3.8-Flash-Next, which routes 10 (Qwen3.6 routes 8 already).
+        val N_EXPERT_CHOICES = intArrayOf(0, 8, 6, 4, 3, 2)
         val PREFETCH_CHOICES = intArrayOf(0, 1, 2, 4)
         // Speculated predicted misses per layer. 0 = retention only (zero flash spent) and the app
         // default — the matched-pair A/B showed 2 losing −21% on a saturated flash; anything above

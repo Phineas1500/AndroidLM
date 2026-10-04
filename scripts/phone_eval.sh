@@ -2,7 +2,7 @@
 # Ask the app, on the phone, every question of a question file (JSONL with id and q), one at a
 # time through the dev-only research_question extra, and keep each run's AndroidLM log.
 # Each run starts at 30.5 C or 4 minutes (PHONE_EVAL_GAP seconds) after the previous one ended,
-# whichever comes first.
+# whichever comes first. A run is given up after PHONE_EVAL_TIMEOUT seconds (default 1200).
 # usage: phone_eval.sh <questions.jsonl> <out dir>
 source ~/androidlm-tools/env.sh
 Q=$1; OUT=$2; mkdir -p "$OUT"
@@ -30,7 +30,7 @@ while IFS=$'\t' read -r -u 3 id q; do
   adb shell "am start -S -n $PKG/io.bigmoeonedge.example.MainActivity --es research_question '$q_sh'" </dev/null >/dev/null
   start=$(date +%s)
   until adb logcat -d -s AndroidLM:I </dev/null > "$OUT/$id.log" 2>&1 && grep -qE "$DONE" "$OUT/$id.log"; do
-    [ $(( $(date +%s) - start )) -gt 1200 ] && { echo "TIMEOUT $id"; break; }
+    [ $(( $(date +%s) - start )) -gt ${PHONE_EVAL_TIMEOUT:-1200} ] && { echo "TIMEOUT $id"; break; }
     sleep 10
   done
   sleep 3; adb logcat -d -s AndroidLM:I </dev/null > "$OUT/$id.log" 2>&1   # the answer follows "completed"
