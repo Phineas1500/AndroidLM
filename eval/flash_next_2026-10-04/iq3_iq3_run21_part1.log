@@ -1,0 +1,60 @@
+Success
+##### trv-001 start skin=31.08491 18:21:18
+run=1 t=31602ms phase_done=PLANNING wall=31596ms tokens=8 tok_s=1.58 prompt_tokens=121
+run=1 t=254283ms phase_done=DRAFTING wall=219735ms tokens=253 tok_s=1.29 prompt_tokens=100
+run=1 t=254284ms phase_done=SEARCHING wall=0ms work=1376ms stems=116ms bm25=40307ms bm25_at=40427ms titles=1376ms
+run=1 t=466251ms phase_done=CHECKING wall=211904ms tokens=126 tok_s=1.18 prompt_tokens=614
+run=1 t=466251ms completed
+##### trv-002 start skin=30.819431 18:32:18
+run=1 t=30112ms phase_done=PLANNING wall=30099ms tokens=5 tok_s=1.49 prompt_tokens=121
+run=1 t=228806ms phase_done=DRAFTING wall=198691ms tokens=215 tok_s=1.27 prompt_tokens=100
+run=1 t=228807ms phase_done=SEARCHING wall=0ms work=601ms stems=128ms bm25=33889ms bm25_at=34030ms titles=601ms
+run=1 t=411184ms phase_done=CHECKING wall=182310ms tokens=116 tok_s=1.21 prompt_tokens=477
+run=1 t=411185ms completed
+##### trv-003 start skin=30.881062 18:42:22
+run=1 t=30295ms phase_done=PLANNING wall=30269ms tokens=5 tok_s=1.51 prompt_tokens=122
+run=1 t=142424ms phase_done=DRAFTING wall=112122ms tokens=109 tok_s=1.30 prompt_tokens=101
+run=1 t=142427ms phase_done=SEARCHING wall=0ms work=629ms stems=150ms bm25=40934ms bm25_at=41108ms titles=629ms
+run=1 t=304155ms phase_done=CHECKING wall=161714ms tokens=79 tok_s=1.19 prompt_tokens=543
+run=1 t=304155ms completed
+##### trv-004 start skin=30.900902 18:50:42
+run=1 t=35803ms phase_done=PLANNING wall=35793ms tokens=13 tok_s=1.61 prompt_tokens=124
+run=1 t=171732ms phase_done=DRAFTING wall=135924ms tokens=139 tok_s=1.30 prompt_tokens=103
+run=1 t=171734ms phase_done=SEARCHING wall=0ms work=466ms stems=54ms bm25=41878ms bm25_at=41941ms titles=466ms
+run=1 t=379359ms phase_done=CHECKING wall=207563ms tokens=120 tok_s=1.22 prompt_tokens=636
+run=1 t=379359ms completed
+##### trv-005 start skin=30.689661 19:00:13
+run=1 t=34817ms phase_done=PLANNING wall=34798ms tokens=8 tok_s=1.56 prompt_tokens=133
+run=1 t=34980ms phase_done=SEARCHING wall=158ms stems=116ms bm25=-1ms bm25_at=-1ms bm25_needed=0ms wait=0ms titles=158ms
+run=1 t=566732ms phase_done=ANSWERING wall=531749ms tokens=367 tok_s=1.19 prompt_tokens=1466
+run=1 t=566733ms completed
+##### trv-006 start skin=30.640602 19:12:57
+run=1 t=34201ms phase_done=PLANNING wall=34194ms tokens=8 tok_s=1.45 prompt_tokens=130
+run=1 t=39044ms phase_done=SEARCHING wall=93ms stems=118ms bm25=38898ms bm25_at=39022ms bm25_needed=0ms wait=0ms titles=93ms
+run=1 t=502114ms phase_done=ANSWERING wall=463068ms tokens=372 tok_s=1.22 prompt_tokens=1012
+run=1 t=502117ms completed
+##### trv-007 start skin=30.71154 19:24:29
+run=1 t=33709ms phase_done=PLANNING wall=33680ms tokens=5 tok_s=1.44 prompt_tokens=134
+run=1 t=33903ms phase_done=SEARCHING wall=190ms stems=135ms bm25=-1ms bm25_at=-1ms bm25_needed=0ms wait=0ms titles=190ms
+run=1 t=438769ms phase_done=ANSWERING wall=404862ms tokens=318 tok_s=1.24 prompt_tokens=1018
+run=1 t=438770ms completed
+##### trv-008 start skin=30.614252 19:34:58
+run=1 t=33956ms phase_done=PLANNING wall=33951ms tokens=7 tok_s=1.51 prompt_tokens=130
+run=1 t=260630ms phase_done=DRAFTING wall=226668ms tokens=255 tok_s=1.30 prompt_tokens=109
+run=1 t=260632ms phase_done=SEARCHING wall=0ms work=1164ms stems=80ms bm25=35606ms bm25_at=35690ms titles=1164ms
+run=1 t=435263ms phase_done=CHECKING wall=174571ms tokens=79 tok_s=1.24 prompt_tokens=661
+run=1 t=435263ms completed
+##### trv-009 start skin=30.477932 19:45:25
+run=1 t=31179ms phase_done=PLANNING wall=31165ms tokens=7 tok_s=1.51 prompt_tokens=120
+run=1 t=161499ms phase_done=DRAFTING wall=126469ms tokens=133 tok_s=1.29 prompt_tokens=99
+run=1 t=161501ms phase_done=SEARCHING wall=0ms work=747ms stems=123ms bm25=33875ms bm25_at=34011ms titles=747ms
+run=1 t=346479ms phase_done=CHECKING wall=184926ms tokens=98 tok_s=1.21 prompt_tokens=624
+run=1 t=346480ms completed
+##### trv-010 start skin=30.331783 19:54:24
+run=1 t=39034ms phase_done=PLANNING wall=39028ms tokens=16 tok_s=1.42 prompt_tokens=125
+run=1 t=210750ms phase_done=DRAFTING wall=171712ms tokens=182 tok_s=1.27 prompt_tokens=104
+run=1 t=210751ms phase_done=SEARCHING wall=0ms work=566ms stems=95ms bm25=35909ms bm25_at=36009ms titles=566ms
+run=1 t=412930ms phase_done=CHECKING wall=202117ms tokens=129 tok_s=1.23 prompt_tokens=563
+run=1 t=412930ms completed
+3. The Thai government has historically failed to promote utility cycling as a transport solution, viewing it primarily as leisure, which reinforces the relianc
+##### dng-001 start skin=30.498062 20:04:18

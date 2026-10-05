@@ -1,0 +1,167 @@
+{
+  "food-001": {
+    "scores": {"A": 7, "B": 7, "C": 7, "D": 9},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "D",
+    "reason": "D names 10 real, fully vegan places across fine dining, casual, döner and sweets with areas, dishes and current notes (Bonvivant now vegan, FREA closed both check out). A/B/C give the same 8 real places with addresses and hours but say little about what to eat."
+  },
+  "food-002": {
+    "scores": {"A": 7, "B": 7, "C": 6, "D": 9},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "D",
+    "reason": "D covers the best-known vegan places (Kong, Ao 26, Organi, A Minha Avó, Al Sanpietrino, Legumi) with neighbourhoods and signature dishes. A and B list 8 real places with addresses and hours (A opens with an irrelevant line about costs and safety); C lists only 6."
+  },
+  "food-003": {
+    "scores": {"A": 6, "B": 9, "C": 7, "D": 7},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "B",
+    "reason": "B gives 8 well-chosen places across neighbourhoods with what each serves, plus useful local tips. C and D list 8 real places from map data with little detail; A lists only 6, with distances."
+  },
+  "food-004": {
+    "scores": {"A": 5, "B": 5, "C": 6, "D": 9},
+    "errors": {
+      "A": ["Saravana Bhavan is a vegetarian Indian chain (dairy/ghee), not vegan", "Annalakshmi is vegetarian Indian, not vegan", "Gives Saravana Bhavan's VivoCity address but says it is 'opposite Mustafa Centre' (that is the Syed Alwi Rd branch)"],
+      "B": ["Saravana Bhavan is a vegetarian Indian chain (dairy/ghee), not vegan", "Annalakshmi is vegetarian Indian, not vegan"],
+      "C": ["Saravana Bhavan is a vegetarian Indian chain (dairy/ghee), not vegan", "Annalakshmi is vegetarian Indian, not vegan"],
+      "D": []
+    },
+    "best": "D",
+    "reason": "D gives 8 real places with areas, food and practical tips (hawker 素食 stalls, VeganBurg down to one outlet). The other three repeat map data that calls dairy-using Indian vegetarian places 'vegan', and several entries have no address or details."
+  },
+  "food-005": {
+    "scores": {"A": 8, "B": 7, "C": 9, "D": 7},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "C",
+    "reason": "C lists 9 real places with areas and what to eat, plus jay-food and khao soi tips. A gives 8 real places with full addresses and hours; D has the same 8 but only street names; B lists 6."
+  },
+  "food-006": {
+    "scores": {"A": 6, "B": 7, "C": 7, "D": 9},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "D",
+    "reason": "D gives 9 real vegan places (T's Tantan, Saido, Masaka, Nuts Exchange, Ballon, Fucha Bon and others) with areas, dishes and dashi advice. B and C list 8 places from map data with addresses and little detail; A lists 6."
+  },
+  "food-007": {
+    "scores": {"A": 9, "B": 6, "C": 7, "D": 7},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "A",
+    "reason": "A covers well-known vegan places (Vegan Mahanakhon, May Veggie Home, Broccoli Revolution, Veganerie, Jay Oh) with areas and dishes, plus jay and fish-sauce tips. C and D list 8 real places with locations and hours; B lists 6."
+  },
+  "food-008": {
+    "scores": {"A": 6, "B": 7, "C": 9, "D": 6},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "C",
+    "reason": "C gives 8 real vegan places on both sides of the city with neighbourhoods, dishes and tips on naturally vegan Turkish food. B lists 8 places from map data (with an irrelevant line about costs and safety); A and D list 6 with little detail."
+  },
+  "food-009": {
+    "scores": {"A": 7, "B": 9, "C": 7, "D": 6},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "B",
+    "reason": "B mixes famous taco stands and sit-down places with neighbourhoods, dishes and a lard warning, and flags Na Tlali's conflicting addresses. A and C list 8 real places with addresses and hours; D lists 6."
+  },
+  "food-010": {
+    "scores": {"A": 9, "B": 6, "C": 6, "D": 5},
+    "errors": {
+      "A": [],
+      "B": ["Original Vegan (Dapinglin, Beixin Rd) is in Xindian, New Taipei, not Taipei city"],
+      "C": ["Original Vegan (Dapinglin, Beixin Rd) is in Xindian, New Taipei, not Taipei city", "Station name misspelled as 'Daopinglin' (Dapinglin)"],
+      "D": ["Original Vegan (Dapinglin, Beixin Rd) is in Xindian, New Taipei, not Taipei city"]
+    },
+    "best": "A",
+    "reason": "A names well-known places (Yang Shin, Laixin dumplings, Mukuchi, Chao, Vege Creek, Plants) with locations, dishes and the 全素/蛋奶素 tip. B, C and D list the same 8 map entries with almost no detail, and D opens with an irrelevant line about costs and safety."
+  },
+  "food-011": {
+    "scores": {"A": 5, "B": 6, "C": 9, "D": 5},
+    "errors": {
+      "A": [],
+      "B": [],
+      "C": [],
+      "D": ["Huggers address mistranslated as 'Daegwango 6-gil' (should be Daesagwan-ro 6-gil)", "Vegan Kitchen address garbled ('26ga-gil, Yeonhui-ro 15')"]
+    },
+    "best": "C",
+    "reason": "C covers Korean vegan, temple and international places in sensible areas, with dishes and a fish-sauce warning. B lists 8 map entries with full addresses but no description; A gives street names only; D lists 6 with garbled addresses."
+  },
+  "food-012": {
+    "scores": {"A": 6, "B": 7, "C": 7, "D": 9},
+    "errors": {
+      "A": ["Střecha hours garbled ('Wednesday to Wednesday 16:00-23:00')"],
+      "B": [],
+      "C": [],
+      "D": []
+    },
+    "best": "D",
+    "reason": "D gives real vegan places (Shromáždiště, Palo Verde, Linh, Dosa Dosa, Eaternia) plus the vegetarian classics, with areas and dishes. B and C list 8 real places with addresses and hours; A is the same but has garbled hours for Střecha."
+  },
+  "food-013": {
+    "scores": {"A": 9, "B": 6, "C": 6, "D": 6},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "A",
+    "reason": "A lists many real vegan and vegetarian spots (Kiwi, Lutra Lutra, Daner, Stricha, Shpana) plus Georgian places and the dishes to order, which suits this question best. B, C and D draw on the same map list (which includes a coffee shop and a wine bar) with brief details; D adds two bare entries."
+  },
+  "food-014": {
+    "scores": {"A": 6, "B": 6, "C": 6, "D": 9},
+    "errors": {
+      "A": [],
+      "B": [],
+      "C": ["Romanised addresses wrong: 'Sannodori' for Sanjo-dori, 'Miboboji-cho' for Mibu Bojo-cho"],
+      "D": []
+    },
+    "best": "D",
+    "reason": "D covers Kyoto's shojin temple restaurants and real vegan cafés (Ain Soph Journey, Mumokuteki, Veg Out, UZU), with a dashi warning. A, B and C list map entries (Little Heaven, Ren and others) with addresses and hours but little description; C drops one and garbles two romanised addresses."
+  },
+  "food-015": {
+    "scores": {"A": 9, "B": 7, "C": 6, "D": 7},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "A",
+    "reason": "A organises 10 places by area (Poblado/Manila, Laureles) with dishes and day-of-week cautions. B and D list 8 map entries with distances and a little guide detail; C gives addresses only."
+  },
+  "food-016": {
+    "scores": {"A": 6, "B": 5, "C": 8, "D": 6},
+    "errors": {
+      "A": ["Gives a phone number (0615261358) as The Kind Kitchen's address"],
+      "B": ["Gives a phone number (0615261358) as The Kind Kitchen's address"],
+      "C": ["Plant Cafe placed at 87 Victoria Rd, Clifton/Camps Bay; its own website gives 8 Buiten St, CBD"],
+      "D": []
+    },
+    "best": "C",
+    "reason": "C gives 9 places with areas and what they serve (Conscious Kitchen, Grumpy & Runt, Romeo and Vero, Pizzasaurus, Prashad), though Plant's address conflicts with its website. A, B and D list 8 map entries with no description; A and B use a phone number as an address; D has an irrelevant opening line."
+  },
+  "food-017": {
+    "scores": {"A": 6, "B": 9, "C": 7, "D": 7},
+    "errors": {
+      "A": ["Contradictory hours: Terra Mamma 'de segunda a sexta' yet 'fechando às segundas'", "Contradictory hours: Congolinária 'de segunda a sexta' yet closed Monday and Tuesday"],
+      "B": [],
+      "C": [],
+      "D": []
+    },
+    "best": "B",
+    "reason": "B, in good Portuguese, covers fine dining to everyday places (Banana Verde, Camélia Òdòdó, Sushimar, Pratada, Futuro Refeitório) with neighbourhoods and dishes. C and D list 8 map places with hours (D opens with an irrelevant disclaimer); A lists 6 with contradictory hours."
+  },
+  "food-018": {
+    "scores": {"A": 6, "B": 7, "C": 7, "D": 9},
+    "errors": {"A": [], "B": [], "C": [], "D": []},
+    "best": "D",
+    "reason": "D names Barcelona and the user's spot (Plaça de Catalunya) and gives walkable, real vegan places by area with dishes. B and C list 8 nearby places with addresses and hours but never name the city; A lists 6."
+  },
+  "food-019": {
+    "scores": {"A": 8, "B": 6, "C": 5, "D": 6},
+    "errors": {
+      "A": [],
+      "B": ["Veggiesf at 11 Stanley St appears to be the old, closed predecessor of Veggie4Love at the same address", "Loving Hut given two different addresses (Wan Chai Rd and Hennessy Rd)"],
+      "C": ["JAJA placed in 'Tsim Sha Tsui'; the Hong Kong Arts Centre (2 Harbour Rd) is in Wan Chai", "7 Johnston Rd placed in 'Causeway Bay'; it is in Wan Chai", "Veggiesf at 11 Stanley St appears to be the old, closed predecessor of Veggie4Love"],
+      "D": ["Veggiesf at 11 Stanley St appears to be the old, closed predecessor of Veggie4Love at the same address", "Loving Hut given two different addresses (Wan Chai Rd and Hennessy Rd)"]
+    },
+    "best": "A",
+    "reason": "A names Central and gives walkable vegan and vegetarian places (Root Vegan, Veggie4Love, TREEHOUSE, Yuan, LockCha) with dishes and caveats. B, C and D list the same map entries; C misplaces two by district and all three include a stale Veggie SF entry."
+  },
+  "food-020": {
+    "scores": {"A": 7, "B": 4, "C": 4, "D": 3},
+    "errors": {
+      "A": ["Bang Up to the Elephant closed permanently on 5 Aug 2026 but is presented as open"],
+      "B": ["Bang Up to the Elephant closed permanently on 5 Aug 2026", "Native Foods at 500 16th St is closed (the only Denver-area branch left is in Glendale)", "WaterCourse hours wrong: actually Tue-Sun 10-9, closed Mondays"],
+      "C": ["Bang Up to the Elephant closed permanently on 5 Aug 2026", "Native Foods at 500 16th St is closed (the only Denver-area branch left is in Glendale)", "WaterCourse hours wrong: actually Tue-Sun 10-9, closed Mondays"],
+      "D": ["Bang Up to the Elephant closed permanently on 5 Aug 2026", "Native Foods at 500 16th St is closed (the only Denver-area branch left is in Glendale)", "WaterCourse hours wrong: actually Tue-Sun 10-9, closed Mondays"]
+    },
+    "best": "A",
+    "reason": "A names downtown Denver and gives 10 mostly real, open places (WaterCourse with correct hours, City O' City, Corner Beet, Wellness Sushi, Somebody People), though it includes the now-closed Bang Up. B, C and D rely on stale map data: two of their first four picks are closed and WaterCourse's hours are wrong; D even names two closed places among its three top picks."
+  }
+}

@@ -262,3 +262,62 @@ alongside):
   City's tap water.
 - **IQ3_XXS is level with or slightly ahead of Qwen3.6** on these questions. The 3-point margin is
   within one grader's noise.
+
+## All 61 questions with the IQ3_XXS build (overnight, 2026-10-04/05)
+
+**The run:**
+- The other 40 questions (restaurants, crypto, the three "near me" with a test GPS position) in
+  the app with the IQ3_XXS build, on the cooling pad, `places.db` back on the phone.
+- All 61 finished (answers: `eval/answers_phone_flashnext_iq3xxs_vitalik.jsonl`).
+- **Four launches got stuck** in the 61 IQ3_XXS runs (dng-002, food-008, cry-004, food-018): the app
+  opened from adb with the question, started its engine, but never began the research run. The
+  phone itself was fine.
+  - Three re-asks worked. cry-004 got stuck again, so it and food-018 were finally asked with the
+    app already open and its model loaded (`eval/flash_next_2026-10-04/iq3_warm_ask.sh`), which
+    worked first time.
+  - This looks like a race between the app's model preload and a question delivered at cold
+    start. It is not understood yet; a person typing a question is unlikely to hit it.
+
+**Grading:** four-way and blind, one grader per group, every answer next to the others for the same
+question: IQ3_XXS, Q2_0, Qwen3.6 (1.2.1) and the web reference (`eval/sets_flashnext_iq3xxs_*.json`,
+keys and grades alongside). Web search was out of quota for the graders, so they checked facts by
+fetching pages (OpenStreetMap, HappyCow, restaurants' sites, eips.ethereum.org, NIST, CDC) and from
+their own knowledge.
+
+| Group | Flash-Next IQ3_XXS | Qwen3.6 | Flash-Next Q2_0 | IQ3_XXS against Qwen3.6, per question |
+|---|---|---|---|---|
+| Restaurants (20) | 72% | 68% | 71% | better on 10, worse on 3 |
+| Crypto (20) | 60% | 55% | 54% | better on 9, worse on 1 |
+| Travel, emergencies, arithmetic (21) | 69% | 66% | 57% | better on 8, worse on 6 |
+| **All 61** | **67%** | **63%** | **60%** | **better on 27, worse on 10** |
+
+- **Errors:** IQ3_XXS 41, Qwen3.6 48, Q2_0 44, reference 2.
+- **The reference** was the best answer on all 61.
+- **Qwen3.6's 63% here** matches its 62-65% in the earlier sittings with other graders.
+
+**Speed** (medians, cooling pad, from a cold start; leaving out the unplugged run and the two warm
+starts):
+
+| Group | IQ3_XXS first words / done | Q2_0 on the pad | Qwen3.6 (10/01) |
+|---|---|---|---|
+| Restaurants | 106 s / 490 s | 54 s / 376 s | 30 s / 126 s |
+| Crypto | 199 s / 494 s | 130 s / 259 s | 64 s / 121 s |
+| Travel | 65 s / 424 s | 44 s / 276 s | 18 s / 103 s |
+| Emergencies | 124 s / 416 s | 45 s / 249 s | 21 s / 177 s |
+| Arithmetic | 75 s / 362 s | 48 s / 263 s | 41 s / 107 s |
+
+- **Overall:** first words after a median 124 s and done after 7.8 minutes, about 3.5 times
+  Qwen3.6.
+- **Why so long:** it writes about 1.2-1.3 tok/s, and it writes longer, more complete answers.
+
+## What to make of it (updated)
+
+- **The compression was the problem.** In the app, the 2-bit Q2_0 build was behind Qwen3.6 (60%
+  against 63% in this sitting). The 75.8GB IQ3_XXS build is ahead: 67%, better than Qwen3.6 on 27
+  questions and worse on 10, with fewer factual errors.
+- **It is ahead in every group,** most clearly in crypto (60% against 55%).
+- **It costs time:** about 3.5 times as long per answer.
+- **It also costs space:** 75.8GB, so on a 128GB phone it fits with the corpus only without
+  Qwen3.6. It is over the bounty's 50GB, so it is an option, not the submission.
+- **As a "slower, more thorough" second model,** it is now worth offering: the first configuration
+  of this project to beat Qwen3.6 on the bounty-style questions.

@@ -1,0 +1,8 @@
+##### dng-002 start skin=33.79359 23:43:07
+run=1 t=38161ms phase_done=PLANNING wall=38149ms tokens=7 tok_s=1.15 prompt_tokens=133
+run=1 t=167891ms phase_done=DRAFTING wall=129727ms tokens=123 tok_s=1.29 prompt_tokens=112
+run=1 t=167892ms phase_done=SEARCHING wall=0ms work=248ms stems=139ms bm25=40704ms bm25_at=40855ms titles=248ms
+run=1 t=359529ms phase_done=CHECKING wall=191626ms tokens=102 tok_s=1.21 prompt_tokens=630
+run=1 t=359531ms completed
+PHONE_EVAL_DONE
+IQ3_REDO_DONE

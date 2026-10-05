@@ -1,0 +1,374 @@
+{
+ "cry-001": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 7,
+   "D": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Says FN-DSA/Falcon security is based on the Closest Vector Problem; it rests on SIS over NTRU lattices (CVP-style sampling is only the trapdoor mechanism)"
+   ],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D lists all four families (ML-DSA, SLH-DSA, FN-DSA, XMSS/LMS) with FIPS numbers, sizes and status, and clearly lists RSA/ECDSA/EdDSA/BLS as not quantum resistant; the others omit XMSS/LMS and most omit the non-resistant list."
+ },
+ "cry-002": {
+  "scores": {
+   "A": 6,
+   "B": 4,
+   "C": 4,
+   "D": 10
+  },
+  "errors": {
+   "A": [
+    "Says SLH-DSA relies on collision resistance; SPHINCS+/SLH-DSA is designed not to need collision resistance (relies on preimage/second-preimage and PRF properties)",
+    "Answer is cut off mid-section and gives no sizes"
+   ],
+   "B": [
+    "Implies SLH-DSA parameter sets cover only security categories 3 and 5 with SHA-2; FIPS 205 has categories 1, 3 and 5 with both SHA-2 and SHAKE"
+   ],
+   "C": [
+    "Implies SLH-DSA parameter sets cover only security categories 3 and 5 with SHA-2; FIPS 205 has categories 1, 3 and 5 with both SHA-2 and SHAKE"
+   ],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D gives the math basis, exact key/signature sizes for every parameter set, speed trade-offs and use cases; B and C miss the size/speed contrast and misstate SLH-DSA parameter coverage."
+ },
+ "cry-003": {
+  "scores": {
+   "A": 7,
+   "B": 10,
+   "C": 7,
+   "D": 6
+  },
+  "errors": {
+   "A": [
+    "Lumps collision resistance in with Grover's quadratic speedup; Grover concerns preimages, collisions are already 2^128 classically and quantum collision search gives no practical gain"
+   ],
+   "B": [],
+   "C": [],
+   "D": [
+    "Overstates SHA-256's role in Ethereum (Keccak-256 is the main execution-layer hash); spends much of the answer on off-topic ERC-2477/PBKDF2 detail"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains why Shor needs algebraic (periodic) structure that hashes lack, quantifies Grover and BHT collision costs, and gives accurate current resource estimates (Gidney 2025, Google Quantum AI March 2026)."
+ },
+ "cry-004": {
+  "scores": {
+   "A": 5,
+   "B": 6,
+   "C": 6,
+   "D": 10
+  },
+  "errors": {
+   "A": [
+    "Frames blobs as primarily for optimistic rollups; ZK rollups use them equally"
+   ],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "D",
+  "reason": "Only D covers blob size (128 KiB), KZG commitments, type-0x03 transactions, the separate blob-gas market, ~18-day pruning and later capacity changes; A-C omit KZG and blob size."
+ },
+ "cry-005": {
+  "scores": {
+   "A": 2,
+   "B": 3,
+   "C": 10,
+   "D": 4
+  },
+  "errors": {
+   "A": [
+    "Says Ethereum PoS has probabilistic finality; Casper FFG gives explicit economic finality on checkpoints",
+    "States reverting finality 'requires 66% of stake'; the protocol guarantee is that a revert would require at least 1/3 of stake to be slashable"
+   ],
+   "B": [
+    "Says checkpoints are finalized by 'a majority' of validators; it requires a 2/3 supermajority of stake",
+    "States finality reversion requires 66% of stake; the guarantee is that >=1/3 of stake would be slashed"
+   ],
+   "C": [],
+   "D": [
+    "States reverting a finalized block requires at least 66% of stake; the guarantee is that >=1/3 of stake would be slashed",
+    "Says altering a finalized block requires altering all subsequent blocks (a PoW framing, not how FFG finality works)"
+   ]
+  },
+  "best": "C",
+  "reason": "C correctly explains Gasper (LMD-GHOST + Casper FFG), justification/finalization with 2/3 stake, ~2 epochs timing, 1/3 slashing for accountable safety and the inactivity leak; A gets the basic nature of finality wrong and B/D are vague."
+ },
+ "cry-006": {
+  "scores": {
+   "A": 5,
+   "B": 6,
+   "C": 6,
+   "D": 10
+  },
+  "errors": {
+   "A": [
+    "Says ZK rollups do not need to post transaction data on-chain without noting they must still publish data (or state diffs) to reconstruct state"
+   ],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D covers fraud-proof games, the ~7-day challenge window, validity-proof verification on L1, withdrawal times, trust assumptions and examples; A-C omit the 7-day window and are thinner."
+ },
+ "cry-007": {
+  "scores": {
+   "A": 10,
+   "B": 3,
+   "C": 3,
+   "D": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says validators bundle UserOperations; ERC-4337 bundlers do this"
+   ],
+   "C": [
+    "Says validators collect UserOperations into bundles; ERC-4337 bundlers do this"
+   ],
+   "D": [
+    "Says validators collect UserOperations into bundles; ERC-4337 bundlers do this",
+    "Says EIP-7702 lets EOAs 'temporarily' act as contracts; the delegation persists until changed"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains UserOperations, the alt mempool, bundlers, EntryPoint, paymasters, EIP-7702 and native AA (EIP-8141, scheduled for Hegota); B-D are thin and misattribute bundling to validators."
+ },
+ "cry-008": {
+  "scores": {
+   "A": 6,
+   "B": 5,
+   "C": 10,
+   "D": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Calls G_T an elliptic curve group; G_T is a subgroup of an extension-field multiplicative group",
+    "Says signatures are G1 elements; in Ethereum's BLS12-381 scheme signatures are in G2 and public keys in G1"
+   ],
+   "C": [],
+   "D": []
+  },
+  "best": "C",
+  "reason": "C names BLS12-381, gives key/signature sizes, the verification equation, proof-of-possession, the aggregation use in attestations and sync committees, and the quantum caveat; the others omit the curve and details."
+ },
+ "cry-009": {
+  "scores": {
+   "A": 5,
+   "B": 10,
+   "C": 4,
+   "D": 4
+  },
+  "errors": {
+   "A": [
+    "Claims SNARK proving and verification scale linearly while STARKs scale quasilinearly and are therefore faster; quasilinear is not better than linear and SNARK verification is constant-time"
+   ],
+   "B": [],
+   "C": [
+    "Claims SNARK proving and verification scale linearly while STARKs scale quasilinearly and are therefore faster; quasilinear is not better than linear and SNARK verification is constant-time"
+   ],
+   "D": [
+    "Claims SNARK proving and verification scale linearly while STARKs scale quasilinearly and are therefore faster; quasilinear is not better than linear and SNARK verification is constant-time"
+   ]
+  },
+  "best": "B",
+  "reason": "B correctly contrasts setup, cryptographic basis, proof size, verification cost and prover speed, with concrete numbers and the STARK-to-SNARK wrapping practice; A, C and D repeat a garbled scaling claim and omit proof size."
+ },
+ "cry-010": {
+  "scores": {
+   "A": 10,
+   "B": 4,
+   "C": 4,
+   "D": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Describes unconditional builder payment as a current PBS property; on mainnet PBS still runs out of protocol through MEV-Boost relays (ePBS not yet live)"
+   ],
+   "C": [],
+   "D": [
+    "Describes unconditional builder payment and discarding of invalid blocks as current PBS behaviour; on mainnet PBS still runs out of protocol through MEV-Boost relays (ePBS not yet live)"
+   ]
+  },
+  "best": "A",
+  "reason": "A covers MEV sources (arbitrage, liquidations, sandwiches), MEV-Boost relays as today's PBS, and ePBS (EIP-7732) status for Glamsterdam; B-D never mention MEV-Boost and blur designed and deployed PBS."
+ },
+ "cry-011": {
+  "scores": {
+   "A": 6,
+   "B": 4,
+   "C": 10,
+   "D": 6
+  },
+  "errors": {
+   "A": [
+    "Says any amount above the base fee is refunded; only the amount above base fee plus tip (up to maxFeePerGas) is not charged"
+   ],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "C",
+  "reason": "C states that the base fee is burned and the tip goes to the producer, gives the 1/8 per-block cap, the target of half the gas limit, and the exact payment formula; B never says the base fee is burned."
+ },
+ "cry-012": {
+  "scores": {
+   "A": 5,
+   "B": 4,
+   "C": 5,
+   "D": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says Spurious Dragon went live in September/October 2016; it activated on 22 November 2016 (block 2,675,000)"
+   ],
+   "C": [],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D explains the ETH/ETC cross-chain replay context, the chain ID in the signed data and the v = {0,1} + CHAIN_ID*2 + 35 encoding, plus the limits; the others give only the high-level purpose."
+ },
+ "cry-013": {
+  "scores": {
+   "A": 10,
+   "B": 6,
+   "C": 6,
+   "D": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "A",
+  "reason": "A covers type 0x04, the authorization tuple, the 0xef0100||address indicator, persistence and revocation, Pectra, use cases and caveats accurately; B-D are correct but less precise and B omits Pectra."
+ },
+ "cry-014": {
+  "scores": {
+   "A": 7,
+   "B": 7,
+   "C": 7,
+   "D": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "D",
+  "reason": "All four give 2048 ETH correctly; D adds that the minimum stays 32 ETH, the 0x02 compounding-credential requirement, consolidation, EIP-7002 partial withdrawals and slashing changes."
+ },
+ "cry-015": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 6,
+   "D": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": [
+    "Calls Pectra 'expected mid-2025'; it went live on 7 May 2025"
+   ]
+  },
+  "best": "A",
+  "reason": "A precisely explains the push-based system operation (no gas, cannot fail, no code runs), the 16-per-payload sweep, the withdrawal fields and withdrawals_root; B-D are correct but less specific."
+ },
+ "cry-016": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 10,
+   "D": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "C",
+  "reason": "All four are correct on fungible balances versus unique tokenIds; C adds both interfaces, divisibility, ERC-165 and safeTransferFrom, authorship and a comparison table."
+ },
+ "cry-017": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 7,
+   "D": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "B",
+  "reason": "B explains the vault/share model, the full interface, real uses and the security pitfalls (rounding, inflation attack); A, C and D are correct but generic."
+ },
+ "cry-018": {
+  "scores": {
+   "A": 7,
+   "B": 8,
+   "C": 7,
+   "D": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "D",
+  "reason": "All four correctly say ML-KEM is a KEM, not a signature scheme; D adds the FIPS 203 date, the Kyber origin, parameter sets, sizes, deployments and the list of actual signature standards."
+ },
+ "cry-019": {
+  "scores": {
+   "A": 10,
+   "B": 8,
+   "C": 7,
+   "D": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "A",
+  "reason": "A explains the OTS + Merkle tree construction, why reusing a leaf is catastrophic, real-world reuse hazards, SP 800-208 requirements and CNSA 2.0 usage; B is solid but less concrete."
+ },
+ "cry-020": {
+  "scores": {
+   "A": 10,
+   "B": 6,
+   "C": 6,
+   "D": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "A",
+  "reason": "A covers PoW to PoS, TTD, last/first blocks, removal of block and ommer rewards, header/opcode changes and the date; B-D are correct but omit the reward removal and other changes (C and D also omit the date)."
+ }
+}
