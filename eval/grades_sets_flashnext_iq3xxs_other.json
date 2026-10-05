@@ -1,0 +1,445 @@
+{
+ "dng-001": {
+  "scores": {
+   "A": 6,
+   "B": 5,
+   "C": 7,
+   "D": 9
+  },
+  "errors": {
+   "A": [
+    "Tells a lone hiker to hike out 'as fast as possible'; exertion should be minimised and a steady, calm pace is advised"
+   ],
+   "B": [
+    "'Keep the bite below heart level' is outdated (CDC now advises a neutral position)"
+   ],
+   "C": [
+    "'Below heart level' is outdated (CDC: neutral position)",
+    "With no signal two hours out, frames walking out as a last resort, which could delay antivenom"
+   ],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D covers every CDC point (neutral limb, wash/cover, mark swelling with time, no NSAIDs, no tourniquet/ice) plus satellite SOS and a sensible plan for getting out; the others omit several items."
+ },
+ "dng-002": {
+  "scores": {
+   "A": 6,
+   "B": 5,
+   "C": 7,
+   "D": 10
+  },
+  "errors": {
+   "A": [
+    "Says call emergency services if the person is confused, but the partner is already confused, so help should be called now"
+   ],
+   "B": [
+    "Says call for help only if 'unconscious, confused or unable to speak', though the partner is already confused",
+    "Offers drinks 'if conscious' without requiring that they be alert enough to swallow safely"
+   ],
+   "C": [
+    "Calls shivering plus confusion 'severe' hypothermia (still shivering suggests mild to moderate)",
+    "Says not to use heating pads although wrapped heat sources on the core are recommended; contradicts its own warm-compress advice",
+    "Says CPR 'only if trained'; untrained bystanders should still give CPR"
+   ],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D is complete and correct: shelter, insulation from the ground, gentle handling, core warming and skin-to-skin, drinks only if alert, and CPR guidance specific to hypothermia."
+ },
+ "dng-003": {
+  "scores": {
+   "A": 7,
+   "B": 10,
+   "C": 8,
+   "D": 7
+  },
+  "errors": {
+   "A": [
+    "Cooling '10-20 minutes'; the recommendation is a full 20 minutes"
+   ],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "B",
+  "reason": "B matches NHS guidance exactly: 20 minutes of running water, keep the child warm, cling film, pain relief, and always get a child's burn checked, with clear ED criteria."
+ },
+ "dng-004": {
+  "scores": {
+   "A": 3,
+   "B": 8,
+   "C": 8,
+   "D": 10
+  },
+  "errors": {
+   "A": [
+    "Odd advice about avoiding a bed or sofa because of items stored above",
+    "The 'after' section is mostly irrelevant (store food, plan for tsunamis) and omits checking for damage, gas, leaving by the stairs, not using elevators"
+   ],
+   "B": [
+    "Tsunami: says move to higher ground 'if advised'; after strong shaking at the coast you should go without waiting for a warning"
+   ],
+   "C": [],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D gives the full drop-cover-hold-on detail (bed, doorways, don't run) and practical after-steps (shoes, gas, stairs, leaving damaged buildings, tsunami without waiting, texting)."
+ },
+ "dng-005": {
+  "scores": {
+   "A": 7,
+   "B": 5,
+   "C": 10,
+   "D": 6
+  },
+  "errors": {
+   "A": [
+    "Bleach dose of '2-4 drops per liter' for clear water, doubled for cloudy, overstates CDC (2 drops/L clear, 4 cloudy)",
+    "Answer is cut off mid-sentence",
+    "Irrelevant note on demineralised water"
+   ],
+   "B": [
+    "Bleach dose of 5-6 drops per gallon underdoses 5-6% bleach (CDC/EPA: 8 drops per gallon)",
+    "Cloudy-water dose of 8-10 drops per gallon is too low (should be 16)",
+    "Recommends NSF 42, which covers taste and odour, not pathogens"
+   ],
+   "C": [],
+   "D": [
+    "Says boiling doesn't affect taste (boiled water tastes flat)",
+    "Gives no bleach dose, so the chemical option can't be followed",
+    "Bottled water appears only as a fallback for chemical contamination"
+   ]
+  },
+  "best": "C",
+  "reason": "C matches CDC exactly: bottled water first, filter cloudy water, boil 1 minute (3 above 6,500 ft), 2 drops/L or 8 per gallon of bleach with a 30-minute wait, and the limits on chemicals."
+ },
+ "mth-001": {
+  "scores": {
+   "A": 8,
+   "B": 8,
+   "C": 8,
+   "D": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "D",
+  "reason": "All four get 31.36 mpg; D shows the unit-by-unit working and adds the UK-gallon figure (37.7)."
+ },
+ "mth-002": {
+  "scores": {
+   "A": 10,
+   "B": 8,
+   "C": 9,
+   "D": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "A",
+  "reason": "All compute 5.6 h correctly; A also gives h:min and useful caveats (breaks, terrain, a slower-group variant with correct arithmetic)."
+ },
+ "mth-003": {
+  "scores": {
+   "A": 7,
+   "B": 7,
+   "C": 10,
+   "D": 8
+  },
+  "errors": {
+   "A": [
+    "Source check says the total is $73.83, contradicting the $73.84 answer"
+   ],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "C",
+  "reason": "All get $67.12 and $73.84 (A and B state only the total as the final answer); C adds accurate Thailand context (10% service charge plus VAT shown as '++', tipping not expected, choose to pay in baht)."
+ },
+ "mth-004": {
+  "scores": {
+   "A": 8,
+   "B": 10,
+   "C": 8,
+   "D": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "B",
+  "reason": "All correct (18 L, 18 kg); B adds pounds, per-person load, container weight and sensible hydration notes."
+ },
+ "mth-005": {
+  "scores": {
+   "A": 10,
+   "B": 6,
+   "C": 6,
+   "D": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Never says power banks are prohibited in checked baggage (the key rule); 'without restriction' ignores airline limits on in-flight use"
+   ],
+   "C": [
+    "Never says power banks are prohibited in checked baggage"
+   ],
+   "D": [
+    "Never says power banks are prohibited in checked baggage"
+   ]
+  },
+  "best": "A",
+  "reason": "All compute 19.25 Wh; only A states the essential carry-on-only rule, the 100/160 Wh tiers and current airline restrictions on using power banks in flight."
+ },
+ "mth-006": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 10,
+   "D": 7
+  },
+  "errors": {
+   "A": [
+    "'Medical guidelines advise against strenuous activity above 32°C' is an unsupported generalisation",
+    "Source check conflates the heat-stroke body-temperature threshold (40°C) with air temperature"
+   ],
+   "B": [
+    "Source check conflates the heat-stroke body-temperature threshold with air temperature",
+    "Says hot air makes sweating less effective; evaporation mainly depends on humidity"
+   ],
+   "C": [],
+   "D": []
+  },
+  "best": "C",
+  "reason": "C shows the conversion, cites the NWS 'Danger' category correctly, and gives practical prevention plus heat-exhaustion and heat-stroke signs and first aid."
+ },
+ "trv-001": {
+  "scores": {
+   "A": 8,
+   "B": 2,
+   "C": 5,
+   "D": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says 112 is Thailand's primary number (191 is; 112 only redirects from mobiles)",
+    "Gives ambulance as 192 (it is 1669)",
+    "Gives Tourist Police as 115 (it is 1155)",
+    "The answer contradicts its own source-check corrections"
+   ],
+   "C": [
+    "Lists 1196 as the Tourist Police number and 'highly recommends' it; the Tourist Police number is 1155"
+   ],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D has all four correct numbers (191, 1669, 199, 1155) plus the TAT 1672 hotline and practical tips; A is also correct but less practical."
+ },
+ "trv-002": {
+  "scores": {
+   "A": 10,
+   "B": 4,
+   "C": 8,
+   "D": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Gives the standard voltage as 120 V; Brazil uses 127 V or 220 V",
+    "Omits the 60 Hz frequency"
+   ],
+   "C": [
+    "Source check 'corrects' a 230 V claim the answer never made (confusing but harmless)"
+   ],
+   "D": [
+    "Presents 127 V as the standard with 220 V only in some places, though roughly half the states use 220 V",
+    "Says Type N is unique to Brazil (also used in South Africa and Paraguay)",
+    "Suggests Type C may not fit Type N sockets; Type N sockets are designed to accept Europlugs"
+   ]
+  },
+  "best": "A",
+  "reason": "A is accurate and most useful: Type N/C, 127 V or 220 V by state with correct city examples, 60 Hz, and what it means for devices."
+ },
+ "trv-003": {
+  "scores": {
+   "A": 2,
+   "B": 7,
+   "C": 7,
+   "D": 10
+  },
+  "errors": {
+   "A": [
+    "Says tap water is generally safe to drink; travellers are advised not to drink it (CDC), so this is unsafe"
+   ],
+   "B": [
+    "Says people rely on pipas (water trucks) for drinking water; drinking water comes mainly from garrafones and bottles"
+   ],
+   "C": [
+    "Overstates that the water is officially 'classified as non-potable' (it is treated at source; contamination happens in distribution and storage)"
+   ],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D gives the correct no, explains why (pipes, tinacos), and gives practical alternatives (garrafones, purified ice, boiling) with sensible tips."
+ },
+ "trv-004": {
+  "scores": {
+   "A": 9,
+   "B": 4,
+   "C": 3,
+   "D": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says to ride the Red Line 'towards Santos'; the line ends at São Sebastião and has no Santos station",
+    "Bus 'Route 700' to the airport does not exist",
+    "Doesn't explain that reaching downtown needs a line change"
+   ],
+   "C": [
+    "Says the Red Line stops at Restauradores and Baixa-Chiado; it doesn't, so you must change lines",
+    "Recommends the Aerobus with lines and prices; it was discontinued in 2023",
+    "Calls the card 'Navegante Oeste'",
+    "Says taxis have a fixed fare; Lisbon taxis are metered",
+    "Answer is cut off"
+   ],
+   "D": [
+    "Recommends the Aerobus as the fastest option; it was discontinued in 2023",
+    "Says to change to the green or blue line at Oriente; Oriente only has the red line and is away from the centre"
+   ]
+  },
+  "best": "A",
+  "reason": "A is accurate and current: Red Line with the right transfer stations (Alameda, São Sebastião, Saldanha), Carris buses, Aerobus noted as discontinued, and realistic taxi and ride-hail options."
+ },
+ "trv-005": {
+  "scores": {
+   "A": 8,
+   "B": 8,
+   "C": 10,
+   "D": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [],
+   "D": []
+  },
+  "best": "C",
+  "reason": "All give the lari correctly; C best answers the card question (contactless everywhere, tap on metro and buses, Amex less common, cash for markets and rural areas, ATM and currency-conversion tips)."
+ },
+ "trv-006": {
+  "scores": {
+   "A": 3,
+   "B": 10,
+   "C": 2,
+   "D": 5
+  },
+  "errors": {
+   "A": [
+    "Doesn't mention the International Driving Permit tourists need",
+    "Muddled licensing info (getting a Thai licence, the ASEAN rule for Thai licence holders) that doesn't answer the tourist question"
+   ],
+   "B": [],
+   "C": [
+    "Says tourists must pass a Thai driving test and get a probationary licence; tourists can drive with a home licence plus an IDP"
+   ],
+   "D": [
+    "Licensing is muddled: it leads with converting to a Thai licence and mentions the IDP only as 'typically required'",
+    "Omits the motorbike licence/insurance problem"
+   ]
+  },
+  "best": "B",
+  "reason": "B is the only answer that gives the real requirements (home licence plus IDP, motorcycle category) and the key insurance warning, along with safety advice."
+ },
+ "trv-007": {
+  "scores": {
+   "A": 8,
+   "B": 9,
+   "C": 6,
+   "D": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Says Thais casually say 'khop' (คอบ); that's not a standard form (casual is 'khop jai')"
+   ],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D is correct and practical: khop khun plus khrap/kha by speaker gender, pronunciation, 'mak', khop jai, and the wai."
+ },
+ "trv-008": {
+  "scores": {
+   "A": 10,
+   "B": 9,
+   "C": 5,
+   "D": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Puts the smoky season at mid- or late March to May with the worst in April-May; it usually runs Feb-April and peaks in March and early April",
+    "Internally inconsistent start date (mid-March vs late March)"
+   ],
+   "D": [
+    "Gives the smoky season as March-May with an April peak; it often starts in February and peaks in March"
+   ]
+  },
+  "best": "A",
+  "reason": "A gets both seasons right (Nov to early Feb; smoke Feb-Apr, worst late Feb-Mar) and adds festivals, AQI and mask advice, and the rainy season."
+ },
+ "trv-009": {
+  "scores": {
+   "A": 10,
+   "B": 8,
+   "C": 7,
+   "D": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Calls 5-10% 'expected' in mid-range restaurants, contradicting 'not mandatory'",
+    "Source-check 'corrections' contradict the body and confuse the guidance"
+   ],
+   "D": []
+  },
+  "best": "A",
+  "reason": "A gives accurate, practical norms by venue type (round up / 5-10%), the cash-tip tip, the 'serviço' note, and the couvert warning."
+ },
+ "trv-010": {
+  "scores": {
+   "A": 5,
+   "B": 6,
+   "C": 3,
+   "D": 10
+  },
+  "errors": {
+   "A": [
+    "Says cash is rarely accepted through the apps; Grab and Bolt in Thailand accept cash"
+   ],
+   "B": [
+    "Says ride-hailing was legalised by decree in early 2020; the regulation was approved in 2021",
+    "Irrelevant addition about cycling policy"
+   ],
+   "C": [],
+   "D": []
+  },
+  "best": "D",
+  "reason": "D is accurate and practical: Grab vs Bolt vs inDrive, cash or card, surges at rush hour and in rain, airport pickup points, metered taxis and tuk-tuk scams. C is minimal."
+ }
+}

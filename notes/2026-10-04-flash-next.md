@@ -207,3 +207,58 @@ The reference was the best answer on all 61.
   better option.
 - **What could change that:** prompts tuned for it (longer, more complete practical answers; a
   check that flags unsupported specifics). It would then need the same comparison again.
+
+## Less compression: the IQ3_XXS build (2026-10-04 evening)
+
+The publisher's own numbers ([model page](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF)),
+average of three reasoning benchmarks:
+- full precision 93.1;
+- our Q2_0 build (66.4GB) 89.1;
+- their IQ3_XXS build (75.8GB) 92.6. It keeps 18 of 48 expert layers at 4 bits (IQ4_NL), mixes 2-
+  and 3-bit formats in the rest, and keeps the attention weights at 5-6 bits instead of 3.
+
+The n-gram table is byte-identical in every build, so only the 47.0GB first part was downloaded.
+
+**On the phone:**
+- **Storage:** the IQ3_XXS build plus the full corpus leaves 3.0GB free on the 110GB phone. This
+  took removing the 14 demo takes (all on the Mac) and AICore's on-device model data.
+- **A bug it found:** with the engine's dense repacking on, llama.cpp moved IQ4_NL experts into its
+  CPU_REPACK buffer despite the engine's override to the plain CPU buffer, about 8GB of RAM. The
+  phone ran out of memory and restarted (boot reason: kernel panic on OOM).
+  - **Fix:** `patches/llama.cpp/0004` adds `LLAMA_OVERRIDE_CPU_PLAIN`, which keeps such overrides
+    on the plain CPU buffer, and `patches/0008` makes the engine set it whenever it repacks.
+    Streamed experts now always stay in the file mapping.
+- **Prompt kernels:** IQ4_NL, IQ3_S, IQ2_XXS and IQ2_S experts get an fp32 path for prompts in patch
+  0003. Each group of rows is decoded once by ggml's own to_float and multiplied in fp32;
+  `test-iqk-f32.cpp` matches ggml's dot products to 1e-5 of the output.
+- **Speed:** about 15% slower than the Q2_0 build. A 64-token answer was written at 1.60 against
+  1.82-1.95 tok/s; in the app, 1.2-1.3 tok/s with the cooling pad, against about 1.5. Loading
+  takes 66 s against 52 s.
+
+**Perplexity** (Mac, same text): 10.71 against the Q2_0 build's 11.23 (-4.7% +/- 1.8%). The two builds
+pick the same top token 71% of the time (KLD 0.48 between them).
+
+**The 21 practical questions,** same app, prompts and cooling pad as the Q2_0 run, graded four-way
+in one sitting by one blind grader (`eval/sets_flashnext_iq3xxs_other.json`, key and grades
+alongside):
+
+| Answers | Share of the reference | Errors | Travel / emergencies / arithmetic |
+|---|---|---|---|
+| **Flash-Next IQ3_XXS** | **69%** | 21 | 65% / 71% / 75% |
+| Qwen3.6 (1.2.1) | 66% | 24 | 59% / 71% / 75% |
+| Flash-Next Q2_0 | 57% | 24 | 49% / 51% / 75% |
+
+- **IQ3_XXS against Q2_0:** better on 14, worse on 3.
+- **IQ3_XXS against Qwen3.6:** better on 8, worse on 6.
+- **The compression caused most of the Q2_0 build's losses,** the short answers included. Medians
+  of the answer before its check:
+
+| Group | IQ3_XXS | Q2_0 | Qwen3.6 |
+|---|---|---|---|
+| Emergencies | 1,619 characters | 606 | 1,652 |
+| Travel | 967 | 674 | 770 |
+
+- **It fixed the costly travel specifics:** Thailand's emergency numbers, Brazil's 127 V, Mexico
+  City's tap water.
+- **IQ3_XXS is level with or slightly ahead of Qwen3.6** on these questions. The 3-point margin is
+  within one grader's noise.
