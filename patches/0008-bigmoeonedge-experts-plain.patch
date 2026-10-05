@@ -1,0 +1,22 @@
+diff --git a/core/src/engine/session.cpp b/core/src/engine/session.cpp
+index 16af402..32d07a3 100644
+--- a/core/src/engine/session.cpp
++++ b/core/src/engine/session.cpp
+@@ -788,7 +788,16 @@ std::unique_ptr<Session> Session::open(const SessionConfig & cfg,
+         {"_exps", ggml_backend_cpu_buffer_type()},
+         {nullptr, nullptr},
+     };
+-    if (repack) mparams.tensor_buft_overrides = experts_plain;
++    if (repack) {
++        mparams.tensor_buft_overrides = experts_plain;
++        // AndroidLM: llama.cpp would otherwise move an expert it has a repacked kernel for (IQ4_NL)
++        // from the plain CPU buffer into CPU_REPACK, gigabytes of RAM the rebind below then refuses
++#if defined(_WIN32)
++        _putenv_s("LLAMA_OVERRIDE_CPU_PLAIN", "1");
++#else
++        setenv("LLAMA_OVERRIDE_CPU_PLAIN", "1", 1);
++#endif
++    }
+     mparams.n_gpu_layers = 0;
+     // The nextn/MTP block is skipped at load unless asked for: llama.cpp marks its tensors
+     // TENSOR_SKIP by default, and only --mtp builds a graph over them. n_layer_nextn comes from

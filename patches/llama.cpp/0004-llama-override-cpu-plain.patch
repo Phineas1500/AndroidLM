@@ -1,0 +1,30 @@
+diff --git a/src/llama-model-loader.cpp b/src/llama-model-loader.cpp
+index d924102..c3445d4 100644
+--- a/src/llama-model-loader.cpp
++++ b/src/llama-model-loader.cpp
+@@ -8,6 +8,7 @@
+ 
+ #include <algorithm>
+ #include <array>
++#include <cstdlib>
+ #include <cinttypes>
+ #include <cstdint>
+ #include <cstring>
+@@ -1186,8 +1187,15 @@ struct ggml_tensor * llama_model_loader::create_tensor(
+                 std::regex pattern(overrides->pattern);
+                 if (std::regex_search(tensor_name, pattern)) {
+                     if (overrides->buft == ggml_backend_cpu_buffer_type()) {
+-                        // when overriding to a CPU buffer, consider the extra buffer types
+-                        buft = select_weight_buft(hparams, t_meta, op, buft_list_cpu);
++                        // when overriding to a CPU buffer, consider the extra buffer types, unless
++                        // LLAMA_OVERRIDE_CPU_PLAIN=1 asks for the plain CPU buffer itself (AndroidLM:
++                        // the MoE streamer rebinds expert tensors to the file's own bytes, so an
++                        // expert repacked into CPU_REPACK, as IQ4_NL ones are, cannot be streamed)
++                        static const bool plain = [] {
++                            const char * e = getenv("LLAMA_OVERRIDE_CPU_PLAIN");
++                            return e != nullptr && atoi(e) != 0;
++                        }();
++                        buft = plain ? ggml_backend_cpu_buffer_type() : select_weight_buft(hparams, t_meta, op, buft_list_cpu);
+                         if (use_mmap) {
+                             static std::once_flag once;
+                             std::call_once(once, [] {

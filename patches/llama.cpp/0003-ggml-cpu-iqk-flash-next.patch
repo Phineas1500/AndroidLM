@@ -27,10 +27,18 @@ index 52d4f46..d914043 100644
      const int64_t nr0 = ne0;
  
 diff --git a/ggml/src/ggml-cpu/iqk-moe.cpp b/ggml/src/ggml-cpu/iqk-moe.cpp
-index f3682a6..ec66b4a 100644
+index f3682a6..ae6621b 100644
 --- a/ggml/src/ggml-cpu/iqk-moe.cpp
 +++ b/ggml/src/ggml-cpu/iqk-moe.cpp
-@@ -544,6 +544,167 @@ void mul_mat_q8_k_r8_q8_k(int n, const void * vx, size_t bx, const DataInfo& inf
+@@ -24,6 +24,7 @@
+ 
+ #include "ggml-impl.h"
+ #include "ggml-cpu-impl.h"
++#include "ggml-cpu.h"
+ #include "iqk-moe.h"
+ 
+ #include <algorithm>
+@@ -544,6 +545,232 @@ void mul_mat_q8_k_r8_q8_k(int n, const void * vx, size_t bx, const DataInfo& inf
      }
  }
  
@@ -195,10 +203,75 @@ index f3682a6..ec66b4a 100644
 +    }
 +}
 +
++// ---- expert types without a kernel of their own here (IQ4_NL, IQ3_S, IQ2_XXS, IQ2_S; a
++//      Qwen3.8-Flash-Next build mixes them with the Q2_0, IQ2_XS and IQ3_XXS above): for several
++//      tokens each group of 8 rows is decoded once to fp32 by ggml's own to_float, the activations
++//      (Q8_K or Q8_0, as ggml quantized them) decoded to fp32 once per call, and the two multiplied
++//      in fp32. The products are those of ggml's dot products; only the order of the sums differs.
++
++inline bool iqk_f32_type(int type) {
++    return type == GGML_TYPE_IQ4_NL || type == GGML_TYPE_IQ3_S || type == GGML_TYPE_IQ2_XXS || type == GGML_TYPE_IQ2_S;
++}
++
++// 8 rows of n weights as fp32, weight e of row k at (e/4)*32 + (e%4)*8 + k (as iqk_unpack_bf16_r8)
++void iqk_unpack_f32_r8(int type, int n, const void * vx, size_t bx, float * w, int nrc_x, float * row) {
++    const auto * tt = ggml_get_type_traits((ggml_type)type);
++    for (int ix = 0; ix < nrc_x; ix += 8) {
++        float * w8 = w + (size_t)ix*n;
++        for (int k = 0; k < 8; ++k) {
++            tt->to_float((const char *)vx + (ix + k)*bx, row, n);
++            for (int e = 0; e < n; ++e) w8[(e/4)*32 + (e%4)*8 + k] = row[e];
++        }
++    }
++}
++
++void iqk_dequant_act(int vec_dot_type, int n, const void * vy, float * out) {
++    if (vec_dot_type == GGML_TYPE_Q8_K) {
++        const block_q8_K * y = (const block_q8_K *)vy;
++        for (int ib = 0; ib < n/QK_K; ++ib) {
++            for (int j = 0; j < QK_K; ++j) out[ib*QK_K + j] = y[ib].d * y[ib].qs[j];
++        }
++    } else {
++        const block_q8_0 * y = (const block_q8_0 *)vy;
++        for (int ib = 0; ib < n/QK8_0; ++ib) {
++            const float d = GGML_FP16_TO_FP32(y[ib].d);
++            for (int j = 0; j < QK8_0; ++j) out[ib*QK8_0 + j] = d * y[ib].qs[j];
++        }
++    }
++}
++
++template <int nrc_y>
++void mul_mat_f32_r8_f32(int n, const float * w, const float * const * a, float * const * d, int nrc_x) {
++    for (int ix = 0; ix < nrc_x; ix += 8) {
++        const float * wx = w + (size_t)ix*n;
++        float32x4_t acc[2*nrc_y];
++        for (int i = 0; i < 2*nrc_y; ++i) acc[i] = vdupq_n_f32(0.f);
++        for (int e = 0; e < n; e += 4, wx += 32) {
++            const auto w0 = vld1q_f32_x4(wx);
++            const auto w1 = vld1q_f32_x4(wx + 16);
++            for (int iy = 0; iy < nrc_y; ++iy) {
++                const auto av = vld1q_f32(a[iy] + e);
++                acc[2*iy+0] = vfmaq_laneq_f32(acc[2*iy+0], w0.val[0], av, 0);
++                acc[2*iy+1] = vfmaq_laneq_f32(acc[2*iy+1], w0.val[1], av, 0);
++                acc[2*iy+0] = vfmaq_laneq_f32(acc[2*iy+0], w0.val[2], av, 1);
++                acc[2*iy+1] = vfmaq_laneq_f32(acc[2*iy+1], w0.val[3], av, 1);
++                acc[2*iy+0] = vfmaq_laneq_f32(acc[2*iy+0], w1.val[0], av, 2);
++                acc[2*iy+1] = vfmaq_laneq_f32(acc[2*iy+1], w1.val[1], av, 2);
++                acc[2*iy+0] = vfmaq_laneq_f32(acc[2*iy+0], w1.val[2], av, 3);
++                acc[2*iy+1] = vfmaq_laneq_f32(acc[2*iy+1], w1.val[3], av, 3);
++            }
++        }
++        for (int iy = 0; iy < nrc_y; ++iy) {
++            vst1q_f32(d[iy] + ix + 0, acc[2*iy+0]);
++            vst1q_f32(d[iy] + ix + 4, acc[2*iy+1]);
++        }
++    }
++}
++
  // ---- dense weights: llama.cpp's repacked Q5_K and Q6_K (8 rows interleaved in blocks of B bytes,
  //      repack.h's block_q5_Kx8 and block_q6_Kx8, as make_block_q5_Kx8 / make_block_q6_Kx8 build
  //      them), unpacked once per prompt instead of once per four tokens: the 5- and 6-bit integers
-@@ -932,6 +1093,194 @@ IQK_I8MM void mul_mat_q6k_u_r8_q8_k_i8mm(int n, const void * vx, size_t bx, cons
+@@ -932,6 +1159,194 @@ IQK_I8MM void mul_mat_q6k_u_r8_q8_k_i8mm(int n, const void * vx, size_t bx, cons
      }
  }
  
@@ -393,7 +466,7 @@ index f3682a6..ec66b4a 100644
  bool cpu_has_i8mm() {
  #if defined(__linux__)
      return (getauxval(AT_HWCAP2) & (1UL << 13)) != 0;   // HWCAP2_I8MM
-@@ -1019,7 +1368,23 @@ struct Config {
+@@ -1019,7 +1434,27 @@ struct Config {
      // (Cortex-X3/A715) they read a 1,216-token prompt no faster than the SDOT ones (31.0/32.1 s
      // against 31.3 s), SMMLA's twice the multiply-adds per instruction at half the rate
      bool dense_i8mm       = false;
@@ -401,6 +474,8 @@ index f3682a6..ec66b4a 100644
 +    int  q2_min_rows      = 4;    // from this many tokens of one expert
 +    int  q2_ny            = 8;    // tokens per kernel call
 +    bool q2_gemv          = true; // Q2_0 experts with fewer tokens: mul_mat_q2_0_q8_0_gemv
++    bool f32              = true; // IQ4_NL/IQ3_S/IQ2_XXS/IQ2_S experts decoded to fp32 once per call
++    int  f32_min_rows     = 4;    // from this many tokens of one expert
 +    bool dense2           = true; // dense Q3_K/IQ4_XS/Q2_0/BF16 unpacked once per prompt
 +    int  bf16_ny          = 6;    // tokens per BF16 kernel call
 +    // BF16 through BFMMLA, only with GGML_IQK_BF16_MMLA=1 on a CPU that has it: on an Apple M4 it
@@ -409,6 +484,8 @@ index f3682a6..ec66b4a 100644
      Config() {
 +        if (const char * e = std::getenv("GGML_IQK_BF16_MMLA"))            bf16_mmla        = std::atoi(e) != 0 && cpu_has_bf16();
 +        if (const char * e = std::getenv("GGML_IQK_DENSE2"))               dense2           = std::atoi(e) != 0;
++        if (const char * e = std::getenv("GGML_IQK_F32"))                  f32              = std::atoi(e) != 0;
++        if (const char * e = std::getenv("GGML_IQK_F32_MIN_ROWS"))         f32_min_rows     = std::max(1, std::atoi(e));
 +        if (const char * e = std::getenv("GGML_IQK_Q2_GEMV"))              q2_gemv          = std::atoi(e) != 0;
 +        if (const char * e = std::getenv("GGML_IQK_BF16_NY"))              bf16_ny          = std::min(8, std::max(1, std::atoi(e)));
 +        if (const char * e = std::getenv("GGML_IQK_Q2"))                   q2               = std::atoi(e) != 0;
@@ -417,10 +494,14 @@ index f3682a6..ec66b4a 100644
          if (const char * e = std::getenv("GGML_IQK_DENSE_I8MM"))           dense_i8mm       = std::atoi(e) != 0 && cpu_has_i8mm();
          if (const char * e = std::getenv("GGML_IQK_DENSE_NY"))             dense_ny         = std::min(8, std::max(1, std::atoi(e)));
          if (const char * e = std::getenv("GGML_IQK_DENSE"))                dense            = std::atoi(e) != 0;
-@@ -1045,6 +1410,11 @@ std::vector<char> & thread_local_work_buffer() {
+@@ -1045,6 +1480,15 @@ std::vector<char> & thread_local_work_buffer() {
  
  extern "C" int ggml_iqk_moe_chunk_rows(int type, int64_t ne00, int64_t nrows, int64_t n_tokens) {
      const Config & c = config();
++    if (iqk_f32_type(type)) {
++        if (!c.f32 || n_tokens < c.f32_min_rows || ne00 % ggml_blck_size((ggml_type)type) != 0 || ne00 % 4 != 0 || nrows % 8 != 0) return 0;
++        return c.chunk_rows;
++    }
 +    if (type == GGML_TYPE_Q2_0) {
 +        if (!c.q2 || ne00 % QK2_0 != 0 || nrows % 8 != 0) return 0;
 +        if (n_tokens < c.q2_min_rows) return c.q2_gemv ? 2*c.chunk_rows : 0;
@@ -429,10 +510,46 @@ index f3682a6..ec66b4a 100644
      if (!c.enabled || n_tokens < c.min_rows || ne00 % QK_K != 0 || nrows % 8 != 0) return 0;
      if (type != GGML_TYPE_IQ2_XS && type != GGML_TYPE_IQ3_XXS) return 0;
      return c.chunk_rows;
-@@ -1061,6 +1431,45 @@ extern "C" void ggml_iqk_moe_mul_mat(int type, int64_t row_start, int64_t row_en
+@@ -1061,6 +1505,81 @@ extern "C" void ggml_iqk_moe_mul_mat(int type, int64_t row_start, int64_t row_en
      MulMat mm;
      DataInfo info{C + row_start, (const char *)B, nb1/sizeof(float), strideB, 0, (int)ne11, row_mapping, nb2/sizeof(float)};
  
++    if (iqk_f32_type(type)) {
++        // the expert's tokens decoded to fp32 once, then its rows 32 at a time
++        GGML_ASSERT(row_start % 8 == 0 && nrc_x % 8 == 0);
++        const int vtype = ggml_get_type_traits_cpu((ggml_type)type)->vec_dot_type;
++        thread_local std::vector<float> fa, fw, frow;
++        if (fa.size() < (size_t)Ny*ne00) fa.resize((size_t)Ny*ne00);
++        if (fw.size() < (size_t)32*ne00) fw.resize((size_t)32*ne00);
++        if (frow.size() < (size_t)ne00) frow.resize(ne00);
++        std::vector<const float *> act(Ny);
++        std::vector<float *> dst(Ny);
++        for (int iy = 0; iy < Ny; ++iy) {
++            iqk_dequant_act(vtype, (int)ne00, info.src1_row(iy), fa.data() + (size_t)iy*ne00);
++            act[iy] = fa.data() + (size_t)iy*ne00;
++            dst[iy] = info.dst_row(iy);
++        }
++        for (int ix = 0; ix < nrc_x; ix += 32) {
++            const int this_nrc_x = std::min(32, nrc_x - ix);
++            iqk_unpack_f32_r8(type, (int)ne00, (const char *)A + (row_start + ix)*strideA, strideA, fw.data(), this_nrc_x, frow.data());
++            std::vector<float *> d(Ny);
++            for (int iy = 0; iy < Ny; ++iy) d[iy] = dst[iy] + ix;
++            for (int iy = 0; iy < Ny; iy += 6) {
++                const float * const * a = act.data() + iy;
++                float * const * dd = d.data() + iy;
++                switch (std::min(6, (int)Ny - iy)) {
++                    case 1: mul_mat_f32_r8_f32<1>((int)ne00, fw.data(), a, dd, this_nrc_x); break;
++                    case 2: mul_mat_f32_r8_f32<2>((int)ne00, fw.data(), a, dd, this_nrc_x); break;
++                    case 3: mul_mat_f32_r8_f32<3>((int)ne00, fw.data(), a, dd, this_nrc_x); break;
++                    case 4: mul_mat_f32_r8_f32<4>((int)ne00, fw.data(), a, dd, this_nrc_x); break;
++                    case 5: mul_mat_f32_r8_f32<5>((int)ne00, fw.data(), a, dd, this_nrc_x); break;
++                    default: mul_mat_f32_r8_f32<6>((int)ne00, fw.data(), a, dd, this_nrc_x); break;
++                }
++            }
++        }
++        return;
++    }
++
 +    if (type == GGML_TYPE_Q2_0 && Ny < config().q2_min_rows) {
 +        // one to three tokens: the activations rearranged, the codes read in place
 +        const int nb32 = (int)(ne00/32);
@@ -475,7 +592,7 @@ index f3682a6..ec66b4a 100644
      if (Ny >= config().convert_min_rows) {
          // rows converted 32 at a time to Q8_K_R8, then multiplied by all the tokens
          GGML_ASSERT(row_start % 8 == 0 && nrc_x % 8 == 0);
-@@ -1135,8 +1544,75 @@ extern "C" void ggml_iqk_dense_mul_mat(int type, int interleave, int64_t row_sta
+@@ -1135,8 +1654,75 @@ extern "C" void ggml_iqk_dense_mul_mat(int type, int interleave, int64_t row_sta
      }
  }
  
@@ -699,6 +816,76 @@ index 0000000..c874c0d
 +        fails += run(GGML_TYPE_BF16,   10240, 320,  ntok, rng);
 +        fails += run(GGML_TYPE_BF16,   320, 1024,   ntok, rng);
 +        fails += run(GGML_TYPE_BF16,   2560, 48,    ntok, rng);
++    }
++    printf("%s\n", fails ? "FAILED" : "all OK");
++    return fails ? 1 : 0;
++}
+diff --git a/ggml/src/ggml-cpu/test-iqk-f32.cpp b/ggml/src/ggml-cpu/test-iqk-f32.cpp
+new file mode 100644
+index 0000000..9c6ae19
+--- /dev/null
++++ b/ggml/src/ggml-cpu/test-iqk-f32.cpp
+@@ -0,0 +1,64 @@
++// Accuracy of ggml_iqk_moe_mul_mat (iqk-moe.cpp) on IQ4_NL, IQ3_S, IQ2_XXS and IQ2_S experts (the
++// fp32 path), against ggml's own vec_dot on the same rows and the same activations, quantized to the
++// type's vec_dot_type as mul_mat_id does. The weights are random floats quantized by ggml (with an
++// all-ones importance matrix, which the 2-bit types require). Built like test-iqk-q2.cpp.
++#include "ggml.h"
++#include "ggml-cpu.h"
++#include "iqk-moe.h"
++
++#include <algorithm>
++#include <cmath>
++#include <cstdio>
++#include <random>
++#include <vector>
++
++struct row_map { int32_t i1, i2; };
++
++static int run(ggml_type type, int ne00, int nrows, int ntok, std::mt19937 & rng) {
++    const auto * tw = ggml_get_type_traits_cpu(type);
++    const ggml_type vt = tw->vec_dot_type;
++    const auto * tv = ggml_get_type_traits_cpu(vt);
++    const size_t row_a = ggml_row_size(type, ne00), row_b = ggml_row_size(vt, ne00);
++    std::normal_distribution<float> nd(0.f, 1.f);
++    std::vector<float> wf((size_t)nrows*ne00), xf(ne00), imat(ne00, 1.0f);
++    for (auto & v : wf) v = 0.05f*nd(rng);
++    std::vector<uint8_t> a(row_a*nrows), b(row_b*ntok);
++    ggml_quantize_chunk(type, wf.data(), a.data(), 0, nrows, ne00, imat.data());
++    for (int t = 0; t < ntok; ++t) { for (auto & v : xf) v = nd(rng); tv->from_float(xf.data(), b.data() + t*row_b, ne00); }
++    std::vector<row_map> map(ntok);
++    for (int t = 0; t < ntok; ++t) map[t] = {0, t};
++    std::vector<float> c((size_t)nrows*ntok, NAN);
++    const int chunk = ggml_iqk_moe_chunk_rows(type, ne00, nrows, ntok);
++    if (chunk <= 0) { printf("%s tokens=%d: not taken\n", ggml_type_name(type), ntok); return 1; }
++    for (int r0 = 0; r0 < nrows; r0 += chunk)
++        ggml_iqk_moe_mul_mat(type, r0, std::min(r0 + chunk, nrows), ne00, 1, a.data(), row_a, b.data(), row_b,
++                             c.data(), 0, nrows*sizeof(float), map.data(), ntok);
++    double max_err = 0, sum_sq = 0;
++    for (int t = 0; t < ntok; ++t) for (int r = 0; r < nrows; ++r) {
++        float vd;
++        tw->vec_dot(ne00, &vd, 0, a.data() + r*row_a, 0, b.data() + t*row_b, 0, 1);
++        max_err = std::max(max_err, (double)std::fabs(c[(size_t)t*nrows + r] - vd));
++        sum_sq += (double)vd*vd;
++    }
++    const double rel = max_err/std::sqrt(sum_sq/((double)nrows*ntok));
++    const bool ok = rel < 2e-5;
++    printf("%-8s ne00=%4d rows=%4d tokens=%3d: max difference from ggml's vec_dot %.2e of the output RMS %s\n",
++           ggml_type_name(type), ne00, nrows, ntok, rel, ok ? "OK" : "FAIL");
++    return ok ? 0 : 1;
++}
++
++int main() {
++    setvbuf(stdout, nullptr, _IONBF, 0);
++    ggml_cpu_init();
++    std::mt19937 rng(5);
++    int fails = 0;
++    for (ggml_type t : {GGML_TYPE_IQ4_NL, GGML_TYPE_IQ3_S, GGML_TYPE_IQ2_XXS, GGML_TYPE_IQ2_S}) {
++        ggml_quantize_init(t);
++        for (int ntok : {4, 7, 24}) {
++            fails += run(t, 2560, 640, ntok, rng);   // gate/up
++            fails += run(t, 768, 2560, ntok, rng);   // down-like (640 is not a multiple of 256)
++        }
 +    }
 +    printf("%s\n", fails ? "FAILED" : "all OK");
 +    return fails ? 1 : 0;
