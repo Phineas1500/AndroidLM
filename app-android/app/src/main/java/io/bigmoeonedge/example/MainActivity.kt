@@ -328,6 +328,18 @@ private fun MainScreen(
                             onSelect = onSelectModel,
                         )
                     }
+                    // AndroidLM: the optional larger model says what choosing it costs
+                    val chosen = models.getOrNull(modelIdx)
+                    var chosenArch by remember { mutableStateOf("") }
+                    LaunchedEffect(chosen) {
+                        chosenArch = chosen?.let { withContext(Dispatchers.IO) { ModelProfile.architecture(it.absolutePath) } } ?: ""
+                    }
+                    if (chosenArch == ModelProfile.FLASH_NEXT_ARCH) {
+                        Hint(
+                            "The larger model: more thorough, but each answer takes about 3 to 4 times as long " +
+                                "(first words after about 2 minutes).",
+                        )
+                    }
 
                     OutlinedTextField(
                         value = prompt,

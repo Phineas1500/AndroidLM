@@ -140,6 +140,12 @@ The signed APK is in the [v1.3.1 release](https://github.com/Phineas1500/Android
 - **From a computer:** `scripts/install.sh` downloads the model and corpus, checks their SHA-256,
   pushes them to the phone over USB and installs the APK.
 
+An optional larger model, Qwen3.8-Flash-Next (75.8 GB), can be added from the Set up card or with
+`scripts/install.sh --flash-next`. On the 61 research questions it scored 67% of a web search +
+frontier AI answer against 63% for the main model, but each answer takes about 3 to 4 times as
+long, and both models together need more than a 128 GB phone. See [`INSTALL.md`](INSTALL.md#optional-the-larger-model)
+and [`notes/2026-10-04-flash-next.md`](notes/2026-10-04-flash-next.md).
+
 Building the app: [`app-android/README.md`](app-android/README.md). Testing it: [`TESTING.md`](TESTING.md).
 
 ## Layout

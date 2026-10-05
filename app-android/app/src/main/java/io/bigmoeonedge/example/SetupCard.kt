@@ -42,10 +42,14 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
         if (wasRunning && !progress.running) onImported()
         wasRunning = progress.running
     }
-    val st = status ?: return
+    val all = status ?: return
+    // the optional larger model is offered in a section of its own: missing it never opens the card
+    val st = all.filter { !it.file.extra }
+    val extras = all.filter { it.file.extra }
     val missing = st.filter { it.found == null }
+    val extraMissing = extras.filter { it.found == null }
     val report = progress.running || progress.done.isNotEmpty() || progress.errors.isNotEmpty()
-    if (missing.isEmpty() && !report) return
+    if (missing.isEmpty() && extraMissing.isEmpty() && !report) return
 
     var open by rememberSaveable { mutableStateOf<Boolean?>(null) }
     val isOpen = open ?: (missing.any { it.file.required } || report)
@@ -62,7 +66,10 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                 TextButton(onClick = { open = !isOpen }) { Text(if (isOpen) "Close" else "Open") }
             }
             if (!isOpen) {
-                Hint("Not on this phone yet: " + missing.joinToString(", ") { it.file.label })
+                Hint(
+                    if (missing.isNotEmpty()) "Not on this phone yet: " + missing.joinToString(", ") { it.file.label }
+                    else "Optional: a larger model, slower and more thorough (${ModelManager.gbLabel(extras.sumOf { it.file.bytes })})",
+                )
                 return@Column
             }
             Hint(
@@ -71,7 +78,8 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                     "phone's browser, or copy them from a computer or a USB drive, then import them " +
                     "here: each file is checked and copied into the app.",
             )
-            st.forEach { s ->
+            @Composable
+            fun FileRow(s: SetupStatus) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(s.file.label, fontSize = 14.sp)
@@ -91,6 +99,26 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                             }.exceptionOrNull()?.let { "No browser to download with: ${s.file.url}" }
                         }) { Text("Download") }
                     }
+                }
+            }
+            st.forEach { FileRow(it) }
+            if (extras.isNotEmpty()) {
+                Text("Optional: a larger model", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Hint(
+                    "Qwen3.8-Flash-Next, in two parts of ${ModelManager.gbLabel(extras.sumOf { it.file.bytes })} " +
+                        "together. On 61 research questions (restaurants, crypto, travel, emergencies) its " +
+                        "answers scored 67% of a web search + frontier AI answer, against 63% for the main " +
+                        "model, but each takes about 3 to 4 times as long (first words after about 2 minutes, " +
+                        "done after about 8). Both models and the libraries together take about 113GB, more " +
+                        "than a 128GB phone holds. Once both parts are imported, choose it in the Model list.",
+                )
+                extras.forEach { FileRow(it) }
+                if (extraMissing.isNotEmpty()) {
+                    val need = extraMissing.sumOf { it.file.bytes }
+                    Hint(
+                        "Its missing parts are ${sizeLabel(need)}" +
+                            if (need + 2_000_000_000L <= free) "." else ": free up some space first, or import them with the box below ticked.",
+                    )
                 }
             }
             if (missing.isNotEmpty()) {

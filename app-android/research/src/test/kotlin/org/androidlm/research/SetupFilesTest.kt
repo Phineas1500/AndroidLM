@@ -33,10 +33,12 @@ class SetupFilesTest {
             assertEquals(m.get("sha256").asString, f.sha256)
             assertEquals(m.get("url").asString, f.url)
             val path = m.get("device_path").asString
-            assertEquals(f.name, if (f.role == "model") "models" else path.substringBeforeLast('/'), f.dir)
+            assertEquals(f.name, if (f.role.startsWith("model")) "models" else path.substringBeforeLast('/'), f.dir)
         }
         assertEquals(listOf("Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf", "wiki.db"), SetupFiles.ALL.filter { it.required }.map { it.name })
         assertEquals("sizes tell the files apart", SetupFiles.ALL.size, SetupFiles.ALL.map { it.bytes }.toSet().size)
+        assertEquals(2, SetupFiles.ALL.count { it.extra })
+        assertTrue("an extra is never required", SetupFiles.ALL.none { it.extra && it.required })
     }
 
     @Test fun identifiesByNameOrSize() {

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "device_root": "/data/local/tmp/bmoe",
-  "note": "scripts/install.sh downloads each file from its url and refuses to push a file whose size or SHA-256 does not match.",
+  "note": "scripts/install.sh downloads each file from its url and refuses to push a file whose size or SHA-256 does not match. Files with role \"model-extra\" (an optional second model) are skipped unless --flash-next is given.",
   "files": [
     {
       "name": "Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf",
@@ -47,6 +47,24 @@
       "url": "https://huggingface.co/datasets/rammingaway/androidlm-places/resolve/main/places.db",
       "device_path": "corpus/places.db",
       "license": "ODbL 1.0 (OpenStreetMap contributors; Overture Maps Foundation places, CDLA-Permissive-2.0; GeoNames, CC BY 4.0)"
+    },
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00001-of-00002.gguf",
+      "role": "model-extra",
+      "bytes": 47039860096,
+      "sha256": "219ea929900dfa9ef091f3aa473fdba6874b65fcb36526d7d851ac9e95856d15",
+      "url": "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/ed59f92082b1e93c0e96d60a8b11aab089b52f09/IQ3_XXS/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00001-of-00002.gguf",
+      "device_path": "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00001-of-00002.gguf",
+      "license": "Qwen Community License 1.0 (Qwen3.8-Flash-Next; GGUF by ISTA-DASLab, whose repository lists Apache-2.0)"
+    },
+    {
+      "name": "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00002-of-00002.gguf",
+      "role": "model-extra",
+      "bytes": 28800138432,
+      "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113",
+      "url": "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/ed59f92082b1e93c0e96d60a8b11aab089b52f09/IQ3_XXS/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00002-of-00002.gguf",
+      "device_path": "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00002-of-00002.gguf",
+      "license": "Qwen Community License 1.0 (Qwen3.8-Flash-Next; GGUF by ISTA-DASLab, whose repository lists Apache-2.0)"
     }
   ]
 }

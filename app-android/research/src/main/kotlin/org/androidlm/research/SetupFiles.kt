@@ -24,6 +24,9 @@ data class SetupFile(
 ) {
     /** Research mode needs the model and wiki.db; the rest add faster search, the travel guide and places. */
     val required: Boolean get() = role == "model" || name == SetupFiles.WIKI
+
+    /** A part of the optional second model (Qwen3.8-Flash-Next): offered apart, never needed. */
+    val extra: Boolean get() = role == "model-extra"
 }
 
 /**
@@ -70,13 +73,27 @@ object SetupFiles {
             "https://huggingface.co/datasets/rammingaway/androidlm-places/resolve/main/places.db",
             "corpus", "Places to eat, drink and stay",
         ),
+        // the optional second model, in two parts that must sit side by side; the second is its
+        // n-gram table, the same file in every published build of this model
+        SetupFile(
+            "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00001-of-00002.gguf", "model-extra", 47_039_860_096L,
+            "219ea929900dfa9ef091f3aa473fdba6874b65fcb36526d7d851ac9e95856d15",
+            "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/ed59f92082b1e93c0e96d60a8b11aab089b52f09/IQ3_XXS/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00001-of-00002.gguf",
+            "models", "Larger model, part 1 of 2",
+        ),
+        SetupFile(
+            "Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00002-of-00002.gguf", "model-extra", 28_800_138_432L,
+            "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113",
+            "https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/ed59f92082b1e93c0e96d60a8b11aab089b52f09/IQ3_XXS/Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00002-of-00002.gguf",
+            "models", "Larger model, part 2 of 2 (its n-gram table)",
+        ),
     )
 
     fun byName(name: String): SetupFile? = ALL.firstOrNull { it.name == name }
 
     /**
      * Which file a picked document is: by its name, or by its size when a browser renamed the
-     * download ("wiki (1).db"). The five sizes differ, and the copy checks the SHA-256 anyway.
+     * download ("wiki (1).db"). The sizes all differ, and the copy checks the SHA-256 anyway.
      */
     fun identify(name: String, size: Long): SetupFile? = byName(name) ?: ALL.firstOrNull { it.bytes == size }
 

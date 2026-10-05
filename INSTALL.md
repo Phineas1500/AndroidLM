@@ -97,6 +97,35 @@ permission and with direct I/O, which the streaming engine needs for speed. File
 `/sdcard` also work for the model but are slower, and the corpus cannot be opened from a file
 picker location at all.
 
+## Optional: the larger model
+
+A second, larger model, Qwen3.8-Flash-Next (the IQ3_XXS build by ISTA-DASLab), can sit next to the
+main one.
+- **What it gives:** on the 61 research questions of
+  [`notes/2026-10-04-flash-next.md`](notes/2026-10-04-flash-next.md), its answers scored 67% of a
+  web search + frontier AI answer, against 63% for the main model.
+- **What it costs:** each answer takes about 3 to 4 times as long (first words after about 2
+  minutes, done after about 8 on a Pixel 8 Pro).
+- **Space:** it is two files of 75.8 GB together, and both models with the libraries take about
+  113 GB, more than a 128 GB phone holds. The app streams its experts from storage, so it runs on a
+  12 GB phone.
+- **Licence:** Qwen Community License 1.0 (the GGUF repository lists Apache-2.0).
+- **Choosing it:** once it is on the phone, pick it in the app's Model list. The app keeps that
+  choice, and the Set up card and the Model list say what the larger model costs.
+
+Three ways to install it:
+- **On the phone alone:** the Set up card has an "Optional: a larger model" section with Download
+  buttons for its two parts. Import both, as with the other files.
+- **With the script:** `scripts/install.sh --flash-next` downloads, checks and pushes the two parts
+  too.
+- **Without the script:** push both parts next to the main model; they must keep their names:
+
+```sh
+adb push Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00001-of-00002.gguf /data/local/tmp/bmoe/
+adb push Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00002-of-00002.gguf /data/local/tmp/bmoe/
+adb shell 'chmod 644 /data/local/tmp/bmoe/*.gguf'
+```
+
 ## Removing it
 
 Uninstalling the app also deletes the files it imported. Files pushed with adb are removed with

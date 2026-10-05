@@ -2,13 +2,16 @@
 # Put AndroidLM on a phone from a computer: download the model and corpus (resumable), verify
 # them, push them over adb, and install the APK. The phone never needs a network connection.
 #
-# Usage: scripts/install.sh [--assets-dir DIR] [--apk FILE] [--no-download] [--no-voyage] [--no-places]
+# Usage: scripts/install.sh [--assets-dir DIR] [--apk FILE] [--no-download] [--no-voyage] [--no-places] [--flash-next]
 #   --assets-dir DIR  where the large files are kept on this computer (default ./assets-cache)
 #   --apk FILE        APK to install (default: newest app-android/app/build/outputs/apk/**.apk)
 #   --no-download     only use files already present in the assets directory
 #   --no-voyage       skip the optional Wikivoyage corpus
 #   --no-places       skip the optional places database (where to eat, drink and stay)
-# Needs: adb (Android platform-tools), curl, python3, and about 37GB free here and on the phone.
+#   --flash-next      also the optional larger model, Qwen3.8-Flash-Next (75.8GB more): slower answers,
+#                     scored higher in our tests (notes/2026-10-04-flash-next.md)
+# Needs: adb (Android platform-tools), curl, python3, and about 37GB free here and on the phone
+# (113GB with --flash-next).
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
@@ -18,6 +21,7 @@ APK=""
 DOWNLOAD=1
 VOYAGE=1
 PLACES=1
+FLASHNEXT=0
 while [ $# -gt 0 ]; do
   case $1 in
     --assets-dir) ASSETS=$2; shift 2 ;;
@@ -25,7 +29,8 @@ while [ $# -gt 0 ]; do
     --no-download) DOWNLOAD=0; shift ;;
     --no-voyage) VOYAGE=0; shift ;;
     --no-places) PLACES=0; shift ;;
-    -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
+    --flash-next) FLASHNEXT=1; shift ;;
+    -h|--help) sed -n '2,15p' "$0"; exit 0 ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
   esac
 done
@@ -55,6 +60,7 @@ need=0
 while IFS='|' read -r -u 3 name role bytes sha url dpath; do
   [ "$role" = corpus-optional ] && [ $VOYAGE = 0 ] && continue
   [ "$role" = places ] && [ $PLACES = 0 ] && continue
+  [ "$role" = model-extra ] && [ $FLASHNEXT = 0 ] && continue
   have=$(remote_size "$DEVICE_ROOT/$dpath")
   [ "$have" = "$bytes" ] && continue
   need=$((need + bytes - ${have:-0}))
@@ -67,6 +73,7 @@ echo "to push: $((need / 1000000000)) GB; free on the phone's /data: $((free_kb 
 while IFS='|' read -r -u 3 name role bytes sha url dpath; do
   [ "$role" = corpus-optional ] && [ $VOYAGE = 0 ] && continue
   [ "$role" = places ] && [ $PLACES = 0 ] && continue
+  [ "$role" = model-extra ] && [ $FLASHNEXT = 0 ] && continue
   local_file=$ASSETS/$name
   if [ ! -f "$local_file" ] || [ "$(filesize "$local_file")" != "$bytes" ]; then
     [ $DOWNLOAD = 1 ] && [ -n "$url" ] || die "$name is missing or incomplete in $ASSETS and has no download URL yet"
