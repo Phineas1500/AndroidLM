@@ -38,8 +38,11 @@ data class AppSettings(
     // memory — the KV cache is sized for it once at open — so on a model that already fills RAM a
     // shorter context hands the difference back to the expert cache and the dense weights.
     val sessionCtx: Int = SESSION_CTX,
-    // Widest graph computed at once (--ubatch); not a user setting, chosen per device at load
-    // (see defaultUbatch).
+    // AndroidLM: the memory preset (MemoryPreset key, or MemoryPreset.AUTO for the one the phone's
+    // RAM calls for). Choosing one sets cacheMb and ubatch together.
+    val memoryPreset: String = MemoryPreset.AUTO,
+    // Widest graph computed at once (--ubatch); not a user setting of its own, it comes with the
+    // memory preset.
     val ubatch: Int = SESSION_UBATCH,
     val oDirect: Boolean = true,        // bypass the page cache
     val overlap: Boolean = true,        // read the next experts while the current layer computes
@@ -274,6 +277,7 @@ data class AppSettings(
     fun save(ctx: Context) {
         ctx.prefs().edit()
             .putBoolean("mmap", mmap)
+            .putString("memoryPreset", memoryPreset)
             .putInt("cacheMb", cacheMb).putInt("cacheCeilMb", cacheCeilMb)
             .putInt("ioThreads", ioThreads).putInt("threads", threads)
             .putInt("nExpertUsed", nExpertUsed)
@@ -314,7 +318,7 @@ data class AppSettings(
         // spent 13.9 s/token of "compute" that was really page faults, against 1.5 s at this
         // width). Prefill pays instead, and barely: chunking it costs ~7.7x the flash reads but
         // only ~6% of prefill wall time, because prefill is compute-bound. (No longer true with
-        // the faster prompt kernels, so a 12GB phone reads prompts wider: see defaultUbatch.)
+        // the faster prompt kernels, so a 12GB phone reads prompts wider: see MemoryPreset.)
         const val SESSION_UBATCH = 512
 
         // Context rungs. 4096 is the default a chat wants; the shorter ones exist for a model that
@@ -409,41 +413,22 @@ data class AppSettings(
         val NPREDICT_CHOICES = intArrayOf(16, 32, 48, 64, 128, 256, 512, 1024, 2048)
 
         /**
-         * Expert cache for a phone whose user has not chosen one. On a 12GB phone the default
-         * 2000 MiB leaves most of the RAM unused, and a bigger cache is lossless (it only changes
-         * where the weights come from). Pixel 8 Pro, Qwen3.6-35B-A3B, same answer each time:
-         * 2000 MiB 4.64 tok/s, 4000 MiB 5.56, 5000 MiB 6.05, 6000 MiB 6.27, with no more swapping
-         * than at 2000. Smaller phones keep [fallback].
+         * The memory preset's settings for a phone whose user has not chosen a cache: on a 12GB
+         * phone a bigger cache is lossless (it only changes where the weights come from). Pixel 8
+         * Pro, Qwen3.6-35B-A3B, same answer each time: 2000 MiB 4.64 tok/s, 4000 MiB 5.56, 5000 MiB
+         * 6.05, 6000 MiB 6.27, with no more swapping than at 2000 (MemoryPreset).
          */
-        fun defaultCacheMb(ctx: Context, fallback: Int): Int =
-            if (isLargeRam(ctx)) LARGE_RAM_CACHE_MB else fallback
-
-        /**
-         * Prefill width. A research prompt is 650-1,250 tokens; read in 512-token slices it streams
-         * the experts from flash once per slice. With the faster prompt kernels that is no longer
-         * hidden behind compute: on a Pixel 8 Pro the 1,216-token prompt read 22 GB in 45.5 s at
-         * 512 and 9 GB in 36.7 s at 1,280 (notes/2026-09-25-iqk-port.md). The price is a larger
-         * reserved compute buffer, 1,256 MiB instead of 502, so only a 12GB phone gets it.
-         */
-        fun defaultUbatch(ctx: Context): Int =
-            if (isLargeRam(ctx)) LARGE_RAM_UBATCH else SESSION_UBATCH
-
-        private fun isLargeRam(ctx: Context): Boolean {
-            val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager ?: return false
-            val mi = android.app.ActivityManager.MemoryInfo().also { am.getMemoryInfo(it) }
-            return mi.totalMem / (1024.0 * 1024.0 * 1024.0) >= LARGE_RAM_GIB
-        }
-        /** A "12GB" phone reports about 11.2-11.6 GiB of total memory. */
-        const val LARGE_RAM_GIB = 11.0
-        const val LARGE_RAM_CACHE_MB = 5000
-        const val LARGE_RAM_UBATCH = 1280
+        fun presetOf(ctx: Context): MemoryPreset =
+            MemoryPreset.resolve(ctx, ctx.prefs().getString("memoryPreset", MemoryPreset.AUTO) ?: MemoryPreset.AUTO)
 
         fun load(ctx: Context): AppSettings {
             val p = ctx.prefs()
             val d = AppSettings()
+            val preset = presetOf(ctx)
             return AppSettings(
                 mmap = p.getBoolean("mmap", d.mmap),
-                cacheMb = p.getInt("cacheMb", defaultCacheMb(ctx, d.cacheMb)),
+                memoryPreset = p.getString("memoryPreset", d.memoryPreset) ?: d.memoryPreset,
+                cacheMb = p.getInt("cacheMb", preset.cacheMb),
                 cacheCeilMb = p.getInt("cacheCeilMb", d.cacheCeilMb),
                 ioThreads = p.getInt("ioThreads", d.ioThreads),
                 threads = p.getInt("threads", d.threads),
@@ -458,8 +443,8 @@ data class AppSettings(
                         // Migrate the old two-boolean prefs from a pre-harmonization install.
                         p.getBoolean("denseOdirect", false) -> DenseWeights.ANON
                         !p.getBoolean("warmDense", true) -> DenseWeights.MMAP
-                        // No prior choice: the field default is the one source of truth.
-                        else -> d.denseWeights
+                        // No prior choice: the memory preset's
+                        else -> preset.dense
                     }
                 },
                 prefetchLayers = p.getInt("prefetchLayers", d.prefetchLayers),
@@ -471,7 +456,7 @@ data class AppSettings(
                 releaseMmap = p.getBoolean("releaseMmap", d.releaseMmap),
                 substitutePct = p.getInt("substitutePct", d.substitutePct),
                 sessionCtx = p.getInt("sessionCtx", d.sessionCtx),
-                ubatch = defaultUbatch(ctx),
+                ubatch = preset.ubatch,
                 spec = run {
                     val saved = p.getString("spec", null)
                     when {

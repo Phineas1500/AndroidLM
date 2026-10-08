@@ -1,0 +1,20 @@
+diff --git a/core/src/engine/session.cpp b/core/src/engine/session.cpp
+index 32d07a3..689bc2e 100644
+--- a/core/src/engine/session.cpp
++++ b/core/src/engine/session.cpp
+@@ -796,6 +796,15 @@ std::unique_ptr<Session> Session::open(const SessionConfig & cfg,
+         _putenv_s("LLAMA_OVERRIDE_CPU_PLAIN", "1");
+ #else
+         setenv("LLAMA_OVERRIDE_CPU_PLAIN", "1", 1);
++#endif
++    }
++    // AndroidLM: the streamer reads the experts with its own I/O, so the mapping should not read
++    // them at load (llama.cpp otherwise populates the whole file: see LLAMA_LAZY_EXPERTS there)
++    if (cfg.moe.enabled) {
++#if defined(_WIN32)
++        _putenv_s("LLAMA_LAZY_EXPERTS", "1");
++#else
++        setenv("LLAMA_LAZY_EXPERTS", "1", 1);
+ #endif
+     }
+     mparams.n_gpu_layers = 0;

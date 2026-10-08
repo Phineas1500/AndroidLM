@@ -653,6 +653,8 @@ private fun configSummary(s: AppSettings): String {
     if (s.mmap) {
         parts += "mmap baseline (no streaming)"
     } else {
+        // AndroidLM: the memory preset first, with the prompt width that comes with it
+        parts += (if (s.memoryPreset == MemoryPreset.AUTO) "memory auto" else "memory ${s.memoryPreset} GB") + " (ubatch ${s.ubatch})"
         parts += when {
             s.cacheMb == AppSettings.CACHE_AUTO -> if (s.cacheCeilMb > 0) "cache auto≤${s.cacheCeilMb}" else "cache auto"
             s.cacheMb == 0 -> "cache off"

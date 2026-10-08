@@ -9,9 +9,10 @@ and the corpus reach the phone another way, by one of two routes:
 
 ## What you need
 
-- An Android phone with 12GB of RAM, arm64, Android 10 or newer, and about 39GB free (about 59GB
-  while the files are imported on the phone alone). Developed for a Pixel 8 Pro; nothing here
-  needs Google Play Services.
+- An Android phone with 8GB of RAM or more (12GB recommended), arm64, Android 10 or newer, and
+  about 39GB free (about 59GB while the files are imported on the phone alone). Developed for a
+  Pixel 8 Pro; nothing here needs Google Play Services. See [Memory](#memory) for what the app
+  takes on each size of phone.
 - From a computer: a computer with about 38GB free, `adb` (Android platform-tools), `curl` and
   `python3`, a USB data cable, and USB debugging enabled on the phone (Settings > About phone >
   tap Build number 7 times, then Developer options > USB debugging).
@@ -125,6 +126,29 @@ adb push Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00001-of-00002.gguf /data/local/tmp/
 adb push Qwen3.8-Flash-Next-GSQ-RCO-IQ3_XXS-00002-of-00002.gguf /data/local/tmp/bmoe/
 adb shell 'chmod 644 /data/local/tmp/bmoe/*.gguf'
 ```
+
+## Memory
+
+The app sizes itself to the phone: Settings > Memory preset, Auto by default, picks the preset
+for the RAM the phone reports.
+
+| Preset | The app takes | Expert cache | Speed on a Pixel 8 Pro |
+|---|---|---|---|
+| 8 GB phone | about 4GB | 1,500 MiB | writes about 3 tokens/s; questions take 3-4 minutes |
+| 12 GB phone | about 8GB | 5,000 MiB | writes 5-7 tokens/s; questions take 1-2 minutes |
+| 16 GB phone or more | about 11GB | 8,000 MiB | not yet measured on a 16GB phone |
+
+The 8GB figures were measured on the Pixel 8 Pro with 4GB of its memory held by another process,
+which leaves it what a Pixel 8 has (`notes/2026-10-08-memory-presets.md`). A smaller preset only
+gives up speed: the answers are the same.
+
+### In the Android emulator
+
+The emulator's memory is the computer's. Give the virtual device 8GB of RAM (not 12) and at least
+64GB of internal storage, and close other large programs on the computer; Auto then picks the 8 GB
+preset, and the Settings screen says so. An arm64 system image is needed (Apple Silicon Macs run
+one natively). With 12GB given to the emulator, a reviewer's laptop swapped and the app wrote
+about 0.2 tokens/s. The 8GB setting has been measured on a phone, not yet in an emulator.
 
 ## Removing it
 

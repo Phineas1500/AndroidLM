@@ -8,6 +8,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +60,33 @@ fun SettingsScreen(current: AppSettings, onChange: (AppSettings) -> Unit, onBack
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            // AndroidLM: the one memory choice most phones need, before the engine's own levers
+            Section("Memory") {
+                val ctx = LocalContext.current
+                val ram = remember { MemoryPreset.totalGib(ctx) }
+                val auto = MemoryPreset.forRam(ram)
+                val presets = MemoryPreset.values()
+                val options = listOf("Auto: ${auto.label}") + presets.map { it.label }
+                val selected = presets.indexOfFirst { it.key == current.memoryPreset } + 1
+                LabeledDropdown("Memory preset", options, selected, enabled = stream) { i ->
+                    val p = if (i == 0) auto else presets[i - 1]
+                    onChange(current.copy(memoryPreset = if (i == 0) MemoryPreset.AUTO else p.key, cacheMb = p.cacheMb, ubatch = p.ubatch, denseWeights = p.dense))
+                }
+                val shown = presets.getOrNull(selected - 1) ?: auto
+                Hint(
+                    "This phone has %.1f GB of memory. ".format(ram) + shown.blurb +
+                        " A smaller preset answers more slowly but leaves room for other apps."
+                )
+                if (MemoryPreset.isEmulator) {
+                    Hint(
+                        "This is an emulator: its memory comes from the computer running it. Give the " +
+                            "emulator 8 GB and choose \"8 GB phone\" here, on a computer with 16 GB or more."
+                    )
+                } else if (ram < 7.0) {
+                    Hint("AndroidLM needs a phone with 8 GB or more; on this one the system may close it while it answers.")
+                }
+            }
+
             Section("Streaming") {
                 // mmap is the no-streaming baseline. When on, every streaming knob below is
                 // inert (the CLI omits --moe-stream and all sub-flags), so they are disabled.

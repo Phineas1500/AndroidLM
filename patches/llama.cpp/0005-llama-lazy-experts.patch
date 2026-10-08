@@ -1,0 +1,23 @@
+diff --git a/src/llama-model-loader.cpp b/src/llama-model-loader.cpp
+index c3445d4..cf44eb4 100644
+--- a/src/llama-model-loader.cpp
++++ b/src/llama-model-loader.cpp
+@@ -1306,6 +1306,18 @@ struct ggml_tensor * llama_model_loader::create_tensor(
+                     __func__, tn.str().c_str(), ggml_nbytes(cur)/1024/1024);
+         }
+     }
++    // AndroidLM: a caller that streams the routed experts from the file itself (BigMoeOnEdge sets
++    // LLAMA_LAZY_EXPERTS=1) never reads them through the mapping. Left in it, a mapping with no
++    // lazy range at all is MAP_POPULATE'd, so the whole file is read at load (11 GB for an 11 GB
++    // model, of which 1.7 GB is used), which on a phone with 4 GB free gets the app killed.
++    static const bool lazy_experts = [] {
++        const char * e = getenv("LLAMA_LAZY_EXPERTS");
++        return e != nullptr && atoi(e) != 0;
++    }();
++    if (lazy_experts && use_mmap && tn.str().find("_exps") != std::string::npos) {
++        const auto & w = require_weight(tn.str().c_str());
++        lazy_tensor_ranges[w.idx].emplace_back(w.offs, w.offs + ggml_nbytes(cur));
++    }
+ 
+     ggml_tensor t_meta = *cur;
+     if (flags & TENSOR_ALLOW_RESHAPE) {
