@@ -133,7 +133,7 @@ cores, RAM, GPU and TPU help, and by how much).
 
 ## Install
 
-The signed APK is in the [v1.4.0 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.4.0).
+The signed APK is in the [v1.5.0 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.5.0).
 [`INSTALL.md`](INSTALL.md) has two routes:
 - **On the phone alone:** install the APK, download the five files with the phone's browser from
   the app's Set up card, then import them. The app checks each file's SHA-256 as it copies it
