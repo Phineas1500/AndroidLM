@@ -38,8 +38,10 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
   unreliable) and everything else answer-first, followed by a source check: the facts from the
   cited passages that the answer leaves out or states differently, stated as the sources give them
   ([`notes/2026-10-08-source-check.md`](notes/2026-10-08-source-check.md)).
-- **Offline by construction:** the APK declares no `INTERNET` permission and has no Google Play
-  Services dependency.
+- **Offline by construction:** answering never touches the network, and nothing needs Google
+  Play Services. The app downloads its model and corpus itself (resumable, each file checked
+  against its SHA-256, from Hugging Face or a server of your choice); an `-offline` APK without
+  the `INTERNET` permission imports them instead.
 
 ## Status
 

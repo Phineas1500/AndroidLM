@@ -1,8 +1,9 @@
 package io.bigmoeonedge.example
 
 // AndroidLM: the "Set up" card. It lists the files the app reads (SetupFiles), says which are on
-// the phone, opens each missing one's download in the browser (the app itself has no network
-// access), and imports the files the user picks (ImportService).
+// the phone, downloads the missing ones into the app (DownloadService, "online" build) or opens
+// each one's download in the browser ("offline" build, which has no network access), and imports
+// the files the user picks (ImportService).
 
 import android.content.Intent
 import android.net.Uri
@@ -55,6 +56,30 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
     val isOpen = open ?: (missing.any { it.file.required } || report)
     var deleteOriginals by rememberSaveable { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
+    // a download asked for on mobile data, or with no connection, waits for a second tap
+    var asked by remember { mutableStateOf<Pair<List<org.androidlm.research.SetupFile>, SetupServer.Network>?>(null) }
+    fun download(files: List<org.androidlm.research.SetupFile>, confirmed: Boolean = false) {
+        error = null
+        val net = SetupServer.network(context)
+        if (!confirmed && net != SetupServer.Network.UNMETERED) { asked = files to net; return }
+        asked = null
+        DownloadService.start(context, files)
+    }
+    asked?.let { (files, net) ->
+        val size = sizeLabel(files.sumOf { it.bytes })
+        AlertDialog(
+            onDismissRequest = { asked = null },
+            title = { Text(if (net == SetupServer.Network.NONE) "No connection" else "Download over mobile data?") },
+            text = {
+                Text(
+                    if (net == SetupServer.Network.NONE) "The phone is not connected to a network right now. Connect to Wi-Fi, then download the $size."
+                    else "The phone is on mobile data, and the download is $size.",
+                )
+            },
+            confirmButton = { TextButton(onClick = { download(files, confirmed = true) }) { Text(if (net == SetupServer.Network.NONE) "Try anyway" else "Download") } },
+            dismissButton = { TextButton(onClick = { asked = null }) { Text("Not now") } },
+        )
+    }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         if (uris.isNotEmpty()) ImportService.start(context, uris, deleteOriginals)
     }
@@ -73,10 +98,16 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                 return@Column
             }
             Hint(
-                "AndroidLM never uses the network. Its model and libraries are ${st.size} files of " +
-                    "${ModelManager.gbLabel(st.sumOf { it.file.bytes })}. Download them with the " +
-                    "phone's browser, or copy them from a computer or a USB drive, then import them " +
-                    "here: each file is checked and copied into the app.",
+                if (BuildConfig.SETUP_DOWNLOADS)
+                    "AndroidLM answers without the network. Its model and libraries are ${st.size} files of " +
+                        "${ModelManager.gbLabel(st.sumOf { it.file.bytes })}: download them here (the only thing " +
+                        "the app uses the internet for), or import files copied from a computer or a USB drive. " +
+                        "Each file is checked against its SHA-256 before the app uses it."
+                else
+                    "AndroidLM never uses the network. Its model and libraries are ${st.size} files of " +
+                        "${ModelManager.gbLabel(st.sumOf { it.file.bytes })}. Download them with the " +
+                        "phone's browser, or copy them from a computer or a USB drive, then import them " +
+                        "here: each file is checked and copied into the app.",
             )
             @Composable
             fun FileRow(s: SetupStatus) {
@@ -86,6 +117,7 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                         Hint(
                             "${s.file.name} · ${sizeLabel(s.file.bytes)} · " + when {
                                 s.found != null -> "on this phone"
+                                s.partBytes > 0 -> "${sizeLabel(s.partBytes)} downloaded so far"
                                 s.outdated -> "an older version is on this phone"
                                 s.file.required -> "needed"
                                 else -> "optional"
@@ -94,10 +126,11 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                     }
                     if (s.found == null) {
                         TextButton(onClick = {
-                            error = runCatching {
+                            if (BuildConfig.SETUP_DOWNLOADS) download(listOf(s.file))
+                            else error = runCatching {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(s.file.url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                             }.exceptionOrNull()?.let { "No browser to download with: ${s.file.url}" }
-                        }) { Text("Download") }
+                        }, enabled = !progress.running) { Text(if (s.partBytes > 0) "Resume" else "Download") }
                     }
                 }
             }
@@ -121,7 +154,22 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                     )
                 }
             }
-            if (missing.isNotEmpty()) {
+            if (BuildConfig.SETUP_DOWNLOADS && missing.isNotEmpty()) {
+                val need = missing.sumOf { it.file.bytes - it.partBytes }
+                Button(
+                    onClick = { download(missing.map { it.file }) },
+                    enabled = !progress.running,
+                    modifier = Modifier.fillMaxWidth(),
+                ) { Text("Download all missing (${sizeLabel(need)})") }
+                Hint(
+                    "The phone has ${ModelManager.gbLabel(free)} free" +
+                        (if (need + 500_000_000L <= free) "." else ": free up some space first.") +
+                        " A download continues with the screen off, and one that stops resumes where it left off.",
+                )
+                ServerRow(enabled = !progress.running)
+                Text("Or import files copied to the phone", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            }
+            if (missing.isNotEmpty() && !BuildConfig.SETUP_DOWNLOADS) {
                 // downloaded files already take their space, so the import itself needs room for
                 // one copy at a time when each download is deleted after it
                 val need = missing.sumOf { it.file.bytes }
@@ -154,12 +202,13 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
 
             if (progress.running) {
                 val name = progress.file
-                if (name == null) {
-                    Text("Preparing…", fontSize = 12.sp)
+                val downloading = progress.verb == "Downloading"
+                if (name == null || progress.checking) {
+                    Text(if (name == null) "Preparing…" else "Checking $name…", fontSize = 12.sp)
                     LinearProgressIndicator(Modifier.fillMaxWidth())
                 } else {
                     Text(
-                        "Copying $name (${progress.index + 1} of ${progress.count}): " +
+                        "${progress.verb} $name (${progress.index + 1} of ${progress.count}): " +
                             "${ModelManager.gbLabel(progress.copied)} of ${ModelManager.gbLabel(progress.total)}",
                         fontSize = 12.sp,
                     )
@@ -168,12 +217,47 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                TextButton(onClick = { ImportService.cancel(context) }) { Text("Cancel") }
+                TextButton(onClick = { if (downloading) DownloadService.cancel(context) else ImportService.cancel(context) }) {
+                    Text(if (downloading) "Pause" else "Cancel")
+                }
             }
             progress.done.forEach { Text("✓ $it", fontSize = 12.sp) }
             (progress.errors + listOfNotNull(error)).forEach {
                 Text(it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
             }
+        }
+    }
+}
+
+/**
+ * Where the downloads come from: the manifest's servers (Hugging Face) unless the user names
+ * another, which must serve each file under its own name.
+ */
+@Composable
+private fun ServerRow(enabled: Boolean) {
+    val context = LocalContext.current
+    var server by remember { mutableStateOf(SetupServer.get(context)) }
+    var editing by rememberSaveable { mutableStateOf(false) }
+    var draft by rememberSaveable { mutableStateOf(server) }
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            "From: " + if (server.isEmpty()) "Hugging Face (the default)" else server,
+            fontSize = 12.sp, modifier = Modifier.weight(1f),
+        )
+        TextButton(onClick = { draft = server; editing = !editing }, enabled = enabled) { Text(if (editing) "Close" else "Change") }
+    }
+    if (editing) {
+        OutlinedTextField(
+            value = draft, onValueChange = { draft = it }, singleLine = true,
+            label = { Text("Another server (empty for the default)") },
+            placeholder = { Text("https://example.org/androidlm") },
+            isError = !SetupServer.valid(draft),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Hint("Each file is fetched as <server>/<file name> and checked against the same SHA-256, so a mirror cannot change what the app reads.")
+        Row {
+            TextButton(onClick = { SetupServer.set(context, draft); server = draft.trim(); editing = false }, enabled = SetupServer.valid(draft)) { Text("Save") }
+            TextButton(onClick = { SetupServer.set(context, ""); server = ""; draft = ""; editing = false }) { Text("Use the default") }
         }
     }
 }

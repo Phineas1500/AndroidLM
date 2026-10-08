@@ -3,7 +3,8 @@ package io.bigmoeonedge.example
 // AndroidLM: setting the app up without adb. The model and the corpus files reach the phone some
 // other way (the phone's browser, a USB drive) and are imported here: each picked file is
 // recognised, copied into app storage and checked against its SHA-256 (SetupFiles, in the
-// research module, where the copy is tested). The app still has no internet permission.
+// research module, where the copy is tested). The "online" build can also download them
+// (SetupDownload.kt).
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -34,8 +35,11 @@ import org.androidlm.research.android.CorpusLocator
 import java.io.File
 import java.util.concurrent.CancellationException
 
-/** Where [file] is on this phone: [found] is a copy that matches it; [outdated] when only other versions are there. */
-data class SetupStatus(val file: SetupFile, val found: File?, val outdated: Boolean)
+/**
+ * Where [file] is on this phone: [found] is a copy that matches it; [outdated] when only other
+ * versions are there; [partBytes], what an unfinished download of it holds so far.
+ */
+data class SetupStatus(val file: SetupFile, val found: File?, val outdated: Boolean, val partBytes: Long = 0)
 
 object SetupLocator {
     /**
@@ -48,7 +52,8 @@ object SetupLocator {
         else CorpusLocator.dirs(ctx).map { File(it, f.name) }.filter { it.isFile })
             .filter { !it.absolutePath.startsWith("/storage/") && !it.absolutePath.startsWith("/sdcard/") }
         val ok = copies.firstOrNull { it.canRead() && SetupFiles.matches(it, f) }
-        SetupStatus(f, ok, outdated = ok == null && copies.isNotEmpty())
+        val part = if (ok == null) SetupFiles.partOf(destination(ctx, f)).length() else 0L
+        SetupStatus(f, ok, outdated = ok == null && copies.isNotEmpty(), partBytes = part)
     }
 
     /** Where an import puts [f]: the first directory each scan looks in. */
@@ -57,9 +62,13 @@ object SetupLocator {
         else File(File(ctx.filesDir, CorpusLocator.DIR).apply { mkdirs() }, f.name)
 }
 
-/** What an import is doing, for the setup card; the notification says the same. */
+/** What an import or a download is doing, for the setup card; the notification says the same. */
 data class ImportProgress(
     val running: Boolean = false,
+    /** "Copying" for an import, "Downloading" for a download. */
+    val verb: String = "Copying",
+    /** A downloaded file is being checked against its SHA-256. */
+    val checking: Boolean = false,
     /** The label of the file being copied, its place in the run, and the bytes so far. */
     val file: String? = null,
     val index: Int = 0,

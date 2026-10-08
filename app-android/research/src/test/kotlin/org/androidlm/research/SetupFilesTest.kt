@@ -106,4 +106,125 @@ class SetupFilesTest {
         assertFalse("an imported file of another version", SetupFiles.matches(f, good))
         assertFalse(SetupFiles.matches(f, good.copy(bytes = good.bytes + 1)))
     }
+
+    // ---- downloads ----
+
+    /** Serves [bytes] from [from], failing after [failAfter] bytes when set (a dropped connection). */
+    private fun opened(bytes: ByteArray, from: Long, failAfter: Int = -1) = SetupFiles.Opened(
+        object : java.io.InputStream() {
+            var at = from.toInt()
+            var sent = 0
+            override fun read(): Int = throw UnsupportedOperationException()
+            override fun read(b: ByteArray, off: Int, len: Int): Int {
+                if (failAfter in 0..sent) throw IOException("connection reset")
+                if (at >= bytes.size) return -1
+                var n = minOf(len, bytes.size - at, 65_536)
+                if (failAfter >= 0) n = minOf(n, failAfter - sent)
+                System.arraycopy(bytes, at, b, off, n)
+                at += n; sent += n
+                return n
+            }
+        },
+        from,
+    )
+
+    @Test fun downloadsAVerifiedFile() {
+        val dest = File(tmp.root, "t.db")
+        val got = SetupFiles.download("u", good, dest, open = { _, off -> opened(data, off) }, pause = {})
+        assertTrue(got.readBytes().contentEquals(data))
+        assertEquals(good.sha256, File(dest.path + SetupFiles.STAMP).readText())
+        assertFalse(SetupFiles.partOf(dest).exists())
+    }
+
+    @Test fun resumesAfterADroppedConnection() {
+        val dest = File(tmp.root, "t.db")
+        val offsets = mutableListOf<Long>()
+        SetupFiles.download("u", good, dest, open = { _, off ->
+            offsets += off
+            opened(data, off, failAfter = if (offsets.size < 3) 3_000_000 else -1)
+        }, pause = {})
+        assertTrue(dest.readBytes().contentEquals(data))
+        assertEquals(listOf(0L, 3_000_000L, 6_000_000L), offsets)
+    }
+
+    @Test fun startsOverWhenTheServerIgnoresTheRange() {
+        val dest = File(tmp.root, "t.db")
+        SetupFiles.partOf(dest).writeBytes(data.copyOf(4_000_000))
+        SetupFiles.download("u", good, dest, open = { _, _ -> opened(data, 0) }, pause = {})
+        assertTrue(dest.readBytes().contentEquals(data))
+    }
+
+    @Test fun cancelKeepsThePartForLater() {
+        val dest = File(tmp.root, "t.db")
+        var reads = 0
+        try {
+            SetupFiles.download("u", good, dest, open = { _, off -> opened(data, off) }, cancelled = { ++reads > 20 }, pause = {})
+            fail("not cancelled")
+        } catch (_: CancellationException) {
+        }
+        val part = SetupFiles.partOf(dest)
+        assertTrue(part.length() in 1 until data.size)
+        SetupFiles.download("u", good, dest, open = { _, off -> assertEquals(part.length(), off); opened(data, off) }, pause = {})
+        assertTrue(dest.readBytes().contentEquals(data))
+    }
+
+    @Test fun refusesADamagedDownload() {
+        val bad = data.copyOf().also { it[5_000_000] = (it[5_000_000] + 1).toByte() }
+        expectDownloadRefused(bad, "damaged")
+        val long = data + byteArrayOf(1, 2, 3)
+        expectDownloadRefused(long, "more than")
+    }
+
+    private fun expectDownloadRefused(served: ByteArray, why: String) {
+        val dest = File(tmp.root, "t.db")
+        try {
+            SetupFiles.download("u", good, dest, open = { _, off -> opened(served, off) }, pause = {})
+            fail("accepted a bad download")
+        } catch (e: IOException) {
+            assertTrue(e.message, why in e.message!!)
+        }
+        assertFalse(dest.exists())
+        assertFalse(SetupFiles.partOf(dest).exists())
+    }
+
+    @Test fun givesUpAfterRetriesWithoutProgress() {
+        val dest = File(tmp.root, "t.db")
+        var tries = 0
+        try {
+            SetupFiles.download("u", good, dest, open = { _, _ -> tries++; throw IOException("no route to host") }, retries = 3, pause = {})
+            fail("did not give up")
+        } catch (e: IOException) {
+            assertTrue(e.message, "resumes" in e.message!!)
+        }
+        assertEquals(4, tries)
+    }
+
+    @Test fun httpRangeAndRedirect() {
+        val server = com.sun.net.httpserver.HttpServer.create(java.net.InetSocketAddress("127.0.0.1", 0), 0)
+        server.createContext("/moved/t.db") { ex ->
+            ex.responseHeaders.add("Location", "/files/t.db")
+            ex.sendResponseHeaders(302, -1); ex.close()
+        }
+        var drop = true
+        server.createContext("/files/t.db") { ex ->
+            val m = Regex("""bytes=(\d+)-""").find(ex.requestHeaders.getFirst("Range") ?: "")
+            val start = m?.groupValues?.get(1)?.toInt() ?: 0
+            if (m != null) ex.responseHeaders.add("Content-Range", "bytes $start-${data.size - 1}/${data.size}")
+            ex.sendResponseHeaders(if (m != null) 206 else 200, (data.size - start).toLong())
+            ex.responseBody.use { out ->
+                // the first response stops halfway, as a dropped connection does
+                val end = if (drop) data.size / 2 else data.size
+                drop = false
+                out.write(data, start, end - start)
+            }
+        }
+        server.start()
+        try {
+            val dest = File(tmp.root, "t.db")
+            SetupFiles.download("http://127.0.0.1:${server.address.port}/moved/t.db", good, dest, pause = {})
+            assertTrue(dest.readBytes().contentEquals(data))
+        } finally {
+            server.stop(0)
+        }
+    }
 }

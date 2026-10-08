@@ -61,6 +61,17 @@ Per Apache-2.0 section 4(b), the files below were changed from upstream.
   item, `launchResearch`.
 - `README.md`: replaced with a description of this app.
 
+**Added later (AndroidLM's own)**
+
+- Setup without adb: `SetupCard.kt`, `SetupImport.kt` (import of picked files), and, in the
+  `online` network flavor only, `SetupDownload.kt` with `src/online/AndroidManifest.xml`, which
+  declares `INTERNET` and `ACCESS_NETWORK_STATE` for it. This is a new downloader of AndroidLM's
+  own files (resumable, checked against `assets/manifest.json`), not upstream's model downloader
+  or catalog; the `offline` flavor declares no network permission, as before.
+- `app/build.gradle`: the `network` flavor dimension (`online`, `offline`).
+- `MemoryPreset.kt` and the Memory section of `SettingsScreen.kt`; `AppSettings.kt` takes the
+  expert cache, prompt width and dense-weights policy from the preset.
+
 **Unchanged**
 
 The `--session` line-protocol handling and session lifecycle of the engine foreground service,

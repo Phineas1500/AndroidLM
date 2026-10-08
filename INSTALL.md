@@ -1,9 +1,15 @@
 # Installing AndroidLM on a phone
 
-AndroidLM never uses the network: the app does not declare the INTERNET permission. The model
-and the corpus reach the phone another way, by one of two routes:
-- **On the phone alone:** download the files with the phone's browser, then import them in the
-  app ([below](#on-the-phone-alone)). No computer and no adb.
+AndroidLM answers without the network. It comes in two builds:
+- **`androidlm-<version>.apk`** downloads its model and corpus itself, from its **Set up** card.
+  That download is the only thing the app uses the internet for; on GrapheneOS its Network
+  permission can be turned off afterwards.
+- **`androidlm-<version>-offline.apk`** has no INTERNET permission at all: the files reach the
+  phone another way and are imported.
+
+The files reach the phone by one of these routes:
+- **On the phone alone:** the app downloads them, or (offline build) the phone's browser does and
+  the app imports them ([below](#on-the-phone-alone)). No computer and no adb.
 - **From a computer:** `scripts/install.sh` downloads them, checks them and pushes them over USB
   ([Steps](#steps)).
 
@@ -59,16 +65,29 @@ access.
 
 1. In the phone's browser, open the [latest release](https://github.com/Phineas1500/AndroidLM/releases/latest),
    download the APK and open it to install it (allow the browser to install apps when asked).
-2. Open AndroidLM (allow its notifications: the import shows its progress there). Its **Set up**
-   card lists the five files. Tap **Download** next to each one, coming back to the app after
-   each: the browser downloads them all at once.
+2. Open AndroidLM (allow its notifications: downloads and imports show their progress there). On
+   Wi-Fi, tap **Download all missing** in its **Set up** card.
+   - The five files are 37GB. The download goes on with the screen off. **Pause** stops it, and
+     **Resume** (or a dropped connection, retried on its own) carries on where it stopped.
+   - Each file is checked against its SHA-256 before the app uses it. A damaged file is deleted
+     and downloaded again.
+   - The files come from Hugging Face. To use another server instead, tap **Change** next to
+     "From:" and enter its address. It must serve each file under its own name
+     (`<server>/wiki.db`), and the same SHA-256 check applies.
+3. Turn on airplane mode and ask a question (see the end of [Steps](#steps)).
+
+**With the offline build**, the browser downloads the files and the app imports them:
+
+1. Install the `-offline` APK as above and open it. Its **Set up** card lists the five files. Tap
+   **Download** next to each one, coming back to the app after each: the browser downloads them
+   all at once.
    - The files are 37GB in all, so use Wi-Fi. On Wi-Fi at about 8 MB/s they took 75 minutes;
      `wiki.db` (21GB) is the last to finish.
    - A browser opened for the first time shows its own welcome screen first.
    - Leave the downloads running until they finish. Hugging Face's download links expire after an
      hour. A download that keeps going finishes past that (`wiki.db` did, 14 minutes after), but
      one that is interrupted later may have to start again.
-3. When the downloads have finished, tap **Import files…**, open Downloads in the file picker,
+2. When the downloads have finished, tap **Import files…**, open Downloads in the file picker,
    select all five files (press and hold the first, then tap the others) and tap **Select**.
    - The app recognises each file and checks its size and SHA-256 as it copies it into its own
      storage. A damaged or unfinished download is refused, and the card says which.
@@ -77,11 +96,11 @@ access.
      room for the largest copy while it is written. Afterwards the files take 37GB.
    - All five took 4 minutes on a Pixel 8 Pro. The copy goes on with the screen off; a
      notification shows its progress.
-4. Turn on airplane mode and ask a question (see the end of [Steps](#steps)).
+3. Turn on airplane mode and ask a question.
 
-**From a USB drive** instead of the browser: on any computer, copy the five files onto a USB-C
-drive formatted as exFAT (FAT32 cannot hold files over 4GB), plug it into the phone, and pick the
-files on the drive in step 3. The drive is only read, and the phone needs 37GB free.
+**From a USB drive** instead of the browser (either build): on any computer, copy the five files
+onto a USB-C drive formatted as exFAT (FAT32 cannot hold files over 4GB), plug it into the phone,
+and pick the files on the drive with **Import files…**. The drive is only read, and the phone needs 37GB free.
 
 ## Without the script
 
@@ -165,8 +184,21 @@ adb shell rm -r /data/local/tmp/bmoe
 The install flow has been run end to end on a Pixel 8 Pro (Android 16): download, checksum
 verification, `adb push` of the files and the APK install, followed by research questions in the
 app; the v1.0.0 APK was installed from scratch and answered a research question on that phone
-before it was published. The app has no network permission (`aapt2 dump permissions` lists no
-`android.permission.INTERNET`), so it cannot reach the network even with Wi-Fi on.
+before it was published. The offline build has no network permission (`aapt2 dump permissions`
+lists no `android.permission.INTERNET`), so it cannot reach the network even with Wi-Fi on; the
+online build declares INTERNET (and ACCESS_NETWORK_STATE) for its setup downloader alone.
+
+The in-app download (1.6.0) was run on the same phone with two of the files missing:
+- From a mirror, with the phone offline and the mirror reached over USB (`adb reverse`), the 1.7MB
+  word counts and the 0.3GB travel guide downloaded and passed their SHA-256 checks. The guide was
+  paused at 156MB; on Resume the app asked for `Range: bytes=156246016-` and fetched only the rest.
+- From Hugging Face, on the phone's Wi-Fi: the word counts in 1.4 s, and the travel guide in 57 s
+  (about 5.8 MB/s). Paused at 4.4MB and resumed, it fetched exactly the remaining 324,451,384
+  bytes through Hugging Face's redirect to its CDN; both files passed their SHA-256 checks.
+- Seven JVM tests (`SetupFilesTest`) cover a dropped connection, a server that ignores the range,
+  a damaged or oversized file, giving up after retries, and a real HTTP server with a redirect.
+
+The full 37GB set has not been downloaded in the app yet.
 
 "On the phone alone" was run end to end on the same phone with the v1.3.0 APK, installed fresh
 with no adb-pushed files:

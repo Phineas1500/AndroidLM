@@ -9,9 +9,10 @@
          Asked for only when such a question is asked. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!-- AndroidLM: NO android.permission.INTERNET, by design. Upstream's in-app model downloader
-         (the only network user) was removed; the app cannot open a socket. Inference is entirely
-         on-device — nothing about a prompt or an answer leaves the phone. -->
+    <!-- AndroidLM: NO android.permission.INTERNET here. Inference is entirely on-device: nothing
+         about a prompt or an answer leaves the phone. The "online" build adds INTERNET in
+         src/online/AndroidManifest.xml for its setup downloader alone; the "offline" build
+         cannot open a socket at all. -->
     <!-- No broad storage permission here: models arrive through the system file picker, which
          copies into the app-internal models dir (filesDir, a real filesystem where O_DIRECT
          works). The dev flavor overlay (src/dev/AndroidManifest.xml) adds all-files access to

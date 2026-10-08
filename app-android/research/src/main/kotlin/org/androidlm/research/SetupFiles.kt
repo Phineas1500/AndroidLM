@@ -30,10 +30,10 @@ data class SetupFile(
 }
 
 /**
- * The files of a working install, and the copy that puts one into app storage. The app has no
- * internet permission, so the files reach the phone some other way (the phone's browser, a USB
- * drive, adb) and an import copies each one into app storage, where the engine's direct reads
- * work, checking its size and SHA-256 as it goes.
+ * The files of a working install, and the two ways one reaches app storage, where the engine's
+ * direct reads work: an import copies a file that reached the phone some other way (the phone's
+ * browser, a USB drive, adb), and a download (the app's "online" build only) fetches it from a
+ * server. Either way the file counts only once its size and SHA-256 are the manifest's.
  */
 object SetupFiles {
     const val WIKI = "wiki.db"
@@ -139,6 +139,120 @@ object SetupFiles {
             throw t
         }
     }
+
+    /** Where a copy or a download keeps what it has so far; a download resumes from its length. */
+    fun partOf(dest: File): File = File(dest.path + PART)
+
+    /** An open download: the bytes, from [start] (0 when the server did not honour the range). */
+    class Opened(val input: InputStream, val start: Long)
+
+    /**
+     * Opens [url] from byte [offset] with an HTTP range request. HttpURLConnection follows the
+     * redirects a file host uses (Hugging Face sends its files from a CDN). A download only asks
+     * for bytes it lacks, so a 416 (nothing past [offset]) means the server's file is shorter than
+     * the one expected.
+     */
+    fun httpOpen(url: String, offset: Long): Opened {
+        val c = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+        c.connectTimeout = 30_000
+        c.readTimeout = 60_000
+        c.setRequestProperty("User-Agent", "AndroidLM-setup")
+        if (offset > 0) c.setRequestProperty("Range", "bytes=$offset-")
+        return when (val code = c.responseCode) {
+            200 -> Opened(c.inputStream, 0)
+            206 -> {
+                // "bytes 1000-1999/2000": trust the server's start over the one asked for
+                val start = c.getHeaderField("Content-Range")
+                    ?.let { Regex("""bytes (\d+)-""").find(it)?.groupValues?.get(1)?.toLongOrNull() } ?: offset
+                Opened(c.inputStream, start)
+            }
+            416 -> { c.disconnect(); throw WrongFile("$url is shorter than $offset bytes: not the file this app expects") }
+            else -> { c.disconnect(); throw IOException("$url: the server answered HTTP $code") }
+        }
+    }
+
+    /**
+     * Downloads [file] from [url] to [dest] through its part file, resuming from what an earlier
+     * attempt left and retrying a dropped connection (up to [retries] times in a row without
+     * progress, [pause] between tries). The finished file is then read once more and kept only if
+     * its size and SHA-256 are [file]'s; otherwise the part is deleted and an IOException says so.
+     * [onProgress] gets the bytes so far, [onChecking] is called when the check starts; [cancelled]
+     * is polled between reads (a CancellationException then, the part kept for a later resume).
+     */
+    fun download(
+        url: String,
+        file: SetupFile,
+        dest: File,
+        onProgress: (Long) -> Unit = {},
+        onChecking: () -> Unit = {},
+        cancelled: () -> Boolean = { false },
+        open: (String, Long) -> Opened = ::httpOpen,
+        retries: Int = 6,
+        pause: (Int) -> Unit = { Thread.sleep(RETRY_SECONDS[minOf(it, RETRY_SECONDS.size - 1)] * 1000L) },
+    ): File {
+        val part = partOf(dest)
+        if (part.length() > file.bytes) part.delete()
+        var failures = 0
+        while (part.length() < file.bytes) {
+            if (cancelled()) throw CancellationException("download cancelled")
+            val before = part.length()
+            try {
+                val o = open(url, before)
+                o.input.use { input ->
+                    java.io.RandomAccessFile(part, "rw").use { raf ->
+                        // a server that ignored the range sends the file from its start
+                        raf.setLength(o.start)
+                        raf.seek(o.start)
+                        var at = o.start
+                        val buf = ByteArray(1 shl 20)
+                        while (true) {
+                            if (cancelled()) throw CancellationException("download cancelled")
+                            val n = input.read(buf)
+                            if (n < 0) break
+                            if (at + n > file.bytes) throw WrongFile("${file.name}: the server sent more than ${file.bytes} bytes: not the file this app expects")
+                            raf.write(buf, 0, n)
+                            at += n
+                            onProgress(at)
+                        }
+                        raf.fd.sync()
+                    }
+                }
+                if (part.length() < file.bytes) throw IOException("the connection ended at ${part.length()} of ${file.bytes} bytes")
+            } catch (e: WrongFile) {
+                part.delete()
+                throw IOException(e.message)
+            } catch (e: IOException) {
+                if (part.length() > before) failures = 0
+                if (++failures > retries) throw IOException("${file.name}: the download stopped (${e.message}); Download resumes it", e)
+                pause(failures - 1)
+            }
+        }
+        onChecking()
+        val digest = MessageDigest.getInstance("SHA-256")
+        part.inputStream().use { input ->
+            val buf = ByteArray(4 shl 20)
+            while (true) {
+                if (cancelled()) throw CancellationException("download cancelled")
+                val n = input.read(buf)
+                if (n < 0) break
+                digest.update(buf, 0, n)
+            }
+        }
+        val sha = digest.digest().joinToString("") { "%02x".format(it) }
+        if (sha != file.sha256) {
+            part.delete()
+            throw IOException("${file.name} arrived damaged or is a different version (SHA-256 does not match); it was deleted")
+        }
+        if (!part.renameTo(dest)) throw IOException("could not rename ${part.name}")
+        File(dest.path + STAMP).writeText(sha)
+        return dest
+    }
+
+    /** The server's file cannot be the expected one: not retried. */
+    private class WrongFile(message: String) : IOException(message)
+
+    /** Seconds between the tries of a dropped download. */
+    private val RETRY_SECONDS = longArrayOf(2, 5, 10, 30, 60)
 
     /**
      * Is [f] [file], as far as can be told without reading it? Its size must match, and when an

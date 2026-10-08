@@ -75,12 +75,26 @@ android {
     //         src/dev/AndroidManifest.xml.
     //   play  Play-Store-compliant. No broad storage permission: models arrive only through
     //         the system file picker (SAF), which copies into the app-internal models dir
-    //         (filesDir) and needs no permission. (AndroidLM removed upstream's URL downloader:
-    //         neither flavor declares INTERNET.)
+    //         (filesDir) and needs no permission.
     // SHARED_STORAGE gates the storage-permission code paths; no model names or URLs are
     // ever hardcoded — the scanned directories are the only difference.
-    flavorDimensions += 'distribution'
+    //
+    // AndroidLM: and two network builds of each.
+    //   online   the setup downloader (SetupDownload.kt) fetches the model and corpus files into
+    //            the app; src/online/AndroidManifest.xml adds INTERNET for it alone.
+    //   offline  no INTERNET permission at all: the files arrive through the browser or a
+    //            computer and are imported (the app before 1.6.0).
+    flavorDimensions += ['distribution', 'network']
     productFlavors {
+        online {
+            dimension 'network'
+            buildConfigField 'boolean', 'SETUP_DOWNLOADS', 'true'
+        }
+        offline {
+            dimension 'network'
+            versionNameSuffix '-offline'
+            buildConfigField 'boolean', 'SETUP_DOWNLOADS', 'false'
+        }
         dev {
             dimension 'distribution'
             applicationIdSuffix '.dev'

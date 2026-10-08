@@ -56,8 +56,8 @@ from the SDK manager. `ANDROID_HOME` must point at the SDK.
 
    ```sh
    ./gradlew :research:test            # retrieval + pipeline tests (JVM)
-   ./gradlew :app:assembleDevDebug
-   adb install app/build/outputs/apk/dev/debug/app-dev-debug.apk
+   ./gradlew :app:assembleDevOnlineDebug        # or assembleDevOfflineDebug
+   adb install app/build/outputs/apk/devOnline/debug/app-dev-online-debug.apk
    ```
 
    `:research:test` compares against fixtures (`golden.json`, `sample_wiki.db`,
@@ -67,7 +67,9 @@ from the SDK manager. `ANDROID_HOME` must point at the SDK.
 
 Flavors: **dev** (application id `io.github.phineas1500.androidlm.dev`) also requests all-files
 access, so it can read a model adb-pushed to shared storage; **play** has no storage permission
-at all (`./gradlew :app:assemblePlayDebug`).
+at all (`./gradlew :app:assemblePlayOnlineDebug`). Each comes in two network builds: **online**
+downloads the model and corpus from the Set up card, **offline** declares no network permission
+and only imports them.
 
 ## Files on the device
 
@@ -102,13 +104,15 @@ research question is asked and stay open until the model is unloaded.
 Research prompts carry about 1,000 tokens of sources plus a 600-token draft, so keep the
 session context at 4096 (the default) or more.
 
-## No network, by design
+## The network: the setup downloader only
 
-Neither flavor declares `android.permission.INTERNET`; upstream's model downloader and catalog
-were removed along with it. Check a built APK with:
+Inference and research never use the network; upstream's model downloader and catalog were
+removed. The **offline** builds declare no `android.permission.INTERNET` at all. The **online**
+builds add it, with `ACCESS_NETWORK_STATE`, in `src/online/AndroidManifest.xml`, for the setup
+downloader (`SetupDownload.kt`) alone. Check a built APK with:
 
 ```sh
-$ANDROID_HOME/build-tools/<version>/aapt2 dump permissions app/build/outputs/apk/dev/debug/app-dev-debug.apk
+$ANDROID_HOME/build-tools/<version>/aapt2 dump permissions app/build/outputs/apk/devOffline/debug/app-dev-offline-debug.apk
 ```
 
 Expected: `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_DATA_SYNC`, `POST_NOTIFICATIONS`,
