@@ -1,0 +1,636 @@
+{
+ "broad-01": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add the same correct island count, area, terrain and Article 9 facts; neither catches the draft's 'west of the Sea of Japan' (it is east) or the garbled 'third-largest nominal GDP by PPP' (4th nominal, 5th PPP)."
+ },
+ "broad-02": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add the same correct population and Treaty of Georgievsk facts; neither fixes the draft's Mount Shkhara height (about 5,193 m, not 4,860 m) or its claim that Georgia was the first Christian state (Armenia was)."
+ },
+ "broad-03": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "B",
+  "reason": "The draft is sound. B adds a source-backed cause (the rise of Germany upsetting the balance of power), which bears directly on the question. A adds dates and casualty figures that are less relevant."
+ },
+ "broad-04": {
+  "A_effect": "hurt",
+  "B_effect": "helped",
+  "A_errors": [
+   "Says the draft compared surface gravity to the Moon (it compared size), and Mercury's gravity is in fact slightly lower than Mars's, not higher",
+   "'Corrects' a Caloris Planitia name the draft never used; Caloris Planitia and Caloris Basin are the same feature",
+   "Marks the draft's correct 176-day solar day as wrong by swapping in the 58.65-day sidereal day"
+  ],
+  "B_errors": [
+   "Says surface gravity is slightly higher than Mars's; it is slightly lower (3.70 vs 3.72 m/s^2)"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "B",
+  "reason": "A's three corrections are all bogus, and one tells the reader that the draft's correct solar day is wrong. B adds the trace atmosphere, the Caloris size and the 3:2 resonance, with only a trivial gravity slip."
+ },
+ "edge-01": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add correct island, area and Article 9 facts, and B adds a correct defence-spending figure. Neither catches that Japan is now 4th, not 3rd, by nominal GDP, or that Japan opened to trade before the Meiji Restoration, not after it."
+ },
+ "edge-02": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [
+   "Labels the Aquaman/Poseidonis point a correction, implying the draft said something about Poseidonis that it never said"
+  ],
+  "B_errors": [
+   "Says Plato describes Atlantis as fictional; Plato presents it as true history (modern scholars think he invented it)"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Each has one misleading line next to useful context on Plato inventing the story. Neither notes that Plato never gives the city a separate name, so the draft's 'capital also named Atlantis' stands."
+ },
+ "edge-04": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "The draft is accurate. Both add the same correct founding and launch dates, the market-cap rank and the Merge date."
+ },
+ "fact-01": {
+  "A_effect": "hurt",
+  "B_effect": "helped",
+  "A_errors": [
+   "Presents the 2021 UN figure (213.4M) as a correction, though it does not contradict a 2024 estimate of 223-225M",
+   "Gives the population density as 167.5/km^2; at 213-237M people over 923,768 km^2 it is about 230-250/km^2"
+  ],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "B",
+  "reason": "B gives the 213.4M (2021) and 230M+ figures neutrally, without calling the draft wrong. A frames the figures as contradictory 'corrections' and adds a wrong density."
+ },
+ "fact-02": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "Both are accurate. A confirms the core answer and adds the 1970 Rabassa translation date, which ties in with the draft. B's praise and quote are less useful."
+ },
+ "fact-03": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "The draft is correct. Both add accurate specifics (free-standing record, 4,900 m above the base, the national park, the highest volcano in the Eastern Hemisphere)."
+ },
+ "fact-04": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "The draft is correct. Both add the same accurate Bellatrix/Paris/Shapella detail, the block number and the energy cut."
+ },
+ "fact-05": {
+  "A_effect": "helped",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "The draft is correct. A adds the capitals and the basin area. B mostly restates the length and the countries."
+ },
+ "fact-06": {
+  "A_effect": "neutral",
+  "B_effect": "hurt",
+  "A_errors": [
+   "Says the siege lasted 55 days from 6 April; 6 April to 29 May is 53 days, as the draft had it"
+  ],
+  "B_errors": [
+   "Says the siege lasted 55 days from 6 April; 6 April to 29 May is 53 days, as the draft had it"
+  ],
+  "A_missed": false,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "Both wrongly contradict the draft's 53-day siege. Only A, by dating the empire to 27 BC, lets a careful reader see that the draft's 'nearly 1,500 years since 753 BC' is off. B says 'No corrections' and leaves that standing."
+ },
+ "fact-07": {
+  "A_effect": "helped",
+  "B_effect": "hurt",
+  "A_errors": [
+   "Says the city was renamed Astana in 1998 'not 1997', but the draft never dated the rename to 1997 (1997 was the capital move)"
+  ],
+  "B_errors": [
+   "Says the name returned to Astana in 2023 'not 2022'; it was September 2022, so this reinforces the draft's error"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "A correctly catches the 2022 reversion that the draft got wrong. B 'corrects' it the wrong way. Neither fixes the draft's claim that Akmola was the Kazakh SSR capital (it was Alma-Ata)."
+ },
+ "fact-08": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "Both are accurate. A's additions (Fleming named it, benzylpenicillin from P. rubens, the 1945 Nobel) are more on topic than B's lysozyme and penicillinase points."
+ },
+ "fresh-01": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "The draft is correct. Both add the same accurate facts on the term, re-election and the office."
+ },
+ "fresh-02": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both give only reserve-currency status and the 2000/2008 extreme dates, with no values. Neither catches that the draft's upper bound of 1.20 EUR per USD is far off for recent years (about 0.80-1.05)."
+ },
+ "fresh-03": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [
+   "Says CME introduced the first bitcoin futures; CBOE launched a week earlier (10 Dec 2017)"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "The draft rightly declines. Both add irrelevant history, and B has a small factual slip."
+ },
+ "fresh-04": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both clearly show that Argentina won in 2022, beating France. Neither fixes the draft's false claim that France won the 1930 tournament (Uruguay did)."
+ },
+ "health-01": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add correct, modest background (2,500 m threshold, fitness, HAPE/HACE, coca). Neither catches that Machu Picchu is lower than Cusco, not higher."
+ },
+ "health-02": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Draft is accurate; A adds the ~5% severe-dengue rate and the three phases, B adds the 4-7 day incubation and febrile-phase length. Both correct and comparably useful."
+ },
+ "health-03": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both add the same correct caveats: vinegar may not help Portuguese man o' war stings and box jellyfish stings need urgent care. The cassiosome item is trivia in both."
+ },
+ "hum-01": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Draft is sound. A gives the three eupatheiai categories (joy, wish, caution) with Greek terms; B gives the same plus behavior over speech and the cardinal virtues. Both correct."
+ },
+ "hum-02": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both add the same correct Confucius details (dates, 'transmitter', Han-era oldest portrait); neither touches Laozi. Equivalent."
+ },
+ "hum-03": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "Neither catches the draft's false claim that Westphalia introduced permanent embassies. A also notes that non-interference was developed in the 18th century, which tempers the draft's 'codified in 1648' framing."
+ },
+ "reason-01": {
+  "A_effect": "hurt",
+  "B_effect": "neutral",
+  "A_errors": [
+   "Calls the driving distance ~280 km and says 300-320 km is wrong; the road via the A1 is ~313 km",
+   "Gives an arrival time of 11:48 AM; at ~313 km it is about 12:08"
+  ],
+  "B_errors": [
+   "Gives ~280 km as the Lisbon-Porto distance in a driving question; that is about the straight-line distance, the road is ~313 km"
+  ],
+  "A_missed": false,
+  "B_missed": true,
+  "prefer": "B",
+  "reason": "A rightly flags the 3:00 PM headline, but it then 'corrects' the draft's right 12:06-12:12 answer to a wrong 11:48. B leaves the 3 PM slip and is a little misleading on distance, but it does not overwrite the right answer."
+ },
+ "reason-02": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Draft's 1,321 is correct. Both checks only note that Jupiter's diameter is 11 times Earth's and that the ratio isn't in the sources."
+ },
+ "reason-03": {
+  "A_effect": "helped",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "Both confirm the 72-80 AD Colosseum dates and the 7th-century BC first walls. A adds the relevant point that the best-known sections are Ming; B adds trivia (Flavian Amphitheatre, trade duties)."
+ },
+ "reason-04": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Draft is correct (6 hours); both checks only restate the definition of average speed."
+ },
+ "reason-05": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Draft is correct. Both cite correct Japan figures (area, population, density rank) but nothing on the Netherlands."
+ },
+ "reason-06": {
+  "A_effect": "helped",
+  "B_effect": "neutral",
+  "A_errors": [
+   "Says 'Corrections: None' although the draft's headline of ~10 m is wrong"
+  ],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "The draft's headline says ~10 m, but its own calculation gives 7.3 m. A states ~7.2 m outright, which settles it, despite its 'None' label. B only gives the 30-diameters ratio and leaves the 10 m headline standing."
+ },
+ "reason-07": {
+  "A_effect": "neutral",
+  "B_effect": "hurt",
+  "A_errors": [],
+  "B_errors": [
+   "States Bush was 64 when the Wall fell; born 12 June 1924, he was 65 on 9 November 1989"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "Draft wrongly says 64. A just repeats the birth date and leaves the error; B actively confirms the wrong age of 64."
+ },
+ "reason-08": {
+  "A_effect": "helped",
+  "B_effect": "neutral",
+  "A_errors": [
+   "Says 'No corrections' although the draft's headline figure of $16,386.19 is wrong"
+  ],
+  "B_errors": [
+   "Says the sources agree with the answer, though they give no figures and the draft's headline $16,386.19 is wrong"
+  ],
+  "A_missed": false,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "A explicitly confirms $26,532.98, so the reader can see that the $16,386.19 headline is wrong. B gives no number and vaguely endorses the answer."
+ },
+ "tech-01": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "B",
+  "reason": "Both point to ML-DSA (Dilithium) and SLH-DSA (SPHINCS+, FIPS 205), but B states plainly that 'SL-DSA' does not exist and untangles the draft's confusion. Neither fixes the 'July 2024' date (it was August), the claim that only two algorithms were selected, or the missing Falcon/FN-DSA."
+ },
+ "tech-02": {
+  "A_effect": "hurt",
+  "B_effect": "hurt",
+  "A_errors": [
+   "Says the verifier cannot prove the statement to third parties; a zk-SNARK proof is non-interactive and publicly verifiable, so it can be forwarded and checked by anyone"
+  ],
+  "B_errors": [
+   "Says the verifier cannot prove the statement to third parties; a zk-SNARK proof is non-interactive and publicly verifiable, so it can be forwarded and checked by anyone"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both add the same claim that the verifier can't convince third parties. That holds for interactive ZK but is wrong for publicly verifiable SNARKs. The rest (non-interactivity suits blockchains) is the same in both."
+ },
+ "tech-03": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Sources are off-topic (Ethereum history), and both say so. Neither catches the draft's false claim that PBS was implemented in the Merge via EIP-4844 (MEV-Boost is out-of-protocol)."
+ },
+ "tech-04": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [
+   "Says the sources agree with the answer right after saying the sources are empty"
+  ],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "B",
+  "reason": "Neither catches the draft's 'operates at the protocol level' (ERC-4337 needs no protocol change). A contradicts itself, while B is a coherent if uncritical confirmation."
+ },
+ "tech-05": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [
+   "Calls Offchain Labs (a company) an EVM-compatible Layer-2; the rollup is Arbitrum"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "Both add tangential zk-SNARK history and an Offchain Labs mention, and neither flags the bogus 'Scalar' example or the overstated 'seconds to minutes' ZK withdrawals. B misstates Offchain Labs as an L2."
+ },
+ "tech-06": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [
+   "'Corrects' the draft for saying ECC is broken by Shor's alone, but the draft already said a sufficiently powerful quantum computer is needed"
+  ],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "A",
+  "reason": "Both catch the draft's main error with correct qubit and gate counts (ECC is an easier quantum target than RSA). B adds a strawman correction."
+ },
+ "tech-07": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Draft is accurate. Both checks only restate generic definitions (second-layer protocol for Bitcoin scalability)."
+ },
+ "tech-08": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "The draft has several errors: proofs are not constant 128 bytes, KZG is Kate-Zaverucha-Goldberg, Ethereum's Verkle design uses Pedersen/IPA, and Verkle trees belong to 'The Verge', not 'The Purge'. Neither check catches any of them. A says the sources are off-topic and B lists irrelevant Ethereum history."
+ },
+ "tech-09": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "The draft is correct. Both checks add the same correct points about FIPS 186-4 requiring d < lambda(n) and about CRT decryption."
+ },
+ "tech-10": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "The draft is sound. Both add the same correct points: the name Brewer's theorem, CAP consistency versus ACID consistency, and the CAP definition of availability."
+ },
+ "trav-01": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "The draft wrongly has the red line running to Baixa-Chiado and Terreiro do Pa\u00e7o (you must change lines), names a non-existent 'S\u00e3o Francisco Xavier' terminus, and wrongly says the machines take no cash. Both checks only confirm the 25-minute time and the red-line terminus, and leave these errors standing."
+ },
+ "trav-02": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "Both add the 30-day visa-free stay on Ph\u00fa Qu\u1ed1c, which corrects the draft's claim that airport transit is the only exemption. Both also confirm the 90-day multiple-entry e-visa. The content is the same."
+ },
+ "trav-03": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "The draft is correct. Both checks offer only generic statements about tipping that support it and add nothing specific to Japan."
+ },
+ "trav-04": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "The draft's advice is sound. Both note that piped water is not necessarily drinkable and that the sources have nothing specific to Mexico City."
+ },
+ "trav-05": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "B",
+  "reason": "B confirms every service number (191, 1193, 1155, 1669, 199) and rightly says the sources list a separate number for each service, a fair caution against the draft's claim that 191 dispatches everything. A adds 1193 but spends the rest on vehicle light colours, which are off-topic."
+ },
+ "trav-06": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [
+   "Says the sources support the draft's taxi 'payment switching' details, but the draft never describes a taxi note-switch scam"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "A",
+  "reason": "Both add the Taksim bar scam that the draft lacks. A also gives the concrete taxi note-switch trick, while B attributes taxi details to the draft that it never gave. Neither questions the draft's apparently invented 'step on the rug and you must buy it' scam."
+ },
+ "trav-07": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "tie",
+  "reason": "The draft is reasonable. Both add the same example hotels in each area (Park Hyatt, Sakura Hostel, Cerulean Tower); A names a couple more, which is a marginal difference."
+ },
+ "trav-09": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "The draft calls the grape harvest 'Rustavi' (it is Rtveli) and calls Tbilisi a lake town. Both checks give only general facts about Georgia and Borjomi, so these errors stand."
+ },
+ "trav-11": {
+  "A_effect": "hurt",
+  "B_effect": "hurt",
+  "A_errors": [
+   "Claims Argentine outlets are mounted upside-down with the earth pin at the top; usually the earth receptacle is at the bottom (China puts it at the top)",
+   "Says Argentine Type I plugs lack insulation on the prongs; insulating sleeves are optional, not absent",
+   "Calls Argentina's supply a '220-240V range'; the nominal voltage is 220 V"
+  ],
+  "B_errors": [
+   "Claims the outlet is mounted upside-down with the earth pin at the top for safety; usually the earth receptacle is at the bottom in Argentina"
+  ],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "B",
+  "reason": "Both correctly note the reversed live/neutral wiring, but both wrongly say the earth pin sits at the top, and neither fixes the draft's 'two parallel pins and a round earth pin' description or its 110V claim. A adds two more doubtful statements."
+ },
+ "trav-12": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add the same correct context: the 2022 homicide rate, where violence is concentrated, and the warning about jokes to police. Neither corrects the draft's 'Parque Llerce' (Parque Lleras)."
+ },
+ "trav-13": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add useful notes on Grab and tuk-tuks; B adds motorcycle taxis and A the 1992 meter rule. Neither corrects the draft's 6 baht/min waiting charge (it is about 3 baht/min)."
+ },
+ "zh-01": {
+  "A_effect": "neutral",
+  "B_effect": "neutral",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "The draft's restaurants and details (such as 'Vegana' by chef Jo\u00e3o Santos) look invented. Both checks only say the sources do not cover restaurants and add basic facts about Lisbon."
+ },
+ "zh-02": {
+  "A_effect": "neutral",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": false,
+  "B_missed": false,
+  "prefer": "B",
+  "reason": "The draft is accurate. B adds relevant context: Mozi's period and Mohism's decline after the Qin unification. A adds only a birthplace and points the draft already covers."
+ },
+ "zh-03": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "B",
+  "reason": "Both confirm about 123 million and the 11th-largest rank, and B adds where the population is concentrated. Neither corrects the draft's 2010 peak figure (about 128.1 million, not 127.4 million)."
+ },
+ "zh-04": {
+  "A_effect": "helped",
+  "B_effect": "helped",
+  "A_errors": [],
+  "B_errors": [],
+  "A_missed": true,
+  "B_missed": true,
+  "prefer": "tie",
+  "reason": "Both add the correct point that the verifier cannot convince third parties. Neither corrects the draft's claim that Monero uses zk-SNARKs/STARKs or its garbled two-ball analogy."
+ }
+}

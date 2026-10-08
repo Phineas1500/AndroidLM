@@ -1,0 +1,542 @@
+[
+ {
+  "key": "passages:trav-11:1",
+  "id": "trav-11",
+  "variant": "passages",
+  "q": "What plug type and voltage does Argentina use?",
+  "correction": "Argentina uses Type I plugs with live and neutral pins swapped compared to Australia/New Zealand [1].",
+  "label": "PRECISION",
+  "why": "True that Argentine Type I has reversed polarity, but the draft only calls it the Australian/NZ style (physically identical) and never claims the same wiring."
+ },
+ {
+  "key": "passages:trav-11:2",
+  "id": "trav-11",
+  "variant": "passages",
+  "q": "What plug type and voltage does Argentina use?",
+  "correction": "Argentine outlets are mounted upside-down with the earth pin at the top [1].",
+  "label": "NOT_IN_DRAFT",
+  "why": "The draft never mentions socket mounting orientation (the 'sometimes upside-down' fact is real but contradicts nothing)."
+ },
+ {
+  "key": "passages:tech-01:1",
+  "id": "tech-01",
+  "variant": "passages",
+  "q": "Which signature algorithms are quantum resistant?",
+  "correction": "The second selected algorithm is **SLH-DSA** (Stateless Hash-based Digital Signature Algorithm), not \"SL-DSA\" or \"SPHINCS+\" as a separate name; it is standardized as FIPS 205 [3].",
+  "label": "VALID",
+  "why": "The draft names a non-existent 'SL-DSA'; the real second standard is SLH-DSA (SPHINCS+), FIPS 205."
+ },
+ {
+  "key": "passages:tech-01:2",
+  "id": "tech-01",
+  "variant": "passages",
+  "q": "Which signature algorithms are quantum resistant?",
+  "correction": "There is no \"SL-DSA\" standard; the lattice-based signature is **ML-DSA** (FIPS 204) [2].",
+  "label": "VALID",
+  "why": "The draft presents 'SL-DSA' as a lattice standard; no such standard exists, and the lattice one is ML-DSA (FIPS 204)."
+ },
+ {
+  "key": "passages:tech-01:3",
+  "id": "tech-01",
+  "variant": "passages",
+  "q": "Which signature algorithms are quantum resistant?",
+  "correction": "The lattice-based standard is based on **CRYSTALS-Dilithium** (specifically version 3.1) [1].",
+  "label": "AGREES",
+  "why": "The draft already says ML-DSA's origin is CRYSTALS-Dilithium; this only adds 'version 3.1'."
+ },
+ {
+  "key": "passages:tech-06:1",
+  "id": "tech-06",
+  "variant": "passages",
+  "q": "How does Shor's algorithm threaten elliptic curve cryptography?",
+  "correction": "ECC is not broken by Shor's algorithm alone; it requires a hypothetical quantum computer [2].",
+  "label": "AGREES",
+  "why": "The draft already says ECC breaks only on a sufficiently powerful, error-corrected quantum computer."
+ },
+ {
+  "key": "passages:tech-06:2",
+  "id": "tech-06",
+  "variant": "passages",
+  "q": "How does Shor's algorithm threaten elliptic curve cryptography?",
+  "correction": "ECC is an easier target for quantum computers than RSA, contrary to the implication that RSA is more vulnerable [2].",
+  "label": "VALID",
+  "why": "The draft says ECC needs more quantum resources than RSA at equal security; in fact ECC is the easier target (about 2,330 qubits for P-256 vs more for RSA-2048/3072)."
+ },
+ {
+  "key": "passages:reason-01:1",
+  "id": "reason-01",
+  "variant": "passages",
+  "q": "If I drive from Lisbon to Porto at an average of 100 km/h and leave at 9am, when do I arrive?",
+  "correction": "Your answer incorrectly states the arrival time as 3:00 PM.",
+  "label": "VALID",
+  "why": "The draft's headline '3:00 PM' is wrong; its own working gives about 12:06-12:12."
+ },
+ {
+  "key": "passages:reason-01:2",
+  "id": "reason-01",
+  "variant": "passages",
+  "q": "If I drive from Lisbon to Porto at an average of 100 km/h and leave at 9am, when do I arrive?",
+  "correction": "The distance is approximately 280 km [2], not 300–320 km.",
+  "label": "WRONG",
+  "why": "The driving distance is about 313 km via the A1, so the draft's 300-320 km is right; 280 km is roughly the straight-line distance."
+ },
+ {
+  "key": "passages:reason-01:3",
+  "id": "reason-01",
+  "variant": "passages",
+  "q": "If I drive from Lisbon to Porto at an average of 100 km/h and leave at 9am, when do I arrive?",
+  "correction": "At 100 km/h, the drive takes 2 hours 48 minutes, resulting in an arrival time of 11:48 AM, not 3:00 PM.",
+  "label": "WRONG",
+  "why": "11:48 rests on the wrong 280 km figure; the right arrival is about 12:10, which the draft's body already gives."
+ },
+ {
+  "key": "passages:fact-01:1",
+  "id": "fact-01",
+  "variant": "passages",
+  "q": "What is the population of Nigeria?",
+  "correction": "The UN estimated Nigeria's population at 213.4 million in 2021 [1].",
+  "label": "OTHER",
+  "why": "A stale 2021 UN figure (213.4M) that doesn't contradict the draft's 2024 estimate and would make the answer worse as a correction."
+ },
+ {
+  "key": "passages:fact-01:2",
+  "id": "fact-01",
+  "variant": "passages",
+  "q": "What is the population of Nigeria?",
+  "correction": "The country has over 230 million people [2].",
+  "label": "OTHER",
+  "why": "Estimate update, not a real error: the draft's 223-225M (2024) is in the expected ~220-230M range; newer UN figures (~233M) are a bit higher."
+ },
+ {
+  "key": "passages:fact-07:1",
+  "id": "fact-07",
+  "variant": "passages",
+  "q": "What is the capital of Kazakhstan?",
+  "correction": "The city returned to the name Astana in 2023, not 2022 [2].",
+  "label": "WRONG",
+  "why": "Astana got its name back on 17 Sep 2022; the draft's 2023 is the error, and this 'correction' keeps 2023 and claims the draft said 2022."
+ },
+ {
+  "key": "passages:broad-04:1",
+  "id": "broad-04",
+  "variant": "passages",
+  "q": "Tell me about Mercury",
+  "correction": "Surface gravity is slightly higher than Mars, not Earth's Moon [1].",
+  "label": "WRONG",
+  "why": "The draft compares Mercury's size, not its gravity, to the Moon (its 38% g is right), and Mercury's gravity is slightly lower than Mars's, not higher."
+ },
+ {
+  "key": "passages:broad-04:2",
+  "id": "broad-04",
+  "variant": "passages",
+  "q": "Tell me about Mercury",
+  "correction": "Largest crater is Caloris Basin, not Caloris Planitia [1].",
+  "label": "NOT_IN_DRAFT",
+  "why": "The draft never mentions Caloris; Caloris Planitia and Caloris Basin are the same feature anyway."
+ },
+ {
+  "key": "passages:broad-04:3",
+  "id": "broad-04",
+  "variant": "passages",
+  "q": "Tell me about Mercury",
+  "correction": "Sidereal day is 58.65 Earth days, not 176 Earth days [1].",
+  "label": "WRONG",
+  "why": "The draft correctly calls 176 days the solar day; the 58.65-day sidereal day doesn't contradict it."
+ },
+ {
+  "key": "passages:broad-04:4",
+  "id": "broad-04",
+  "variant": "passages",
+  "q": "Tell me about Mercury",
+  "correction": "Additions: Mercury has a trace atmosphere [1].",
+  "label": "OTHER",
+  "why": "An Additions line misparsed as a correction (it starts with 'Additions:'); a trace atmosphere agrees with the draft's 'lacks a significant atmosphere'."
+ },
+ {
+  "key": "passages:broad-04:5",
+  "id": "broad-04",
+  "variant": "passages",
+  "q": "Tell me about Mercury",
+  "correction": "It is the planet with the highest delta-v needed to travel to and from all other planets [1].",
+  "label": "OTHER",
+  "why": "An Additions item (delta-v) misparsed as a correction from a single-line check; the draft says nothing about it."
+ },
+ {
+  "key": "passages:broad-04:6",
+  "id": "broad-04",
+  "variant": "passages",
+  "q": "Tell me about Mercury",
+  "correction": "Mercury's sidereal year and sidereal day are in a 3:2 spin-orbit resonance ratio [1].",
+  "label": "OTHER",
+  "why": "An Additions item (3:2 resonance) misparsed as a correction from a single-line check; not a contradiction."
+ },
+ {
+  "key": "passages:fresh-04:1",
+  "id": "fresh-04",
+  "variant": "passages",
+  "q": "Who won the most recent FIFA World Cup?",
+  "correction": "France did not win the most recent FIFA World Cup; Argentina won the 2022 tournament by defeating France [1].",
+  "label": "VALID",
+  "why": "The draft says France (2018); Argentina won the 2022 World Cup, beating France."
+ },
+ {
+  "key": "passages:fresh-04:2",
+  "id": "fresh-04",
+  "variant": "passages",
+  "q": "Who won the most recent FIFA World Cup?",
+  "correction": "The 2022 World Cup was held in Qatar from 20 November to 18 December 2022 [2].",
+  "label": "AGREES",
+  "why": "Repeats the draft's Qatar 2022 with dates; only the tense of 'next World Cup' changes, and item 1 already fixes that."
+ },
+ {
+  "key": "passages:fresh-04:3",
+  "id": "fresh-04",
+  "variant": "passages",
+  "q": "Who won the most recent FIFA World Cup?",
+  "correction": "It was the first World Cup in the Middle East and the last with 32 teams [2].",
+  "label": "NOT_IN_DRAFT",
+  "why": "Middle East / last 32-team facts are additions; the draft says nothing about them."
+ },
+ {
+  "key": "passages:health-03:1",
+  "id": "health-03",
+  "variant": "passages",
+  "q": "How do I treat a jellyfish sting?",
+  "correction": "Vinegar is not universally effective; it may help with box jellyfish but not Portuguese man o' war stings [1].",
+  "label": "PRECISION",
+  "why": "The draft says vinegar for 'most' stings, not all; the man o' war exception is a useful caveat, not a contradiction."
+ },
+ {
+  "key": "passages:health-03:2",
+  "id": "health-03",
+  "variant": "passages",
+  "q": "How do I treat a jellyfish sting?",
+  "correction": "Do not scrape tentacles off for box jellyfish, as this triggers more venom release; scraping is only recommended for other species after vinegar application [1][2].",
+  "label": "PRECISION",
+  "why": "A box-jellyfish caveat; the draft already removes tentacles only after vinegar, which is standard first aid."
+ },
+ {
+  "key": "passages:edge-02:1",
+  "id": "edge-02",
+  "variant": "passages",
+  "q": "What is the capital of Atlantis?",
+  "correction": "Poseidonis is the capital of Atlantis in the Aquaman franchise, not in Plato's original account [3].",
+  "label": "NOT_IN_DRAFT",
+  "why": "The draft never mentions Poseidonis or Aquaman."
+ },
+ {
+  "key": "base:fact-01:1",
+  "id": "fact-01",
+  "variant": "base",
+  "q": "What is the population of Nigeria?",
+  "correction": "The population is more than 230 million, not 223–225 million [1].",
+  "label": "OTHER",
+  "why": "Estimate update, not a real error: the draft's 223-225M (2024) is in the expected ~220-230M range; newer UN figures (~233M) are a bit higher."
+ },
+ {
+  "key": "base:fact-01:2",
+  "id": "fact-01",
+  "variant": "base",
+  "q": "What is the population of Nigeria?",
+  "correction": "Nigeria is the world's sixth-most populous country, not seventh [1].",
+  "label": "AGREES",
+  "why": "The draft already says sixth-most populous; it never says seventh."
+ },
+ {
+  "key": "base:broad-04:1",
+  "id": "broad-04",
+  "variant": "base",
+  "q": "Tell me about Mercury",
+  "correction": "Mercury's surface gravity is slightly higher than that of Mars, not just \"slightly larger than Earth's Moon\" [1].",
+  "label": "WRONG",
+  "why": "The draft's 'slightly larger than the Moon' is about size and its 38% g is right; Mercury's gravity is slightly lower than Mars's, not higher."
+ },
+ {
+  "key": "base:broad-04:2",
+  "id": "broad-04",
+  "variant": "base",
+  "q": "Tell me about Mercury",
+  "correction": "Mercury's largest crater is Caloris Basin (Caloris Planitia), with a diameter of 1,550 km, not simply described as \"heavily cratered\" without specific scale [1].",
+  "label": "PRECISION",
+  "why": "'Heavily cratered' is right; this only adds Caloris Basin's 1,550 km size."
+ },
+ {
+  "key": "base:broad-04:3",
+  "id": "broad-04",
+  "variant": "base",
+  "q": "Tell me about Mercury",
+  "correction": "Mercury's sidereal day is 58.65 Earth days, not 176 Earth days (which is the solar day) [1].",
+  "label": "WRONG",
+  "why": "The draft says 176 days is the solar day, which is correct; the correction even admits it."
+ },
+ {
+  "key": "base:trav-11:1",
+  "id": "trav-11",
+  "variant": "base",
+  "q": "What plug type and voltage does Argentina use?",
+  "correction": "Argentina uses Type I plugs with live and neutral pins swapped compared to Australia/New Zealand [1].",
+  "label": "PRECISION",
+  "why": "True that Argentine Type I has reversed polarity, but the draft only calls it the Australian/NZ style (physically identical) and never claims the same wiring."
+ },
+ {
+  "key": "base:trav-11:2",
+  "id": "trav-11",
+  "variant": "base",
+  "q": "What plug type and voltage does Argentina use?",
+  "correction": "Argentine outlets are mounted upside-down with the earth pin at the top [1].",
+  "label": "NOT_IN_DRAFT",
+  "why": "The draft never mentions socket mounting orientation (the 'sometimes upside-down' fact is real but contradicts nothing)."
+ },
+ {
+  "key": "base:tech-01:1",
+  "id": "tech-01",
+  "variant": "base",
+  "q": "Which signature algorithms are quantum resistant?",
+  "correction": "The second NIST-standardized signature algorithm is **SLH-DSA** (based on SPHINCS+), not \"SL-DSA\" or \"ML-DSA\" as a pair; ML-DSA is based on CRYSTALS-Dilithium [4].",
+  "label": "VALID",
+  "why": "Correctly replaces the draft's invented 'SL-DSA' with SLH-DSA (SPHINCS+)."
+ },
+ {
+  "key": "base:tech-01:2",
+  "id": "tech-01",
+  "variant": "base",
+  "q": "Which signature algorithms are quantum resistant?",
+  "correction": "NIST selected **ML-DSA** (Module-Lattice-Based Digital Signature Algorithm) and **SLH-DSA** (Stateless Hash-Based Digital Signature Algorithm) as the two primary signature standards [3], [4].",
+  "label": "VALID",
+  "why": "The draft's list includes the fake 'SLDSA'; ML-DSA and SLH-DSA are the published FIPS 204/205 signature standards."
+ },
+ {
+  "key": "base:reason-06:1",
+  "id": "reason-06",
+  "variant": "base",
+  "q": "If the Earth were the size of a basketball, how far away would the Moon be?",
+  "correction": "The Moon would be approximately 7.3 meters away, not 10 meters [3].",
+  "label": "VALID",
+  "why": "The draft's headline 10 m is wrong; 30.15 x 24 cm is about 7.3 m (as the draft's own working shows)."
+ },
+ {
+  "key": "base:reason-06:2",
+  "id": "reason-06",
+  "variant": "base",
+  "q": "If the Earth were the size of a basketball, how far away would the Moon be?",
+  "correction": "The Moon's diameter is roughly one-quarter of Earth's, not 27% [3].",
+  "label": "WRONG",
+  "why": "The draft's 27% (3,474/12,742) is right; 'one-quarter' is just a rougher rounding."
+ },
+ {
+  "key": "base:fact-07:1",
+  "id": "fact-07",
+  "variant": "base",
+  "q": "What is the capital of Kazakhstan?",
+  "correction": "The city returned to the name Astana in 2022, not 2023 [3].",
+  "label": "VALID",
+  "why": "The draft says the renaming was in September 2023; it was September 2022."
+ },
+ {
+  "key": "base:fresh-04:1",
+  "id": "fresh-04",
+  "variant": "base",
+  "q": "Who won the most recent FIFA World Cup?",
+  "correction": "France did not win the most recent World Cup; Argentina won the 2022 tournament by defeating France [3].",
+  "label": "VALID",
+  "why": "The draft says France (2018); Argentina won the 2022 World Cup, beating France."
+ },
+ {
+  "key": "base:health-03:1",
+  "id": "health-03",
+  "variant": "base",
+  "q": "How do I treat a jellyfish sting?",
+  "correction": "Do not scrape tentacles off with hands or items; this triggers more venom release [2].",
+  "label": "WRONG",
+  "why": "As blanket advice this contradicts standard first aid (remove tentacles with tweezers or a card after vinegar), which the draft gives; the source warning is box-jellyfish-specific."
+ },
+ {
+  "key": "base:health-03:2",
+  "id": "health-03",
+  "variant": "base",
+  "q": "How do I treat a jellyfish sting?",
+  "correction": "Scraping is only safe after vinegar application and nematocyst clearance [3].",
+  "label": "AGREES",
+  "why": "The draft already says to scrape only after the vinegar rinse."
+ },
+ {
+  "key": "base:edge-02:1",
+  "id": "edge-02",
+  "variant": "base",
+  "q": "What is the capital of Atlantis?",
+  "correction": "Poseidonis is the capital of Atlantis in the Aquaman franchise, not the historical/mythological city described by Plato [4].",
+  "label": "NOT_IN_DRAFT",
+  "why": "The draft never mentions Poseidonis or Aquaman."
+ },
+ {
+  "key": "excerpts:tech-01:1",
+  "id": "tech-01",
+  "variant": "excerpts",
+  "q": "Which signature algorithms are quantum resistant?",
+  "correction": "\"SL-DSA\" is incorrect; the correct name is SLH-DSA (Stateless Hash-Based Digital Signature Algorithm), standardized as FIPS 205 [2].",
+  "label": "VALID",
+  "why": "'SL-DSA' in the draft is wrong; the name is SLH-DSA (FIPS 205)."
+ },
+ {
+  "key": "excerpts:tech-01:2",
+  "id": "tech-01",
+  "variant": "excerpts",
+  "q": "Which signature algorithms are quantum resistant?",
+  "correction": "\"SL-DSA is based on Falcon and SPHINCS+ hybrid concepts\" is incorrect; SLH-DSA is based on SPHINCS+ [2].",
+  "label": "VALID",
+  "why": "The draft says SL-DSA comes from 'SPHINCS+ and Falcon-like approaches'; SLH-DSA is simply SPHINCS+."
+ },
+ {
+  "key": "excerpts:reason-06:1",
+  "id": "reason-06",
+  "variant": "excerpts",
+  "q": "If the Earth were the size of a basketball, how far away would the Moon be?",
+  "correction": "If the Earth were the size of a basketball (approx. 24 cm), the Moon would be about 7.3 meters away, not 10 meters.",
+  "label": "VALID",
+  "why": "The draft's headline 10 m is wrong; with a 24 cm ball the Moon is about 7.3 m away."
+ },
+ {
+  "key": "excerpts:reason-06:2",
+  "id": "reason-06",
+  "variant": "excerpts",
+  "q": "If the Earth were the size of a basketball, how far away would the Moon be?",
+  "correction": "The average distance is about 30 times Earth's diameter [1].",
+  "label": "AGREES",
+  "why": "The draft itself computes the distance/diameter ratio as 30.15."
+ },
+ {
+  "key": "excerpts:fact-01:1",
+  "id": "fact-01",
+  "variant": "excerpts",
+  "q": "What is the population of Nigeria?",
+  "correction": "The UN estimated Nigeria's 2021 population at 213,401,323 [1].",
+  "label": "OTHER",
+  "why": "A stale 2021 UN figure (213.4M) that doesn't contradict the draft's 2024 estimate and would make the answer worse as a correction."
+ },
+ {
+  "key": "excerpts:fact-01:2",
+  "id": "fact-01",
+  "variant": "excerpts",
+  "q": "What is the population of Nigeria?",
+  "correction": "The country has more than 230 million people [2].",
+  "label": "OTHER",
+  "why": "Estimate update, not a real error: the draft's 223-225M (2024) is in the expected ~220-230M range; newer UN figures (~233M) are a bit higher."
+ },
+ {
+  "key": "excerpts:broad-04:1",
+  "id": "broad-04",
+  "variant": "excerpts",
+  "q": "Tell me about Mercury",
+  "correction": "Surface gravity is slightly higher than Mars, not Earth's Moon [1].",
+  "label": "WRONG",
+  "why": "The draft's Moon comparison is about size and its 38% g is right; Mercury's gravity is slightly lower than Mars's, not higher."
+ },
+ {
+  "key": "excerpts:broad-04:2",
+  "id": "broad-04",
+  "variant": "excerpts",
+  "q": "Tell me about Mercury",
+  "correction": "Sidereal day is 58.65 Earth days, not 176 Earth days [1].",
+  "label": "WRONG",
+  "why": "The draft correctly calls 176 days the solar day; the 58.65-day sidereal day doesn't contradict it."
+ },
+ {
+  "key": "excerpts:broad-04:3",
+  "id": "broad-04",
+  "variant": "excerpts",
+  "q": "Tell me about Mercury",
+  "correction": "Orbital speed is 47.4 km/s [2].",
+  "label": "NOT_IN_DRAFT",
+  "why": "The draft never states an orbital speed; 47.4 km/s is true but contradicts nothing."
+ },
+ {
+  "key": "excerpts:fresh-04:1",
+  "id": "fresh-04",
+  "variant": "excerpts",
+  "q": "Who won the most recent FIFA World Cup?",
+  "correction": "France did not win the most recent World Cup; Argentina won the 2022 tournament in Qatar, defeating France in the final [1][2].",
+  "label": "VALID",
+  "why": "The draft says France (2018); Argentina won the 2022 World Cup in Qatar, beating France."
+ },
+ {
+  "key": "excerpts:health-03:1",
+  "id": "health-03",
+  "variant": "excerpts",
+  "q": "How do I treat a jellyfish sting?",
+  "correction": "Vinegar may help with box jellyfish stings but not Portuguese man o' war stings [1].",
+  "label": "PRECISION",
+  "why": "The draft says vinegar for 'most' stings, not all; the man o' war exception is a caveat, not a contradiction."
+ },
+ {
+  "key": "excerpts:health-03:2",
+  "id": "health-03",
+  "variant": "excerpts",
+  "q": "How do I treat a jellyfish sting?",
+  "correction": "Do not scrape tentacles off with hands, wet sand, or any item, as this triggers more venom release [2].",
+  "label": "WRONG",
+  "why": "As blanket advice this contradicts standard first aid (remove tentacles with tweezers or a card after vinegar), which the draft gives; the source warning is box-jellyfish-specific."
+ },
+ {
+  "key": "excerpts:health-03:3",
+  "id": "health-03",
+  "variant": "excerpts",
+  "q": "How do I treat a jellyfish sting?",
+  "correction": "Additions: Box jellyfish stings cause excruciating pain and can lead to cardiac and respiratory arrest within minutes [2].",
+  "label": "OTHER",
+  "why": "An Additions line misparsed as a correction (it starts with 'Additions:'); box jellyfish danger isn't contradicted by the draft."
+ },
+ {
+  "key": "excerpts:health-03:4",
+  "id": "health-03",
+  "variant": "excerpts",
+  "q": "How do I treat a jellyfish sting?",
+  "correction": "Jellyfish stings can cause effects ranging from mild discomfort to extreme pain and death [3].",
+  "label": "OTHER",
+  "why": "An Additions item misparsed as a correction from a single-line check; general severity statement, no contradiction."
+ },
+ {
+  "key": "excerpts:health-03:5",
+  "id": "health-03",
+  "variant": "excerpts",
+  "q": "How do I treat a jellyfish sting?",
+  "correction": "For unidentified jellyfish, apply the same first aid as for box jellyfish: douse the sting for 30 seconds with vinegar [4].",
+  "label": "OTHER",
+  "why": "An Additions item misparsed as a correction; vinegar for 30 seconds agrees with the draft."
+ },
+ {
+  "key": "excerpts:edge-02:1",
+  "id": "edge-02",
+  "variant": "excerpts",
+  "q": "What is the capital of Atlantis?",
+  "correction": "Poseidonis is the capital of Atlantis in the Aquaman franchise, not the historical/mythological account [3].",
+  "label": "NOT_IN_DRAFT",
+  "why": "The draft never mentions Poseidonis or Aquaman."
+ },
+ {
+  "key": "excerpts:edge-02:2",
+  "id": "edge-02",
+  "variant": "excerpts",
+  "q": "What is the capital of Atlantis?",
+  "correction": "Additions: Plato's Atlantis is a fictional allegory on hubris [1].",
+  "label": "OTHER",
+  "why": "An Additions line misparsed as a correction (it starts with 'Additions:'); it agrees with the draft calling Atlantis mythical."
+ },
+ {
+  "key": "excerpts:edge-02:3",
+  "id": "edge-02",
+  "variant": "excerpts",
+  "q": "What is the capital of Atlantis?",
+  "correction": "The story was allegedly transmitted orally from Solon in Egypt through the family of Dropides to Critias [2].",
+  "label": "OTHER",
+  "why": "An Additions item (Solon/Dropides) misparsed as a correction from a single-line check."
+ },
+ {
+  "key": "excerpts:edge-02:4",
+  "id": "edge-02",
+  "variant": "excerpts",
+  "q": "What is the capital of Atlantis?",
+  "correction": "Olaus Rudbeck argued Sweden was Atlantis, with Gamla Uppsala as its capital [4].",
+  "label": "OTHER",
+  "why": "An Additions item (Rudbeck/Gamla Uppsala) misparsed as a correction from a single-line check."
+ }
+]

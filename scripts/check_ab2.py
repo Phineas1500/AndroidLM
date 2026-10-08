@@ -9,7 +9,7 @@ be compared on identical drafts and retrieved passages:
   excerpts  the same with each passage cut to its sentences that do
 
 Usage: check_ab2.py --db wiki.db --voyage-db voyage.db --variant excerpts [--budget 2000]
-                    --out out.jsonl [--ids a,b] [--skip-prefix poi,place] answers.jsonl
+                    [--followup prompt.txt --name quoted] --out out.jsonl [--ids a,b] [--skip-prefix poi,place] answers.jsonl
 """
 import argparse
 import json
@@ -27,8 +27,11 @@ ap.add_argument("--variant", choices=["base", "passages", "excerpts"], required=
 ap.add_argument("--budget", type=int, default=2000)
 ap.add_argument("--ids", help="only these ids (comma-separated)")
 ap.add_argument("--skip-prefix", default="", help="leave out ids starting with these (comma-separated)")
+ap.add_argument("--followup", help="a file holding another wording of the check's follow-up turn")
+ap.add_argument("--name", help="the variant's name in the output (default: --variant)")
 ap.add_argument("--out", required=True)
 args = ap.parse_args()
+followup = open(args.followup).read().strip() if args.followup else None
 
 wiki = rag.Corpus(args.db)
 voyage = rag.Corpus(args.voyage_db) if args.voyage_db else None
@@ -52,10 +55,10 @@ for line in open(args.answers):
     base_sources = [f"{h['title']} — {h['section']} ({h['via']})" for h in rag.build_context(hits, 4000)[1]]
     messages = [{"role": "system", "content": rag.CLOSED_SYSTEM}, {"role": "user", "content": r["q"]},
                 {"role": "assistant", "content": r["draft"]},
-                {"role": "user", "content": rag.check_followup_user(context)}]
+                {"role": "user", "content": rag.check_followup_user(context, followup)}]
     t0 = time.time()
     res = rag.chat_messages(args.url, messages, 260)
-    rec = {"id": r["id"], "cat": r.get("cat"), "q": r["q"], "variant": args.variant, "budget": args.budget,
+    rec = {"id": r["id"], "cat": r.get("cat"), "q": r["q"], "variant": args.name or args.variant, "budget": args.budget,
            "draft": r["draft"], "context_chars": len(context),
            "sources": [f"{h['title']} — {h['section']} ({h['via']})" for h in used],
            "sources_match_run": base_sources == r["sources"], "run_check": r["check"],

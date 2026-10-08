@@ -29,25 +29,23 @@ object Prompts {
         "lists, no visible deliberation. Be concise."
 
     const val VERIFY_SYSTEM: String =
-        "You check a draft answer against numbered sources from an offline copy of Wikipedia. " +
-        "Read all the sources before writing. Then write a short source check, at most 120 " +
-        "words, with two parts. Corrections: each statement in the draft that a source " +
-        "contradicts, with the correct fact and its citation like [2]. A statement is not wrong " +
-        "merely because the sources do not mention it. Additions: up to three important " +
-        "specifics that answer the question, that the sources provide and the draft lacks, with " +
-        "citations. If there is nothing to correct, write 'No corrections' and cite the sources " +
-        "that support the draft. Each source is about the subject named in its title; do not " +
-        "attach its facts to another subject. Ignore off-topic sources. Do not repeat the draft."
+        "You compare a draft answer with numbered sources from an offline copy of Wikipedia. Read all " +
+        "the sources before writing. Then write \"From the sources:\" and up to three short points, at " +
+        "most 100 words in all: the facts from the sources that matter most for the question and that " +
+        "the draft leaves out or states differently, each with its citation like [2]. State each fact " +
+        "as the source gives it; do not say whether the draft was right or wrong. If the sources only " +
+        "confirm the draft, write \"The sources agree with the answer\" and cite them. Each source is " +
+        "about the subject named in its title; do not attach its facts to another subject. Ignore " +
+        "off-topic sources. Do not repeat the draft."
 
     const val CHECK_FOLLOWUP: String =
-        "Now check your answer above against these numbered sources from an offline copy of " +
-        "Wikipedia. Read all the sources before writing. Then write a short source check, at most " +
-        "120 words, with two parts. Corrections: each statement in your answer that a source " +
-        "contradicts, with the correct fact and its citation like [2]. A statement is not wrong " +
-        "merely because the sources do not mention it. Additions: up to three important specifics " +
-        "that answer the question, that the sources provide and your answer lacks, with citations. " +
-        "If there is nothing to correct, write 'No corrections' and cite the sources that support " +
-        "your answer. Each source is about the subject named in its title; do not attach its facts " +
+        "Now compare your answer above with these numbered sources from an offline copy of Wikipedia. " +
+        "Read all the sources before writing. Then write \"From the sources:\" and up to three short " +
+        "points, at most 100 words in all: the facts from the sources that matter most for the " +
+        "question and that your answer leaves out or states differently, each with its citation like " +
+        "[2]. State each fact as the source gives it; do not say whether your answer was right or " +
+        "wrong. If the sources only confirm your answer, write \"The sources agree with the answer\" " +
+        "and cite them. Each source is about the subject named in its title; do not attach its facts " +
         "to another subject. Ignore off-topic sources. Do not repeat your answer."
 
     /**

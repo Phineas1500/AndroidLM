@@ -1335,23 +1335,6 @@ class ResearchPipelineTest {
     }
 
     @Test
-    fun correctionsAreDetected() {
-        // source checks from eval/answers_vm_redteam.jsonl
-        for (c in listOf(
-            "Corrections:\n*   The Moon would be approximately 7.3 meters away, not 10 meters [3].\n\nAdditions:\n*   The Moon orbits at 384,399 km [3].",
-            "Corrections: Japan\u2019s population is over 123 million as of 2025, not approximately 125 million [1].",
-            "Corrections: The distance is approximately 280 km, not 310 km [3]. Additions: Train travel takes 2 hr 46 min [2].",
-        )) assertTrue(c, checkCorrects(c))
-        for (c in listOf(
-            "Corrections: No corrections. The sources confirm the war's duration (1914\u20131918) [1].",
-            "Corrections: None.\n\nAdditions: Georgia hosts the world's earliest known sites of winemaking [1].",
-            "No corrections. The calculation of speed as distance divided by time aligns with [1] and [2].",
-            "Corrections:\n\nAdditions: The euro is the second-most traded currency [1].",
-            "Corrections: There are no corrections to make. Additions: none.",
-        )) assertFalse(c, checkCorrects(c))
-    }
-
-    @Test
     fun workedDetection() {
         // the questions rag.py's needs_working picks from eval/questions_redteam.jsonl, and some it leaves
         for (q in listOf(

@@ -15,7 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.androidlm.research.PhaseTiming
-import org.androidlm.research.checkCorrects
 import org.androidlm.research.ResearchPhase
 import org.androidlm.research.ResearchSource
 import org.androidlm.research.Route
@@ -116,17 +115,6 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
             }
         }
 
-        if (r.answer.isNotEmpty() && r.check != null && checkCorrects(r.check)) {
-            Surface(
-                color = MaterialTheme.colorScheme.errorContainer,
-                shape = MaterialTheme.shapes.small,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text("The source check below corrects part of this answer.", fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onErrorContainer,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp))
-            }
-        }
         if (r.answer.isNotEmpty()) {
             Labeled(
                 when (r.route?.route) {
@@ -154,7 +142,7 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
                         color = MaterialTheme.colorScheme.onSecondaryContainer)
                     Text(
                         if (r.phase == ResearchPhase.CANCELLED) "Stopped before the end, for the next question"
-                        else "The answer above, checked against the sources",
+                        else "Facts from the sources that the answer leaves out or states differently",
                         fontSize = 12.sp, color = MaterialTheme.colorScheme.onSecondaryContainer,
                     )
                     if (r.check.isNotEmpty()) {
