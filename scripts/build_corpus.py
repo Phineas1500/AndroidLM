@@ -8,9 +8,8 @@ Output is one SQLite file:
   chunks(id, article_id, start, end)        character offsets into the article text
   fts(title, section, body)                 contentless FTS5 index, rowid = chunks.id
 
-Tiering (the full corpus is ~40GB of text, too much for the 50GB app budget): articles ranked
-in the top --full-top by monthly pageviews keep their whole text; all others keep only the
-lead section. Table-heavy chunks stay in the stored text but are left out of the index, since
+Tiering: articles ranked in the top --full-top by monthly pageviews keep their whole text; all
+others keep only the lead section (--full-top 0 keeps every article in full, about 40GB of text). Table-heavy chunks stay in the stored text but are left out of the index, since
 rows of numbers bloat the index and rank badly under BM25.
 
 Article text is "<infobox facts>\n\n<markdown body>"; chunks never cross a heading and are
@@ -34,7 +33,8 @@ ap = argparse.ArgumentParser()
 ap.add_argument("shards", nargs="+")
 ap.add_argument("--out", required=True)
 ap.add_argument("--pageviews", help="TSV of page_id<TAB>views; without it every article is kept in full")
-ap.add_argument("--full-top", type=int, default=1_000_000, help="articles kept in full, by pageview rank")
+ap.add_argument("--full-top", type=int, default=1_000_000,
+                help="articles kept in full, by pageview rank (0: every article)")
 ap.add_argument("--lead-chars", type=int, default=2500)
 ap.add_argument("--limit", type=int, default=0, help="stop after N articles (0 = all)")
 ap.add_argument("--chunk-chars", type=int, default=1000)
@@ -164,10 +164,12 @@ if args.pageviews:
     for line in open(args.pageviews):
         pid, v = line.split("\t")
         views[int(pid)] = int(v)
-    ranked = sorted(views, key=views.get, reverse=True)
-    full_ids = set(ranked[:args.full_top])
-    del ranked
-    print(f"pageviews for {len(views)} pages; {len(full_ids)} kept in full", flush=True)
+    if args.full_top > 0:
+        ranked = sorted(views, key=views.get, reverse=True)
+        full_ids = set(ranked[:args.full_top])
+        del ranked
+    print(f"pageviews for {len(views)} pages; "
+          f"{len(full_ids) if full_ids is not None else 'all'} kept in full", flush=True)
 
 t0 = time.time()
 cctx = zstd.ZstdCompressor(level=args.zlevel)
