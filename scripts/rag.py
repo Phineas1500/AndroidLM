@@ -236,6 +236,9 @@ class Corpus:
         self.has_redirects = self.db.execute(
             "select 1 from sqlite_master where name='redirects'").fetchone() is not None
         self.has_word_counts = self._attach_word_counts(word_counts_path(path))
+        # whole-index search reads only the leads of articles below this many monthly views
+        # (0: every passage); their full text is still read when the plan names the article
+        self.body_min_views = 0
 
     def _attach_word_counts(self, path):
         """Attach the word-count file (scripts/build_df.py) when it belongs to this database: the
@@ -405,13 +408,15 @@ class Corpus:
             aid, start, end = self.db.execute(
                 "select article_id, start, end from chunks where id=?", (rid,)).fetchone()
             views = self.db.execute("select views from articles where id=?", (aid,)).fetchone()[0]
-            cands.append((-score + prior * math.log10(1 + views), aid, start, end))
+            cands.append((-score + prior * math.log10(1 + views), aid, start, end, views))
         cands.sort(reverse=True)
         hits, per = [], {}
-        for score, aid, start, end in cands:
+        for score, aid, start, end, views in cands:
             if per.get(aid, 0) >= per_article:
                 continue
             hit = self._hit(aid, start, end, score, "bm25")
+            if views < self.body_min_views and hit["section"]:
+                continue
             if min_coverage and self.coverage(hit["title"] + " " + hit["text"], stems) < min_coverage:
                 continue
             per[aid] = per.get(aid, 0) + 1
@@ -822,6 +827,8 @@ def main():
     ap.add_argument("-k", type=int, default=6)
     ap.add_argument("--context-chars", type=int, default=4000, help="about 1000 tokens, six passages")
     ap.add_argument("--max-tokens", type=int, default=600)
+    ap.add_argument("--bm25-body-min-views", type=int, default=0,
+                    help="whole-index search skips the body passages of articles below this many monthly views")
     ap.add_argument("--route-views", type=int, default=5000,
                     help="auto mode: go retrieval-first when the subject article has fewer monthly views")
     ap.add_argument("--check-chars", type=int, default=0,
@@ -857,6 +864,7 @@ def main():
         ENGINE = BmoeSession(args.engine_cli, args.engine_model, cache_mb=args.cache_mb)
         print(f"engine ready in {ENGINE.load_s}s: {ENGINE.ready}", flush=True)
     corpus = Corpus(args.db)
+    corpus.body_min_views = args.bm25_body_min_views
     if args.voyage_db:
         global VOYAGE
         VOYAGE = Corpus(args.voyage_db)

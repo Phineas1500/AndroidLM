@@ -1,0 +1,94 @@
+{
+ "regress:cmp-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "regress:cry-002": {
+  "A": "first",
+  "B": "second"
+ },
+ "regress:cry-009": {
+  "A": "first",
+  "B": "second"
+ },
+ "regress:cry-012": {
+  "A": "second",
+  "B": "first"
+ },
+ "regress:cry-019": {
+  "A": "second",
+  "B": "first"
+ },
+ "regress:num-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "regress:poi-04": {
+  "A": "first",
+  "B": "second"
+ },
+ "regress:reason-04": {
+  "A": "first",
+  "B": "second"
+ },
+ "regress:tail-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "regress:tail-12": {
+  "A": "second",
+  "B": "first"
+ },
+ "regress:tech-10": {
+  "A": "second",
+  "B": "first"
+ },
+ "regress:trav-10": {
+  "A": "first",
+  "B": "second"
+ },
+ "regress:trv2-08": {
+  "A": "first",
+  "B": "second"
+ },
+ "leadgate:lead-02": {
+  "A": "first",
+  "B": "second"
+ },
+ "leadgate:lead-04": {
+  "A": "first",
+  "B": "second"
+ },
+ "leadgate:lead-05": {
+  "A": "first",
+  "B": "second"
+ },
+ "leadgate:lead-20": {
+  "A": "second",
+  "B": "first"
+ },
+ "leadgate:lead-21": {
+  "A": "second",
+  "B": "first"
+ },
+ "leadgate:lead-28": {
+  "A": "first",
+  "B": "second"
+ },
+ "leadgate:lead-29": {
+  "A": "first",
+  "B": "second"
+ },
+ "leadgate:lead-31": {
+  "A": "first",
+  "B": "second"
+ },
+ "regressgate:cry-009": {
+  "A": "first",
+  "B": "second"
+ },
+ "regressgate:tech-10": {
+  "A": "first",
+  "B": "second"
+ }
+}

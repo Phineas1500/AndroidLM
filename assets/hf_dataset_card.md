@@ -15,9 +15,13 @@ opened read-only with any SQLite build that includes FTS5.
 
 | File | Size | Contents |
 |---|---|---|
-| `wiki.db` | 21.3GB | English Wikipedia from the FineWiki extraction (August 2025 HTML dump): 6.05M articles, the 1.87M most-read in full and lead sections for the rest; 38.9M passages of which 31.9M are in a BM25 full-text index; Wikipedia's redirect table (September 2026); August 2026 monthly pageviews per article |
+| `v2/wiki.db` | 30.1GB | English Wikipedia from the FineWiki extraction (August 2025 HTML dump): 6.06M articles, all in full; 57.0M passages of which 44.3M are in a BM25 full-text index; Wikipedia's redirect table (September 2026); August 2026 monthly pageviews per article |
 | `voyage.db` | 0.33GB | English Wikivoyage (September 2026 dump): 34,004 travel guides with listing templates rendered as text, plus redirects |
-| `wiki_df.db` | 1.7MB | For `wiki.db`: how many indexed passages contain each of the 119,003 stems found in at least 256 of them (`df(term, doc)`, the FTS5 index's own counts), so a search can rank a question's words without reading their posting lists; `meta` records what it was built from. Optional: a search returns the same results without it |
+| `v2/wiki_df.db` | 2.3MB | For `v2/wiki.db`: how many indexed passages contain each of the 155,285 stems found in at least 256 of them (`df(term, doc)`, the FTS5 index's own counts), so a search can rank a question's words without reading their posting lists; `meta` records what it was built from. Optional: a search returns the same results without it |
+
+`wiki.db` and `wiki_df.db` at the top level are the previous build (21.3GB: the 1.87M most-read
+articles in full and lead sections for the rest), which AndroidLM 1.6.0 and earlier download;
+newer releases use `v2/`.
 
 Schema: `blocks(id, zdata)` holds zstd-compressed runs of article text; `articles(id, title,
 views, block_id, off, len)` locates an article as a byte range in a block; `chunks(id,

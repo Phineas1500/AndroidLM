@@ -1,0 +1,281 @@
+{
+ "lead-01": {
+  "A": 2,
+  "B": 9,
+  "A_key_facts": "0/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "B gives the date, Antropov, the surprise attack on ploughing villagers and the fight with rifles (only the Nogai princes missing); A says it has no information and adds only general context."
+ },
+ "lead-02": {
+  "A": 6,
+  "B": 4,
+  "A_key_facts": "3/5",
+  "B_key_facts": "1/5",
+  "A_fabricated": true,
+  "B_fabricated": false,
+  "note": "A names Irosustat and the breast, endometrial and prostate cancer targets but makes up an alias ('oristusane'); B names EMATE and estradiol sulfamate (E2MATE) but leaves out Irosustat and gives breast cancer only."
+ },
+ "lead-03": {
+  "A": 2,
+  "B": 3,
+  "A_key_facts": "1/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": true,
+  "B_fabricated": false,
+  "note": "Neither has Peter's report; A then credits the Tractatus with generic claims (feigned retreats, demands for tribute) that are not in it, while B honestly says the information is not available."
+ },
+ "lead-04": {
+  "A": 1,
+  "B": 4,
+  "A_key_facts": "0/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": true,
+  "B_fabricated": true,
+  "note": "Both main texts make up the name's origin (beatus, São Domingos, Queen Santa Amélia) and deny any role in 1640; B's source check gives the correct Beato António origin and the conspiracy centre but never retracts the main text."
+ },
+ "lead-05": {
+  "A": 9,
+  "B": 7,
+  "A_key_facts": "4/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both have SR 65 from 1923, signing in 1930 and paving between 1930 and 1939; A also gives the Ottawa-to-Michigan extent and 'no changes since 1939'."
+ },
+ "lead-06": {
+  "A": 7,
+  "B": 7,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "The two answers are the same: Hartford and New Haven plus the producers Erlanger and Tyler, with no theatres, dates or reviews."
+ },
+ "lead-07": {
+  "A": 0,
+  "B": 0,
+  "A_key_facts": "0/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": true,
+  "B_fabricated": true,
+  "note": "The two answers are the same and wholly made up (gender inequality and news-media topics, led by Lister, Esping-Andersen and Kriesi); the real subjects are child protection and health inequalities, led by Grietens and Bambra."
+ },
+ "lead-08": {
+  "A": 3,
+  "B": 2,
+  "A_key_facts": "0/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both say the occupational data is missing; A adds a correct general note that agriculture and farm labour dominate."
+ },
+ "lead-09": {
+  "A": 4,
+  "B": 6,
+  "A_key_facts": "1/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both give 1872 and the LNWR-then-Midland route; B adds the 1 August 1876 transfer and the Midland Railway (Further Powers) Act 1876."
+ },
+ "lead-10": {
+  "A": 4,
+  "B": 2,
+  "A_key_facts": "2/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "A gives the 30-40 and 100-200 figures, B denies there is any figure; both wrongly answer the returnees part with Vietnam-era pardons and miss Anderson, Snyder and Brobeck."
+ },
+ "lead-11": {
+  "A": 5,
+  "B": 4,
+  "A_key_facts": "2/5",
+  "B_key_facts": "2/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both say Grönholm crashed and Loeb retook the lead but give no stage, wall or hospital details; B adds a muddled 'runner-up behind Loeb and Hirvonen'."
+ },
+ "lead-12": {
+  "A": 1,
+  "B": 4,
+  "A_key_facts": "0/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": true,
+  "B_fabricated": false,
+  "note": "A makes up a career (Breydel statue on Bruges City Hall, Antwerp under Meunier); B gets the early training right (lessons at nine, Carbon at fourteen) but frames him as a war-memorial sculptor and leaves out the Gezelle bust and the 1896 commissions."
+ },
+ "lead-13": {
+  "A": 9,
+  "B": 2,
+  "A_key_facts": "4/5",
+  "B_key_facts": "1/5",
+  "A_fabricated": false,
+  "B_fabricated": true,
+  "note": "A has the running records, the Michigan title and the Aberdeen Best Feature win for Students of Springfield Street; B says nothing is known and makes up a second Steve Johnson who directed Atonement."
+ },
+ "lead-14": {
+  "A": 2,
+  "B": 2,
+  "A_key_facts": "2/5",
+  "B_key_facts": "2/5",
+  "A_fabricated": true,
+  "B_fabricated": true,
+  "note": "Both claim a Fiat 1-2-3 finish, which contradicts Biagio Nazzaro's fatal crash and Bordino's retirement (A even puts Friderich in a Fiat; B says 'Luigi' Bordino and a rolling start); only Felice's win and the early Fiat lead are right."
+ },
+ "lead-15": {
+  "A": 6,
+  "B": 6,
+  "A_key_facts": "3/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both cover Birmingham 2008-2011, the Swansea PVC role and Princeton, but miss Anglian Water, the Aircraft Research Association and the early Swansea posts."
+ },
+ "lead-16": {
+  "A": 4,
+  "B": 4,
+  "A_key_facts": "2/5",
+  "B_key_facts": "1/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Neither names the founding four as such; A gives 2008 and Sault Ste. Marie with the current lineup; B gives 2008 plus past members Wigglesworth, Coulter and Pierucci."
+ },
+ "lead-17": {
+  "A": 2,
+  "B": 3,
+  "A_key_facts": "0/5",
+  "B_key_facts": "1/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both dispute the premise and have no pidgin or Leonidas Polk etymology; B at least gives the 1719 Bienville plantation and local naming details."
+ },
+ "lead-18": {
+  "A": 1,
+  "B": 9,
+  "A_key_facts": "0/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": true,
+  "B_fabricated": false,
+  "note": "A wrongly says Ḫubišna had no role in Hittite history; B correctly covers the Cilician Gates, Labarna I's conquest, his sons ruling it and Ammuna's campaign (only the Telepinu Proclamation missing)."
+ },
+ "lead-19": {
+  "A": 2,
+  "B": 2,
+  "A_key_facts": "0/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both honestly say the sources name no government or royal customers; neither has the halters, the sultans or the Pentridge whip cord."
+ },
+ "lead-20": {
+  "A": 4,
+  "B": 3,
+  "A_key_facts": "1/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "A correctly says the Confederates felled trees across Deer Creek, including behind the flotilla; B says the sources lack it and mentions tree-felling only as a general practice; neither names Featherston, Ferguson or Murphy's sailors."
+ },
+ "lead-21": {
+  "A": 9,
+  "B": 2,
+  "A_key_facts": "4/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "A gives the parents, the West Anatolia origin, the parents' jobs and the FU Berlin studies; B says the family background and studies are not available."
+ },
+ "lead-22": {
+  "A": 7,
+  "B": 1,
+  "A_key_facts": "2/5",
+  "B_key_facts": "1/5",
+  "A_fabricated": false,
+  "B_fabricated": true,
+  "note": "A has Intentionet (2017) and the exact Microsoft Research promotions; B makes up a company 'Ripple/B4x' and leaks its reasoning into the answer."
+ },
+ "lead-23": {
+  "A": 5,
+  "B": 5,
+  "A_key_facts": "1/5",
+  "B_key_facts": "1/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both put the purchase down to a sale to Russia that fell through and say it surrendered after Army fire off Niterói; neither has Jeanne/Caroline, São Francisco Cove, the white flag or the Navy launch."
+ },
+ "lead-24": {
+  "A": 2,
+  "B": 0,
+  "A_key_facts": "0/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": false,
+  "B_fabricated": true,
+  "note": "A gives only generic framing with no descriptions of the Houses; B makes up Houses (Crabb, Excorio, Merital) and false lore such as vampire Tremere."
+ },
+ "lead-25": {
+  "A": 6,
+  "B": 1,
+  "A_key_facts": "2/5",
+  "B_key_facts": "0/5",
+  "A_fabricated": false,
+  "B_fabricated": true,
+  "note": "A names Rudzītis as administrator from 20 November 1918, though it hedges on the founding date; B makes up a 2005 founding and Juris Pūce as first director."
+ },
+ "lead-26": {
+  "A": 3,
+  "B": 9,
+  "A_key_facts": "1/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "A gives only the Maddington school; B adds the ballet-mistress year, helping Bousloff, the teaching methods and the Ilbak-based hand movements."
+ },
+ "lead-27": {
+  "A": 9,
+  "B": 3,
+  "A_key_facts": "4/5",
+  "B_key_facts": "1/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "A covers Huanghetitan, its size, the 90+ sites, the six skeletons and all six dinosaur types; B names only Huanghetitan."
+ },
+ "lead-28": {
+  "A": 3,
+  "B": 1,
+  "A_key_facts": "3/5",
+  "B_key_facts": "1/5",
+  "A_fabricated": true,
+  "B_fabricated": true,
+  "note": "Both main texts make up the coaches (Vanderslager, Bauerle, Miller); A's source check adds Richardson, Bottom and Bowe, B's only Bowe, and neither retracts the main text."
+ },
+ "lead-29": {
+  "A": 3,
+  "B": 7,
+  "A_key_facts": "0/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "B gives the 4,000 °C heat, the acetylene explosion risk and the empty, reinforced room rule but misses the dust diseases; A gives only generic thermal-spray hazards."
+ },
+ "lead-30": {
+  "A": 5,
+  "B": 6,
+  "A_key_facts": "2/5",
+  "B_key_facts": "3/5",
+  "A_fabricated": false,
+  "B_fabricated": false,
+  "note": "Both have 1 June 1973 and the lost steering; B adds the starboard impact and the fire, while A leaves out the fire altogether; neither has the cargo details or the lifeboat."
+ },
+ "lead-31": {
+  "A": 1,
+  "B": 9,
+  "A_key_facts": "0/5",
+  "B_key_facts": "4/5",
+  "A_fabricated": true,
+  "B_fabricated": false,
+  "note": "A makes up a founder ('Father Jay Velasquez'); B correctly gives Cullen, Hermoso, Ramirez, the 720 mothers, the 1993 suit and the $650,000 through USAID."
+ }
+}
