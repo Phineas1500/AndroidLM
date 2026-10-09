@@ -103,3 +103,26 @@ That has been the case since 1.5.0, and 1.4.0's `LARGE_RAM_GIB = 11.0` had the s
 `MemoryPreset.forRam` now puts the thresholds halfway between what 8, 12 and 16GB phones report
 (12GB from 9.5 GiB, 16GB from 13.5); the run above is with that fix (`cache_mb=5000`,
 `n_ubatch=1280` in the metrics).
+
+## Updating a phone that has the old Wikipedia
+
+1.7.0 treats an older `wiki.db` or `wiki_df.db` as an update, not a missing file. The Set up
+card stays closed and says "Update available: Wikipedia (30.1 GB)", and the app goes on
+answering from the old file. A download replaces the old file once the new one has passed its
+SHA-256 check. `CorpusFiles` now carries the files' sizes and times, so the next question after
+a replacement opens the new file instead of reading on from the old one, which also gives back
+the old file's space.
+
+When the new file does not fit next to the old one (for the 30.1GB file, under about 31GB free),
+the card asks before deleting the old one. An import deletes it without asking, since the user
+picked the new file. The model is unloaded first: an open database keeps its space until it is
+closed.
+
+Tested on the Pixel 8 Pro both ways:
+
+| | Enough room | Too little room |
+|---|---|---|
+| Setup | A test build that takes the old `wiki.db` as the new one, with the full-text one on the phone, served from the computer over USB | 1.7.0 over the old `wiki.db`, with 19.9GB free (a filler file) |
+| Download | 21.3GB in about 10 minutes, nothing asked | "Delete the older version first?", then 30.1GB from Hugging Face in 68 minutes, checksum passed |
+| During the download | A question answered from the old file (66 s) | Research mode has no Wikipedia |
+| Next question | The Ruyang County question got the old build's sources, and free space went from 31 to 59GB as the replaced file closed | The full-text sources, and the full-text answer (18 m, Liufugou Village) |

@@ -50,15 +50,15 @@ object SetupFiles {
             "models", "The model (Qwen3.6-35B-A3B)",
         ),
         SetupFile(
-            WIKI, "corpus", 21_314_895_872L,
-            "736034e74f139559bc9517991a8572092c17cddbc66967ef66e4df130e4b7bee",
-            "https://huggingface.co/datasets/rammingaway/androidlm-corpus/resolve/main/wiki.db",
+            WIKI, "corpus", 30_096_670_720L,
+            "68af223e091ff9ca4ec3ef7a412f6cf1b835841ff19a2167f1e3185f02981204",
+            "https://huggingface.co/datasets/rammingaway/androidlm-corpus/resolve/main/v2/wiki.db",
             "corpus", "Wikipedia",
         ),
         SetupFile(
-            "wiki_df.db", "corpus", 1_748_992L,
-            "c87ba297ac464ed92c5f3087bcdcf4ef81ace57bd131b626d9cbd70c762a11fb",
-            "https://huggingface.co/datasets/rammingaway/androidlm-corpus/resolve/main/wiki_df.db",
+            "wiki_df.db", "corpus", 2_293_760L,
+            "0a75f1f5f686c35c1d47a68eb0854d894c161627e15c05a51ff4318afbef429d",
+            "https://huggingface.co/datasets/rammingaway/androidlm-corpus/resolve/main/v2/wiki_df.db",
             "corpus", "Wikipedia word counts (faster search)",
         ),
         SetupFile(

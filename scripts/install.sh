@@ -10,7 +10,7 @@
 #   --no-places       skip the optional places database (where to eat, drink and stay)
 #   --flash-next      also the optional larger model, Qwen3.8-Flash-Next (75.8GB more): slower answers,
 #                     scored higher in our tests (notes/2026-10-04-flash-next.md)
-# Needs: adb (Android platform-tools), curl, python3, and about 37GB free here and on the phone
+# Needs: adb (Android platform-tools), curl, python3, and about 46GB free here and on the phone
 # (113GB with --flash-next).
 set -euo pipefail
 

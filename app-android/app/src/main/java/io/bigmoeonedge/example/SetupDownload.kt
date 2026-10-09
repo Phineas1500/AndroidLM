@@ -66,7 +66,7 @@ object SetupServer {
 
 /**
  * Downloads the named setup files one after another, as a foreground service: a full set is
- * 37GB and takes an hour or more, with the screen off. Progress goes to the setup card through
+ * 46GB and takes an hour or more, with the screen off. Progress goes to the setup card through
  * SetupBus, as an import's does; a cancelled or dropped download keeps its part file, and the
  * next Download resumes it.
  */
@@ -92,6 +92,7 @@ class DownloadService : Service() {
         if (job?.isActive == true) return
         val names = intent?.getStringArrayListExtra(EXTRA_NAMES)
         if (names.isNullOrEmpty()) { finish(); return }
+        val replace = intent.getBooleanExtra(EXTRA_REPLACE, false)
         cancelled = false
         wakeLock = (getSystemService(Context.POWER_SERVICE) as PowerManager)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "AndroidLM:download").apply { acquire(12 * 60 * 60 * 1000L) }
@@ -101,14 +102,15 @@ class DownloadService : Service() {
         SetupBus.update { ImportProgress(running = true, verb = "Downloading") }
         job = scope.launch {
             try {
-                downloadAll(names.mapNotNull { SetupFiles.byName(it) })
+                downloadAll(names.mapNotNull { SetupFiles.byName(it) }, replace)
             } finally {
                 finish()
             }
         }
     }
 
-    private fun downloadAll(files: List<SetupFile>) {
+    /** [replace]: the user agreed to delete an older version that leaves too little room for the new one. */
+    private fun downloadAll(files: List<SetupFile>, replace: Boolean) {
         val errors = mutableListOf<String>()
         val done = mutableListOf<String>()
         val status = SetupLocator.status(this).associateBy { it.file.name }
@@ -123,12 +125,15 @@ class DownloadService : Service() {
             if (cancelled) break
             val dest = SetupLocator.destination(this, f)
             val have = SetupFiles.partOf(dest).length()
-            val free = dest.parentFile!!.usableSpace
-            if (f.bytes - have + SPARE > free) {
-                errors += "Not enough space for ${f.name}: it needs ${ModelManager.gbLabel(f.bytes - have + SPARE)} more, " +
-                    "the phone has ${ModelManager.gbLabel(free)} free"
-                SetupBus.update { it.copy(errors = errors.toList()) }
-                continue
+            when (SetupLocator.makeRoom(this, f, f.bytes - have + SPARE, mayDelete = replace)) {
+                Room.ENOUGH -> {}
+                Room.MADE -> done += "${f.label}: the older version was deleted to make room"
+                Room.TOO_LITTLE -> {
+                    errors += "Not enough space for ${f.name}: it needs ${ModelManager.gbLabel(f.bytes - have + SPARE)} more, " +
+                        "the phone has ${ModelManager.gbLabel(dest.parentFile!!.usableSpace)} free"
+                    SetupBus.update { it.copy(done = done.toList(), errors = errors.toList()) }
+                    continue
+                }
             }
             val url = SetupServer.urlOf(server, f)
             SetupBus.update { it.copy(file = f.label, index = i, copied = have, total = f.bytes, checking = false) }
@@ -214,15 +219,19 @@ class DownloadService : Service() {
     companion object {
         private const val ACTION_CANCEL = "io.bigmoeonedge.example.DOWNLOAD_CANCEL"
         private const val EXTRA_NAMES = "names"
+        private const val EXTRA_REPLACE = "replace"
         private const val CHANNEL = "setup"
         private const val NOTIF_ID = 4
         private const val DONE_ID = 5
         /** Room left on the phone after a download, so it never fills it. */
         private const val SPARE = 500_000_000L
 
-        fun start(ctx: Context, files: List<SetupFile>) {
+        /** [replace]: delete an older version of a file first when the new one does not fit next to it. */
+        fun start(ctx: Context, files: List<SetupFile>, replace: Boolean = false) {
             ctx.startForegroundService(
-                Intent(ctx, DownloadService::class.java).putStringArrayListExtra(EXTRA_NAMES, ArrayList(files.map { it.name })),
+                Intent(ctx, DownloadService::class.java)
+                    .putStringArrayListExtra(EXTRA_NAMES, ArrayList(files.map { it.name }))
+                    .putExtra(EXTRA_REPLACE, replace),
             )
         }
 

@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.androidlm.research.SetupFile
+import org.androidlm.research.SetupFiles
 
 /**
  * Shown while a file is missing (open when a required one is), and while an import runs or has
@@ -47,25 +49,55 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
     // the optional larger model is offered in a section of its own: missing it never opens the card
     val st = all.filter { !it.file.extra }
     val extras = all.filter { it.file.extra }
-    val missing = st.filter { it.found == null }
+    // an older version of a file still works until the new one is in: an update, not a gap
+    val missing = st.filter { it.found == null && !it.outdated }
+    val updates = st.filter { it.found == null && it.outdated }
+    val todo = missing + updates
     val extraMissing = extras.filter { it.found == null }
     val report = progress.running || progress.done.isNotEmpty() || progress.errors.isNotEmpty()
-    if (missing.isEmpty() && extraMissing.isEmpty() && !report) return
+    if (todo.isEmpty() && extraMissing.isEmpty() && !report) return
 
     var open by rememberSaveable { mutableStateOf<Boolean?>(null) }
     val isOpen = open ?: (missing.any { it.file.required } || report)
     var deleteOriginals by rememberSaveable { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     // a download asked for on mobile data, or with no connection, waits for a second tap
-    var asked by remember { mutableStateOf<Pair<List<org.androidlm.research.SetupFile>, SetupServer.Network>?>(null) }
-    fun download(files: List<org.androidlm.research.SetupFile>, confirmed: Boolean = false) {
+    var asked by remember { mutableStateOf<NetAsk?>(null) }
+    // and one that only fits once older versions are deleted asks before they are
+    var replaceAsked by remember { mutableStateOf<List<SetupFile>?>(null) }
+    fun download(files: List<SetupFile>, replace: Boolean = false, confirmed: Boolean = false) {
         error = null
+        if (!replace) {
+            val of = all.associateBy { it.file.name }
+            val need = files.sumOf { it.bytes - (of[it.name]?.partBytes ?: 0L) } + 500_000_000L
+            val old = files.sumOf { of[it.name]?.oldBytes ?: 0L }
+            if (need > free && old > 0 && need <= free + old) { replaceAsked = files; return }
+        }
         val net = SetupServer.network(context)
-        if (!confirmed && net != SetupServer.Network.UNMETERED) { asked = files to net; return }
+        if (!confirmed && net != SetupServer.Network.UNMETERED) { asked = NetAsk(files, net, replace); return }
         asked = null
-        DownloadService.start(context, files)
+        DownloadService.start(context, files, replace)
     }
-    asked?.let { (files, net) ->
+    replaceAsked?.let { files ->
+        val olds = all.filter { s -> s.oldBytes > 0 && files.any { it.name == s.file.name } }
+        AlertDialog(
+            onDismissRequest = { replaceAsked = null },
+            title = { Text("Delete the older version first?") },
+            text = {
+                Text(
+                    "The phone has ${ModelManager.gbLabel(free)} free: not enough for the new " +
+                        olds.joinToString(", ") { it.file.label } + " next to the older version " +
+                        "(${sizeLabel(olds.sumOf { it.oldBytes })}). AndroidLM can delete the older version " +
+                        "first. Until the new one is downloaded and checked, " +
+                        (if (olds.any { it.file.name == SetupFiles.WIKI }) "research mode has no Wikipedia" else "it is missing") +
+                        ", and the model is unloaded.",
+                )
+            },
+            confirmButton = { TextButton(onClick = { replaceAsked = null; download(files, replace = true) }) { Text("Delete and download") } },
+            dismissButton = { TextButton(onClick = { replaceAsked = null }) { Text("Not now") } },
+        )
+    }
+    asked?.let { (files, net, replace) ->
         val size = sizeLabel(files.sumOf { it.bytes })
         AlertDialog(
             onDismissRequest = { asked = null },
@@ -76,7 +108,7 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                     else "The phone is on mobile data, and the download is $size.",
                 )
             },
-            confirmButton = { TextButton(onClick = { download(files, confirmed = true) }) { Text(if (net == SetupServer.Network.NONE) "Try anyway" else "Download") } },
+            confirmButton = { TextButton(onClick = { download(files, replace, confirmed = true) }) { Text(if (net == SetupServer.Network.NONE) "Try anyway" else "Download") } },
             dismissButton = { TextButton(onClick = { asked = null }) { Text("Not now") } },
         )
     }
@@ -92,8 +124,12 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
             }
             if (!isOpen) {
                 Hint(
-                    if (missing.isNotEmpty()) "Not on this phone yet: " + missing.joinToString(", ") { it.file.label }
-                    else "Optional: a larger model, slower and more thorough (${ModelManager.gbLabel(extras.sumOf { it.file.bytes })})",
+                    when {
+                        missing.isNotEmpty() -> "Not on this phone yet: " + missing.joinToString(", ") { it.file.label }
+                        updates.isNotEmpty() -> "Update available: " + updates.joinToString(", ") { it.file.label } +
+                            " (${sizeLabel(updates.sumOf { it.file.bytes - it.partBytes })})"
+                        else -> "Optional: a larger model, slower and more thorough (${ModelManager.gbLabel(extras.sumOf { it.file.bytes })})"
+                    },
                 )
                 return@Column
             }
@@ -118,7 +154,7 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                             "${s.file.name} · ${sizeLabel(s.file.bytes)} · " + when {
                                 s.found != null -> "on this phone"
                                 s.partBytes > 0 -> "${sizeLabel(s.partBytes)} downloaded so far"
-                                s.outdated -> "an older version is on this phone"
+                                s.outdated -> "newer than the copy on this phone, which works until this one is in"
                                 s.file.required -> "needed"
                                 else -> "optional"
                             },
@@ -130,11 +166,19 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                             else error = runCatching {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(s.file.url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                             }.exceptionOrNull()?.let { "No browser to download with: ${s.file.url}" }
-                        }, enabled = !progress.running) { Text(if (s.partBytes > 0) "Resume" else "Download") }
+                        }, enabled = !progress.running) {
+                            Text(when { s.partBytes > 0 -> "Resume"; s.outdated -> "Update"; else -> "Download" })
+                        }
                     }
                 }
             }
             st.forEach { FileRow(it) }
+            if (updates.any { it.file.name == SetupFiles.WIKI }) {
+                Hint(
+                    "The new Wikipedia has every article in full; the older one has only the opening " +
+                        "section of the 4 million least-read.",
+                )
+            }
             if (extras.isNotEmpty()) {
                 Text("Optional: a larger model", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 Hint(
@@ -154,30 +198,44 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
                     )
                 }
             }
-            if (BuildConfig.SETUP_DOWNLOADS && missing.isNotEmpty()) {
-                val need = missing.sumOf { it.file.bytes - it.partBytes }
+            if (BuildConfig.SETUP_DOWNLOADS && todo.isNotEmpty()) {
+                val need = todo.sumOf { it.file.bytes - it.partBytes }
                 Button(
-                    onClick = { download(missing.map { it.file }) },
+                    onClick = { download(todo.map { it.file }) },
                     enabled = !progress.running,
                     modifier = Modifier.fillMaxWidth(),
-                ) { Text("Download all missing (${sizeLabel(need)})") }
+                ) {
+                    Text(
+                        when {
+                            missing.isEmpty() -> "Download the update"
+                            updates.isEmpty() -> "Download all missing"
+                            else -> "Download all"
+                        } + " (${sizeLabel(need)})",
+                    )
+                }
                 Hint(
-                    "The phone has ${ModelManager.gbLabel(free)} free" +
-                        (if (need + 500_000_000L <= free) "." else ": free up some space first.") +
-                        " A download continues with the screen off, and one that stops resumes where it left off.",
+                    "The phone has ${ModelManager.gbLabel(free)} free" + when {
+                        need + 500_000_000L <= free -> "."
+                        need + 500_000_000L <= free + updates.sumOf { it.oldBytes } ->
+                            ": enough once the older version is deleted, which the download offers to do."
+                        else -> ": free up some space first."
+                    } + " A download continues with the screen off, and one that stops resumes where it left off.",
                 )
                 ServerRow(enabled = !progress.running)
                 Text("Or import files copied to the phone", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
-            if (missing.isNotEmpty() && !BuildConfig.SETUP_DOWNLOADS) {
+            if (todo.isNotEmpty() && !BuildConfig.SETUP_DOWNLOADS) {
                 // downloaded files already take their space, so the import itself needs room for
-                // one copy at a time when each download is deleted after it
-                val need = missing.sumOf { it.file.bytes }
-                val largest = missing.maxOf { it.file.bytes }
+                // one copy at a time when each download is deleted after it; and an import deletes
+                // the older version of a file when the new one needs its room
+                val need = todo.sumOf { it.file.bytes }
+                val largest = todo.maxOf { it.file.bytes }
+                val room = free + updates.sumOf { it.oldBytes }
                 Hint(
-                    "The missing files are ${sizeLabel(need)}; the phone has ${ModelManager.gbLabel(free)} free." + when {
+                    "The files to get are ${sizeLabel(need)}; the phone has ${ModelManager.gbLabel(free)} free." + when {
                         need <= free -> ""
-                        free >= largest + 500_000_000L ->
+                        need <= room -> " That is enough: an older version is deleted when the new one needs its room."
+                        room >= largest + 500_000_000L ->
                             " That is enough when they are already in this phone's Downloads and the box below is " +
                                 "ticked: each download is deleted once it is copied, so only one file at a time needs " +
                                 "room (the largest is ${sizeLabel(largest)})."
@@ -261,6 +319,9 @@ private fun ServerRow(enabled: Boolean) {
         }
     }
 }
+
+/** A download that waits for a second tap: on mobile data or with no connection. */
+private data class NetAsk(val files: List<SetupFile>, val net: SetupServer.Network, val replace: Boolean)
 
 /** A size as the card writes it: in MB below 0.1 GB, where GB would round to "0.0 GB". */
 private fun sizeLabel(bytes: Long): String =

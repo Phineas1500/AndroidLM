@@ -15,18 +15,18 @@
     {
       "name": "wiki.db",
       "role": "corpus",
-      "bytes": 21314895872,
-      "sha256": "736034e74f139559bc9517991a8572092c17cddbc66967ef66e4df130e4b7bee",
-      "url": "https://huggingface.co/datasets/rammingaway/androidlm-corpus/resolve/main/wiki.db",
+      "bytes": 30096670720,
+      "sha256": "68af223e091ff9ca4ec3ef7a412f6cf1b835841ff19a2167f1e3185f02981204",
+      "url": "https://huggingface.co/datasets/rammingaway/androidlm-corpus/resolve/main/v2/wiki.db",
       "device_path": "corpus/wiki.db",
       "license": "CC BY-SA 4.0 (English Wikipedia via FineWiki, Aug 2025; redirects Sep 2026)"
     },
     {
       "name": "wiki_df.db",
       "role": "corpus",
-      "bytes": 1748992,
-      "sha256": "c87ba297ac464ed92c5f3087bcdcf4ef81ace57bd131b626d9cbd70c762a11fb",
-      "url": "https://huggingface.co/datasets/rammingaway/androidlm-corpus/resolve/main/wiki_df.db",
+      "bytes": 2293760,
+      "sha256": "0a75f1f5f686c35c1d47a68eb0854d894c161627e15c05a51ff4318afbef429d",
+      "url": "https://huggingface.co/datasets/rammingaway/androidlm-corpus/resolve/main/v2/wiki_df.db",
       "device_path": "corpus/wiki_df.db",
       "license": "CC BY-SA 4.0 (word counts derived from wiki.db)"
     },

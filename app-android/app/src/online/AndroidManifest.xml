@@ -5,7 +5,7 @@
          files into the app; nothing else in the app opens a connection, and research questions
          never reach it. The offline build declares neither permission nor the service. -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- to tell Wi-Fi from mobile data before a 37GB download -->
+    <!-- to tell Wi-Fi from mobile data before a 46GB download -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- plain http too, for a mirror on a home network: every file is checked against the

@@ -19,15 +19,15 @@ The files reach the phone by one of these routes:
   about 39GB free (about 59GB while the files are imported on the phone alone). Developed for a
   Pixel 8 Pro; nothing here needs Google Play Services. See [Memory](#memory) for what the app
   takes on each size of phone.
-- From a computer: a computer with about 38GB free, `adb` (Android platform-tools), `curl` and
+- From a computer: a computer with about 47GB free, `adb` (Android platform-tools), `curl` and
   `python3`, a USB data cable, and USB debugging enabled on the phone (Settings > About phone >
   tap Build number 7 times, then Developer options > USB debugging).
 
 | File | Size | What it is |
 |---|---|---|
 | `Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf` | 12.3GB | The language model (Apache-2.0), 2-bit quantization by Unsloth |
-| `wiki.db` | 21.3GB | English Wikipedia: text, search index, redirects, pageviews (CC BY-SA 4.0) |
-| `wiki_df.db` | 1.7MB | Word counts for `wiki.db`'s index, so a search does not have to read them from it; optional (same results without it, slower) |
+| `wiki.db` | 30.1GB | English Wikipedia: text, search index, redirects, pageviews (CC BY-SA 4.0) |
+| `wiki_df.db` | 2.3MB | Word counts for `wiki.db`'s index, so a search does not have to read them from it; optional (same results without it, slower) |
 | `voyage.db` | 0.3GB | English Wikivoyage travel guides, optional (CC BY-SA 4.0) |
 | `places.db` | 2.9GB | 21.1 million places worldwide (to eat, drink and stay, and pharmacies, ATMs, hospitals, supermarkets, stations...), for questions like "vegan restaurants in Lisbon" or "a pharmacy near me"; optional (ODbL: © OpenStreetMap contributors, Overture Maps Foundation, GeoNames) |
 
@@ -51,7 +51,7 @@ The APK is signed with the project's release key (certificate SHA-256
 its package is `io.github.phineas1500.androidlm.dev`, the build that reads the model and corpus
 from `/data/local/tmp`. An earlier build of that package signed with another key has to be
 uninstalled first (see below).
-Pushing 37GB over USB takes roughly 15-40 minutes depending on the cable and port.
+Pushing 46GB over USB takes roughly 20-50 minutes depending on the cable and port.
 
 Then, on the phone: turn on airplane mode, open AndroidLM (it finds the model and the corpus by
 itself; if it was open during the install, tap Refresh; on first launch Android asks whether it
@@ -67,7 +67,7 @@ access.
    download the APK and open it to install it (allow the browser to install apps when asked).
 2. Open AndroidLM (allow its notifications: downloads and imports show their progress there). On
    Wi-Fi, tap **Download all missing** in its **Set up** card.
-   - The five files are 37GB. The download goes on with the screen off. **Pause** stops it, and
+   - The five files are 46GB. The download goes on with the screen off. **Pause** stops it, and
      **Resume** (or a dropped connection, retried on its own) carries on where it stopped.
    - Each file is checked against its SHA-256 before the app uses it. A damaged file is deleted
      and downloaded again.
@@ -81,8 +81,8 @@ access.
 1. Install the `-offline` APK as above and open it. Its **Set up** card lists the five files. Tap
    **Download** next to each one, coming back to the app after each: the browser downloads them
    all at once.
-   - The files are 37GB in all, so use Wi-Fi. On Wi-Fi at about 8 MB/s they took 75 minutes;
-     `wiki.db` (21GB) is the last to finish.
+   - The files are 46GB in all, so use Wi-Fi. At about 8 MB/s that is about 95 minutes;
+     `wiki.db` (30GB) is the last to finish.
    - A browser opened for the first time shows its own welcome screen first.
    - Leave the downloads running until they finish. Hugging Face's download links expire after an
      hour. A download that keeps going finishes past that (`wiki.db` did, 14 minutes after), but
@@ -92,15 +92,15 @@ access.
    - The app recognises each file and checks its size and SHA-256 as it copies it into its own
      storage. A damaged or unfinished download is refused, and the card says which.
    - With **Delete each download once it is copied** ticked (the default), each download is
-     deleted once its copy is checked. The phone needs about 59GB free in all: the downloads, plus
-     room for the largest copy while it is written. Afterwards the files take 37GB.
+     deleted once its copy is checked. The phone needs about 76GB free in all: the downloads, plus
+     room for the largest copy while it is written. Afterwards the files take 46GB.
    - All five took 4 minutes on a Pixel 8 Pro. The copy goes on with the screen off; a
      notification shows its progress.
 3. Turn on airplane mode and ask a question.
 
 **From a USB drive** instead of the browser (either build): on any computer, copy the five files
 onto a USB-C drive formatted as exFAT (FAT32 cannot hold files over 4GB), plug it into the phone,
-and pick the files on the drive with **Import files…**. The drive is only read, and the phone needs 37GB free.
+and pick the files on the drive with **Import files…**. The drive is only read, and the phone needs 46GB free.
 
 ## Without the script
 
@@ -116,6 +116,25 @@ adb install -r androidlm-1.6.1.apk
 permission and with direct I/O, which the streaming engine needs for speed. Files under
 `/sdcard` also work for the model but are slower, and the corpus cannot be opened from a file
 picker location at all.
+
+## Updating from 1.6.1 or earlier
+
+1.7.0 reads a new Wikipedia: `wiki.db` (30.1GB) has every article in full, where the old one
+(21.3GB) kept only the opening section of the 4 million least-read, and `wiki_df.db` goes with
+it. The other files stay as they are. Install the new APK over the old one, then:
+
+- **Files downloaded or imported in the app:** the **Set up** card says "Update available". Until
+  the new Wikipedia is in, the app answers from the old one. On Wi-Fi, tap **Download the update**
+  (30.1GB, 60-90 minutes on Wi-Fi). The old file is replaced once the new one has passed its SHA-256
+  check.
+  - The new file needs about 31GB free next to the old one. With less, the app offers to delete
+    the old one first; research mode then has no Wikipedia until the download is finished and
+    checked.
+  - With the offline build, **Update** next to each file downloads it in the browser; then
+    **Import files…** as in the first setup. An import deletes the older version itself when the
+    new one needs its room.
+- **Files pushed with adb:** run `scripts/install.sh --apk androidlm-1.7.0.apk` again. It pushes
+  only the files that changed.
 
 ## Optional: the larger model
 
@@ -198,7 +217,9 @@ The in-app download (1.6.0) was run on the same phone with two of the files miss
 - Seven JVM tests (`SetupFilesTest`) cover a dropped connection, a server that ignores the range,
   a damaged or oversized file, giving up after retries, and a real HTTP server with a redirect.
 
-The full 37GB set has not been downloaded in the app yet.
+The full-text `wiki.db` (30.1GB) was then downloaded in the app the same way, from Hugging Face
+on the phone's Wi-Fi with a test build of the next release: 90 minutes (about 5.6 MB/s), and it
+passed its SHA-256 check.
 
 "On the phone alone" was run end to end on the same phone with the v1.3.0 APK, installed fresh
 with no adb-pushed files:

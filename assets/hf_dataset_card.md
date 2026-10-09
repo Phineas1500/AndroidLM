@@ -20,8 +20,8 @@ opened read-only with any SQLite build that includes FTS5.
 | `v2/wiki_df.db` | 2.3MB | For `v2/wiki.db`: how many indexed passages contain each of the 155,285 stems found in at least 256 of them (`df(term, doc)`, the FTS5 index's own counts), so a search can rank a question's words without reading their posting lists; `meta` records what it was built from. Optional: a search returns the same results without it |
 
 `wiki.db` and `wiki_df.db` at the top level are the previous build (21.3GB: the 1.87M most-read
-articles in full and lead sections for the rest), which AndroidLM 1.6.0 and earlier download;
-newer releases use `v2/`.
+articles in full and lead sections for the rest), which AndroidLM 1.6.1 and earlier download;
+1.7.0 and newer use `v2/`.
 
 Schema: `blocks(id, zdata)` holds zstd-compressed runs of article text; `articles(id, title,
 views, block_id, off, len)` locates an article as a byte range in a block; `chunks(id,

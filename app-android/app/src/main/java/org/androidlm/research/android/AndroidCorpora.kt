@@ -11,9 +11,14 @@ import java.security.MessageDigest
 /**
  * The corpus databases found on the device: [wiki] is what research mode needs, [voyage] (the
  * travel guide), [places] (where to eat, drink and stay) and [pack] (the Ethereum and
- * cryptography library) are optional.
+ * cryptography library) are optional. [stamp] is their sizes and times, and the word-count
+ * file's, so a file replaced at the same path (a new wiki.db downloaded over the old) makes
+ * different CorpusFiles, and the research threads open the new file instead of reading on from
+ * the old one.
  */
-data class CorpusFiles(val wiki: File, val voyage: File?, val places: File? = null, val pack: File? = null) {
+data class CorpusFiles(
+    val wiki: File, val voyage: File?, val places: File? = null, val pack: File? = null, val stamp: String = "",
+) {
     fun label(): String = listOfNotNull(wiki, voyage, places, pack).joinToString(" + ") { it.name }
 }
 
@@ -86,7 +91,10 @@ object CorpusLocator {
         val wiki = first(WIKI) ?: return null
         // the APK's own pack first: it is the one this version of the app was built and tested with
         val pack = runCatching { BundledPack.file(ctx) }.getOrNull() ?: first(PACK)
-        return CorpusFiles(wiki, first(VOYAGE), first(PLACES), pack)
+        // with the word-count file, which only counts when it matches the wiki.db it sits next to
+        val found = listOfNotNull(wiki, File(Corpus.wordCountsPath(wiki.path)).takeIf { it.isFile }, first(VOYAGE), first(PLACES), pack)
+        return CorpusFiles(wiki, first(VOYAGE), first(PLACES), pack,
+            stamp = found.joinToString(",") { "${it.length()}@${it.lastModified()}" })
     }
 
     /** Where to put the files, for the screen that says research mode is unavailable. */

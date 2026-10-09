@@ -193,6 +193,7 @@ class RunService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        alive = true
         when (intent?.action) {
             ACTION_GENERATE -> sendGenerate(reqFrom(intent))
             ACTION_RESEARCH -> startResearch(intent.getStringExtra(EXTRA_QUESTION) ?: "")
@@ -1107,6 +1108,7 @@ class RunService : Service() {
     }
 
     override fun onDestroy() {
+        alive = false
         shuttingDown = true
         main.removeCallbacks(idleUnload)
         main.removeCallbacks(forceKill)
@@ -1146,6 +1148,9 @@ class RunService : Service() {
     }
 
     companion object {
+        /** The service is running, so its research threads may hold the databases open. */
+        @Volatile var alive = false
+            private set
         const val ACTION_GENERATE = "io.bigmoeonedge.example.GENERATE"
         const val ACTION_CANCEL = "io.bigmoeonedge.example.CANCEL"
         const val ACTION_SHUTDOWN = "io.bigmoeonedge.example.SHUTDOWN"

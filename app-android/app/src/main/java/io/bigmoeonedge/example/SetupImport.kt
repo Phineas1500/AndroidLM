@@ -37,9 +37,16 @@ import java.util.concurrent.CancellationException
 
 /**
  * Where [file] is on this phone: [found] is a copy that matches it; [outdated] when only other
- * versions are there; [partBytes], what an unfinished download of it holds so far.
+ * versions are there, which the app goes on reading until the new one is in; [oldBytes], the size
+ * of such a copy that is the app's own and can be deleted to make room for the new one (0 when
+ * there is none); [partBytes], what an unfinished download of it holds so far.
  */
-data class SetupStatus(val file: SetupFile, val found: File?, val outdated: Boolean, val partBytes: Long = 0)
+data class SetupStatus(
+    val file: SetupFile, val found: File?, val outdated: Boolean, val partBytes: Long = 0, val oldBytes: Long = 0,
+)
+
+/** Whether there is room for a file: there was, there is now that its older version is gone, or there is not. */
+enum class Room { ENOUGH, MADE, TOO_LITTLE }
 
 object SetupLocator {
     /**
@@ -53,8 +60,36 @@ object SetupLocator {
             .filter { !it.absolutePath.startsWith("/storage/") && !it.absolutePath.startsWith("/sdcard/") }
         val ok = copies.firstOrNull { it.canRead() && SetupFiles.matches(it, f) }
         val part = if (ok == null) SetupFiles.partOf(destination(ctx, f)).length() else 0L
-        SetupStatus(f, ok, outdated = ok == null && copies.isNotEmpty(), partBytes = part)
+        SetupStatus(f, ok, outdated = ok == null && copies.isNotEmpty(), partBytes = part,
+            oldBytes = if (ok == null) ownOld(ctx, f)?.length() ?: 0L else 0L)
     }
+
+    /** An older version of [f] at its destination, which a new copy would replace: the app's own. */
+    private fun ownOld(ctx: Context, f: SetupFile): File? =
+        destination(ctx, f).takeIf { it.isFile && !SetupFiles.matches(it, f) }
+
+    /**
+     * Room for [need] bytes where [f] goes. When there is too little, and [mayDelete], the older
+     * version of [f] there is deleted first: the new copy would replace it anyway, and a 30GB
+     * wiki.db may not fit next to the 21GB one it replaces. The model is unloaded before that,
+     * since an open database keeps its space until it is closed. Blocking: call off the main thread.
+     */
+    fun makeRoom(ctx: Context, f: SetupFile, need: Long, mayDelete: Boolean): Room {
+        val dir = destination(ctx, f).parentFile!!
+        if (dir.usableSpace >= need) return Room.ENOUGH
+        val old = ownOld(ctx, f)
+        if (!mayDelete || old == null || dir.usableSpace + old.length() < need) return Room.TOO_LITTLE
+        if (RunService.alive) ctx.startService(Intent(ctx, RunService::class.java).setAction(RunService.ACTION_SHUTDOWN))
+        Log.i(RunService.LOG_TAG, "deleting ${old.path} (${old.length()} bytes, an older version) to make room for the new one")
+        old.delete()
+        File(old.path + SetupFiles.STAMP).delete()
+        // the research threads close the database once the session has ended
+        val deadline = System.nanoTime() + ROOM_WAIT_NS
+        while (dir.usableSpace < need && System.nanoTime() < deadline) Thread.sleep(500)
+        return if (dir.usableSpace >= need) Room.MADE else Room.TOO_LITTLE
+    }
+
+    private const val ROOM_WAIT_NS = 60_000_000_000L
 
     /** Where an import puts [f]: the first directory each scan looks in. */
     fun destination(ctx: Context, f: SetupFile): File =
@@ -88,7 +123,7 @@ object SetupBus {
 
 /**
  * Copies the picked files into app storage, one after another, as a foreground service: a full
- * set is 37GB and takes minutes, and the copy must go on with the screen off or the app in the
+ * set is 46GB and takes minutes, and the copy must go on with the screen off or the app in the
  * background. With [EXTRA_DELETE] each original on the phone's own storage is deleted once its
  * copy is checked, so the downloads do not take the space twice; a USB drive is never written.
  */
@@ -158,11 +193,16 @@ class ImportService : Service() {
                 continue
             }
             val dest = SetupLocator.destination(this, f)
-            val free = dest.parentFile!!.usableSpace
-            if (f.bytes + SPARE > free) {
-                errors += "Not enough space for ${f.name}: it needs ${ModelManager.gbLabel(f.bytes + SPARE)}, the phone has ${ModelManager.gbLabel(free)} free"
-                SetupBus.update { it.copy(errors = errors.toList()) }
-                continue
+            // the picked file is the new version, so an older one in the way goes (it can be imported again)
+            when (SetupLocator.makeRoom(this, f, f.bytes + SPARE, mayDelete = true)) {
+                Room.ENOUGH -> {}
+                Room.MADE -> done += "${f.label}: the older version was deleted to make room"
+                Room.TOO_LITTLE -> {
+                    errors += "Not enough space for ${f.name}: it needs ${ModelManager.gbLabel(f.bytes + SPARE)}, " +
+                        "the phone has ${ModelManager.gbLabel(dest.parentFile!!.usableSpace)} free"
+                    SetupBus.update { it.copy(done = done.toList(), errors = errors.toList()) }
+                    continue
+                }
             }
             SetupBus.update { it.copy(file = f.label, index = i, copied = 0, total = f.bytes) }
             var last = 0L
