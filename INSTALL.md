@@ -35,11 +35,11 @@ The files reach the phone by one of these routes:
 
 ```sh
 git clone https://github.com/Phineas1500/AndroidLM && cd AndroidLM
-# the signed app from the v1.6.1 release (or build it yourself: app-android/README.md)
-curl -L -o androidlm-1.6.1.apk \
-  https://github.com/Phineas1500/AndroidLM/releases/download/v1.6.1/androidlm-1.6.1.apk
-shasum -a 256 androidlm-1.6.1.apk   # c553da4da7089ccf0b6212710576c9b53fb77ae45b8c538e153898966a76a68e
-scripts/install.sh --apk androidlm-1.6.1.apk
+# the signed app from the v1.7.0 release (or build it yourself: app-android/README.md)
+curl -L -o androidlm-1.7.0.apk \
+  https://github.com/Phineas1500/AndroidLM/releases/download/v1.7.0/androidlm-1.7.0.apk
+shasum -a 256 androidlm-1.7.0.apk   # 983aa798280c07bcd4ea8fa384df0df5d7d4a8eb1f92a06c825a2b125161444b
+scripts/install.sh --apk androidlm-1.7.0.apk
 ```
 
 The APK carries the Ethereum and cryptography library (19MB) and sets it up on first use.
@@ -109,7 +109,7 @@ adb shell mkdir -p /data/local/tmp/bmoe/corpus
 adb push Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf /data/local/tmp/bmoe/
 adb push wiki.db wiki_df.db voyage.db places.db /data/local/tmp/bmoe/corpus/
 adb shell 'chmod 755 /data/local/tmp/bmoe /data/local/tmp/bmoe/corpus; chmod 644 /data/local/tmp/bmoe/*.gguf /data/local/tmp/bmoe/corpus/*.db'
-adb install -r androidlm-1.6.1.apk
+adb install -r androidlm-1.7.0.apk
 ```
 
 `/data/local/tmp` is used because the app can open files there in place, without a storage
