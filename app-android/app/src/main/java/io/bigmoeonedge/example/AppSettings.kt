@@ -275,15 +275,20 @@ data class AppSettings(
         sessionArgv(cliPath = "", modelPath = modelPath, csvPath = null).joinToString("|")
 
     fun save(ctx: Context) {
-        ctx.prefs().edit()
-            .putBoolean("mmap", mmap)
+        val e = ctx.prefs().edit()
+        // The cache and the dense weights are stored only when they differ from the memory
+        // preset's: a value that only came with the preset must not be kept as if it were chosen.
+        val preset = MemoryPreset.resolve(ctx, memoryPreset)
+        if (cacheMb == preset.cacheMb) e.remove("cacheMb") else e.putInt("cacheMb", cacheMb)
+        if (denseWeights == preset.dense) e.remove("denseWeights").remove("denseOdirect").remove("warmDense")
+        else e.putString("denseWeights", denseWeights.name)
+        e.putBoolean("mmap", mmap)
             .putString("memoryPreset", memoryPreset)
-            .putInt("cacheMb", cacheMb).putInt("cacheCeilMb", cacheCeilMb)
+            .putInt("cacheCeilMb", cacheCeilMb)
             .putInt("ioThreads", ioThreads).putInt("threads", threads)
             .putInt("nExpertUsed", nExpertUsed)
             .putInt("nPredict", nPredict).putBoolean("oDirect", oDirect)
             .putBoolean("overlap", overlap)
-            .putString("denseWeights", denseWeights.name)
             .putInt("prefetchLayers", prefetchLayers)
             .putBoolean("predictPrefetch", predictPrefetch)
             .putInt("predictSpecMax", predictSpecMax)
@@ -421,7 +426,34 @@ data class AppSettings(
         fun presetOf(ctx: Context): MemoryPreset =
             MemoryPreset.resolve(ctx, ctx.prefs().getString("memoryPreset", MemoryPreset.AUTO) ?: MemoryPreset.AUTO)
 
+        /**
+         * Until 1.6.1, [save] stored the cache and the dense weights the preset gave as if they had
+         * been chosen, so any change to the settings (the Research switch too) kept them for good.
+         * 1.4.0 to 1.6.0 also gave a 12GB Pixel 8 Pro, which reports 10.9 GiB, a small phone's: a
+         * 2,000 MiB cache in 1.4.0, the 8GB preset in 1.5.0 and 1.6.0. On Auto, a saved value that
+         * an older version could have stored without the user choosing it (a preset's, or the
+         * 2,000 MiB default) is dropped once, so the preset for this phone's RAM applies. Other
+         * values were chosen by hand and stay.
+         */
+        private fun dropOldPresetValues(ctx: Context) {
+            val p = ctx.prefs()
+            if (p.getInt("settingsVersion", 0) >= SETTINGS_VERSION) return
+            val e = p.edit().putInt("settingsVersion", SETTINGS_VERSION)
+            if ((p.getString("memoryPreset", MemoryPreset.AUTO) ?: MemoryPreset.AUTO) == MemoryPreset.AUTO) {
+                val given = MemoryPreset.values()
+                if (p.getInt("cacheMb", 0).let { mb -> mb == 2000 || given.any { it.cacheMb == mb } }) e.remove("cacheMb")
+                if (given.any { it.dense.name == p.getString("denseWeights", null) }) {
+                    e.remove("denseWeights").remove("denseOdirect").remove("warmDense")
+                }
+            }
+            e.apply()
+        }
+
+        /** Raised when [load] has to clean up what an older version saved ([dropOldPresetValues]). */
+        private const val SETTINGS_VERSION = 161
+
         fun load(ctx: Context): AppSettings {
+            dropOldPresetValues(ctx)
             val p = ctx.prefs()
             val d = AppSettings()
             val preset = presetOf(ctx)

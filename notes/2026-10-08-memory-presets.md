@@ -55,7 +55,8 @@ The generated text of all four runs is identical; the load takes half as long on
 ## Memory presets
 
 Settings -> Memory preset (MemoryPreset.kt), Auto by default, which picks from the RAM the phone
-reports (16 at 14.5 GiB or more, 12 at 11.0 or more, else 8):
+reports (16 at 13.5 GiB or more, 12 at 9.5 or more, else 8; until 2026-10-09 it was 14.5 and
+11.0, which put the Pixel 8 Pro, at 10.9 GiB, on the 8GB preset):
 
 | Preset | Expert cache | Prompt reading | Dense weights | The app takes |
 |---|---|---|---|---|
@@ -67,6 +68,12 @@ Pinning copies the repacked dense weights once more while the model loads (1.2GB
 peak), so the 8GB preset keeps them in plain app memory. In an emulator the screen says to give it
 8GB and choose the 8GB preset; below 7 GiB it says the phone is too small. The 16GB preset is
 untested on a 16GB phone.
+
+Until 1.6.1 any change to the settings, the Research switch on the main screen too, saved the
+preset's cache and dense weights as if they had been chosen, and a saved value wins over the
+preset. So the wrong preset stuck even with the new thresholds. Now the two are saved only when
+they differ from the preset's, and on Auto, 1.6.1 drops once a saved cache or dense setting that
+an older version could have stored by itself (a preset's, or 1.4.0's 2,000 MiB default).
 
 The app on the simulated 8GB phone (hog running, 8GB preset, patched engine), nothing killed:
 

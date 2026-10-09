@@ -34,16 +34,20 @@ enum class MemoryPreset(
     companion object {
         const val AUTO = "auto"
 
-        /** The phone's RAM as the system reports it: a "12GB" phone shows about 11.2-11.6 GiB. */
+        /**
+         * The phone's RAM as the system reports it, less what the firmware keeps: a 12GB Pixel 8 Pro
+         * shows 10.9 GiB, an 8GB Pixel 8 about 7.4.
+         */
         fun totalGib(ctx: Context): Double {
             val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager ?: return 0.0
             val mi = android.app.ActivityManager.MemoryInfo().also { am.getMemoryInfo(it) }
             return mi.totalMem / (1024.0 * 1024.0 * 1024.0)
         }
 
+        /** Thresholds halfway between what 8, 12 and 16GB phones report. */
         fun forRam(gib: Double): MemoryPreset = when {
-            gib >= 14.5 -> PHONE_16
-            gib >= 11.0 -> PHONE_12
+            gib >= 13.5 -> PHONE_16
+            gib >= 9.5 -> PHONE_12
             else -> PHONE_8
         }
 
