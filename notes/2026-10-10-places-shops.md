@@ -86,7 +86,27 @@ Some categories in some places are mostly wrong:
 - **Nairobi's cinemas:** include "KFC Westgate".
 
 Overture's confidence does not separate these: the school centre has 91, the real GoPlay 71. Places
-named like a nearby town are 0.04% of the new places, too few for a filter to matter.
+named like a nearby town are 0.04% of the new places, too few for a filter to matter. The Overture
+rows have no alternate categories and no brand to go on either.
+
+Two fixes were tried, and neither was kept:
+
+- **A line for the model, for the new kinds only:** "Map data often gives a place the wrong kind.
+  Leave out any place whose name shows it is something else...". It went after the list, so the
+  older kinds' prompts stayed the same. On the phone:
+  - **Asunción's arcades:** the same school centre, dance studio and radio club, and two more.
+  - **Santiago's video game shops:** six instead of eight, one of the two dropped a real shop.
+  - **Lisbon's bookshops:** every place got "The list identifies it as a general bookstore
+    without further descriptive details".
+- **A rule in the build on a name's first word:** a new place is dropped when its first word is
+  common (200 places or more), at least 80% of those places are in one other group, and under 2%
+  are in its own.
+  - It drops 0.7% of the new places. "KFC Westgate" (a cinema) and "Supermercado Stock" (an
+    arcade) go.
+  - A sample of the drops is full of real shops: a Budapest bookshop, toy, vape and optician
+    shops, and a Rolex retailer.
+  - The Asunción "Shopping…" arcades stay.
+  - Looser thresholds (50 places, 50%, 5%) drop 4.4%, with more real shops among them.
 
 ## On the phone
 
