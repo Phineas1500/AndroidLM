@@ -77,8 +77,14 @@ while IFS='|' read -r -u 3 name role bytes sha url dpath; do
   local_file=$ASSETS/$name
   if [ ! -f "$local_file" ] || [ "$(filesize "$local_file")" != "$bytes" ]; then
     [ $DOWNLOAD = 1 ] && [ -n "$url" ] || die "$name is missing or incomplete in $ASSETS and has no download URL yet"
+    # the partial download is named after this version, so an older release's file of the same
+    # name is never resumed as if it were the start of this one; it replaces that file when done
+    tag=${sha:0:12}; [ -n "$tag" ] || tag=$bytes
+    part=$local_file.$tag.part
     echo "downloading $name ($((bytes / 1000000)) MB), resumable..."
-    curl -L --fail -C - -o "$local_file" "$url"
+    curl -L --fail -C - -o "$part" "$url"
+    [ "$(filesize "$part")" = "$bytes" ] || die "$name has the wrong size"
+    mv -f "$part" "$local_file"
   fi
   [ "$(filesize "$local_file")" = "$bytes" ] || die "$name has the wrong size"
   if [ -n "$sha" ]; then
