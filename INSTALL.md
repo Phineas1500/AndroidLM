@@ -36,11 +36,11 @@ The files reach the phone by one of these routes:
 
 ```sh
 git clone https://github.com/Phineas1500/AndroidLM && cd AndroidLM
-# the signed app from the v1.7.1 release (or build it yourself: app-android/README.md)
-curl -L -o androidlm-1.7.1.apk \
-  https://github.com/Phineas1500/AndroidLM/releases/download/v1.7.1/androidlm-1.7.1.apk
-shasum -a 256 androidlm-1.7.1.apk   # 97cf08e4115c7fca29504ff7dddec9e05edd34e007612f03e977357c1f441cbb
-scripts/install.sh --apk androidlm-1.7.1.apk
+# the signed app from the v1.8.0 release (or build it yourself: app-android/README.md)
+curl -L -o androidlm-1.8.0.apk \
+  https://github.com/Phineas1500/AndroidLM/releases/download/v1.8.0/androidlm-1.8.0.apk
+shasum -a 256 androidlm-1.8.0.apk   # ca0c1b219dea65b27f60a0695493f911d439672877d25b4b143dcc4d7557af05
+scripts/install.sh --apk androidlm-1.8.0.apk
 ```
 
 The APK carries the Ethereum and cryptography library (19MB) and sets it up on first use.
@@ -97,6 +97,9 @@ access.
      room for the largest copy while it is written. Afterwards the files take 46GB.
    - All five took 4 minutes on a Pixel 8 Pro. The copy goes on with the screen off; a
      notification shows its progress.
+   - Then close the browser's tabs on the download links. On GrapheneOS, Vanadium asks to download
+     the file again when it reopens such a tab. In our test it twice downloaded the 12.3GB model
+     again by itself, into the Downloads folder.
 3. Turn on airplane mode and ask a question.
 
 **From a USB drive** instead of the browser (either build): on any computer, copy the five files
@@ -110,7 +113,7 @@ adb shell mkdir -p /data/local/tmp/bmoe/corpus
 adb push Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf /data/local/tmp/bmoe/
 adb push wiki.db wiki_df.db voyage.db places.db /data/local/tmp/bmoe/corpus/
 adb shell 'chmod 755 /data/local/tmp/bmoe /data/local/tmp/bmoe/corpus; chmod 644 /data/local/tmp/bmoe/*.gguf /data/local/tmp/bmoe/corpus/*.db'
-adb install -r androidlm-1.7.1.apk
+adb install -r androidlm-1.8.0.apk
 ```
 
 `/data/local/tmp` is used because the app can open files there in place, without a storage
@@ -118,28 +121,39 @@ permission and with direct I/O, which the streaming engine needs for speed. File
 `/sdcard` also work for the model but are slower, and the corpus cannot be opened from a file
 picker location at all.
 
-## Updating from 1.7.0
+## Updating from 1.7.x
 
-Install the 1.7.1 APK over it (the offline one over the offline build). No file changes, and the
-app keeps its files and settings.
+1.8.0 reads a new `places.db` (3.5GB, the old one 2.9GB). It adds shops by kind and places to go
+out. The other files stay as they are. Install the 1.8.0 APK over the old one (the offline one
+over the offline build), then:
+
+- **Files downloaded or imported in the app:** the **Set up** card says "Update available". Until
+  the new file is in, the app answers from the old one, and a question about a shop or a place to
+  go out gets the general answer, as before. On Wi-Fi, tap **Download the update** (3.5GB). The
+  old file is replaced once the new one has passed its SHA-256 check.
+  - With the offline build, **Update** next to the places file downloads it in the browser. Then
+    use **Import files…** as in the first setup.
+- **Files pushed with adb:** run `scripts/install.sh --apk androidlm-1.8.0.apk` again. It
+  downloads and pushes only `places.db`.
 
 ## Updating from 1.6.1 or earlier
 
 1.7.0 reads a new Wikipedia: `wiki.db` (30.1GB) has every article in full, where the old one
 (21.3GB) kept only the opening section of the 4 million least-read, and `wiki_df.db` goes with
-it. The other files stay as they are. Install the new APK over the old one, then:
+it. 1.8.0 also reads a new `places.db` ([above](#updating-from-17x)). The other files stay as
+they are. Install the new APK over the old one, then:
 
 - **Files downloaded or imported in the app:** the **Set up** card says "Update available". Until
   the new Wikipedia is in, the app answers from the old one. On Wi-Fi, tap **Download the update**
-  (30.1GB, 60-90 minutes on Wi-Fi). The old file is replaced once the new one has passed its SHA-256
-  check.
+  (33.6GB with the places, 60-100 minutes on Wi-Fi). Each old file is replaced once its new one has
+  passed its SHA-256 check.
   - The new file needs about 31GB free next to the old one. With less, the app offers to delete
     the old one first; research mode then has no Wikipedia until the download is finished and
     checked.
   - With the offline build, **Update** next to each file downloads it in the browser; then
     **Import files…** as in the first setup. An import deletes the older version itself when the
     new one needs its room.
-- **Files pushed with adb:** run `scripts/install.sh --apk androidlm-1.7.1.apk` again. It pushes
+- **Files pushed with adb:** run `scripts/install.sh --apk androidlm-1.8.0.apk` again. It pushes
   only the files that changed.
 
 ## Optional: the larger model
@@ -250,5 +264,9 @@ On GrapheneOS (2026100600, Android 17, same phone), the 1.7.0 release APK:
   faults. The switch does not reach the engine, a separate program. From 1.7.1 the engine is built
   to be tagged, and GrapheneOS tags it whether the switch is on or not. It gave the same answers
   tagged, again with no faults.
+- **Places update:** with 1.7.1's `places.db` in place, a test build of 1.8.0 showed "Update
+  available: Places to eat, stay, shop and go out (3.5GB)". It imported the new file from
+  Downloads and checked it, and its earlier answers came out word for word.
 
-Details: [`notes/2026-10-09-grapheneos.md`](notes/2026-10-09-grapheneos.md).
+Details: [`notes/2026-10-09-grapheneos.md`](notes/2026-10-09-grapheneos.md) and
+[`notes/2026-10-10-places-shops.md`](notes/2026-10-10-places-shops.md).
