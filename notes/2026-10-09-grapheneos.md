@@ -92,13 +92,62 @@ GrapheneOS's App info page for AndroidLM shows:
 | Secure app spawning | Default (Enabled) |
 
 All of the above therefore ran on GrapheneOS's hardened allocator (hardened_malloc), with nothing
-switched off for compatibility. Memory tagging is off for this app by default, so these runs do
-not cover it. The stock-Android check in [the MTE note](2026-10-08-mte.md) found no faults with
-tagging on, but there it ran under scudo, not hardened_malloc.
+switched off for compatibility. Memory tagging is off for this app by default. The next section
+turns it on.
+
+## Memory tagging
+
+The phone's kernel runs with memory tagging (MTE) on (`bootloader.pixel.MTE_FORCE_ON` on its
+command line). The per-app **Memory tagging** switch turns it on for AndroidLM, and GrapheneOS
+then logs `FORCIBLY_ENABLE_MEMORY_TAGGING` as the app starts. The stock-Android check in
+[the MTE note](2026-10-08-mte.md) ran under scudo; here the allocator is hardened_malloc.
+
+- **The switch does not reach the engine.** The app starts the engine as a program of its own, and
+  the kernel resets tag checking when a program starts. GrapheneOS then tags the program only if
+  its binary asks for it. A probe that prints its own tagging state and then reads past a heap
+  allocation (`work/memtest/mte_state.c`), run from adb:
+  - **As built:** untagged, no fault.
+  - **With `MEMTAG_OPTIONS=sync`:** still untagged. This is what tagged the engine on stock
+    Android.
+  - **Linked with `-fsanitize=memtag-heap -fsanitize-memtag-mode=sync`:** tagged. This marks the
+    binary. The probe stopped at the read with `SIGSEGV, code 9 (SEGV_MTESERR)`.
+- **Two runs:** the eleven questions above (the ten timing questions and the Lisbon restaurants),
+  with the switch on:
+  - **App only:** the 1.7.0 release APK. This tags the app process, where SQLite, zstd and the
+    research pipeline run, but not the engine.
+  - **App and engine:** a test build with the engine relinked as above, from the same object
+    files. No faults.
+- **Results:** in both runs every answer was identical to the untagged run, word for word, and the
+  crash log stayed empty.
+
+| Question | Total, s (untagged / app / app and engine) | First words, s | Writing, tokens/s |
+|---|---|---|---|
+| cry-017 ERC-4626 | 109 / 108 / 116 | 65 / 65 / 72 | 4.23 / 4.32 / 4.28 |
+| cry-013 EIP-7702 | 116 / 114 / 119 | 65 / 65 / 70 | 4.10 / 4.23 / 4.24 |
+| cry-009 zk-SNARK vs zk-STARK | 103 / 103 / 106 | 44 / 47 / 48 | 4.34 / 4.50 / 4.33 |
+| mth-004 water for a hike | 49 / 58 / 59 | 34 / 38 / 39 | 5.33 / 4.05 / 4.17 |
+| trv-010 ride-hailing in Bangkok | 112 / 115 / 121 | 46 / 49 / 55 | 4.43 / 4.42 / 4.41 |
+| dng-005 water after a flood | 182 / 190 / 189 | 52 / 57 / 59 | 4.41 / 4.31 / 4.39 |
+| cry-002 ML-DSA vs SLH-DSA | 168 / 172 / 172 | 65 / 66 / 65 | 4.20 / 4.09 / 4.04 |
+| lead-14 Fiat 804, 1922 | 122 / 123 / 124 | 57 / 57 / 58 | 4.29 / 4.21 / 4.19 |
+| lead-27 Ruyang dinosaurs | 104 / 105 / 105 | 47 / 47 / 48 | 4.29 / 4.12 / 4.19 |
+| lead-30 Esso Brussels, 1973 | 74 / 75 / 76 | 43 / 45 / 45 | 4.31 / 4.37 / 4.30 |
+| vegan-01 Lisbon restaurants | 153 / 155 / 154 | 22 / 22 / 22 | 4.16 / 4.12 / 4.16 |
+
+- **Writing speed:** unchanged.
+- **Total time:** against the untagged run, the median question took about 1 s longer with the app
+  tagged and about 4 s longer with the engine tagged too (at most 9 s), almost all of it before the
+  first words.
+- **Heat accounts for part of that:** the gaps sit in the first questions of each run. There the
+  untagged run started cooler (skin 31-34 °C, against about 35 °C with the engine tagged). The
+  last five questions started at the same temperature and stayed within 2 s.
+
+The release engine is not marked, so on GrapheneOS today the switch tags the app process only.
+Marking the engine would tag it wherever MTE is on, at the cost above. On phones without MTE the
+mark does nothing.
 
 ## Not tested here
 
-- Memory tagging under hardened_malloc, with the per-app **Memory tagging** switch on.
 - The offline build's browser route: Vanadium downloading the files from the Set up card's links.
   The import afterwards uses the same file picker as above.
 - "Near me" questions with a real GPS fix.

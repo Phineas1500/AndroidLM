@@ -240,5 +240,7 @@ On GrapheneOS (2026100600, Android 17, same phone), the 1.7.0 release APK:
 - **Offline build:** installed over it, the offline build imported the model from Downloads in
   about 70 s and answered.
 - **Network off:** both builds answered with no network permission.
+- **Memory tagging:** with the per-app Memory tagging switch on, it gave the same answers with no
+  faults. The same was true of a test build whose engine was tagged as well.
 
 Details: [`notes/2026-10-09-grapheneos.md`](notes/2026-10-09-grapheneos.md).
