@@ -154,6 +154,8 @@ past a heap allocation:
 | Marked | Default (off) | not tagged | tagged, sync | stopped (`SEGV_MTESERR`) |
 | Unmarked | Default (off) | not tagged | not tagged | went unnoticed |
 
+- **What a user sees:** when the tagged stand-in stopped, GrapheneOS posted a notification:
+  "Memory tagging detected an error in AndroidLM", with "Tap to open settings".
 - **1.7.0:** the engine is not tagged on GrapheneOS, whatever the switch says.
 - **The marked engine:** tagged on every GrapheneOS install, with nothing to switch on.
 - **Next release:** `scripts/build-android-engine.sh` now marks it, and the next release ships it.
@@ -163,8 +165,24 @@ past a heap allocation:
 - **Other phones:** MTE is off on stock Pixels unless switched on in Developer options. There, and
   on phones without MTE, the mark does nothing.
 
+## The offline build with Vanadium (2026-10-10)
+
+The offline APK cannot download, so on GrapheneOS its files come through the system browser,
+Vanadium. 1.7.1's offline APK was installed over the online one, and the model was deleted in the
+app. Then:
+
+1. **Download:** **Download** next to the model on the Set up card opened Vanadium on the file at
+   Hugging Face.
+   - Vanadium asked once whether it may post notifications. That was declined, and the download
+     ran without them.
+   - It then asked where to save the file: "12.29 GB", in Downloads.
+   - It took 20 minutes: the first 8.3 GB within about a minute, the rest at about 3.5 MB/s.
+2. **Import:** **Import files…** opened the file picker in Downloads, and one tap on the file was
+   enough. The app copied and checked it in 75 s: "copied and checked; the download was deleted".
+   Downloads was empty again.
+3. **Answer:** lead-27 (the Ruyang dinosaurs) was answered word for word as before, in 97 s. The
+   crash log stayed empty.
+
 ## Not tested here
 
-- The offline build's browser route: Vanadium downloading the files from the Set up card's links.
-  The import afterwards uses the same file picker as above.
 - "Near me" questions with a real GPS fix.

@@ -243,7 +243,8 @@ On GrapheneOS (2026100600, Android 17, same phone), the 1.7.0 release APK:
   check.
 - **Answers:** it gave the same answers as on stock Android, about 9% sooner.
 - **Offline build:** installed over it, the offline build imported the model from Downloads in
-  about 70 s and answered.
+  about 70 s and answered. With 1.7.1, the same worked for a model downloaded in Vanadium,
+  GrapheneOS's browser, from the Set up card's link.
 - **Network off:** both builds answered with no network permission.
 - **Memory tagging:** with the per-app Memory tagging switch on, it gave the same answers with no
   faults. The switch does not reach the engine, a separate program. From 1.7.1 the engine is built
