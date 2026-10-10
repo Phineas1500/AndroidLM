@@ -36,11 +36,11 @@ The files reach the phone by one of these routes:
 
 ```sh
 git clone https://github.com/Phineas1500/AndroidLM && cd AndroidLM
-# the signed app from the v1.7.0 release (or build it yourself: app-android/README.md)
-curl -L -o androidlm-1.7.0.apk \
-  https://github.com/Phineas1500/AndroidLM/releases/download/v1.7.0/androidlm-1.7.0.apk
-shasum -a 256 androidlm-1.7.0.apk   # 983aa798280c07bcd4ea8fa384df0df5d7d4a8eb1f92a06c825a2b125161444b
-scripts/install.sh --apk androidlm-1.7.0.apk
+# the signed app from the v1.7.1 release (or build it yourself: app-android/README.md)
+curl -L -o androidlm-1.7.1.apk \
+  https://github.com/Phineas1500/AndroidLM/releases/download/v1.7.1/androidlm-1.7.1.apk
+shasum -a 256 androidlm-1.7.1.apk   # 97cf08e4115c7fca29504ff7dddec9e05edd34e007612f03e977357c1f441cbb
+scripts/install.sh --apk androidlm-1.7.1.apk
 ```
 
 The APK carries the Ethereum and cryptography library (19MB) and sets it up on first use.
@@ -110,13 +110,18 @@ adb shell mkdir -p /data/local/tmp/bmoe/corpus
 adb push Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf /data/local/tmp/bmoe/
 adb push wiki.db wiki_df.db voyage.db places.db /data/local/tmp/bmoe/corpus/
 adb shell 'chmod 755 /data/local/tmp/bmoe /data/local/tmp/bmoe/corpus; chmod 644 /data/local/tmp/bmoe/*.gguf /data/local/tmp/bmoe/corpus/*.db'
-adb install -r androidlm-1.7.0.apk
+adb install -r androidlm-1.7.1.apk
 ```
 
 `/data/local/tmp` is used because the app can open files there in place, without a storage
 permission and with direct I/O, which the streaming engine needs for speed. Files under
 `/sdcard` also work for the model but are slower, and the corpus cannot be opened from a file
 picker location at all.
+
+## Updating from 1.7.0
+
+Install the 1.7.1 APK over it (the offline one over the offline build). No file changes, and the
+app keeps its files and settings.
 
 ## Updating from 1.6.1 or earlier
 
@@ -134,7 +139,7 @@ it. The other files stay as they are. Install the new APK over the old one, then
   - With the offline build, **Update** next to each file downloads it in the browser; then
     **Import files…** as in the first setup. An import deletes the older version itself when the
     new one needs its room.
-- **Files pushed with adb:** run `scripts/install.sh --apk androidlm-1.7.0.apk` again. It pushes
+- **Files pushed with adb:** run `scripts/install.sh --apk androidlm-1.7.1.apk` again. It pushes
   only the files that changed.
 
 ## Optional: the larger model
@@ -241,6 +246,8 @@ On GrapheneOS (2026100600, Android 17, same phone), the 1.7.0 release APK:
   about 70 s and answered.
 - **Network off:** both builds answered with no network permission.
 - **Memory tagging:** with the per-app Memory tagging switch on, it gave the same answers with no
-  faults. The same was true of a test build whose engine was tagged as well.
+  faults. The switch does not reach the engine, a separate program. From 1.7.1 the engine is built
+  to be tagged, and GrapheneOS tags it whether the switch is on or not. It gave the same answers
+  tagged, again with no faults.
 
 Details: [`notes/2026-10-09-grapheneos.md`](notes/2026-10-09-grapheneos.md).
