@@ -45,7 +45,10 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
 
 ## Status
 
-Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). Measured on that phone:
+Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). On the same phone under GrapheneOS
+(Android 17) it gives the same answers, about 9% sooner
+([`notes/2026-10-09-grapheneos.md`](notes/2026-10-09-grapheneos.md)). Measured on that phone
+under Android 16:
 
 | | |
 |---|---|

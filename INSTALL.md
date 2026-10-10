@@ -3,7 +3,8 @@
 AndroidLM answers without the network. It comes in two builds:
 - **`androidlm-<version>.apk`** downloads its model and corpus itself, from its **Set up** card.
   That download is the only thing the app uses the internet for; on GrapheneOS its Network
-  permission can be turned off afterwards.
+  permission can be turned off afterwards. Installed over the offline build, it starts with
+  Network off on GrapheneOS: turn it on (App info, Permissions, Network) before downloading.
 - **`androidlm-<version>-offline.apk`** has no INTERNET permission at all: the files reach the
   phone another way and are imported.
 
@@ -231,3 +232,13 @@ with no adb-pushed files:
 Separately:
 - a damaged file was refused and its download kept;
 - `wiki.db` was imported with the screen off.
+
+On GrapheneOS (2026100600, Android 17, same phone), the 1.7.0 release APK:
+- **Download:** it downloaded all five files in the app in 1 hour 40 minutes, and each passed its
+  check.
+- **Answers:** it gave the same answers as on stock Android, about 9% sooner.
+- **Offline build:** installed over it, the offline build imported the model from Downloads in
+  about 70 s and answered.
+- **Network off:** both builds answered with no network permission.
+
+Details: [`notes/2026-10-09-grapheneos.md`](notes/2026-10-09-grapheneos.md).
