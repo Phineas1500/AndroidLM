@@ -99,17 +99,32 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
     }
     asked?.let { (files, net, replace) ->
         val size = sizeLabel(files.sumOf { it.bytes })
+        val none = net == SetupServer.Network.NONE
         AlertDialog(
             onDismissRequest = { asked = null },
-            title = { Text(if (net == SetupServer.Network.NONE) "No connection" else "Download over mobile data?") },
+            title = { Text(if (none) "No connection" else "Download over mobile data?") },
             text = {
                 Text(
-                    if (net == SetupServer.Network.NONE) "The phone is not connected to a network right now. Connect to Wi-Fi, then download the $size."
+                    // GrapheneOS's Network permission, when off, hides the network from the app
+                    // rather than denying INTERNET, so it looks the same as no connection
+                    if (none) "AndroidLM sees no network. Either the phone is not connected, or AndroidLM is not " +
+                        "allowed to use the network (on GrapheneOS: App info, Permissions, Network). Connect to Wi-Fi " +
+                        "or allow Network, then download the $size."
                     else "The phone is on mobile data, and the download is $size.",
                 )
             },
-            confirmButton = { TextButton(onClick = { download(files, replace, confirmed = true) }) { Text(if (net == SetupServer.Network.NONE) "Try anyway" else "Download") } },
-            dismissButton = { TextButton(onClick = { asked = null }) { Text("Not now") } },
+            confirmButton = { TextButton(onClick = { download(files, replace, confirmed = true) }) { Text(if (none) "Try anyway" else "Download") } },
+            dismissButton = {
+                Row {
+                    if (none) TextButton(onClick = {
+                        asked = null
+                        context.startActivity(
+                            Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null)),
+                        )
+                    }) { Text("App info") }
+                    TextButton(onClick = { asked = null }) { Text("Not now") }
+                }
+            },
         )
     }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
