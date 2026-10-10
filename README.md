@@ -46,9 +46,9 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
 ## Status
 
 Running end to end on a Pixel 8 Pro (Android 16, 12GB RAM). On the same phone under GrapheneOS
-(Android 17) it gives the same answers, about 9% sooner
-([`notes/2026-10-09-grapheneos.md`](notes/2026-10-09-grapheneos.md)). Measured on that phone
-under Android 16:
+(Android 17) it gives the same answers, about 9% sooner, and from 1.7.1 its engine runs with
+memory tagging ([`notes/2026-10-09-grapheneos.md`](notes/2026-10-09-grapheneos.md)). Measured on
+that phone under Android 16:
 
 | | |
 |---|---|
