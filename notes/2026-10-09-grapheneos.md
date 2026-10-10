@@ -142,9 +142,26 @@ then logs `FORCIBLY_ENABLE_MEMORY_TAGGING` as the app starts. The stock-Android 
   untagged run started cooler (skin 31-34 °C, against about 35 °C with the engine tagged). The
   last five questions started at the same temperature and stayed within 2 s.
 
-The release engine is not marked, so on GrapheneOS today the switch tags the app process only.
-Marking the engine would tag it wherever MTE is on, at the cost above. On phones without MTE the
-mark does nothing.
+### Checked inside the app (2026-10-10, GrapheneOS 2026100601)
+
+Test builds had a stand-in engine. It writes its own tagging state to the app's log, then reads
+past a heap allocation:
+
+| Engine | Switch | App process | Engine | The bad read |
+|---|---|---|---|---|
+| Unmarked (as in 1.7.0) | On | tagged | not tagged | went unnoticed |
+| Marked | On | tagged | tagged, sync | stopped (`SEGV_MTESERR`) |
+| Marked | Default (off) | not tagged | tagged, sync | stopped (`SEGV_MTESERR`) |
+| Unmarked | Default (off) | not tagged | not tagged | went unnoticed |
+
+- **1.7.0:** the engine is not tagged on GrapheneOS, whatever the switch says.
+- **The marked engine:** tagged on every GrapheneOS install, with nothing to switch on.
+- **Next release:** `scripts/build-android-engine.sh` now marks it, and the next release ships it.
+  A build of main with the marked engine, switch at Default, answered three of the questions above
+  (ERC-4626, Ruyang dinosaurs, Lisbon restaurants) word for word as before. The crash log stayed
+  empty. It was faster, but the phone had cooled overnight, so the times don't compare.
+- **Other phones:** MTE is off on stock Pixels unless switched on in Developer options. There, and
+  on phones without MTE, the mark does nothing.
 
 ## Not tested here
 

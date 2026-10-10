@@ -52,11 +52,16 @@ CMAKE_DIR=$(ls -d "$ANDROID_HOME"/cmake/* | sort -V | tail -1)/bin
 HOST_TAG=$(ls "$NDK/toolchains/llvm/prebuilt" | head -1)
 echo "NDK: $NDK ($HOST_TAG) | ARM_ARCH: $ARM_ARCH"
 
+# The linker flags mark bmoe-cli for heap memory tagging (MTE), in sync mode. Tagging is reset
+# when a program starts, so GrapheneOS's per-app Memory tagging switch does not reach the engine
+# the app starts; a marked binary is tagged again (notes/2026-10-09-grapheneos.md). A link flag
+# only, no change to the code. Phones without MTE ignore the mark.
 "$CMAKE_DIR/cmake" -S "$ROOT" -B "$ROOT/$BUILD" -G Ninja \
   -DCMAKE_MAKE_PROGRAM="$CMAKE_DIR/ninja" \
   -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
   -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-$API \
   -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=memtag-heap -fsanitize-memtag-mode=sync" \
   -DBMOE_BUILD_TESTS=OFF -DGGML_NATIVE=OFF -DGGML_OPENCL=OFF -DGGML_OPENMP=OFF \
   -DGGML_CPU_ARM_ARCH="$ARM_ARCH" -DLLAMA_CURL=OFF
 "$CMAKE_DIR/cmake" --build "$ROOT/$BUILD" -j "${JOBS:-3}"
