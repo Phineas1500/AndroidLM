@@ -55,12 +55,49 @@ GROUPS = {
     "transport": ("train_station", "bus_station", "metro_station", "airport", "car_rental_service", "bike_rental",
                   "scooter_rental", "ferry_service"),
     "fitness": ("gym",),
+    # shops by kind and places to go for fun (build_places.py TRAVEL, second part)
+    "electronics": ("electronics_store", "mobile_phone_repair"),
+    "books": ("bookstore",),
+    "games": ("toys_and_games_store", "video_game_store"),
+    "outdoor": ("sporting_goods_store", "bike_repair_maintenance"),
+    "hardware": ("hardware_store",),
+    "clothes": ("clothing_store", "shoe_store", "department_store", "second_hand_store"),
+    "gifts": ("souvenir_store", "gift_shop"),
+    "flowers": ("florist",),
+    "jewelry": ("jewelry_store",),
+    "eyewear": ("eyewear_store",),
+    "luggage": ("luggage_store",),
+    "liquor": ("liquor_store",),
+    "tobacco": ("tobacco_shop", "smoke_and_vape_store"),
+    "music_shop": ("musical_instrument_store", "music_and_dvd_store", "vinyl_record_store"),
+    "pets": ("pet_store",),
+    "arcade": ("arcade",),
+    "bowling": ("bowling_alley",),
+    "escape_room": ("escape_room",),
+    "laser_tag": ("laser_tag",),
+    "karting": ("go_kart_track",),
+    "trampoline": ("trampoline_park",),
+    "skating": ("ice_skating_rink",),
+    "climbing": ("rock_climbing_spot", "rock_climbing_gym"),
+    "cinema": ("movie_theater",),
+    "casino": ("casino",),
+    "live_music": ("music_venue",),
+    "comedy": ("comedy_club",),
 }
 GROUP_LABEL = {"eat": "places to eat", "cafe": "cafes", "drink": "places to drink", "sweet": "bakeries and sweet shops",
                "stay": "places to stay", "pharmacy": "pharmacies", "health": "hospitals and clinics",
                "money": "ATMs, banks and money changers", "phone": "phone shops", "shop": "shops and markets",
                "laundry": "laundries", "coworking": "coworking spaces", "post": "post offices", "police": "police stations",
-               "embassy": "embassies", "sights": "sights", "transport": "stations and transport", "fitness": "gyms"}
+               "embassy": "embassies", "sights": "sights", "transport": "stations and transport", "fitness": "gyms",
+               "electronics": "electronics and phone repair shops", "books": "bookshops",
+               "games": "video game and toy shops", "outdoor": "sports, outdoor and bike shops",
+               "hardware": "hardware stores", "clothes": "clothes and shoe shops", "gifts": "souvenir and gift shops",
+               "flowers": "florists", "jewelry": "jewellers", "eyewear": "opticians", "luggage": "luggage shops",
+               "liquor": "liquor stores", "tobacco": "tobacco and vape shops", "music_shop": "music shops",
+               "pets": "pet shops", "arcade": "arcades", "bowling": "bowling alleys", "escape_room": "escape rooms",
+               "laser_tag": "laser tag venues", "karting": "go-kart tracks", "trampoline": "trampoline parks",
+               "skating": "ice rinks", "climbing": "climbing gyms and spots", "cinema": "cinemas",
+               "casino": "casinos", "live_music": "live music venues", "comedy": "comedy clubs"}
 # words -> group; a word ending in "s" also matches without it
 KIND_WORDS = [
     ("places to eat", "eat"), ("place to eat", "eat"), ("where to eat", "eat"), ("food", "eat"),
@@ -94,6 +131,58 @@ KIND_WORDS = [
     ("subway station", "transport"), ("airport", "transport"), ("car rental", "transport"), ("rent a car", "transport"),
     ("bike rental", "transport"), ("rent a bike", "transport"), ("scooter rental", "transport"), ("ferry", "transport"),
     ("gym", "fitness"),
+    # shops by kind (at the same place the longer phrase wins: "wine shop" is not a bar, "camping
+    # gear" not a campsite, "pet food" not a restaurant)
+    ("electronics", "electronics"), ("electronic shop", "electronics"), ("electronics store", "electronics"),
+    ("computer shop", "electronics"), ("computer store", "electronics"), ("laptop", "electronics"),
+    ("camera shop", "electronics"), ("camera store", "electronics"), ("phone repair", "electronics"),
+    ("mobile phone repair", "electronics"), ("repair my phone", "electronics"), ("fix my phone", "electronics"),
+    ("charger", "electronics"),
+    ("bookshop", "books"), ("bookstore", "books"), ("book shop", "books"), ("book store", "books"),
+    ("bookseller", "books"), ("buy books", "books"), ("comic shop", "books"), ("comic book", "books"), ("comics", "books"),
+    ("video game", "games"), ("game shop", "games"), ("game store", "games"), ("games shop", "games"),
+    ("games store", "games"), ("gaming shop", "games"), ("gaming store", "games"), ("board game", "games"),
+    ("toy", "games"), ("toyshop", "games"),
+    ("sporting goods", "outdoor"), ("sports shop", "outdoor"), ("sports store", "outdoor"), ("sport shop", "outdoor"),
+    ("outdoor gear", "outdoor"), ("outdoor shop", "outdoor"), ("outdoor store", "outdoor"), ("camping gear", "outdoor"),
+    ("camping shop", "outdoor"), ("camping store", "outdoor"), ("hiking gear", "outdoor"), ("hiking boots", "outdoor"),
+    ("climbing gear", "outdoor"), ("ski shop", "outdoor"), ("surf shop", "outdoor"), ("bike shop", "outdoor"),
+    ("bicycle shop", "outdoor"), ("bike store", "outdoor"), ("bicycle store", "outdoor"), ("bike repair", "outdoor"),
+    ("bicycle repair", "outdoor"), ("fix my bike", "outdoor"),
+    ("hardware store", "hardware"), ("hardware shop", "hardware"), ("diy store", "hardware"), ("tool shop", "hardware"),
+    ("home improvement store", "hardware"),
+    ("clothes", "clothes"), ("clothing", "clothes"), ("shoe", "clothes"), ("department store", "clothes"),
+    ("thrift store", "clothes"), ("thrift shop", "clothes"), ("second hand shop", "clothes"),
+    ("second-hand shop", "clothes"), ("second hand store", "clothes"), ("charity shop", "clothes"),
+    ("vintage shop", "clothes"), ("vintage clothes", "clothes"), ("boutique", "clothes"),
+    ("souvenir", "gifts"), ("gift shop", "gifts"), ("gift store", "gifts"), ("gifts", "gifts"),
+    ("florist", "flowers"), ("flower shop", "flowers"), ("buy flowers", "flowers"),
+    ("jewelry", "jewelry"), ("jewellery", "jewelry"), ("jeweler", "jewelry"), ("jeweller", "jewelry"),
+    ("optician", "eyewear"), ("optometrist", "eyewear"), ("eyeglasses", "eyewear"), ("glasses", "eyewear"),
+    ("sunglasses", "eyewear"), ("contact lenses", "eyewear"), ("eyewear", "eyewear"),
+    ("luggage", "luggage"), ("suitcase", "luggage"),
+    ("liquor store", "liquor"), ("liquor shop", "liquor"), ("liquor", "liquor"), ("bottle shop", "liquor"),
+    ("off licence", "liquor"), ("off-licence", "liquor"), ("off license", "liquor"), ("wine shop", "liquor"),
+    ("wine store", "liquor"), ("buy alcohol", "liquor"), ("buy wine", "liquor"), ("buy beer", "liquor"),
+    ("tobacco", "tobacco"), ("tobacconist", "tobacco"), ("cigarette", "tobacco"), ("cigar", "tobacco"),
+    ("vape", "tobacco"), ("smoke shop", "tobacco"),
+    ("music shop", "music_shop"), ("music store", "music_shop"), ("record store", "music_shop"),
+    ("record shop", "music_shop"), ("vinyl", "music_shop"), ("musical instrument", "music_shop"),
+    ("guitar shop", "music_shop"), ("instrument shop", "music_shop"),
+    ("pet shop", "pets"), ("pet store", "pets"), ("pet supplies", "pets"), ("pet food", "pets"),
+    ("dog food", "pets"), ("cat food", "pets"),
+    # places to go for fun ("shopping arcade" is a shop)
+    ("arcade", "arcade"), ("game arcade", "arcade"), ("amusement arcade", "arcade"), ("pinball", "arcade"),
+    ("shopping arcade", "shop"),
+    ("bowling", "bowling"), ("escape room", "escape_room"), ("escape game", "escape_room"),
+    ("laser tag", "laser_tag"), ("go kart", "karting"), ("go-kart", "karting"), ("karting", "karting"),
+    ("trampoline", "trampoline"), ("ice rink", "skating"), ("ice skating", "skating"), ("skating rink", "skating"),
+    ("climbing gym", "climbing"), ("climbing wall", "climbing"), ("bouldering", "climbing"),
+    ("rock climbing", "climbing"), ("climbing", "climbing"),
+    ("cinema", "cinema"), ("movie theater", "cinema"), ("movie theatre", "cinema"), ("watch a movie", "cinema"),
+    ("watch a film", "cinema"), ("casino", "casino"), ("live music", "live_music"), ("music venue", "live_music"),
+    ("concert venue", "live_music"), ("comedy club", "comedy"), ("stand-up comedy", "comedy"),
+    ("stand up comedy", "comedy"), ("comedy show", "comedy"),
 ]
 DIET_WORDS = [
     ("plant based", "vegan"), ("plant-based", "vegan"), ("vegan", "vegan"),
@@ -129,7 +218,32 @@ SUB_WORDS = {"hostel": "hostel", "bed and breakfast": "bed_and_breakfast", "b&b"
              "bus station": "bus_station", "metro station": "metro_station", "subway station": "metro_station",
              "airport": "airport", "car rental": "car_rental_service", "rent a car": "car_rental_service",
              "bike rental": "bike_rental", "rent a bike": "bike_rental", "scooter rental": "scooter_rental",
-             "ferry": "ferry_service"}
+             "ferry": "ferry_service",
+             "computer shop": "computer_store", "computer store": "computer_store", "laptop": "computer_store",
+             "camera shop": "camera_and_photography_store", "camera store": "camera_and_photography_store",
+             "phone repair": "mobile_phone_repair", "mobile phone repair": "mobile_phone_repair",
+             "repair my phone": "mobile_phone_repair", "fix my phone": "mobile_phone_repair",
+             "comic shop": "comic_books_store", "comic book": "comic_books_store", "comics": "comic_books_store",
+             "video game": "video_game_store", "game shop": "video_game_store", "game store": "video_game_store",
+             "games shop": "video_game_store", "games store": "video_game_store", "gaming shop": "video_game_store",
+             "gaming store": "video_game_store", "board game": "tabletop_games_store", "toy": "toy_store",
+             "toyshop": "toy_store",
+             "outdoor gear": "outdoor_store", "outdoor shop": "outdoor_store", "outdoor store": "outdoor_store",
+             "camping gear": "outdoor_store", "camping shop": "outdoor_store", "camping store": "outdoor_store",
+             "hiking gear": "outdoor_store", "hiking boots": "outdoor_store", "climbing gear": "outdoor_store",
+             "bike shop": "bike_store", "bicycle shop": "bike_store", "bike store": "bike_store",
+             "bicycle store": "bike_store", "bike repair": "bike_repair_maintenance",
+             "bicycle repair": "bike_repair_maintenance", "fix my bike": "bike_repair_maintenance",
+             "shoe": "shoe_store", "department store": "department_store", "thrift store": "second_hand_store",
+             "thrift shop": "second_hand_store", "second hand shop": "second_hand_store",
+             "second-hand shop": "second_hand_store", "second hand store": "second_hand_store",
+             "charity shop": "second_hand_store", "vintage shop": "second_hand_store",
+             "vintage clothes": "second_hand_store",
+             "souvenir": "souvenir_store", "gift shop": "gift_shop", "gift store": "gift_shop", "gifts": "gift_shop",
+             "vape": "smoke_and_vape_store", "smoke shop": "smoke_and_vape_store",
+             "musical instrument": "musical_instrument_store", "guitar shop": "musical_instrument_store",
+             "instrument shop": "musical_instrument_store",
+             "climbing gym": "rock_climbing_gym", "climbing wall": "rock_climbing_gym", "bouldering": "rock_climbing_gym"}
 RECOMMEND = re.compile(r"\b(best|good|great|top|recommend\w*|suggest\w*|where|find|any|list|options?|"
                        r"places?|spots?|cheap|affordable|nice|popular|famous|must|should i|can i|could i|"
                        r"favou?rite|near|nearby)\b")
@@ -146,7 +260,10 @@ PLACE_NOUNS = re.compile(r"\b(restaurants?|cafes?|caf\u00e9s?|coffee shops?|bars
                          r"eatery|eateries|guest ?houses?|bistros?|brewery|breweries|pharmacy|pharmacies|chemists?|"
                          r"hospitals?|clinics?|dentists?|atms?|banks?|supermarkets?|groceries|grocery stores?|"
                          r"museums?|galleries|gallery|beaches|beach|parks?|gyms?|laundromats?|laundry|coworking|"
-                         r"embassy|embassies|markets?|malls?)\b")
+                         r"embassy|embassies|markets?|malls?|shops?|stores?|bookshops?|bookstores?|opticians?|florists?|"
+                         r"jewell?ers?|tobacconists?|arcades?|casinos?|cinemas?|venues?|bowling alleys?|escape rooms?|"
+                         r"ice rinks?|ice skating|climbing gyms?|bouldering|go[- ]?karts?|go[- ]?karting|karting|"
+                         r"trampoline parks?|bowling|laser tag|live music|comedy|clubs?)\b")
 # a question about opening hours late in the day
 LATE = re.compile(r"\b(open late|late at night|late night|late-night|24 hours|24/7|all night|open now|tonight|after midnight|at night)\b")
 HOURS = re.compile(r"\b(open|opening|hours|clos(e|es|ed|ing)|late|tonight|now|today|tomorrow|morning|breakfast|"
@@ -786,9 +903,18 @@ class Lookup:
     city: City = None
 
 
+def covers(db, ask):
+    """Some category in [db] belongs to what [ask] asks for: a places.db from before 1.8 has no shops
+    by kind or places to go for fun, and such a question goes to Wikipedia (Places.kt `parse`)."""
+    return any(in_group(ask, path) for name, path in _kinds(db).values())
+
+
 def lookup(db, ask, here=None):
     """The places for [ask]: around the city it names, or around [here] (lat, lon) for "near me".
-    None when the question names no city this database knows, or asks "near me" without [here]."""
+    None when the question names no city this database knows, asks "near me" without [here], or
+    asks for a kind of place [db] does not have."""
+    if not covers(db, ask):
+        return None
     if ask.here:
         if here is None:
             return None

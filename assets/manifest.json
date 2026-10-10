@@ -42,9 +42,9 @@
     {
       "name": "places.db",
       "role": "places",
-      "bytes": 2900869120,
-      "sha256": "0323f51cb99b7b7bf9288a3558371978178f88b2f2afb372b66b6c6f469746d7",
-      "url": "https://huggingface.co/datasets/rammingaway/androidlm-places/resolve/main/places.db",
+      "bytes": 3480481792,
+      "sha256": "79037d79a6c5626cad83d3723a6350d04b3b2c3677a6a63795efc425cd1ee4b6",
+      "url": "https://huggingface.co/datasets/rammingaway/androidlm-places/resolve/main/v2/places.db",
       "device_path": "corpus/places.db",
       "license": "ODbL 1.0 (OpenStreetMap contributors; Overture Maps Foundation places, CDLA-Permissive-2.0; GeoNames, CC BY 4.0)"
     },

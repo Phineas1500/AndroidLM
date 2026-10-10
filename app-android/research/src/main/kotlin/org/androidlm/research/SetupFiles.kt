@@ -68,10 +68,10 @@ object SetupFiles {
             "corpus", "Wikivoyage travel guide",
         ),
         SetupFile(
-            "places.db", "places", 2_900_869_120L,
-            "0323f51cb99b7b7bf9288a3558371978178f88b2f2afb372b66b6c6f469746d7",
-            "https://huggingface.co/datasets/rammingaway/androidlm-places/resolve/main/places.db",
-            "corpus", "Places to eat, drink and stay",
+            "places.db", "places", 3_480_481_792L,
+            "79037d79a6c5626cad83d3723a6350d04b3b2c3677a6a63795efc425cd1ee4b6",
+            "https://huggingface.co/datasets/rammingaway/androidlm-places/resolve/main/v2/places.db",
+            "corpus", "Places to eat, stay, shop and go out",
         ),
         // the optional second model, in two parts that must sit side by side; the second is its
         // n-gram table, the same file in every published build of this model

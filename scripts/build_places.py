@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build places.db: where to eat, drink and stay, worldwide, for questions like "the best vegan
-restaurants in Lisbon" (which Wikipedia cannot answer and Wikivoyage covers only thinly).
+restaurants in Lisbon" (which Wikipedia cannot answer and Wikivoyage covers only thinly), and
+what else a traveller looks for: pharmacies, ATMs, stations, shops by kind, places to go for fun.
 
 Sources, merged into one SQLite file the app opens read-only:
 
@@ -90,6 +91,20 @@ TRAVEL = ("pharmacy_and_drug_store", "hospital", "emergency_or_urgent_care_facil
           "religious_landmark", "botanical_garden", "park", "national_park", "beach", "public_plaza", "hiking_trail",
           "gym", "train_station", "bus_station", "metro_station", "airport", "car_rental_service", "bike_rental",
           "scooter_rental", "ferry_service")
+# shops a traveller asks for by kind ("video game shops in Santiago") and places to go for fun
+# ("arcades in Paraguay"), at MIN_CONF_OTHER too: 4.1M places, about 0.6 GB (Overture 2026-09-23.1).
+# They are kept apart from the places above wherever the build compares places with each other
+# (OSM matches, duplicates, travel-guide listings, how common a name is), so adding them changes
+# nothing about those.
+MORE = ("electronics_store", "camera_and_photography_store", "mobile_phone_repair", "bookstore",
+        "toys_and_games_store", "video_game_store", "sporting_goods_store", "bike_repair_maintenance",
+        "hardware_store", "clothing_store", "shoe_store", "department_store", "second_hand_store",
+        "souvenir_store", "gift_shop", "florist", "jewelry_store", "eyewear_store", "luggage_store",
+        "liquor_store", "tobacco_shop", "smoke_and_vape_store", "musical_instrument_store",
+        "music_and_dvd_store", "vinyl_record_store", "pet_store",
+        "arcade", "bowling_alley", "escape_room", "laser_tag", "go_kart_track", "trampoline_park",
+        "ice_skating_rink", "rock_climbing_spot", "rock_climbing_gym", "movie_theater", "casino",
+        "music_venue", "comedy_club")
 MIN_CONF = 0.3
 MIN_CONF_OTHER = 0.5
 MATCH_M = 120  # OSM place to Overture place
@@ -136,10 +151,13 @@ def load_overture(con, pattern, bbox):
                taxonomy.alternates as alts, confidence as conf, operating_status as status,
                addresses[1].freeform as street, addresses[1].locality as locality,
                addresses[1].country as country, websites[1] as website, phones[1] as phone,
-               brand.names.primary as brand
+               brand.names.primary as brand,
+               -- kept only for MORE
+               not ((taxonomy.hierarchy[1] in {TOP} and confidence >= {MIN_CONF})
+                    or (list_has_any(taxonomy.hierarchy, {list(TRAVEL)}) and confidence >= {MIN_CONF_OTHER})) as more
         from read_parquet('{pattern}')
         where ((taxonomy.hierarchy[1] in {TOP} and confidence >= {MIN_CONF})
-               or (list_has_any(taxonomy.hierarchy, {list(TRAVEL)}) and confidence >= {MIN_CONF_OTHER}))
+               or (list_has_any(taxonomy.hierarchy, {list(TRAVEL + MORE)}) and confidence >= {MIN_CONF_OTHER}))
           and coalesce(operating_status, '') <> 'permanently_closed'
           and names.primary is not null and length(trim(names.primary)) > 1 {where}""")
     log("overture:", con.execute("select count(*) from ov").fetchone()[0], "places")
@@ -229,7 +247,7 @@ def match_osm(con):
     g = 500  # 0.002 degree grid for the join
     con.execute(f"""
         create or replace table ovn as select oid, lat, lon, {sql_norm('name')} as n,
-            cast(floor(lat * {g}) as integer) as gy, cast(floor(lon * {g}) as integer) as gx from ov""")
+            cast(floor(lat * {g}) as integer) as gy, cast(floor(lon * {g}) as integer) as gx from ov where not more""")
     con.execute(f"""
         create or replace table osmn as select osm_id, lat, lon, {sql_norm('name')} as n,
             cast(floor(lat * {g}) as integer) as gy, cast(floor(lon * {g}) as integer) as gx from osm""")
@@ -380,7 +398,7 @@ def match_guide(con, voyage_path, names, cities_by_id, region_keys, bbox):
         create or replace table pln as
         select pid, lat, lon, n, nf, street, top, left(n, 3) as p3,
                cast(floor(lat * {g}) as integer) as gy, cast(floor(lon * {g}) as integer) as gx
-        from (select pid, lat, lon, {sql_norm('name')} as n, {sql_full('name')} as nf, street, top from merged) where n <> ''""")
+        from (select pid, lat, lon, {sql_norm('name')} as n, {sql_full('name')} as nf, street, top from merged where not more) where n <> ''""")
     # each listing in every grid cell its city's radius reaches; a place is a candidate when it is
     # in one of them and its name starts with the same three letters (fuzzy matches included)
     con.execute("""
@@ -462,7 +480,7 @@ def main():
         return f"{path}:{os.path.getsize(path)}:{int(os.path.getmtime(path))}" if path and os.path.exists(path) else str(path)
 
     pattern = os.path.join(a.overture, "*.parquet")
-    cached("ov", f"{pattern}:{bbox}:{TOP}:{TRAVEL}:{MIN_CONF}:{MIN_CONF_OTHER}:{len(glob.glob(pattern))}",
+    cached("ov", f"{pattern}:{bbox}:{TOP}:{TRAVEL}:{MORE}:more:{MIN_CONF}:{MIN_CONF_OTHER}:{len(glob.glob(pattern))}",
            lambda: load_overture(con, pattern, bbox))
     known = {r[0] for r in con.execute("select distinct cat from ov where cat is not null").fetchall()}
     cached("osm", f"{stamp(a.osm)}:{bbox}:{UTIL_AMENITY}:{FOOD_AMENITY}:{FOOD_SHOP}", lambda: load_osm(con, a.osm, bbox, known))
@@ -479,11 +497,11 @@ def main():
                    {SRC_OVERTURE} | (case when o.osm_id is null then 0 else {SRC_OSM} end) as src,
                    cast(round(v.conf * 100) as integer) as conf, (v.brand is not null)::int as chain,
                    coalesce(v.street, o.street) as street, v.locality, coalesce(v.phone, o.phone) as phone,
-                   coalesce(v.website, o.website) as website, o.hours, o.cuisine
+                   coalesce(v.website, o.website) as website, o.hours, o.cuisine, v.more
             from ov v left join pairs p on p.oid = v.oid left join osm o on o.osm_id = p.osm_id
             union all
             select o.lat, o.lon, o.name, o.kind, coalesce(k.top, 'food_and_drink'), null, o.diet, {SRC_OSM}, 60, 0, o.street, o.locality,
-                   o.phone, o.website, o.hours, o.cuisine
+                   o.phone, o.website, o.hours, o.cuisine, false
             from osm o anti join pairs p on p.osm_id = o.osm_id
             left join (select cat, any_value(hier[1]) as top from ov group by cat) k on k.cat = o.kind
         )""")
@@ -497,17 +515,17 @@ def main():
                    cast(round(lat * 300) as bigint) as gy, cast(round(lon * 300) as bigint) as gx
             from merged
         ), r as (
-            select *, row_number() over (partition by nk, gy, gx, top order by conf desc, pid) as rn,
+            select *, row_number() over (partition by nk, gy, gx, top, more order by conf desc, pid) as rn,
                    bit_or(src) over w as src_all, bit_or(diet) over w as diet_all,
                    max(hours) over w as hours_any, max(cuisine) over w as cuisine_any, max(website) over w as web_any,
                    max(phone) over w as phone_any, max(street) over w as street_any
             from g
-            window w as (partition by nk, gy, gx, top)
+            window w as (partition by nk, gy, gx, top, more)
         )
         select pid, lat, lon, name, cat, top, alt, diet_all as diet, src_all as src, conf, chain,
                coalesce(street, street_any) as street, locality, coalesce(phone, phone_any) as phone,
                coalesce(website, web_any) as website, coalesce(hours, hours_any) as hours,
-               coalesce(cuisine, cuisine_any) as cuisine
+               coalesce(cuisine, cuisine_any) as cuisine, more
         from r where rn = 1""")
     log("merged, duplicates folded:", con.execute("select count(*) from merged").fetchone()[0], "places")
     # A lone branch called vegan: when a business has three or more places to eat and fewer than a
@@ -711,14 +729,18 @@ def match_fame(con, wiki_path, big_city_names):
     con.execute(f"""
         create or replace table fame_cand as
         with names as (
-            select pid, lower(trim(name)) as n, chain from merged
+            select pid, lower(trim(name)) as n, chain, more from merged
         ), counts as (
             -- in how many places around the world (0.1-degree cells) the name is found: Overture has
-            -- several records of the Louvre, all in one place; a chain is in many
-            select n, count(distinct cast(floor(lat * 10) as bigint) * 4000 + cast(floor(lon * 10) as bigint)) as c
-            from (select lower(trim(name)) as n, lat, lon from merged) group by n
+            -- several records of the Louvre, all in one place; a chain is in many. For the places of
+            -- the earlier categories, among those only (MORE changes nothing about them)
+            select n, more_only, count(distinct cast(floor(lat * 10) as bigint) * 4000 + cast(floor(lon * 10) as bigint)) as c
+            from (select lower(trim(name)) as n, lat, lon, more from merged),
+                 (select unnest([false, true]) as more_only)
+            where more_only or not more
+            group by n, more_only
         ), cand as (
-            select m.pid, m.n, c.c from names m join counts c using (n)
+            select m.pid, m.n, c.c from names m join counts c on c.n = m.n and c.more_only = m.more
             where m.chain = 0 and c.c <= 5 and m.n not in (select n from big_city)
         ), plain as (
             -- the name is the article's title, a proper name of two words or more, or a redirect

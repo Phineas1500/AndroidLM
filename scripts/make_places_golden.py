@@ -75,6 +75,25 @@ QUESTIONS = [
     "Where can I exchange money in Buenos Aires?",
     "Which vegan restaurants in Buenos Aires are open on Sunday?",
     "Best vegan restaurants in Buenos Aires, and how much should I tip?",
+    # shops by kind and places to go for fun
+    "Video game shops in London",
+    "Where are the arcades in Buenos Aires?",
+    "Best bookshops in London",
+    "Where can I buy wine in Buenos Aires?",
+    "Best wine bars in Buenos Aires",
+    "camping gear shop in Buenos Aires",
+    "bike repair in London",
+    "phone repair in Buenos Aires",
+    "second hand shops in London",
+    "Where to buy souvenirs in Buenos Aires",
+    "escape rooms in London",
+    "Cinemas in Buenos Aires",
+    "Comedy clubs in London",
+    "Bowling in London",
+    "shopping arcade in London",
+    "toy shops in Buenos Aires",
+    "Is it safe to go climbing in Patagonia?",
+    "Who invented the arcade game Pong?",
 ]
 HERE = (-34.6, -58.4)
 # starts of Wikipedia articles as wiki.db has them (infobox facts, then "# Title")

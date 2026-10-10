@@ -18,9 +18,11 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
   articles in full, a BM25 full-text index, Wikipedia's redirect table, and monthly pageviews
   per article, plus a 2.3MB file of the index's word counts that keeps the search off the
   critical path. Optional Wikivoyage (0.3GB) for travel questions.
-- **Places:** 21.1 million places worldwide in one 2.9GB SQLite file: where to eat, drink and
-  stay, and what a traveller needs (pharmacies, ATMs and money changers, hospitals, supermarkets,
-  stations, sights). Overture Maps places merged with OpenStreetMap's diet tags and opening hours,
+- **Places:** 25.3 million places worldwide in one 3.5GB SQLite file: where to eat, drink and
+  stay, what a traveller needs (pharmacies, ATMs and money changers, hospitals, supermarkets,
+  stations, sights), shops by kind (electronics and phone repair, books, video games and toys,
+  outdoor gear and bikes, clothes, souvenirs, liquor...) and places to go out (arcades, cinemas,
+  bowling, escape rooms, climbing gyms, live music, comedy). Overture Maps places merged with OpenStreetMap's diet tags and opening hours,
   GeoNames cities, the Wikivoyage listings matched to them, and how widely read each place's
   Wikipedia article is. A question like "the best vegan restaurants in Lisbon" or "a pharmacy near
   me" (GPS, no network) gets a ranked list of real places in about 0.1 s, then the model's
@@ -52,7 +54,7 @@ that phone under Android 16:
 
 | | |
 |---|---|
-| Storage | 45.6GB (model 12.3GB, Wikipedia 30.1GB, places 2.9GB, Wikivoyage 0.3GB) plus the 69MB APK, which carries the 19MB Ethereum and cryptography library |
+| Storage | 46.2GB (model 12.3GB, Wikipedia 30.1GB, places 3.5GB, Wikivoyage 0.3GB) plus the 69MB APK, which carries the 19MB Ethereum and cryptography library |
 | Memory during a research question | about 7.9GB (engine 5.8GB including a 5GB expert cache, pinned dense weights 2.0GB, app 0.15GB); about 4GB with the 8 GB phone preset, at about half the speed ([`notes/2026-10-08-memory-presets.md`](notes/2026-10-08-memory-presets.md)) |
 | Generation speed | 4-6 tokens/s in the app (lower when the phone is hot) |
 | Prompt reading | 32-36 tokens/s in the app from a cool start, lower when hot (a 1,000-token source prompt in about 31 s, against 37 s on 1.3.0: [`notes/2026-10-02-dense-prompts.md`](notes/2026-10-02-dense-prompts.md)) |

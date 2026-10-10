@@ -17,7 +17,7 @@ The files reach the phone by one of these routes:
 ## What you need
 
 - An Android phone with 8GB of RAM or more (12GB recommended), arm64, Android 10 or newer, and
-  about 39GB free (about 59GB while the files are imported on the phone alone). Developed for a
+  about 47GB free (about 77GB while the files are imported on the phone alone). Developed for a
   Pixel 8 Pro; nothing here needs Google Play Services. See [Memory](#memory) for what the app
   takes on each size of phone.
 - From a computer: a computer with about 47GB free, `adb` (Android platform-tools), `curl` and
@@ -30,7 +30,7 @@ The files reach the phone by one of these routes:
 | `wiki.db` | 30.1GB | English Wikipedia: text, search index, redirects, pageviews (CC BY-SA 4.0) |
 | `wiki_df.db` | 2.3MB | Word counts for `wiki.db`'s index, so a search does not have to read them from it; optional (same results without it, slower) |
 | `voyage.db` | 0.3GB | English Wikivoyage travel guides, optional (CC BY-SA 4.0) |
-| `places.db` | 2.9GB | 21.1 million places worldwide (to eat, drink and stay, and pharmacies, ATMs, hospitals, supermarkets, stations...), for questions like "vegan restaurants in Lisbon" or "a pharmacy near me"; optional (ODbL: © OpenStreetMap contributors, Overture Maps Foundation, GeoNames) |
+| `places.db` | 3.5GB | 25.3 million places worldwide (to eat, drink and stay; pharmacies, ATMs, hospitals, supermarkets, stations; shops by kind; arcades, cinemas and other places to go out), for questions like "vegan restaurants in Lisbon", "a pharmacy near me" or "video game shops in Santiago"; optional (ODbL: © OpenStreetMap contributors, Overture Maps Foundation, GeoNames) |
 
 ## Steps
 
@@ -93,7 +93,7 @@ access.
    - The app recognises each file and checks its size and SHA-256 as it copies it into its own
      storage. A damaged or unfinished download is refused, and the card says which.
    - With **Delete each download once it is copied** ticked (the default), each download is
-     deleted once its copy is checked. The phone needs about 76GB free in all: the downloads, plus
+     deleted once its copy is checked. The phone needs about 77GB free in all: the downloads, plus
      room for the largest copy while it is written. Afterwards the files take 46GB.
    - All five took 4 minutes on a Pixel 8 Pro. The copy goes on with the screen off; a
      notification shows its progress.
