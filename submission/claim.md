@@ -39,8 +39,8 @@ Play Services.
 - Research, not recall:
   - The model names the articles it needs.
   - Obscure subjects are answered from the retrieved passages, with citations.
-  - Well-known subjects get an answer first, then a cited source check that corrects it where
-    the sources disagree.
+  - Well-known subjects get an answer first, then a source check: up to three facts from the
+    sources, with citations, that the answer leaves out or states differently.
   - "The best vegan restaurants in Lisbon" gets a ranked list of real places in 0.1 s, then six to
     eight recommendations from it, with their streets and hours.
 - Against the bounty's bar:
