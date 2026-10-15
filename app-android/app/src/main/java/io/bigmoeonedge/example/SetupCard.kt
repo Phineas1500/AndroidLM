@@ -27,10 +27,11 @@ import org.androidlm.research.SetupFiles
 
 /**
  * Shown while a file is missing (open when a required one is), and while an import runs or has
- * something to report. [onImported] re-scans the models and the corpus when an import ends.
+ * something to report. [onImported] re-scans the models and the corpus when an import ends. With
+ * [essentialOnly] (a new chat), the optional larger model alone does not show it.
  */
 @Composable
-fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
+fun SetupCard(scanning: Boolean, onImported: () -> Unit, essentialOnly: Boolean = false) {
     val context = LocalContext.current
     val progress by SetupBus.state.collectAsStateWithLifecycle()
     var status by remember { mutableStateOf<List<SetupStatus>?>(null) }
@@ -55,7 +56,7 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit) {
     val todo = missing + updates
     val extraMissing = extras.filter { it.found == null }
     val report = progress.running || progress.done.isNotEmpty() || progress.errors.isNotEmpty()
-    if (todo.isEmpty() && extraMissing.isEmpty() && !report) return
+    if (todo.isEmpty() && (extraMissing.isEmpty() || essentialOnly) && !report) return
 
     var open by rememberSaveable { mutableStateOf<Boolean?>(null) }
     val isOpen = open ?: (missing.any { it.file.required } || report)

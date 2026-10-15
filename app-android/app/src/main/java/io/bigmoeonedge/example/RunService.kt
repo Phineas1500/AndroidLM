@@ -866,6 +866,7 @@ class RunService : Service() {
                 researchHistory = if (preview == null) withFinished(it) else it.researchHistory,
                 transcript = emptyList(), answer = "", reasoning = "", summary = "", error = null)
         }
+        saveChat()
         val job = scope.launch(start = CoroutineStart.LAZY) {
             try {
                 val files = withContext(Dispatchers.IO) { CorpusLocator.find(this@RunService) }
@@ -878,6 +879,7 @@ class RunService : Service() {
                 pipeline.run(question, researchListener(runId), previousExchange())
             } catch (e: CancellationException) {
                 publishResearch(runId) { if (it.running) it.copy(phase = ResearchPhase.CANCELLED) else it }
+                saveChat()
                 throw e
             } catch (t: Throwable) {
                 val msg = t.message ?: t.toString()
@@ -889,6 +891,7 @@ class RunService : Service() {
                     else it.copy(research = r.copy(phase = ResearchPhase.FAILED, error = msg),
                         error = it.error ?: "Research failed: $msg")
                 }
+                saveChat()
             } finally {
                 onResearchEnded(coroutineContext.job)
             }
@@ -915,23 +918,30 @@ class RunService : Service() {
         }
     }
 
-    /** The history with the finished run on screen added (it is about to be replaced). */
+    /**
+     * The chat's turns with the finished run on screen added (it is about to be replaced). A run
+     * stopped or failed before its answer stays in the chat too, as it does on screen.
+     */
     private fun withFinished(ui: UiState): List<ResearchUi> {
         val r = ui.research ?: return ui.researchHistory
-        if (r.running || r.answer.isEmpty()) return ui.researchHistory
+        if (r.running) return ui.researchHistory
         return (ui.researchHistory + r).takeLast(HISTORY_MAX)
     }
 
     /**
-     * The last answered question, when it was answered within [FOLLOW_UP_MS]: a follow-up to it
-     * ("what about Porto?") is rewritten to stand on its own. "Clear the answer" clears it.
+     * The chat's last answered question: a follow-up to it ("what about Porto?") is rewritten to
+     * stand on its own. A new chat has none.
      */
     private fun previousExchange(): Exchange? {
-        val ui = RunBus.state.value
-        val last = ui.researchHistory.lastOrNull() ?: return null
-        val at = last.finishedAt ?: return null
-        if (SystemClock.elapsedRealtime() - at > FOLLOW_UP_MS || last.answer.isEmpty()) return null
+        val last = RunBus.state.value.researchHistory.lastOrNull { it.answer.isNotEmpty() } ?: return null
         return Exchange(last.askedAs ?: last.translatedAs ?: last.question, last.answer)
+    }
+
+    /** Saves the open chat (its turns so far, the one on screen included) to the phone. */
+    private fun saveChat() {
+        val ui = RunBus.state.value
+        val id = ui.chatId ?: return
+        ChatStore.save(this, id, ui.researchHistory + listOfNotNull(ui.research))
     }
 
     private fun publishResearch(runId: Int, block: (ResearchUi) -> ResearchUi) = RunBus.update {
@@ -982,6 +992,7 @@ class RunService : Service() {
                     it.copy(phase = e.phase, check = if (e.phase == ResearchPhase.CHECKING) "" else it.check,
                         finishedAt = if (e.phase == ResearchPhase.DONE) SystemClock.elapsedRealtime() else it.finishedAt)
                 }
+                if (e.phase == ResearchPhase.DONE) saveChat()
                 researchNotice(e.phase)?.let { text -> main.post { notify(text) } }
             }
             is ResearchEvent.Planned -> publishResearch(runId) { it.copy(titles = e.titles) }
@@ -991,7 +1002,7 @@ class RunService : Service() {
             is ResearchEvent.Translated -> publishResearch(runId) { it.copy(translatedAs = e.question) }
             is ResearchEvent.Rewritten -> publishResearch(runId) { it.copy(askedAs = e.question) }
             is ResearchEvent.AnswerToken -> if (textFrameDue()) telemetry.current.text.let { text -> publishResearch(runId) { it.copy(answer = text) } }
-            is ResearchEvent.AnswerCompleted -> publishResearch(runId) { it.copy(answer = e.text) }
+            is ResearchEvent.AnswerCompleted -> { publishResearch(runId) { it.copy(answer = e.text) }; saveChat() }
             is ResearchEvent.CheckToken -> if (textFrameDue()) telemetry.current.text.let { text -> publishResearch(runId) { it.copy(check = text) } }
             is ResearchEvent.CheckCompleted -> publishResearch(runId) { it.copy(check = e.text) }
             is ResearchEvent.PhaseCompleted -> publishResearch(runId) { it.copy(timings = it.timings + e.timing) }
@@ -1196,8 +1207,7 @@ class RunService : Service() {
         // about 30 s, so it stays loaded for half an hour after the last one.
         private const val IDLE_UNLOAD_MS = 30 * 60 * 1000L
         /** A question within this long of the last answer may be a follow-up to it. */
-        private const val FOLLOW_UP_MS = 30 * 60 * 1000L
-        private const val HISTORY_MAX = 20
+        private const val HISTORY_MAX = 200
 
         // How long a session gets to honour `close` and tear down cleanly before it is killed.
         private const val FORCE_KILL_MS = 1500L

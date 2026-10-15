@@ -1,6 +1,7 @@
 package io.bigmoeonedge.example
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -22,8 +25,8 @@ import org.androidlm.research.android.CorpusFiles
 import java.util.Locale
 
 /*
- * AndroidLM research mode, main-screen pieces: the toggle by the prompt box and the view of one
- * run (phase, planned articles, route, answer, source check, sources). State comes from
+ * AndroidLM research mode, chat pieces: the Research switch, and one turn of a chat (the question
+ * as a bubble; the answer with its places, source check, sources and how it was answered). State comes from
  * UiState.research, which RunService fills from the pipeline's events.
  */
 
@@ -66,69 +69,50 @@ fun ResearchToggle(
 private const val RESEARCH_MIN_CTX = 4096
 
 /**
- * One research run, streaming or finished: the question as a title, how it was answered (planned
- * articles and route), the sources, the answer and its source check, and while it runs a status
- * line at the bottom, where the screen follows the newest text. Citations like [1] open the passage.
+ * The question of one turn, as the user's chat bubble on the right.
  */
 @Composable
-fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: Telemetry, generating: Boolean) {
-    var openSource by remember(r.runId) { mutableStateOf<ResearchSource?>(null) }
+fun UserBubble(text: String) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
+        Surface(
+            color = MaterialTheme.colorScheme.primaryContainer,
+            shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp, bottomStart = 18.dp, bottomEnd = 4.dp),
+            modifier = Modifier.widthIn(max = 320.dp),
+        ) {
+            SelectionContainer {
+                Text(text, fontSize = 16.sp, color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp))
+            }
+        }
+    }
+}
+
+/**
+ * The answer of one turn, streaming or finished, as a chat message: how the question was read (a
+ * follow-up or a translation), the places found, the answer, its source check, and while it runs a
+ * status line at the bottom, where the screen follows the newest text. Under a finished answer,
+ * Copy and the details: how it was answered, the sources and the timings. Citations like [1] open
+ * the passage. [key] identifies the turn in its chat, for what stays open across scrolling.
+ */
+@Composable
+fun AssistantTurn(r: ResearchUi, key: String, loading: Boolean, prefill: Prefill?, telemetry: Telemetry, generating: Boolean) {
+    var openSource by remember(key) { mutableStateOf<ResearchSource?>(null) }
+    var details by rememberSaveable(key) { mutableStateOf(false) }
     val cite: (Int) -> Unit = { n -> r.sources?.firstOrNull { it.number == n }?.let { openSource = it } }
+    val places = r.route?.route == Route.PLACES
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        HorizontalDivider()
-        SelectionContainer { Text(r.question, fontSize = 18.sp, fontWeight = FontWeight.SemiBold) }
+        if (r.askedAs != null) Hint("Understood as: " + r.askedAs)
         if (r.translatedAs != null) Hint("Searched for in English as: " + r.translatedAs)
-        if (r.askedAs != null) Hint("Read with the previous answer as: " + r.askedAs)
 
-        if (r.titles != null || r.route != null) {
-            Labeled("How it was answered") {
-                if (r.route != null) Text(routeText(r), fontSize = 13.sp)
-                if (r.titles != null && r.route?.route != Route.PLACES) {
-                    Text(
-                        if (r.titles.isEmpty()) "No Wikipedia article was planned."
-                        else "Articles looked up: " + r.titles.joinToString(" · "),
-                        fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-        }
-
-        if (r.sources != null && r.route?.route == Route.PLACES) {
-            if (r.sources.isNotEmpty()) {
-                Labeled("Places (${r.sources.size}" + (if (r.sourcesDropped > 0) " of ${r.sources.size + r.sourcesDropped}" else "") + ") · tap one for details") {
-                    r.sources.forEach { s -> key(r.runId, s.number) { PlaceRow(s) } }
-                    Hint(PLACES_CREDIT)
-                }
-            }
-        } else if (r.sources != null) {
-            Labeled(if (r.sources.isEmpty()) "Sources" else "Sources (${r.sources.size}) · tap one to read it") {
-                if (r.sources.isEmpty()) {
-                    Hint(
-                        if (r.route?.route == Route.ANSWER_FIRST) "Nothing relevant in the offline Wikipedia, so the answer was not checked."
-                        else "Nothing relevant in the offline Wikipedia: answered from the model's own knowledge."
-                    )
-                }
-                // keyed by run and number, so an expanded passage never carries over to another run
-                r.sources.forEach { s -> key(r.runId, s.number) { SourceRow(s) } }
-                if (r.sourcesDropped > 0) Hint("${r.sourcesDropped} more passages were found but did not fit.")
-            }
-        }
+        if (places && !r.sources.isNullOrEmpty()) PlacesList(r, key)
 
         if (r.answer.isNotEmpty()) {
-            Labeled(
-                when (r.route?.route) {
-                    Route.ANSWER_FIRST -> "Answer, from the model's own knowledge"
-                    Route.PLACES -> if (r.sources.isNullOrEmpty()) "Answer" else "Recommendations, from the list"
-                    else -> "Answer, from the sources"
-                }
-            ) {
-                SelectionContainer { MarkdownText(r.answer, onCitation = cite) }
-            }
+            SelectionContainer { MarkdownText(r.answer, fontSize = 16.sp, onCitation = cite) }
             // the answer is complete while its source check still reads: say so, and that a new
             // question may be asked now
             if (r.checking) answeredMs(r)?.let { ms ->
-                Hint("Answered in " + duration(ms) + ". The source check below is still running; a new question stops it.")
+                Hint("Answered in " + duration(ms) + ". Checking it against the sources; a new question stops this.")
             }
         }
         if (r.check != null && (r.check.isNotEmpty() || r.running)) {
@@ -153,12 +137,49 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
         }
 
         if (r.running) StatusLine(r, loading, prefill, telemetry, generating)
-        if (r.phase == ResearchPhase.CANCELLED) Hint("Stopped.")
+        if (r.phase == ResearchPhase.CANCELLED) Hint(if (r.answer.isEmpty()) "Stopped before an answer." else "Stopped.")
         if (r.error != null) {
             Text(r.error, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.error)
         }
-        if (!r.running && r.timings.isNotEmpty()) {
-            Text(timingSummary(r), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+        if (!r.running) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (r.answer.isNotEmpty()) CopyButton(r)
+                val n = r.sources?.size ?: 0
+                TextButton(onClick = { details = !details }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) {
+                    Text(
+                        (if (!places && n > 0) "Sources ($n) · how it was answered" else "How it was answered") +
+                            if (details) " ▾" else " ▸",
+                        fontSize = 13.sp,
+                    )
+                }
+            }
+        }
+        if (details && !r.running) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                if (r.route != null) Text(routeText(r), fontSize = 13.sp)
+                if (r.titles != null && !places) {
+                    Text(
+                        if (r.titles.isEmpty()) "No Wikipedia article was planned."
+                        else "Articles looked up: " + r.titles.joinToString(" · "),
+                        fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                if (r.sources != null && !places) {
+                    if (r.sources.isEmpty()) {
+                        Hint(
+                            if (r.route?.route == Route.ANSWER_FIRST) "Nothing relevant in the offline Wikipedia, so the answer was not checked."
+                            else "Nothing relevant in the offline Wikipedia: answered from the model's own knowledge."
+                        )
+                    }
+                    // keyed by turn and number, so an expanded passage never carries over to another turn
+                    r.sources.forEach { s -> key(key, s.number) { SourceRow(s) } }
+                    if (r.sourcesDropped > 0) Hint("${r.sourcesDropped} more passages were found but did not fit.")
+                }
+                if (r.timings.isNotEmpty()) {
+                    Text(timingSummary(r), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
         }
     }
 
@@ -181,6 +202,55 @@ fun ResearchView(r: ResearchUi, loading: Boolean, prefill: Prefill?, telemetry: 
                 }
             },
         )
+    }
+}
+
+/** Copies the answer (and its source check) as plain text. */
+@Composable
+private fun CopyButton(r: ResearchUi) {
+    val clipboard = LocalClipboardManager.current
+    var copied by remember(r.answer) { mutableStateOf(false) }
+    TextButton(
+        onClick = {
+            val text = if (r.check.isNullOrBlank()) r.answer else r.answer + "\n\nSource check:\n" + r.check
+            clipboard.setText(AnnotatedString(text))
+            copied = true
+        },
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+    ) { Text(if (copied) "Copied" else "Copy", fontSize = 13.sp) }
+}
+
+/**
+ * The places the offline map data has for a places question, numbered as the answer cites them.
+ * Open while the recommendations are still to come (the list is on screen in a fraction of a
+ * second), folded once they are there; a tap on the header changes that.
+ */
+@Composable
+private fun PlacesList(r: ResearchUi, key: String) {
+    val sources = r.sources ?: return
+    var userOpen by rememberSaveable(key) { mutableStateOf<Boolean?>(null) }
+    val open = userOpen ?: r.answer.isEmpty()
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(Modifier.fillMaxWidth().clickable { userOpen = !open }, verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Places from the offline map (${sources.size}" +
+                        (if (r.sourcesDropped > 0) " of ${sources.size + r.sourcesDropped}" else "") + ")",
+                    fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(if (open) "▾" else "▸", fontSize = 13.sp, color = MaterialTheme.colorScheme.primary)
+            }
+            if (r.placesWhere != null) Hint(r.placesWhere.replaceFirstChar { it.uppercase() })
+            if (open) {
+                sources.forEach { s -> key(key, s.number) { PlaceRow(s) } }
+                Hint(PLACES_CREDIT)
+            }
+        }
     }
 }
 
@@ -246,14 +316,6 @@ private fun StatusLine(r: ResearchUi, loading: Boolean, prefill: Prefill?, telem
         } else if (generating && prefill == null && telemetry.step > 0 && telemetry.wallMs > 0) {
             Hint(String.format(Locale.US, "%.1f tokens/s", 1000.0 / telemetry.wallMs))
         }
-    }
-}
-
-@Composable
-private fun Labeled(label: String, content: @Composable ColumnScope.() -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(label, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-        content()
     }
 }
 
@@ -423,32 +485,3 @@ private fun MapButton(s: ResearchSource) {
     ) { Text("Open in a map app", fontSize = 13.sp) }
     if (missing) Hint(String.format(Locale.US, "No map app is installed. The place is at %.5f, %.5f.", lat, lon))
 }
-
-/** An earlier question of the session: folded to the question and a line of its answer; tap to open. */
-@Composable
-fun ResearchHistoryItem(r: ResearchUi, telemetry: Telemetry) {
-    var open by rememberSaveable(r.runId, r.question) { mutableStateOf(false) }
-    if (open) {
-        Column {
-            TextButton(onClick = { open = false }, contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp)) {
-                Text("Fold this answer", fontSize = 12.sp)
-            }
-            ResearchView(r, loading = false, prefill = null, telemetry = telemetry, generating = false)
-        }
-        return
-    }
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth().clickable { open = true },
-    ) {
-        Column(Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
-            Text(r.question, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            val first = r.answer.lineSequence().map { it.trim() }.firstOrNull { it.isNotEmpty() } ?: ""
-            if (first.isNotEmpty()) {
-                Text(first, fontSize = 12.sp, maxLines = 2, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
-    }
-}
-

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,9 +47,8 @@ import java.io.File
 import java.util.Locale
 
 /**
- * Minimal chat + live telemetry, in Compose. Pick a pushed .gguf, type a prompt, run:
- * the panel shows tok/s and the per-token compute-vs-flash-I/O split and cache hit rate
- * while the answer streams in. All tunables live on the Settings screen.
+ * AndroidLM: a chat with an offline research assistant (ChatScreen), with the model and its files
+ * (ModelScreen), the engine's tunables (SettingsScreen) and per-run metrics one screen away.
  */
 class MainActivity : ComponentActivity() {
 
@@ -71,7 +71,8 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colorScheme.background) { Root() }
             }
         }
-        autoResearch(intent)
+        // (not when the activity is recreated, or reopened from Recents with the intent that started it)
+        if (savedInstanceState == null && (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0) autoResearch(intent)
     }
 
     override fun onStart() {
@@ -160,13 +161,13 @@ fun requestSharedStorageAccess(context: android.content.Context) {
 @Composable
 private fun Root() {
     val context = LocalContext.current
-    var showSettings by remember { mutableStateOf(false) }
-    var showMetrics by remember { mutableStateOf(false) }
+    // the screen over the chat, if any: "settings", "metrics" (from "model") or "model"
+    var screen by rememberSaveable { mutableStateOf<String?>(null) }
     var settings by remember { mutableStateOf(AppSettings.load(context)) }
 
-    // Model-scan state lives here, above the settings/main switch, so opening Settings and
-    // coming back does NOT dispose it and trigger a fresh scan. The scan runs once (and again
-    // only when refreshKey changes: an explicit Refresh, or after a download/import completes).
+    // Model-scan state lives here, above the screen switch, so opening Settings and coming back
+    // does NOT dispose it and trigger a fresh scan. The scan runs once (and again only when
+    // refreshKey changes: an explicit Refresh, or after a download/import completes).
     var models by remember { mutableStateOf<List<File>>(emptyList()) }
     var scanning by remember { mutableStateOf(true) }
     var refreshKey by remember { mutableStateOf(0) }
@@ -183,420 +184,54 @@ private fun Root() {
         scanning = false
     }
 
-    if (showSettings) {
-        SettingsScreen(
+    // the system Back goes from Metrics to Model and files, and from there or Settings to the chat
+    BackHandler(enabled = screen != null) { screen = if (screen == "metrics") "model" else null }
+    val idx = modelIdx.coerceIn(0, maxOf(0, models.size - 1))
+    when (screen) {
+        "settings" -> SettingsScreen(
             current = settings,
             onChange = { settings = it; it.save(context) },
-            onBack = { showSettings = false },
+            onBack = { screen = null },
         )
-    } else if (showMetrics) {
-        MetricsScreen(onBack = { showMetrics = false })
-    } else {
-        MainScreen(
+        "metrics" -> MetricsScreen(onBack = { screen = "model" })
+        "model" -> ModelScreen(
             settings = settings,
             onSettingsChange = { settings = it; it.save(context) },
             corpus = corpus,
             models = models,
             scanning = scanning,
-            modelIdx = modelIdx.coerceIn(0, maxOf(0, models.size - 1)),
+            modelIdx = idx,
             onSelectModel = { modelIdx = it; models.getOrNull(it)?.let { f -> ModelManager.setPreferred(context, f.name) } },
             onRefresh = { refreshKey++ },
-            onOpenSettings = { showSettings = true },
-            onOpenMetrics = { showMetrics = true },
+            onOpenMetrics = { screen = "metrics" },
+            onBack = { screen = null },
         )
-    }
-}
-
-@Composable
-private fun MainScreen(
-    settings: AppSettings,
-    onSettingsChange: (AppSettings) -> Unit,
-    corpus: CorpusFiles?,
-    models: List<File>,
-    scanning: Boolean,
-    modelIdx: Int,
-    onSelectModel: (Int) -> Unit,
-    onRefresh: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenMetrics: () -> Unit,
-) {
-    val context = LocalContext.current
-    val focusManager = LocalFocusManager.current
-    val ui by RunBus.state.collectAsStateWithLifecycle()
-
-    var prompt by rememberSaveable { mutableStateOf("") }
-    val listState = rememberLazyListState()
-
-    // Item 0 is the controls block; the transcript and the in-flight answer follow it. The live
-    // turn also shows while only reasoning has streamed (the thinking phase, before any answer),
-    // so a Thinking-on run does not sit on a blank screen while the model reasons.
-    val liveShown = ui.answer.isNotEmpty() || ui.reasoning.isNotEmpty()
-    // AndroidLM: a research run (in progress or finished) is one more item, after the transcript.
-    val research = ui.research
-    val total = 1 + ui.transcript.size + (if (liveShown) 1 else 0) + (if (research != null) 1 else 0)
-    // Research mode is in effect when it is switched on AND there is a corpus to search.
-    val researchOn = settings.researchMode && corpus != null
-
-    // Follow the tail only while the user is parked at the bottom. A long answer streams for a
-    // long time, and scrolling back to re-read it must not fight a per-token scroll command:
-    // dragging the list detaches the follow, coming back to the bottom re-arms it.
-    var followTail by remember { mutableStateOf(true) }
-    val atBottom by remember {
-        derivedStateOf {
-            val info = listState.layoutInfo
-            val last = info.visibleItemsInfo.lastOrNull()
-            last == null ||
-                (last.index == info.totalItemsCount - 1 && last.offset + last.size <= info.viewportEndOffset)
-        }
-    }
-    // Only the user's own drag detaches the follow, and only where their scroll comes to rest re-arms
-    // it: the list's own scroll-to-bottom (and a layout change right after it, like the final timing
-    // line appearing) must never count as the user scrolling away.
-    var userScroll by remember { mutableStateOf(false) }
-    LaunchedEffect(listState) {
-        listState.interactionSource.interactions.collect {
-            if (it is DragInteraction.Start) { followTail = false; userScroll = true }
-        }
-    }
-    // Re-arm on settle, not the moment the bottom is touched: while an answer streams the bottom
-    // keeps moving away, so only where a scroll actually comes to rest says what the user wants.
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.isScrollInProgress }.collect { scrolling ->
-            if (!scrolling && userScroll) { followTail = atBottom; userScroll = false }
-        }
-    }
-    // A new question (a research run, or a chat turn) is where the user wants to look, wherever
-    // they had scrolled to type it: follow its answer from the start.
-    LaunchedEffect(research?.question, research?.runId, ui.transcript.size) {
-        if (research?.running == true || ui.transcript.isNotEmpty()) followTail = true
-    }
-    LaunchedEffect(total, ui.answer.length, ui.reasoning.length, followTail,
-        research?.answer?.length, research?.check?.length, research?.phase, research?.sources?.size,
-        ui.prefill?.total, ui.telemetry.step > 0) {
-        // A long answer is taller than the viewport, so aligning the item's top would park the view
-        // on its beginning; the large offset pins the list to the newest text instead.
-        if (followTail && total > 1) runCatching { listState.scrollToItem(total - 1, Int.MAX_VALUE) }
-    }
-
-    // adjustResize handles the legacy path; imePadding covers edge-to-edge (Android 15+), where the
-    // window no longer shrinks for the keyboard. Without it the streaming answer draws behind the IME.
-    Box(Modifier.fillMaxSize().imePadding()) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            item(key = "controls") {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text("AndroidLM", fontSize = 22.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                        TextButton(onClick = onOpenSettings) { Text("Settings") }
-                    }
-
-                    // AndroidLM: the files the app reads, which are missing, and their import
-                    SetupCard(scanning = scanning, onImported = onRefresh)
-
-                    val modelNames = remember(models) { friendlyModelNames(models.map { it.name }) }
-                    when {
-                        scanning -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                            Text("Looking for the model…", fontSize = 14.sp)
-                        }
-                        models.isEmpty() -> {
-                            ElevatedCard {
-                                Text(
-                                    ModelManager.pushHint(),
-                                    Modifier.padding(12.dp),
-                                    fontSize = 13.sp,
-                                    fontFamily = FontFamily.Monospace,
-                                )
-                            }
-                            TextButton(onClick = { requestSharedStorageAccess(context); onRefresh() }) { Text("Refresh") }
-                        }
-                        models.size == 1 -> Text(
-                            "Model: " + modelNames[0] + when {
-                                ui.loading -> " · loading…"
-                                ui.ready || ui.generating -> " · loaded"
-                                else -> ""
-                            },
-                            fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        else -> LabeledDropdown(
-                            label = "Model",
-                            options = modelNames,
-                            selected = modelIdx,
-                            onSelect = onSelectModel,
-                        )
-                    }
-                    // AndroidLM: the optional larger model says what choosing it costs
-                    val chosen = models.getOrNull(modelIdx)
-                    var chosenArch by remember { mutableStateOf("") }
-                    LaunchedEffect(chosen) {
-                        chosenArch = chosen?.let { withContext(Dispatchers.IO) { ModelProfile.architecture(it.absolutePath) } } ?: ""
-                    }
-                    if (chosenArch == ModelProfile.FLASH_NEXT_ARCH) {
-                        Hint(
-                            "The larger model: more thorough, but each answer takes about 3 to 4 times as long " +
-                                "(first words after about 2 minutes).",
-                        )
-                    }
-
-                    OutlinedTextField(
-                        value = prompt,
-                        onValueChange = { prompt = it },
-                        label = { Text(if (researchOn) "Question" else "Message") },
-                        placeholder = {
-                            Text(if (researchOn) "Ask a research question: history, science, travel, health…" else "Say something")
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 2,
-                    )
-
-                    // AndroidLM: with Research on, Send runs the retrieval pipeline instead of a
-                    // plain chat turn. The corpus hint shares the models' Refresh (both are rescanned).
-                    val corpusHint = remember { CorpusLocator.hint(context) }
-                    ResearchToggle(
-                        corpus = corpus,
-                        scanning = scanning,
-                        checked = settings.researchMode,
-                        enabled = !ui.busy,
-                        sessionCtx = settings.sessionCtx,
-                        hint = corpusHint,
-                        onChange = { onSettingsChange(settings.copy(researchMode = it)) },
-                    )
-                    if (corpus == null && !scanning && models.isNotEmpty()) {
-                        TextButton(onClick = onRefresh, contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp)) {
-                            Text("Look for the corpus again", fontSize = 12.sp)
-                        }
-                    }
-
-                    // A "near me" question needs the phone's position: location access is asked for
-                    // then, and the question runs whatever the answer (without it, the answer says
-                    // to name the city).
-                    var awaitingLocation by remember { mutableStateOf<String?>(null) }
-                    val locationAsk = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-                        val q = awaitingLocation
-                        awaitingLocation = null
-                        if (q != null && models.isNotEmpty()) {
-                            launchResearch(context, models[modelIdx.coerceIn(0, models.size - 1)], q, settings, RunBus.state.value.sessionSig)
-                        }
-                    }
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Button(
-                            onClick = {
-                                // Drop focus so the soft keyboard retracts: the answer streams into the
-                                // space it was covering, and there is otherwise no in-app way to dismiss it.
-                                focusManager.clearFocus()
-                                if (models.isNotEmpty() && researchOn && prompt.isNotBlank()) {
-                                    // Each research question stands alone (every generation of the
-                                    // pipeline starts from an empty KV).
-                                    val q = prompt.trim()
-                                    val here = PlacesText.parse(q, emptyList())?.here == true || Translation.mentionsHere(q)
-                                    if (here && !AndroidLocator.permitted(context)) {
-                                        awaitingLocation = q
-                                        locationAsk.launch(AndroidLocator.PERMISSIONS)
-                                    } else {
-                                        launchResearch(context, models[modelIdx.coerceIn(0, models.size - 1)], q, settings, ui.sessionSig)
-                                    }
-                                    prompt = "" // the question is shown above its answer
-                                } else if (models.isNotEmpty() && !researchOn) {
-                                    // First message of a conversation clears the KV; a follow-up continues it.
-                                    launchPrompt(context, models[modelIdx.coerceIn(0, models.size - 1)],
-                                        prompt.ifBlank { "The capital of Japan is" }, settings, ui.sessionSig,
-                                        clearKv = ui.transcript.isEmpty())
-                                    prompt = ""
-                                }
-                            },
-                            // (a question asked while only the last answer's source check runs stops the check;
-                            // one asked while the model loads runs when it is ready)
-                            enabled = (!ui.busy || researchOn && (research?.checking == true || ui.state == EngineState.LOADING)) &&
-                                models.isNotEmpty() &&
-                                (!researchOn || prompt.isNotBlank()),
-                            modifier = Modifier.weight(1f),
-                        ) { Text(if (researchOn) "Research" else if (ui.transcript.isNotEmpty()) "Send" else if (ui.ready) "Send" else "Run") }
-
-                        OutlinedButton(
-                            onClick = {
-                                context.startService(
-                                    Intent(context, RunService::class.java).setAction(RunService.ACTION_CANCEL)
-                                )
-                            },
-                            enabled = ui.generating,
-                            modifier = Modifier.weight(1f),
-                        ) { Text("Stop") }
-                    }
-
-                    // Start over: clears the screen (and, in chat, the conversation). Keeps the model loaded.
-                    if ((ui.transcript.isNotEmpty() || research != null || ui.researchHistory.isNotEmpty()) && !ui.busy) {
-                        TextButton(
-                            // (in research, also the history: the next question starts a new topic)
-                            onClick = { RunBus.update { it.copy(transcript = emptyList(), answer = "", summary = "", error = null,
-                                research = null, researchHistory = emptyList()) } },
-                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
-                        ) { Text(if (researchOn) "Clear the answer" else "New chat") }
-                    }
-
-                    // (A research run shows its own loading and reading status.)
-                    if (ui.loading && research == null) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                            Text("Loading the model…", fontSize = 14.sp)
-                        }
-                    }
-                    // After the model is loaded, the prompt is prefilled before the first token streams
-                    // (no BMOE_PROGRESS yet). Signal that phase so a slow prefill does not look stuck.
-                    if (ui.generating && ui.telemetry.step == 0 && research?.running != true) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                            Text("Reading the prompt…", fontSize = 14.sp)
-                        }
-                    }
-
-                    // Everything about the engine, for the curious and for reproducing a run: which
-                    // file, the flags the session runs with, live speed and memory telemetry, the
-                    // per-run metrics, and unloading the model. Collapsed by default.
-                    var showDetails by rememberSaveable { mutableStateOf(false) }
-                    TextButton(
-                        onClick = { showDetails = !showDetails },
-                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
-                    ) {
-                        Text(if (showDetails) "Hide details" else "Details: model file, engine settings, speed", fontSize = 12.sp)
-                    }
-                    if (showDetails) {
-                        models.getOrNull(modelIdx.coerceIn(0, (models.size - 1).coerceAtLeast(0)))?.let {
-                            Text(it.name, fontSize = 12.sp, fontFamily = FontFamily.Monospace,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        if (corpus != null) Hint("Corpus: " + corpus.label())
-                        if (models.isNotEmpty()) {
-                            // Bring a model into app storage without adb: a local file through the system
-                            // picker (no catalog, no URL: this app has no network access).
-                            AddModelSection(models = models, scanning = scanning, loadedSig = ui.sessionSig, onModelReady = onRefresh)
-                        }
-
-                        // A reminder of the active config (full controls in Settings), with the exact
-                        // engine flags one tap away, so a screenshot of a run is reproducible off-device.
-                        // Remembered, not recomputed: this item redraws while a run streams.
-                        val summary = remember(settings) { configSummary(settings) }
-                        Text(summary, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        var showConfig by rememberSaveable { mutableStateOf(false) }
-                        val flags = remember(settings, models, modelIdx) {
-                            models.getOrNull(modelIdx.coerceIn(0, (models.size - 1).coerceAtLeast(0)))
-                                ?.let { configFlags(settings, it.absolutePath, settings.metricsCsv) }
-                                .orEmpty()
-                        }
-                        if (flags.isNotEmpty()) {
-                            TextButton(
-                                onClick = { showConfig = !showConfig },
-                                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
-                            ) {
-                                Text(
-                                    if (showConfig) "Hide engine flags" else "Engine flags (${flags.size})",
-                                    fontSize = 12.sp,
-                                )
-                            }
-                            if (showConfig) {
-                                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                    flags.forEach { (flag, value) ->
-                                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                            Text(
-                                                flag, fontSize = 11.sp, fontFamily = FontFamily.Monospace,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                modifier = Modifier.weight(1f),
-                                            )
-                                            Text(value, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        TelemetryCard(ui, settings.threads, settings.overlap, settings.ioThreads)
-
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            TextButton(onClick = onOpenMetrics) { Text("Metrics") }
-                            // The model stays loaded between questions and unloads itself after 10 idle
-                            // minutes; unloading now is optional and only frees the memory sooner.
-                            if (ui.ready) {
-                                TextButton(onClick = {
-                                    context.startService(
-                                        Intent(context, RunService::class.java).setAction(RunService.ACTION_SHUTDOWN)
-                                    )
-                                }) { Text("Unload model now (optional)") }
-                            }
-                        }
-                        if (ui.ready) {
-                            Hint("The model stays loaded between questions and unloads by itself after 10 idle minutes. Unloading now frees about 8 GB; the next question reloads it in about 30 s.")
-                        }
-                    }
-                }
-            }
-
-            // Committed turns.
-            items(ui.transcript.size) { i -> TurnView(ui.transcript[i]) }
-
-            // The in-flight assistant answer as it streams (its user turn is already in the transcript).
-            // While generating, keep the thinking block open so the reasoning is visible as it arrives.
-            if (liveShown) {
-                item(key = "live") {
-                    TurnView(ChatTurn("assistant", ui.answer, reasoning = ui.reasoning), reasoningExpanded = true)
-                }
-            }
-
-            // earlier questions of the session, folded; the current one below them
-            ui.researchHistory.forEachIndexed { i, old ->
-                item(key = "history-$i-${old.runId}") { ResearchHistoryItem(old, ui.telemetry) }
-            }
-            if (research != null) {
-                item(key = "research") {
-                    ResearchView(research, loading = ui.loading, prefill = ui.prefill,
-                        telemetry = ui.telemetry, generating = ui.generating)
-                }
-            }
-        }
-
-        // Once the follow is detached, the way back to a still-growing answer is a long drag.
-        if (!followTail && !atBottom) {
-            val scope = rememberCoroutineScope()
-            FilledTonalButton(
-                onClick = { scope.launch { listState.animateScrollToItem(total - 1, Int.MAX_VALUE) } },
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
-            ) { Text("Jump to latest") }
-        }
+        else -> ChatScreen(
+            settings = settings,
+            corpus = corpus,
+            models = models,
+            scanning = scanning,
+            modelIdx = idx,
+            onRefresh = { refreshKey++ },
+            onOpenSettings = { screen = "settings" },
+            onOpenModel = { screen = "model" },
+        )
     }
 }
 
 /**
- * One transcript bubble: a small role label and the message, with an optional metrics line and,
- * for a reasoning model, a collapsible thinking block above the answer. [reasoningExpanded] seeds
+ * One turn of a chat without sources: the user's message as a bubble; the model's answer with,
+ * for a reasoning model, a collapsible thinking block above it. [reasoningExpanded] seeds
  * the block open (used for the in-flight turn, so the reasoning is visible as it streams); committed
  * turns default it closed so the transcript stays readable.
  */
 @Composable
-private fun TurnView(turn: ChatTurn, reasoningExpanded: Boolean = false) {
-    val isUser = turn.role == "user"
+internal fun TurnView(turn: ChatTurn, reasoningExpanded: Boolean = false) {
+    if (turn.role == "user") { UserBubble(turn.text); return }
     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        Text(
-            if (isUser) "You" else "Assistant",
-            fontSize = 12.sp, fontWeight = FontWeight.Bold,
-            color = if (isUser) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary,
-        )
         if (turn.reasoning.isNotEmpty()) ReasoningBlock(turn.reasoning, reasoningExpanded)
-        // The user's own prompt is echoed verbatim; only the model's answer is read as Markdown.
-        SelectionContainer {
-            if (isUser) Text(turn.text, fontSize = 15.sp) else MarkdownText(turn.text)
-        }
-        if (turn.metrics.isNotEmpty()) {
-            Text(turn.metrics, fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
+        // only the model's answer is read as Markdown (its speed is in Model and files)
+        SelectionContainer { MarkdownText(turn.text, fontSize = 16.sp) }
     }
 }
 
@@ -648,7 +283,7 @@ private fun ReasoningBlock(reasoning: String, initiallyExpanded: Boolean) {
  * the next one: the lossy levers above all (dropping experts and a narrowed top-k change the
  * ANSWER, not just the speed), then the residency policies that decide where the time goes.
  */
-private fun configSummary(s: AppSettings): String {
+internal fun configSummary(s: AppSettings): String {
     val parts = mutableListOf<String>()
     if (s.mmap) {
         parts += "mmap baseline (no streaming)"
@@ -689,7 +324,7 @@ private fun configSummary(s: AppSettings): String {
  * absent from the run. A curated subset is what left the metrics views unable to state their own
  * drop fraction (#136); this display starts out unable to drift.
  */
-private fun configFlags(s: AppSettings, modelPath: String, csv: Boolean): List<Pair<String, String>> {
+internal fun configFlags(s: AppSettings, modelPath: String, csv: Boolean): List<Pair<String, String>> {
     // Placeholders for the two paths the argv needs but that say nothing about the configuration;
     // the CSV one only has to be non-null for --csv to be emitted at all.
     val argv = s.sessionArgv("bmoe-cli", modelPath, if (csv) "metrics.csv" else null)
@@ -713,7 +348,7 @@ private fun configFlags(s: AppSettings, modelPath: String, csv: Boolean): List<P
 }
 
 @Composable
-private fun TelemetryCard(ui: UiState, threads: Int, overlap: Boolean, ioThreads: Int) {
+internal fun TelemetryCard(ui: UiState, threads: Int, overlap: Boolean, ioThreads: Int) {
     ElevatedCard(Modifier.fillMaxWidth()) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             if (ui.error != null) {
@@ -851,7 +486,7 @@ private fun preloadSession(context: android.content.Context, model: File, settin
     )
 }
 
-private fun launchPrompt(
+internal fun launchPrompt(
     context: android.content.Context,
     model: File,
     prompt: String,
@@ -897,7 +532,7 @@ private fun launchPrompt(
  * once; otherwise the session is (re)started and the pipeline runs as soon as it reports ready.
  * The pipeline sets n_predict and thinking itself (they are part of the method, not preferences).
  */
-private fun launchResearch(
+internal fun launchResearch(
     context: android.content.Context,
     model: File,
     question: String,
@@ -905,6 +540,8 @@ private fun launchResearch(
     currentSig: String?,
 ) {
     RunBus.resetGeneration()
+    // the question opens a chat if none is open; RunService saves it as the run goes
+    RunBus.update { if (it.chatId == null) it.copy(chatId = ChatStore.newId()) else it }
     val sig = settings.sessionSignature(model.absolutePath)
     if (currentSig == sig) {
         context.startService(

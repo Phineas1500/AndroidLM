@@ -89,8 +89,11 @@ data class UiState(
     val streaming: Boolean = true,  // is the loaded session using the MoE streamer (vs mmap baseline)?
     // AndroidLM research mode: the run in progress or the last one finished; null in plain chat.
     val research: ResearchUi? = null,
-    // Earlier research runs of this session, oldest first, shown above the current one.
+    // Earlier turns of the open chat, oldest first, shown above the current one.
     val researchHistory: List<ResearchUi> = emptyList(),
+    // The open chat (ChatStore), saved as its turns are asked and answered; null for a new chat
+    // until its first question.
+    val chatId: String? = null,
     // The engine is reading a prompt (BMOE_PREFILL), until its first token; null otherwise.
     val prefill: Prefill? = null,
 ) {
