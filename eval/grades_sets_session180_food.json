@@ -1,0 +1,350 @@
+{
+ "food-001": {
+  "scores": {
+   "A": 7,
+   "B": 9,
+   "C": 7
+  },
+  "errors": {
+   "A": [
+    "St. Bess called a vegan restaurant; it is a vegetarian pizzeria (no meat toppings, vegan possible)",
+    "Attributes the Oukan description to the travel guide, but only St. Bess is marked as in the travel guide"
+   ],
+   "B": [],
+   "C": [
+    "St. Bess called a vegan restaurant; it is a vegetarian pizzeria (no meat toppings, vegan possible)"
+   ]
+  },
+  "best": "B",
+  "reason": "B names well-known, verified vegan places (Bonvivant, Lucky Leek, Chay Long, Vamos Veganos, doen doen) with areas and dishes, and correctly flags FREA. A and C give real places with hours but mislabel St. Bess and say little about the food."
+ },
+ "food-002": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Adds praise its sources do not contain (e.g. 'one of the best vegan spots in the city', 'cozy atmosphere')"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives real, top-rated vegan places (Kong, O Gambuzino, Ao 26, A Minha Avó, Organi) with neighbourhoods and dishes, and flags uncertain addresses. A and B list real places with hours but little about what to eat."
+ },
+ "food-003": {
+  "scores": {
+   "A": 9,
+   "B": 6,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Opening line ('184 vegan options', 'best matches are those closest to the centre') is filler that does not tell the user which places are good"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives verified, well-regarded places (Gioia, Donnet, La Reverde, Gordo Vegano, Guille Veggie, Let it V) with areas and dishes plus local tips. B and C list real vegan places with addresses only; C has fewer."
+ },
+ "food-004": {
+  "scores": {
+   "A": 9,
+   "B": 4,
+   "C": 4
+  },
+  "errors": {
+   "A": [
+    "Says VeganBurg is down to one outlet; a Woodleigh Mall outlet is still listed"
+   ],
+   "B": [
+    "Saravana Bhavan called vegan; it is a vegetarian Indian chain that uses dairy",
+    "Saravana Bhavan placed at a VivoCity Food Republic stall; the known branch is 84 Syed Alwi Rd",
+    "Annalakshmi called vegan; it is an Indian vegetarian buffet that uses dairy",
+    "Real Food called vegan; it is vegetarian (mostly vegan)",
+    "Warung Ijo called vegan; it is vegetarian and some dishes use real egg",
+    "Tian En and Green Ba given with no usable address"
+   ],
+   "C": [
+    "Saravana Bhavan called vegan; it is a vegetarian Indian chain that uses dairy",
+    "Gives two conflicting addresses for Saravana Bhavan (VivoCity stall vs 84 Syed Alwi Rd) without resolving them",
+    "Annalakshmi called vegan; it is an Indian vegetarian buffet that uses dairy",
+    "Real Food called vegan; it is vegetarian (mostly vegan)",
+    "Warung Ijo called vegan; it is vegetarian and some dishes use real egg",
+    "Tian En and Green Ba given with no usable address"
+   ]
+  },
+  "best": "A",
+  "reason": "A names real vegan or clearly-flagged vegetarian places (Whole Earth, Herbivore, Kind Bowl, nomVnom, Genesis, Pita Bakery) with addresses and dishes. B and C label several vegetarian places as vegan and give thin details."
+ },
+ "food-005": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "All three name real vegan places, but A adds dishes, areas and local tips (jay food, vegan khao soi). B and C give addresses and hours but little about the food."
+ },
+ "food-006": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "東京じゃんがら ecute上野 called a vegan restaurant; Tokyo Jangara is a tonkotsu ramen chain",
+    "Plant Based Tokyo was reported closed in September 2024"
+   ],
+   "B": [
+    "東京じゃんがら ecute上野 said to serve vegan ramen; Tokyo Jangara is a tonkotsu ramen chain",
+    "Plant Based Tokyo was reported closed in September 2024"
+   ],
+   "C": [
+    "Tsuminaki Mapo Tofu placed in Nishi-Shinbashi; its listed branches are in Roppongi and Mita"
+   ]
+  },
+  "best": "C",
+  "reason": "C lists nine real, popular vegan places (T's Tantan, Saido, Vegan Gyoza Yu, Masaka, Ballon, The Nuts Exchange) with areas, dishes and dashi advice. A and B include a non-vegan ramen chain and a closed place, with little description."
+ },
+ "food-007": {
+  "scores": {
+   "A": 6,
+   "B": 9,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "May Veggie Home given at its old Ratchadaphisek address; it moved to Sukhumvit Soi 101 in 2024",
+    "Tien Sin said to be open daily; it is closed on Sundays"
+   ],
+   "B": [],
+   "C": [
+    "May Veggie Home given at its old Ratchadaphisek address; it moved to Sukhumvit Soi 101 in 2024",
+    "Tien Sin said to be open daily; it is closed on Sundays"
+   ]
+  },
+  "best": "B",
+  "reason": "B gives verified, current places (Vegan Mahanakhon, Vegan Pranakhon, Kem-Kon, May Veggie Home's new site, Kaek Kao Kua, Jay Oh) with areas, dishes and jay tips. A and C have real places but an outdated address and thin detail."
+ },
+ "food-008": {
+  "scores": {
+   "A": 6,
+   "B": 9,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "Veganarsist Bostancı is an order/take-away branch, presented as a sit-down restaurant"
+   ],
+   "B": [],
+   "C": [
+    "Veganarsist Bostancı is an order/take-away branch, presented as a sit-down restaurant"
+   ]
+  },
+  "best": "B",
+  "reason": "B names verified vegan places on both sides of the city (Vegan Dükkan, Community Kitchen, Vegan Masa, Veganarsist, Kumin, Ethique) with dishes and areas. A and C list real places but mostly as bare addresses."
+ },
+ "food-009": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "Forever (Guanajuato 54) was reported closed in October 2024",
+    "Paxil described as crepes and seafood; it is a vegan seafood taco stand (listed at Orizaba 83)"
+   ],
+   "B": [
+    "Forever (Guanajuato 54) was reported closed in October 2024",
+    "Paxil described as crepes and seafood; it is a vegan seafood taco stand (listed at Orizaba 83)"
+   ],
+   "C": [
+    "Yug Vegetariano described as without meat or dairy; it is a vegetarian restaurant that uses dairy"
+   ]
+  },
+  "best": "C",
+  "reason": "C picks famous, verified spots (Por Siempre Vegana, Gatorta, VEGuerrero, Malportaco, Gracias Madre, Vegan Ramen Mei) with what to eat and the lard tip. A and B are near-identical address lists that include a reportedly closed place."
+ },
+ "food-010": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "Soul R. Vegan Cafe, listed first, was reported closed (HappyCow, Oct 2023)",
+    "Original Vegan is in New Taipei (Dapinglin, Xindian), not Taipei city"
+   ],
+   "B": [
+    "Soul R. Vegan Cafe, listed first, was reported closed (HappyCow, Oct 2023)",
+    "Original Vegan is in New Taipei (Dapinglin, Xindian), not Taipei city"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives well-known, verified places (Laixin dumplings, Mukuchi, Chao, Vege Creek, The Green Room) with dishes, areas and the 全素/蛋奶素 tip. A and B are bare address lists whose first pick is reportedly closed."
+ },
+ "food-011": {
+  "scores": {
+   "A": 3,
+   "B": 3,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "PPURI ON THE PLATE is closed (Time Out lists it as closed)",
+    "Huggers has been listed as closed since 2018",
+    "Cafe Siva (카페 시바) is marked closed on listing sites",
+    "Weirdough described as a pizza place with vegan options; it is fully vegan"
+   ],
+   "B": [
+    "PPURI ON THE PLATE is closed (Time Out lists it as closed)",
+    "Huggers has been listed as closed since 2018; its street is also misspelled ('Daegwango 6-gil' for Daesagwan-ro 6-gil)",
+    "Cafe Siva (카페 시바) is marked closed on listing sites",
+    "Weirdough described as a pizza place with vegan options; it is fully vegan"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C names current, verified vegan places (Osegye Hyang, Vegan Insa, Maru Kimbap, ByTOFU, Blu, Camouflage) with dishes and a fish-sauce warning. A and B list six places of which three appear to be closed."
+ },
+ "food-012": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Střecha hours are garbled and contradictory (Wednesday to Friday given twice with different closing times)"
+   ],
+   "C": [
+    "Střecha hours are garbled ('Wednesday to Wednesday')"
+   ]
+  },
+  "best": "A",
+  "reason": "A covers the best-known vegan and vegetarian places (Shromáždiště, Palo Verde, Linh, Dosa Dosa, Lehká Hlava, Maitrea) with areas and dishes. B and C list real vegan places with hours but give little about the food and garble Střecha's hours."
+ },
+ "food-013": {
+  "scores": {
+   "A": 8,
+   "B": 5,
+   "C": 5
+  },
+  "errors": {
+   "A": [
+    "Kiwi Vegan Café is closed (In Your Pocket marks it closed)"
+   ],
+   "B": [
+    "Kiwi Vegan Cafe is closed (In Your Pocket marks it closed)",
+    "Black Cup called a vegan coffee shop; no source supports that",
+    "Living Vino presented as a restaurant; it has been take-away/delivery only since 2024"
+   ],
+   "C": [
+    "Kiwi Vegan Cafe is closed (In Your Pocket marks it closed)",
+    "Black Cup called a vegan coffee shop; no source supports that",
+    "Living Vino presented as a restaurant; it has been take-away/delivery only since 2024"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives many real vegan and vegetarian-friendly places (Lutra Lutra, Stricha, Shpana, Café Leila, Daphna) plus useful Georgian dishes to order; one place is closed. B and C include the same closed café and thin entries, and C adds two places with no detail."
+ },
+ "food-014": {
+  "scores": {
+   "A": 8,
+   "B": 5,
+   "C": 5
+  },
+  "errors": {
+   "A": [
+    "Tan presented as a shojin restaurant; it is a Wakuden restaurant whose vegetarian shojin course needs 3 days' notice"
+   ],
+   "B": [
+    "Veg Out described as Thai; it is a vegan café (obanzai plates, curry, bowls)",
+    "Premarche Alternative Diner called vegetarian; it also serves meat"
+   ],
+   "C": [
+    "Veg Out described as Thai; it is a vegan café (obanzai plates, curry, bowls)",
+    "Premarche Alternative Diner called vegetarian; it also serves meat"
+   ]
+  },
+  "best": "A",
+  "reason": "A covers temple shojin cuisine (Shigetsu, Izusen, Ajiro) and real vegan cafés with areas and a dashi warning. B and C list real places with hours but mislabel two of them and barely describe the food."
+ },
+ "food-015": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Verdeo placed in Manila; its listed address is Carrera 35 #8A-3 and its current status is unconfirmed"
+   ]
+  },
+  "best": "C",
+  "reason": "C gives well-rated vegan places by neighbourhood (Helecho, Coraje, Paloma, Las Veganas, Shottas) with dishes and hours advice. A and B are near-identical address lists of mostly real places with almost no description."
+ },
+ "food-016": {
+  "scores": {
+   "A": 9,
+   "B": 4,
+   "C": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "The Kind Kitchen's 'address' is a phone number (0615261358)",
+    "Green & Vegan is a pop-up supper club, not a restaurant",
+    "D-Core Art & Soul is an art and jewellery space; its vegan-restaurant status is unverified",
+    "Intro promises fine dining but none is listed"
+   ],
+   "C": [
+    "The Kind Kitchen's 'address' is a phone number (0615261358)",
+    "Green & Vegan is a pop-up supper club, not a restaurant",
+    "D-Core Art & Soul is an art and jewellery space; its vegan-restaurant status is unverified",
+    "Intro promises fine dining but none is listed"
+   ]
+  },
+  "best": "A",
+  "reason": "A names verified vegan places (Plant Camps Bay, Conscious Kitchen, Grumpy & Runt, Romeo and Vero, Okja, Pizzasaurus) with areas and dishes. B and C are bare lists with a phone number used as an address and a pop-up presented as a restaurant."
+ },
+ "food-017": {
+  "scores": {
+   "A": 6,
+   "B": 9,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "Terra Mamma hours contradict themselves (open Monday to Friday, yet closed Mondays)",
+    "The app's place list is shown with an English header in a Portuguese answer"
+   ],
+   "B": [
+    "Futuro Refeitório is plant-forward but not fully vegan, which the answer does not say"
+   ],
+   "C": [
+    "Terra Mamma hours contradict themselves (open Monday to Friday, yet closed Mondays)",
+    "Congolinária hours contradict themselves (open Monday to Friday, yet closed Mondays and Tuesdays)",
+    "The app's place list is shown with an English header in a Portuguese answer"
+   ]
+  },
+  "best": "B",
+  "reason": "B answers in fluent Portuguese with well-known places (Banana Verde, Camélia Òdòdó, Sushimar, Pop Vegan, Pratada) by neighbourhood with dishes. A and C list mostly real places but with contradictory hours and little description."
+ }
+}

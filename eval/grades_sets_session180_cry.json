@@ -1,0 +1,320 @@
+{
+ "cry-001": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Lists FN-DSA (Falcon) as already standardized by NIST; FIPS 206 is still a draft",
+    "Garbled sentence implies SPHINCS+ is an exception to the schemes being quantum-resistant"
+   ]
+  },
+  "best": "B",
+  "reason": "B lists ML-DSA, SLH-DSA, FN-DSA and XMSS/LMS with correct sizes and status, and names the schemes that are not quantum-resistant. A is correct but omits XMSS/LMS and the vulnerable schemes. C has a misleading sentence and overstates Falcon's status."
+ },
+ "cry-002": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Implies SLH-DSA parameter sets cover only security categories 3 and 5 with SHA2; FIPS 205 has categories 1/3/5 with both SHA2 and SHAKE"
+   ],
+   "B": [
+    "Says SLH-DSA relies on hash collision resistance; SPHINCS+/SLH-DSA is designed not to need collision resistance (second-preimage/PRF-type properties)",
+    "Says both were selected by NIST in 2024; they were selected in 2022 and published in 2024"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the core trade-off (small/fast lattice vs conservative/large hash-based) with exact, correct key and signature sizes. A and B miss sizes and speed, which are the main practical difference."
+ },
+ "cry-003": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "All three give the right Shor-vs-Grover explanation. A adds the reason (algebraic structure), the collision-attack picture and accurate current resource estimates. B and C are correct but thinner, and C pads with source commentary."
+ },
+ "cry-004": {
+  "scores": {
+   "A": 10,
+   "B": 6,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A covers proto-danksharding, blob size, type-0x03 transactions, KZG commitments, the blob gas market, the ~18-day retention and later capacity increases, all accurately. B and C are correct but omit blob size and KZG, and C ends with less useful detail."
+ },
+ "cry-005": {
+  "scores": {
+   "A": 10,
+   "B": 2,
+   "C": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says Ethereum PoS uses probabilistic finality where confidence grows with depth; it has economic finality via Casper FFG checkpoints",
+    "Gives no justification/finalization mechanism; describes finality only as decreasing reorg likelihood with depth"
+   ],
+   "C": [
+    "Says a checkpoint is the block at the end of an epoch; it is the block at the first slot of the epoch",
+    "Says a justified checkpoint is finalized when it is 'justified again in a later epoch'; it is finalized when the next checkpoint is justified with it as source",
+    "Describes the mechanism as a mix of probabilistic and 'justified' finality, which is muddled"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains Gasper, 2/3 justification, finalization after ~2 epochs, the 1/3 slashing guarantee and the inactivity leak, all correctly. B wrongly calls PoS finality probabilistic, and C garbles checkpoints and finalization."
+ },
+ "cry-006": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C states the ~7-day challenge window, how fault proofs and validity proofs work, withdrawal times, trust assumptions and current state. A and B are correct but generic and omit the challenge-window length."
+ },
+ "cry-007": {
+  "scores": {
+   "A": 3,
+   "B": 10,
+   "C": 3
+  },
+  "errors": {
+   "A": [
+    "Says validators bundle UserOperations into transactions; bundlers do this"
+   ],
+   "B": [],
+   "C": [
+    "Says validators bundle UserOperations into transactions; bundlers do this"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains UserOperations, the alt mempool, bundlers, EntryPoint and paymasters, plus EIP-7702 and native AA, correctly. A and C are near-identical one-paragraph answers that misattribute bundling to validators and omit bundlers, paymasters and the mempool."
+ },
+ "cry-008": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Gives the layout with signatures in G1 and public keys in G2; Ethereum uses the reverse (48-byte G1 public keys, 96-byte G2 signatures)"
+   ]
+  },
+  "best": "B",
+  "reason": "B covers BLS12-381, key and signature sizes, pairing verification, aggregation, proof-of-possession, the uses on the consensus layer and quantum vulnerability, all accurately. A and C explain aggregation and quantum vulnerability but omit the curve, and C's group layout does not match Ethereum."
+ },
+ "cry-009": {
+  "scores": {
+   "A": 4,
+   "B": 4,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Says STARK proving and verification time grows quasilinearly versus linearly for SNARKs, so STARKs are faster; quasilinear is slower than linear, STARK verification is polylogarithmic and SNARK verification is constant",
+    "Says STARKs need less time than SNARKs for proving and verifying large datasets; STARK verification is typically more expensive"
+   ],
+   "B": [
+    "Says STARK proving and verification time grows quasilinearly versus linearly for SNARKs, so STARKs are faster; quasilinear is slower than linear, STARK verification is polylogarithmic and SNARK verification is constant"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C correctly covers setup, cryptographic assumptions, proof sizes, verification cost and the wrap-in-SNARK practice. A and B repeat a self-contradictory scalability claim and omit the proof-size difference, the main practical trade-off."
+ },
+ "cry-010": {
+  "scores": {
+   "A": 4,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Garbled claim that validators 'do not need to trust builders to withhold blocks'"
+   ],
+   "B": [
+    "Garbled claim that validators 'do not need to trust builders to withhold block bodies'"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C explains MEV sources (arbitrage, liquidations, sandwiches), PBS, MEV-Boost and relays today, and ePBS status, all accurately. A and B are generic, omit MEV-Boost/relays and sandwiching, and contain a garbled trust statement."
+ },
+ "cry-011": {
+  "scores": {
+   "A": 4,
+   "B": 6,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C states the burn, the tip, the target of half the gas limit and the 12.5% per-block cap, with correct numbers. B mentions the burn but not the cap or target. A never says the base fee is burned, which the question asks."
+ },
+ "cry-012": {
+  "scores": {
+   "A": 10,
+   "B": 5,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says EIP-155 is what makes EIP-712 signatures chain-specific; EIP-712 has its own chainId domain separator"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A explains the ETH/ETC replay attack, the 9-field signing hash, the v = {0,1} + CHAIN_ID*2 + 35 encoding and the limits, all accurately. B and C name replay protection but give no mechanism or formula."
+ },
+ "cry-013": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Calls the delegation indicator 'opcode 0xef'; it is the code prefix 0xef0100 || address (0xef is a banned opcode)"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A gives the 0x04 transaction, the authorization tuple, the 0xef0100||address indicator, use cases and caveats, all correctly. B and C get the core idea and Pectra right but omit the authorization list and exact indicator."
+ },
+ "cry-014": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "All three give 2048 ETH correctly. A adds the 32 ETH minimum, the 0x02 compounding-credential requirement, consolidation and EIP-7002 interplay."
+ },
+ "cry-015": {
+  "scores": {
+   "A": 6,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Calls withdrawals 'withdrawal transactions'; they are system-level operations, not transactions"
+   ],
+   "B": [
+    "Calls withdrawals 'withdrawal transactions'; they are system-level operations, not transactions"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C explains the push design, the 16-per-payload limit, withdrawal fields, crediting after transactions, no gas, no failure and no code execution, accurately. A and B get the system-level/no-gas point and Shapella date but are vaguer and miss that withdrawals cannot fail."
+ },
+ "cry-016": {
+  "scores": {
+   "A": 10,
+   "B": 6,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A covers fungible balances versus unique tokenIds, both interfaces, safeTransferFrom, metadata and examples, accurately. B and C state the core difference correctly with less detail."
+ },
+ "cry-017": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B explains the vault/share model, the full interface, typical uses and pitfalls such as rounding and inflation attacks. A and C are correct but generic, and C adds little beyond restating the standard."
+ },
+ "cry-018": {
+  "scores": {
+   "A": 7,
+   "B": 7,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All three correctly say ML-KEM is a KEM, not a signature. C adds the FIPS 203 date, the Kyber origin, parameter sets, sizes, deployment and the actual signature standards."
+ },
+ "cry-019": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B explains OTS plus Merkle trees, the counter, catastrophic reuse, real-world reuse causes, SP 800-208 HSM requirements and CNSA 2.0. A and C give the core reuse point correctly but omit SP 800-208 and the Merkle-tree structure."
+ },
+ "cry-020": {
+  "scores": {
+   "A": 6,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the date, TTD, Paris/Bellatrix, last PoW block, removal of block and ommer rewards, header and opcode changes, and what did not change. A and B have the TTD and PREVRANDAO but omit the date and reward removal, and B adds filler."
+ }
+}

@@ -13,8 +13,9 @@ python3 -c "import json,sys; [print(json.loads(l)['id']+'\t'+json.loads(l)['q'])
 # `adb logcat` stream once dropped a run's last lines (completed and the answer) while the
 # buffer still held them.
 adb logcat -G 16M </dev/null >/dev/null 2>&1
-# the app's own end-of-run line (an engine warning forwarded to the log can contain "failed")
-DONE="run=[0-9]+ t=[0-9]+ms (completed|failed)"
+# the app's own end-of-run lines (an engine warning forwarded to the log can contain "failed");
+# "phase=DONE" too, since the log has dropped a run's "completed" line under load
+DONE="run=[0-9]+ t=[0-9]+ms (completed|failed|phase=DONE)"
 LAST=0
 while IFS=$'\t' read -r -u 3 id q; do
   [ -s "$OUT/$id.log" ] && grep -qE "$DONE" "$OUT/$id.log" && continue   # resumable

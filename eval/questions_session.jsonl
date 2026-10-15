@@ -1,0 +1,68 @@
+{"id": "dng-004", "q": "An earthquake starts while I'm inside a hotel room. What should I do, and what about after it stops?"}
+{"id": "dng-002", "q": "My hiking partner is shivering, confused and slurring words in the cold. What should I do?"}
+{"id": "trv-006", "q": "Which side of the road do they drive on in Thailand, and can tourists drive there?"}
+{"id": "food-008", "q": "Tell me the best vegan restaurants in Istanbul"}
+{"id": "trv-005", "q": "What currency is used in Georgia (the country), and can I pay by card in Tbilisi?"}
+{"id": "mth-006", "q": "It's 104°F outside. What is that in Celsius, and is it dangerous for a long walk?"}
+{"id": "cry-019", "q": "What are stateful hash-based signatures like XMSS and LMS, and why does the 'state' matter?"}
+{"id": "food-015", "q": "Recommend some vegetarian restaurants in Medellín"}
+{"id": "food-005", "q": "Tell me the best vegan restaurants in Chiang Mai"}
+{"id": "food-006", "q": "Tell me the best vegan restaurants in Tokyo"}
+{"id": "food-006-f", "q": "What about Osaka?", "follows": "food-006", "looks_like_follow_up": true}
+{"id": "cry-008", "q": "What are BLS signatures and why does Ethereum's consensus layer use them?"}
+{"id": "mth-004", "q": "Three of us are hiking for two days and each person needs 3 liters of water per day. How much water do we need and how much does it weigh?"}
+{"id": "food-001", "q": "Tell me the best vegan restaurants in Berlin"}
+{"id": "food-002", "q": "Tell me the best vegan restaurants in Lisbon"}
+{"id": "food-002-f", "q": "Which of those are open late?", "follows": "food-002", "looks_like_follow_up": true}
+{"id": "cry-013", "q": "What does EIP-7702 let a regular Ethereum account (EOA) do?"}
+{"id": "mth-003", "q": "My dinner bill is 2,450 Thai baht and 1 US dollar is 36.5 baht. How much is that in dollars, and what is the total with a 10% tip?"}
+{"id": "mth-003-f", "q": "And at 34 baht to the dollar?", "follows": "mth-003", "looks_like_follow_up": true}
+{"id": "trv-002", "q": "What plug type and voltage does Brazil use?"}
+{"id": "cry-007", "q": "What is account abstraction in Ethereum (ERC-4337)?"}
+{"id": "food-003", "q": "Tell me the best vegan restaurants in Buenos Aires"}
+{"id": "food-007", "q": "Tell me the best vegan restaurants in Bangkok"}
+{"id": "cry-010", "q": "What is MEV and what is proposer-builder separation?"}
+{"id": "food-014", "q": "What are good vegetarian restaurants in Kyoto?"}
+{"id": "food-009", "q": "Tell me the best vegan restaurants in Mexico City"}
+{"id": "food-011", "q": "Tell me the best vegan restaurants in Seoul"}
+{"id": "food-013", "q": "Where can I eat vegetarian food in Tbilisi?"}
+{"id": "cry-020", "q": "What changed in Ethereum at the Merge (EIP-3675)?"}
+{"id": "cry-002", "q": "What is the difference between ML-DSA and SLH-DSA?"}
+{"id": "cry-002-f", "q": "Which of them is faster to verify?", "follows": "cry-002", "looks_like_follow_up": true}
+{"id": "cry-015", "q": "How do staking withdrawals reach the Ethereum execution layer (EIP-4895)?"}
+{"id": "cry-009", "q": "What is the difference between a zk-SNARK and a zk-STARK?"}
+{"id": "food-017", "q": "Quais são os melhores restaurantes veganos em São Paulo?"}
+{"id": "dng-001", "q": "I just got bitten by a snake while hiking, two hours from the nearest road. What do I do right now?"}
+{"id": "dng-001-f", "q": "What should I avoid doing?", "follows": "dng-001", "looks_like_follow_up": false}
+{"id": "trv-008", "q": "When is the best time to visit Chiang Mai, and when is the smoky season?"}
+{"id": "trv-008-f", "q": "Tell me more about the smoky season", "follows": "trv-008", "looks_like_follow_up": true}
+{"id": "mth-002", "q": "A hike is 18 km with 1,200 m of total climbing. Using Naismith's rule, about how long will it take?"}
+{"id": "food-004", "q": "Tell me the best vegan restaurants in Singapore"}
+{"id": "food-016", "q": "Tell me the best vegan restaurants in Cape Town"}
+{"id": "cry-001", "q": "Which signature algorithms are quantum resistant?"}
+{"id": "cry-001-f", "q": "Which one has the smallest signatures?", "follows": "cry-001", "looks_like_follow_up": true}
+{"id": "trv-003", "q": "Is tap water safe to drink in Mexico City?"}
+{"id": "cry-012", "q": "What is EIP-155 and what attack does it prevent?"}
+{"id": "cry-003", "q": "Why is RSA broken by quantum computers but SHA-256 is not?"}
+{"id": "cry-011", "q": "What does EIP-1559 change about Ethereum transaction fees, and what happens to the base fee?"}
+{"id": "mth-005", "q": "My power bank is 5,000 mAh at 3.85 V. How many watt-hours is that, and can I take it on a plane?"}
+{"id": "mth-001", "q": "My rental car uses 7.5 liters per 100 km. What is that in miles per US gallon?"}
+{"id": "trv-009", "q": "Is tipping expected in restaurants in Portugal?"}
+{"id": "cry-017", "q": "What is ERC-4626 used for?"}
+{"id": "cry-004", "q": "What is EIP-4844 and what are blobs in Ethereum?"}
+{"id": "cry-004-f", "q": "How long are they kept?", "follows": "cry-004", "looks_like_follow_up": true}
+{"id": "cry-006", "q": "What is the difference between optimistic rollups and ZK rollups?"}
+{"id": "trv-004", "q": "How do I get from Lisbon airport to the city center?"}
+{"id": "trv-004-f", "q": "How much is a taxi?", "follows": "trv-004", "looks_like_follow_up": false}
+{"id": "cry-005", "q": "How does finality work in Ethereum proof of stake?"}
+{"id": "cry-016", "q": "What is the difference between ERC-20 and ERC-721 tokens?"}
+{"id": "trv-001", "q": "What emergency numbers should I know in Thailand?"}
+{"id": "trv-001-f", "q": "And in Vietnam?", "follows": "trv-001", "looks_like_follow_up": true}
+{"id": "cry-014", "q": "What is the maximum effective balance of an Ethereum validator after EIP-7251?"}
+{"id": "dng-005", "q": "After a flood the tap water might be contaminated. How do I make water safe to drink?"}
+{"id": "food-010", "q": "Tell me the best vegan restaurants in Taipei"}
+{"id": "dng-003", "q": "My child spilled boiling water on their arm. What do I do?"}
+{"id": "trv-007", "q": "How do I say thank you in Thai, and does it change if I'm a man or a woman?"}
+{"id": "food-012", "q": "Tell me the best vegan restaurants in Prague"}
+{"id": "cry-018", "q": "Is ML-KEM a signature algorithm? What is it for?"}
+{"id": "trv-010", "q": "What should I know about using ride-hailing apps in Bangkok?"}
