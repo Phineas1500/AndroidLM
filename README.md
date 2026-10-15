@@ -8,7 +8,7 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
 
 - **Phone:** arm64, 12GB of RAM (8GB works, at about half the speed), Android 10 or newer, 47GB
   free. Developed on a Pixel 8 Pro, under stock Android 16 and under GrapheneOS.
-- **Setup, about an hour and a half:** install `androidlm-1.8.1.apk` from the
+- **Setup, about an hour and a half:** install `androidlm-1.8.2.apk` from the
   [latest release](https://github.com/Phineas1500/AndroidLM/releases/latest), open it, and on
   Wi-Fi tap **Download all missing** in its **Set up** card (46GB, 75-100 minutes). Then turn on
   airplane mode; on GrapheneOS the app's Network permission can be turned off as well. The
@@ -19,6 +19,10 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
   words after 50 s): the answer, then a check against its sources. A places question shows its
   list of real places at once, then the model's recommendations from it. A follow-up adds 12-27 s,
   while the app rewrites it as a question that stands on its own.
+- **Chats:** the app works like a chat app. Each chat is saved on the phone as it goes; the menu
+  (☰, top left) lists them to reopen or delete, and starts a new one. A follow-up is read with the
+  last answer of the open chat, and "Understood as:" shows how. Under each answer, Copy, and the
+  sources and how it was answered.
 - **Long sessions:** after about ten questions the phone is hot and writes at about 60% of its cool
   speed; a phone on a charger runs hotter. 68 questions asked back to back in one session took a
   median of 2.5 minutes each, with no crash, steady memory, and answers as good at the end as at
@@ -175,7 +179,7 @@ cores, RAM, GPU and TPU help, and by how much).
 
 ## Install
 
-The signed APK is in the [v1.8.1 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.8.1) (`androidlm-1.8.1.apk`, or `androidlm-1.8.1-offline.apk` without the network permission).
+The signed APK is in the [v1.8.2 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.8.2) (`androidlm-1.8.2.apk`, or `androidlm-1.8.2-offline.apk` without the network permission).
 [`INSTALL.md`](INSTALL.md) has two routes:
 - **On the phone alone:** install the APK, download the five files with the phone's browser from
   the app's Set up card, then import them. The app checks each file's SHA-256 as it copies it
