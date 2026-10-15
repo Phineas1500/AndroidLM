@@ -255,6 +255,10 @@ KNOWLEDGE = re.compile(r"\b(history|origins?|invented|why|who (founded|owns|open
 # travel guide answers it, not a list of places
 TRIP = re.compile(r"\b(what (should|can|to) (i|we) (see|do|visit)|things to (do|see)|sights|sightseeing|get(ting)? around|"
                   r"itinerary|how (do|can|should) (i|we) get|\d+ days|(two|three|four|five|six|seven|few) days|a week in|weekend in)\b")
+# a question that starts by asking what something costs ("How much is a taxi from the airport?"):
+# the travel guide and Wikipedia answer it, not a list of places. Only at the start, so that "vegan
+# restaurants in Lima, and how much should I tip?" still asks for places
+PRICE = re.compile(r"^(how much|what('s| is| are| does)( the| a)? (price|cost|fare)s?)\b")
 # words that name places to go to: with a city, a request for places even without "best" or "where"
 PLACE_NOUNS = re.compile(r"\b(restaurants?|cafes?|caf\u00e9s?|coffee shops?|bars?|pubs?|hotels?|hostels?|bakery|bakeries|"
                          r"eatery|eateries|guest ?houses?|bistros?|brewery|breweries|pharmacy|pharmacies|chemists?|"
@@ -328,7 +332,7 @@ def parse(question, cuisines=()):
     category names in places.db (to recognise "ramen", "Thai food"...)."""
     q = question.strip()
     low = q.lower()
-    if KNOWLEDGE.search(low) or TRIP.search(low):
+    if KNOWLEDGE.search(low) or TRIP.search(low) or PRICE.search(low):
         return None
     diet = next((d for w, d in DIET_WORDS if _has(low, w)), None)
     # the kind of place named first is the one asked for ("a pharmacy near my hotel")

@@ -694,6 +694,8 @@ object PlacesText {
         "monday|tuesday|wednesday|thursday|friday|saturday|sunday|weekends?|24/7)\\b")
     private val LATE_HOURS = Regex("24/7|-\\s*(2[2-4]|0[0-5])[:.]")
     private val CRYPTO = Regex(U + "\\b(bitcoin|crypto|btc)", setOf(RegexOption.IGNORE_CASE))
+    // places.py PRICE: a question that starts by asking what something costs is not a request for places
+    private val PRICE = Regex(U + "^(how much|what('s| is| are| does)( the| a)? (price|cost|fare)s?)\\b")
     private val TRIP = Regex(U + "\\b(what (should|can|to) (i|we) (see|do|visit)|things to (do|see)|sights|sightseeing|get(ting)? around|" +
         "itinerary|how (do|can|should) (i|we) get|\\d+ days|(two|three|four|five|six|seven|few) days|a week in|weekend in)\\b")
     private val GENERAL = Regex(U + "\\b(what('s| is| are) (the )?\\w+( \\w+)? (like|scene)|typical|traditional|cuisine of|dishes|known for|famous for|specialit(y|ies)|must[- ]try)\\b")
@@ -781,7 +783,7 @@ object PlacesText {
     fun parse(question: String, cuisines: List<String>): PlaceAsk? {
         val q = Py.strip(question)
         val low = q.lowercase(Locale.ROOT)
-        if (KNOWLEDGE.containsMatchIn(low) || TRIP.containsMatchIn(low)) return null
+        if (KNOWLEDGE.containsMatchIn(low) || TRIP.containsMatchIn(low) || PRICE.containsMatchIn(low)) return null
         val diet = DIET_WORDS.firstOrNull { has(low, it.first) }?.second
         // the kind of place named first is the one asked for ("a pharmacy near my hotel")
         var group = first(low, KIND_WORDS)

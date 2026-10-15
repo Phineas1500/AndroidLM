@@ -146,16 +146,23 @@ object FollowUp {
     private val SHORT = Regex("^(in|near|for|at|why|how|really)\\b")
     private val PRONOUNS = Regex("\\b(it|its|they|them|their|those|these|that|this|there|he|him|his|she|her|hers|one|ones)\\b")
     private val PERSONAL = Regex("^(he|him|his|she|her|hers)$")
+    // "I", "I'm", "I'd"...: capitalised, but not a name
+    private val SELF = Regex("^I(['’](m|d|ve|ll))?[?.!,]*$")
     private val SPACE = Regex("\\s+")
     const val PREVIOUS_ANSWER_CHARS = 700
     const val MAX_TOKENS = 80
+    const val SHORT_WORDS = 5
+
+    private fun isName(word: String) = word.firstOrNull()?.isUpperCase() == true && !SELF.matches(word)
 
     /**
      * Opens like a follow-up ("what about...", "which of..."), or is a few words ("in Porto?",
-     * "why?"), or is short, names nothing (no capitalised word after the first) and points back
-     * with a pronoun ("how old was he?"), or has "he", "she"... before any name ("when did he win
+     * "why?"), or is short and names nothing (no capitalised word after the first but "I"): with a
+     * pronoun pointing back ("how old was he?"), or at most [SHORT_WORDS] words ("how much is a
+     * taxi?", "what should I avoid doing?"), or has "he", "she"... before any name ("when did he win
      * the Nobel prize?"). "Is it safe to drink the water in Mexico City?" and "How old was Obama
-     * when he became president?" name what they are about, so they stand alone.
+     * when he became president?" name what they are about, so they stand alone. A short question
+     * that stands alone ("who discovered penicillin?") is rewritten unchanged.
      */
     fun looksLike(question: String): Boolean {
         val t = question.trim()
@@ -165,11 +172,12 @@ object FollowUp {
         if (OPENERS.containsMatchIn(q)) return true
         if (words.size <= 4 && SHORT.containsMatchIn(q)) return true
         val raw = t.split(SPACE).filter { it.isNotEmpty() }
-        val names = raw.drop(1).any { w -> w.firstOrNull()?.isUpperCase() == true }
+        val names = raw.drop(1).any(::isName)
         if (words.size <= 12 && !names && PRONOUNS.containsMatchIn(q)) return true
+        if (words.size <= SHORT_WORDS && !names) return true
         // a person pointed back to before anyone is named
         for ((i, w) in raw.withIndex()) {
-            if (i > 0 && w.firstOrNull()?.isUpperCase() == true) return false
+            if (i > 0 && isName(w)) return false
             if (PERSONAL.matches(w.lowercase(java.util.Locale.ROOT).trim('?', '.', '!', ',', '\'', '"'))) return true
         }
         return false
@@ -179,6 +187,31 @@ object FollowUp {
     fun parse(text: String): String? {
         val line = text.lines().map { it.trim().trim('"', '\u201c', '\u201d').trim() }.firstOrNull { it.isNotEmpty() } ?: return null
         return line.takeIf { it.length in 3..300 }
+    }
+}
+
+/**
+ * An answer that recites the app's own instructions instead of answering. "What should I avoid
+ * doing?" with nothing before it was answered "Avoid guessing specific names, dates, or numbers. Do
+ * not use preambles, restate the question, use LaTeX, include citations, or show visible
+ * deliberation." Such an answer is replaced by a request to say what the question is about.
+ */
+object PromptLeak {
+    // words of the answer prompts that an answer to a real question almost never uses together
+    private val MARKERS = listOf(
+        Regex("preamble"), Regex("latex"), Regex("deliberation"), Regex("restat(e|ing) the question"),
+        Regex("(no|include|use) citations"), Regex("reference lists?"), Regex("numbered sources"),
+        Regex("instead of guessing|avoid guessing"), Regex("be concise"),
+    )
+    const val MIN_MARKERS = 3
+    const val CLARIFY = "I'm not sure what this question is about. Could you ask it again with its " +
+        "subject, for example the place, the topic or the situation?"
+
+    /** [MIN_MARKERS] or more of the markers in the answer that the question itself does not use. */
+    fun looksLike(answer: String, question: String): Boolean {
+        val a = answer.lowercase(java.util.Locale.ROOT)
+        val q = question.lowercase(java.util.Locale.ROOT)
+        return MARKERS.count { it.containsMatchIn(a) && !it.containsMatchIn(q) } >= MIN_MARKERS
     }
 }
 
@@ -544,6 +577,8 @@ class ResearchPipeline(
                     }.also { jobs.add(it) }
                 }
                 draft = answering(ResearchPhase.DRAFTING, closedSystem, answerQuestion)
+                // a draft that recited the instructions was replaced: nothing to search for or check
+                if (leaked) return unanswered(titles, decision, draft)
             }
 
             val searched = searching(titles, half, early)
@@ -693,6 +728,15 @@ class ResearchPipeline(
             }
         }
 
+        /** The run ends with [text] alone, without sources or a source check. */
+        private fun unanswered(titles: List<String>, decision: RouteDecision, text: String): ResearchResult {
+            listener.onEvent(ResearchEvent.SourcesFound(emptyList(), 0))
+            val result = ResearchResult(question, titles, decision, emptyList(), 0, text, null, text, timings.toList())
+            listener.onEvent(ResearchEvent.Completed(result))
+            enter(ResearchPhase.DONE)
+            return result
+        }
+
         /** A places answer without the model: why there is no list. */
         private fun placesNotice(t0: Long, decision: RouteDecision, text: String): ResearchResult {
             listener.onEvent(ResearchEvent.SourcesFound(emptyList(), 0))
@@ -742,13 +786,18 @@ class ResearchPipeline(
             return res
         }
 
+        /** Set when an answer recited the instructions and was replaced by [PromptLeak.CLARIFY]. */
+        private var leaked = false
+
         /** A generation whose text is the user-visible answer. */
         private suspend fun answering(phase: ResearchPhase, system: String, user: String): String {
             val res = generating(phase, system, user, config.answerTokens) {
                 listener.onEvent(ResearchEvent.AnswerToken(it))
             }
-            listener.onEvent(ResearchEvent.AnswerCompleted(res.text))
-            return res.text
+            leaked = PromptLeak.looksLike(res.text, answerQuestion)
+            val text = if (leaked) PromptLeak.CLARIFY else res.text
+            listener.onEvent(ResearchEvent.AnswerCompleted(text))
+            return text
         }
 
         private suspend fun searching(

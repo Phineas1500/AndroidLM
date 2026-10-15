@@ -50,13 +50,16 @@ object Prompts {
 
     /**
      * A follow-up question rewritten to stand on its own (app only; rag.py takes one question at a
-     * time). The earlier exchange fills in what the follow-up refers to.
+     * time). The earlier exchange fills in what the follow-up refers to, and its subject: "How long
+     * are they kept?" after a question on Ethereum's blobs is about Ethereum, not cloud storage.
      */
     const val FOLLOWUP_SYSTEM: String =
-        "Rewrite the user's follow-up question as one question that can be understood on its own, " +
-        "using the previous question and answer only to fill in what the follow-up refers to (a " +
-        "person, a place, a thing, a list). Keep the user's wording and intent and do not answer it. " +
-        "If the follow-up already stands on its own, repeat it unchanged. Output only the question."
+        "Rewrite the user's follow-up question as one question that can be understood on its own, by " +
+        "someone who has not seen the previous question. Use the previous question and answer to fill in " +
+        "what the follow-up refers to (a person, a place, a thing, a list) and the subject it is about (the " +
+        "place, the technology, the situation), keeping the user's wording and intent. Do not answer it. If " +
+        "the follow-up is about something new, unrelated to the previous question, repeat it unchanged. " +
+        "Output only the question."
 
     /** The translation of a question in another language (ResearchPipeline Translation). */
     const val TRANSLATE_SYSTEM: String =

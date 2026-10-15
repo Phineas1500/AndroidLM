@@ -38,11 +38,15 @@ object Planner {
 
     /**
      * rag.py `is_prompt_echo`: a line of four or more words found verbatim in the planning prompt is
-     * the model echoing its instructions ("Output only the titles, nothing else."), not a title.
+     * the model echoing its instructions ("Output only the titles, nothing else."), not a title; so
+     * is a sentence of five or more words ending in a full stop ("Do not include any text other than
+     * the Wikipedia article titles.", written for a question too vague to plan).
      */
-    fun isPromptEcho(line: String): Boolean =
-        line.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }.size >= 4 &&
-            Prompts.PLAN_SYSTEM.lowercase().contains(line.lowercase())
+    fun isPromptEcho(line: String): Boolean {
+        val words = line.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }.size
+        return (words >= 4 && Prompts.PLAN_SYSTEM.lowercase().contains(line.lowercase())) ||
+            (words >= 5 && line.endsWith("."))
+    }
 
     /**
      * `LIST_MARKER.sub("", line).strip().strip('"')` with

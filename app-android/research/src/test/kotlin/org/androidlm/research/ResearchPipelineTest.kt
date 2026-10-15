@@ -645,6 +645,65 @@ class ResearchPipelineTest {
         assertEquals(Prompts.CLOSED_SYSTEM + "\n\n" + question, engine.calls[1].prompt)
     }
 
+    /**
+     * The long-session test's "What should I avoid doing?" with nothing before it: the plan was
+     * instructions and the draft recited the answer prompt. The plan's sentences are not titles, and
+     * the draft is replaced by a request to say what the question is about, with no search or check.
+     */
+    @Test
+    fun aDraftThatRecitesTheInstructionsIsReplaced() {
+        val question = "What should I avoid doing?"
+        val plan = "Do not include any text other than the Wikipedia article titles.\n" +
+            "Do not provide explanations, introductions, or conclusions.\nDo not exceed 4 articles.\n"
+        val leak = "Avoid guessing specific names, dates, or numbers. Do not use preambles, restate the question, " +
+            "use LaTeX, include citations, or show visible deliberation."
+        val engine = FakeEngine(listOf(plan, leak, "Check."))
+        val rec = Recorder()
+
+        val result = run(engine, sampleProvider(), question, rec)
+
+        assertEquals(emptyList<String>(), result.titles)
+        assertEquals(Route.ANSWER_FIRST, result.route.route)
+        assertEquals(2, engine.calls.size)
+        assertEquals(PromptLeak.CLARIFY, result.text)
+        assertNull(result.check)
+        assertEquals(emptyList<ResearchSource>(), result.sources)
+        assertEquals(PromptLeak.CLARIFY, rec.all<ResearchEvent.AnswerCompleted>().single().text)
+        assertEquals(listOf("sources", "result", "phase:DONE"), rec.shape().takeLast(3))
+    }
+
+    @Test
+    fun promptLeakNeedsSeveralMarkersTheQuestionDoesNotUse() {
+        val leak = "Do not use preambles, restate the question, use LaTeX, or show visible deliberation."
+        assertTrue(PromptLeak.looksLike(leak, "What should I avoid doing?"))
+        // a question about LaTeX may be answered with LaTeX words
+        assertFalse(PromptLeak.looksLike("The preamble of a LaTeX document comes before \\begin{document}; " +
+            "packages are loaded there. Be concise in comments.", "What goes in a LaTeX preamble?"))
+        assertFalse(PromptLeak.looksLike("Apply pressure, keep the limb still and below the heart, and get help. " +
+            "Avoid guessing the snake's species by approaching it.", "I was bitten by a snake. What do I do?"))
+    }
+
+    /** The long-session test's rewritten "How much is a taxi?" went to a list of stations. */
+    @Test
+    fun aPriceQuestionIsNotAPlacesRequest() {
+        for (q in listOf("How much is a taxi from Lisbon airport to the city center?", "How much does a hostel in Lisbon cost?",
+            "What is the price of a hostel bed in Lisbon?")) assertNull(q, PlacesText.parse(q, emptyList()))
+        // only a question that starts by asking a price: this one still asks for places
+        for (q in listOf("Best vegan restaurants in Buenos Aires, and how much should I tip?", "Cheap low-cost hotels in Lisbon",
+            "Car rental at Lisbon airport")) {
+            assertNotNull(q, PlacesText.parse(q, emptyList()))
+        }
+    }
+
+    @Test
+    fun aSentenceIsNotAPlannedTitle() {
+        assertEquals(emptyList<String>(), Planner.parsePlanOutput(
+            "Do not include any text other than the Wikipedia article titles.\nDo not exceed 4 articles."))
+        // short titles, and titles with a full stop inside, are kept
+        assertEquals(listOf("Washington, D.C.", "St. Louis", "Snakebite"),
+            Planner.parsePlanOutput("Washington, D.C.\nSt. Louis\nSnakebite"))
+    }
+
     // ── empty context ──
 
     /**
@@ -1355,11 +1414,18 @@ class ResearchPipelineTest {
     fun followUpDetection() {
         for (q in listOf("what about London?", "And in Porto?", "in Porto?", "How old was he?", "which of those is open late?",
             "Tell me more about the second one", "why?", "is it expensive?", "when did he win the Nobel prize?",
-            "What did she say about Paris?")) assertTrue(q, FollowUp.looksLike(q))
+            "What did she say about Paris?",
+            // the long-session test (eval/questions_session.jsonl): "I" is not a name, and a few words that
+            // name nothing lean on the previous question
+            "How much is a taxi?", "What should I avoid doing?", "Should I tip there?", "Can I drink it?",
+            "How long are they kept?", "Which of them is faster to verify?")) assertTrue(q, FollowUp.looksLike(q))
         for (q in listOf("Is it safe to drink the tap water in Mexico City?", "Why is the sky blue and the sea salty in summer?",
             "Tell me the best vegan restaurants in Lisbon", "Who was US president when the Berlin Wall fell?",
             "In which country is Timbuktu, and what is it known for today?", "How old was Obama when he became president?",
             "Who wrote One Hundred Years of Solitude?", "Why did Caesar cross the Rubicon and what did he gain?",
+            "Can I drink the tap water in Mexico City?", "What should I pack for Iceland in winter?",
+            "I'm in Lisbon. Where can I eat vegan food?", "My child spilled boiling water on their arm. What do I do?",
+            "Is ML-KEM a signature algorithm? What is it for?",
         )) assertFalse(q, FollowUp.looksLike(q))
         assertEquals("What are the best vegan restaurants in London?", FollowUp.parse("\n\"What are the best vegan restaurants in London?\"\nextra"))
         assertNull(FollowUp.parse("  \n "))
