@@ -69,4 +69,4 @@ ones that show whether the offline Wikipedia lookup is doing its job.
 - Free storage before you started
 - Expert cache size and any setting you changed
 - For each prompt: tok/s, prefill time or speed, cache hit %, flash per token
-- Anything that went wrong, in your own words; screenshots of the telemetry panel are ideal
+- Anything that went wrong, in your own words; screenshots of the telemetry panel (Model and files, in the menu) are ideal

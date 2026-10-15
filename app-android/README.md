@@ -22,12 +22,15 @@ instead of a plain chat turn. It is a port of `scripts/rag.py` (`--mode auto`):
    **Answer first**: answer from the model's own knowledge straight away, then search and append
    a short **Source check** of that draft against the passages.
 
-The screen shows the question, how it was answered (the route and why, the planned articles),
-the numbered sources (tap one to read the passage the model was given), the streamed answer and
-the source check, whose citations like [1] open the cited passage. While the engine reads a long
+The main screen is a chat (`ChatScreen.kt`): each question as a bubble, then its answer streamed
+in, its source check, whose citations like [1] open the cited passage, and under it Copy and a
+fold-out with how it was answered (the route and why, the planned articles), the numbered sources
+(tap one to read the passage the model was given) and the timings. While the engine reads a long
 prompt, a progress bar shows the tokens read and the time left (the engine reports each chunk,
-patch 0005); while it writes, the speed. Engine settings, the model file, live telemetry and the
-optional "Unload model now" sit under Details.
+patch 0005); while it writes, the speed. Chats are saved in the app's storage (`ChatStore.kt`,
+one JSON file per chat) and listed in the side menu; a follow-up is read with the last answer of
+the open chat. The Set up card, the model, the Research switch, engine settings, live telemetry
+and the optional "Unload model now" are under Model and files (`ModelScreen.kt`), in the menu.
 
 Code: the pipeline and the retrieval library are the pure-JVM module `research/`
 (`ResearchPipeline`, `Corpus`, `Planner`, `Prompts`), unit-tested on the JVM against the Python
@@ -97,7 +100,7 @@ adb push wiki.db voyage.db /data/local/tmp/androidlm/corpus/
 adb shell chmod -R a+rX /data/local/tmp/androidlm
 ```
 
-Without a `wiki.db` the Research switch is disabled and the main screen shows these
+Without a `wiki.db` the Research switch (under Model and files) is disabled and shows these
 instructions; plain chat works regardless. The databases are opened read-only when the first
 research question is asked and stay open until the model is unloaded.
 

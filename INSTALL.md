@@ -56,11 +56,11 @@ Pushing 46GB over USB takes roughly 20-50 minutes depending on the cable and por
 
 Then, on the phone: turn on airplane mode, open AndroidLM (it finds the model and the corpus by
 itself; if it was open during the install, tap Refresh; on first launch Android asks whether it
-may show notifications, which the app uses for its progress while it works), leave Research
-switched on, type a question and tap Research. The first question loads the model, about 30 s;
-later questions reuse it. A question about places near you ("vegan food near me") asks for
+may show notifications, which the app uses for its progress while it works), type a question
+in the box at the bottom and tap the send button. The first question loads the model, about 30
+s; later questions reuse it. A question about places near you ("vegan food near me") asks for
 location access the first time; the position comes from GPS, and the app still has no network
-access.
+access. Chats are saved on the phone: the menu (☰, top left) lists them, and starts a new one.
 
 ## On the phone alone
 
@@ -174,12 +174,14 @@ main one.
   113 GB, more than a 128 GB phone holds. The app streams its experts from storage, so it runs on a
   12 GB phone.
 - **Licence:** Qwen Community License 1.0 (the GGUF repository lists Apache-2.0).
-- **Choosing it:** once it is on the phone, pick it in the app's Model list. The app keeps that
-  choice, and the Set up card and the Model list say what the larger model costs.
+- **Choosing it:** once it is on the phone, pick it in the Model list under **Model and files**
+  (in the menu, ☰). The app keeps that choice, and the Set up card and the Model list say what the
+  larger model costs.
 
 Three ways to install it:
-- **On the phone alone:** the Set up card has an "Optional: a larger model" section with Download
-  buttons for its two parts. Import both, as with the other files.
+- **On the phone alone:** the Set up card under **Model and files** (in the menu, ☰) has an
+  "Optional: a larger model" section with Download buttons for its two parts. Import both, as with
+  the other files.
 - **With the script:** `scripts/install.sh --flash-next` downloads, checks and pushes the two parts
   too.
 - **Without the script:** push both parts next to the main model; they must keep their names:
