@@ -127,6 +127,11 @@ The same failures again on the phone, in one session, with the fixed app:
 | How long are they kept? | "How long are blobs kept in Ethereum?"; about 18 days |
 | Who discovered penicillin? (after the follow-ups) | unchanged; Alexander Fleming, 1928 |
 
+Released as 1.8.1 (2026-10-15). The release APKs, on the phone: the online one in one session,
+blobs then "How long are they kept?" ("...in Ethereum?", about 18 days), then the Lisbon airport
+question (not rewritten) and "How much is a taxi?" (€15 to €25); the offline one over it, "What
+should I avoid doing?" as a first question (the request to say what it is about, in 42 s).
+
 ## Still open
 
 - **Heat:** after ten questions the phone writes at about 60% of its cool speed. Nothing in the app

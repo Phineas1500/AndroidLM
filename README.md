@@ -4,6 +4,41 @@ An Android app that answers research questions with no network, on a 12GB phone 
 more slowly), within 50GB of storage. Built for the poidh bounty ["Build the Best Offline AI Research App for
 Android"](https://poidh.xyz/mainnet/bounty/31).
 
+## For judges
+
+- **Phone:** arm64, 12GB of RAM (8GB works, at about half the speed), Android 10 or newer, 47GB
+  free. Developed on a Pixel 8 Pro, under stock Android 16 and under GrapheneOS.
+- **Setup, about an hour and a half:** install `androidlm-1.8.1.apk` from the
+  [latest release](https://github.com/Phineas1500/AndroidLM/releases/latest), open it, and on
+  Wi-Fi tap **Download all missing** in its **Set up** card (46GB, 75-100 minutes). Then turn on
+  airplane mode; on GrapheneOS the app's Network permission can be turned off as well. The
+  `-offline` APK has no network permission at all: the phone's browser downloads the files and
+  the app imports them ([`INSTALL.md`](INSTALL.md)).
+- **How long an answer takes:** the first question loads the model, about 30 s. On a cool phone
+  a question is done in about 2 minutes (median 111 s over 10 questions on GrapheneOS, first
+  words after 50 s): the answer, then a check against its sources. A places question shows its
+  list of real places at once, then the model's recommendations from it. A follow-up adds 12-27 s,
+  while the app rewrites it as a question that stands on its own.
+- **Long sessions:** after about ten questions the phone is hot and writes at about 60% of its cool
+  speed; a phone on a charger runs hotter. 68 questions asked back to back in one session took a
+  median of 2.5 minutes each, with no crash, steady memory, and answers as good at the end as at
+  the start ([`notes/2026-10-14-long-session.md`](notes/2026-10-14-long-session.md)).
+- **Questions to try:**
+  - "Tell me the best vegan restaurants in Lisbon", then "Which of those are open late?";
+    "Video game shops in Santiago, Chile"; "a pharmacy near me" (GPS, still no network).
+  - "What is EIP-4844 and what are blobs in Ethereum?", then "How long are they kept?"; "What is
+    the difference between ML-DSA and SLH-DSA?"
+  - "I just got bitten by a snake while hiking, two hours from the nearest road. What do I do
+    right now?", then "What should I avoid doing?"
+  - "My dinner bill is 2,450 Thai baht and 1 US dollar is 36.5 baht. How much is that in dollars,
+    and what is the total with a 10% tip?"
+- **What to expect:** on the 61 questions of the evaluation [below](#status), the answers came to
+  60-65% as good as a web search + frontier AI answer, depending on the graders, and the web
+  answer was better on every question. Known weak spots: restaurants that have closed since the
+  map data was made; some mislabelled places in Overture's newer categories (shops, places to go
+  out); and kinds of place the places file does not cover, which get a general answer that may
+  name businesses from the model's memory.
+
 ## Approach
 
 - **Model:** Qwen3.6-35B-A3B (35B parameters, 3B active per token) at 2-bit
@@ -140,7 +175,7 @@ cores, RAM, GPU and TPU help, and by how much).
 
 ## Install
 
-The signed APK is in the [v1.8.0 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.8.0) (`androidlm-1.8.0.apk`, or `androidlm-1.8.0-offline.apk` without the network permission).
+The signed APK is in the [v1.8.1 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.8.1) (`androidlm-1.8.1.apk`, or `androidlm-1.8.1-offline.apk` without the network permission).
 [`INSTALL.md`](INSTALL.md) has two routes:
 - **On the phone alone:** install the APK, download the five files with the phone's browser from
   the app's Set up card, then import them. The app checks each file's SHA-256 as it copies it
