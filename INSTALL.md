@@ -75,7 +75,9 @@ access. Chats are saved on the phone: the menu (☰, top left) lists them, and s
    - The files come from Hugging Face. To use another server instead, tap **Change** next to
      "From:" and enter its address. It must serve each file under its own name
      (`<server>/wiki.db`), and the same SHA-256 check applies.
-3. Turn on airplane mode and ask a question (see the end of [Steps](#steps)).
+3. For no network permission at all, install the `-offline` APK over this one: it has the same
+   package and signature, so it keeps the downloaded files, and it declares no INTERNET
+   permission. Then turn on airplane mode and ask a question (see the end of [Steps](#steps)).
 
 **With the offline build**, the browser downloads the files and the app imports them:
 

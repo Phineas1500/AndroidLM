@@ -10,10 +10,12 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
   free. Developed on a Pixel 8 Pro, under stock Android 16 and under GrapheneOS.
 - **Setup, about an hour and a half:** install `androidlm-1.8.2.apk` from the
   [latest release](https://github.com/Phineas1500/AndroidLM/releases/latest), open it, and on
-  Wi-Fi tap **Download all missing** in its **Set up** card (46GB, 75-100 minutes). Then turn on
-  airplane mode; on GrapheneOS the app's Network permission can be turned off as well. The
-  `-offline` APK has no network permission at all: the phone's browser downloads the files and
-  the app imports them ([`INSTALL.md`](INSTALL.md)).
+  Wi-Fi tap **Download all missing** in its **Set up** card (46GB, 75-100 minutes).
+- **Then take its network away:** install `androidlm-1.8.2-offline.apk` over it. It keeps the
+  downloaded files and declares no network permission at all, so Android itself blocks any
+  network access (`aapt2 dump permissions` on the APK lists no INTERNET). The offline APK can also be set up on its
+  own: the phone's browser downloads the files and the app imports them
+  ([`INSTALL.md`](INSTALL.md)).
 - **How long an answer takes:** the first question loads the model, about 30 s. On a cool phone
   a question is done in about 2 minutes (median 111 s over 10 questions on GrapheneOS, first
   words after 50 s): the answer, then a check against its sources. A places question shows its
