@@ -29,7 +29,7 @@
 {"id": "seed-mh-07", "q": "What is the tallest mountain in the country that hosted the 1964 Summer Olympics?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
 {"id": "seed-mh-08", "q": "What currency do they use in the country where Angkor Wat is?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
 {"id": "seed-mh-09", "q": "How did the printing press help the Protestant Reformation spread?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
-{"id": "seed-mh-10", "q": "Beethoven went deaf \u2014 how did he keep composing, and which famous works came after?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-10", "q": "Beethoven went deaf — how did he keep composing, and which famous works came after?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
 {"id": "seed-num-01", "q": "How many times larger is Russia than France?", "category": "numeric", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
 {"id": "seed-num-02", "q": "Is the Netherlands more densely populated than Germany, and by how much?", "category": "numeric", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
 {"id": "seed-num-03", "q": "How many Earths would fit inside the Sun?", "category": "numeric", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
@@ -55,9 +55,9 @@
 {"id": "seed-ooc-02", "q": "What is the euro to US dollar exchange rate right now?", "category": "out_of_corpus", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
 {"id": "seed-ooc-03", "q": "What will the weather be like in Lisbon this weekend?", "category": "out_of_corpus", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
 {"id": "seed-ooc-04", "q": "What new features does the latest iPhone have?", "category": "out_of_corpus", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
-{"id": "seed-lt-01", "q": "What is surstr\u00f6mming, and why does it smell so bad?", "category": "long_tail", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-lt-01", "q": "What is surströmming, and why does it smell so bad?", "category": "long_tail", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
 {"id": "seed-lt-02", "q": "What happened during the dancing plague of 1518?", "category": "long_tail", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
 {"id": "seed-lt-03", "q": "What was the Antikythera mechanism used for?", "category": "long_tail", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
-{"id": "seed-fu-01", "q": "Why did he build it?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
-{"id": "seed-fu-02", "q": "Why isn't it Sydney?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
-{"id": "seed-fu-03", "q": "And what went wrong at Chernobyl?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-fu-01", "q": "Why did he build it?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)", "asked_after": "Who built the Taj Mahal?"}
+{"id": "seed-fu-02", "q": "Why isn't it Sydney?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)", "asked_after": "What is the capital of Australia?"}
+{"id": "seed-fu-03", "q": "And what went wrong at Chernobyl?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)", "asked_after": "How does a nuclear reactor make electricity?"}
