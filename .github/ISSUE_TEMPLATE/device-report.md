@@ -1,6 +1,6 @@
 ---
 name: Device report
-about: Speed and behaviour of the engine or the app on your phone (see TESTING.md)
+about: How AndroidLM ran on your phone (see TESTING.md)
 title: "Device report: <phone model>"
 labels: device-report
 ---
@@ -8,20 +8,19 @@ labels: device-report
 **Phone:** <!-- e.g. Pixel 8 Pro -->
 **RAM / free storage before starting:** <!-- e.g. 12GB / 60GB -->
 **Android version and ROM:** <!-- e.g. Android 16, stock / GrapheneOS -->
-**App tested:** <!-- BigMoeOnEdge v0.24.0 release APK / AndroidLM build ... -->
-**Model file:** Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf <!-- change if different -->
+**App tested:** <!-- e.g. androidlm-1.8.2.apk / androidlm-1.8.2-offline.apk -->
+**Memory preset and settings changed from default:**
 
-| Run | Expert cache (MiB) | tok/s | Prefill (time or tok/s) | Cache hit % | Flash per token |
-|---|---|---|---|---|---|
-| Short prompt | | | | | |
-| Research-sized prompt | | | | | |
-| Short prompt, larger cache | | | | | |
-| Research-sized prompt, larger cache | | | | | |
+| Question | First words (s) | Done (s) | Right? Anything wrong or invented? |
+|---|---|---|---|
+| | | | |
+| | | | |
+| | | | |
 
-**Repeated short prompt (3 more runs), tok/s each:** <!-- shows thermal throttling -->
+(The timings are under "How it was answered" below each answer.)
 
-**Settings changed from default:**
+**Long session (optional):** how many questions in a row, and whether the answers or the speed changed
 
 **Problems (app killed, phone unresponsive, heat, errors):**
 
-**Screenshots of the telemetry panel (optional):**
+**Screenshots (optional):** of answers, and of the speed and memory panel (Model and files, in the menu)

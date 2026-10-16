@@ -3,12 +3,14 @@
 An offline research assistant for a phone: a large mixture-of-experts language model, streamed
 from flash by the [BigMoeOnEdge](https://github.com/Helldez/BigMoeOnEdge) engine, answering
 questions with the help of an offline copy of Wikipedia (and optionally Wikivoyage) stored on
-the device. Nothing leaves the phone: the app declares no `INTERNET` permission and cannot open
-a socket.
+the device. Answering never touches the network. The **online** build uses it only to download
+the model and corpus files from its Set up card; the **offline** build declares no `INTERNET`
+permission at all and cannot open a socket (its files are imported).
 
-The app is a fork of BigMoeOnEdge's Android demo (see [Attribution](#attribution)). Its chat
-screen, settings and live telemetry (tok/s, compute vs flash wait, cache hits) are upstream's;
-AndroidLM removed everything that used the network and added **research mode**.
+The app is a fork of BigMoeOnEdge's Android demo (see [Attribution](#attribution)). Its
+settings and live telemetry (tok/s, compute vs flash wait, cache hits) are upstream's;
+AndroidLM removed upstream's model catalog and downloader, and added **research mode**, its own
+file download and import, and a chat screen with saved chats.
 
 ## Research mode
 
