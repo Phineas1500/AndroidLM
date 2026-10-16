@@ -1,0 +1,63 @@
+{"id": "seed-fac-01", "q": "When was the US created?", "category": "factual", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-fac-02", "q": "Who was the US president in 2016?", "category": "factual", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-fac-03", "q": "How long did the Roman Empire last?", "category": "factual", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-fac-04", "q": "Who designed the Golden Gate Bridge?", "category": "factual", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-fac-05", "q": "Who created the first rocket ship?", "category": "factual", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-exp-01", "q": "What was the goal of the French Revolution?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-exp-02", "q": "Who really created the foundation of electricity?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-exp-03", "q": "Why is the sky blue and not green?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-exp-04", "q": "How does a motor work?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-exp-05", "q": "How does 3D printing work?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-exp-06", "q": "How can an airplane be so fast?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-exp-07", "q": "Why are people saying WiFi and radio waves are harmful? What is the evidence?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-exp-08", "q": "Who created the concept of the government?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-exp-09", "q": "How does an oven work?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-cmp-01", "q": "What's the difference between a crocodile and an alligator?", "category": "comparison", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-cmp-02", "q": "How can you tell a leopard, a jaguar and a cheetah apart?", "category": "comparison", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-cmp-03", "q": "How is Buddhism different from Hinduism?", "category": "comparison", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-cmp-04", "q": "What's the difference between baking soda and baking powder?", "category": "comparison", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-cmp-05", "q": "Which was bigger, the Roman Empire or the Mongol Empire?", "category": "comparison", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-cmp-06", "q": "Does espresso or drip coffee have more caffeine?", "category": "comparison", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-cmp-07", "q": "What's the difference between a virus and a bacterium, and why don't antibiotics work on viruses?", "category": "comparison", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-cmp-08", "q": "How do Linux and Windows handle file permissions differently?", "category": "comparison", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-01", "q": "What was the goal of Martin Luther and what happened to Christianity through his works?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-02", "q": "What technology is attributed to the foundation of AI and where did it start?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-03", "q": "Which river flows through the capital of Hungary, and into which sea does it flow?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-04", "q": "What language is spoken today in the country where the Inca Empire had its capital?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-05", "q": "Who was the British monarch when the Eiffel Tower was finished?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-06", "q": "Which university did the inventor of the World Wide Web study at?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-07", "q": "What is the tallest mountain in the country that hosted the 1964 Summer Olympics?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-08", "q": "What currency do they use in the country where Angkor Wat is?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-09", "q": "How did the printing press help the Protestant Reformation spread?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-mh-10", "q": "Beethoven went deaf \u2014 how did he keep composing, and which famous works came after?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-num-01", "q": "How many times larger is Russia than France?", "category": "numeric", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-num-02", "q": "Is the Netherlands more densely populated than Germany, and by how much?", "category": "numeric", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-num-03", "q": "How many Earths would fit inside the Sun?", "category": "numeric", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-num-04", "q": "Walking 5 km an hour, how long would it take to walk the length of the Great Wall of China?", "category": "numeric", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-num-05", "q": "How much taller is Mount Everest than Mont Blanc, in metres?", "category": "numeric", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-trv-01", "q": "Is it safe to drink tap water in Mexico City?", "category": "travel", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-trv-02", "q": "Do you tip in restaurants in Japan?", "category": "travel", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-trv-03", "q": "What should I do if I get stung by a jellyfish?", "category": "travel", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-trv-04", "q": "How do I say \"thank you\" and \"excuse me\" in Thai?", "category": "travel", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-trv-05", "q": "What are the signs of altitude sickness, and how do I avoid it when hiking in Peru?", "category": "travel", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-trv-06", "q": "When is the best time to visit Iceland to see the northern lights?", "category": "travel", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-trv-07", "q": "What should I see in Kyoto if I only have two days?", "category": "travel", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-trv-08", "q": "What vaccinations do I need for a trip to Kenya?", "category": "travel", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-trv-09", "q": "What do I have to keep in mind while camping in the wild?", "category": "travel", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-how-01", "q": "What can you feed a bird? What should you not feed a bird?", "category": "howto", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-how-02", "q": "How do I fix a squeaky door hinge?", "category": "howto", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-how-03", "q": "How do I make a sourdough starter from scratch?", "category": "howto", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-how-04", "q": "How do I find out which process is using a port on Linux?", "category": "howto", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-how-05", "q": "How do I fix a flat bike tyre when I'm out on a ride?", "category": "howto", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-how-06", "q": "How do I get rid of black mould in the bathroom for good?", "category": "howto", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-how-07", "q": "How do I solve a quadratic equation by completing the square?", "category": "howto", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-ooc-01", "q": "Who won the most recent FIFA World Cup?", "category": "out_of_corpus", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-ooc-02", "q": "What is the euro to US dollar exchange rate right now?", "category": "out_of_corpus", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-ooc-03", "q": "What will the weather be like in Lisbon this weekend?", "category": "out_of_corpus", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-ooc-04", "q": "What new features does the latest iPhone have?", "category": "out_of_corpus", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-lt-01", "q": "What is surstr\u00f6mming, and why does it smell so bad?", "category": "long_tail", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-lt-02", "q": "What happened during the dancing plague of 1518?", "category": "long_tail", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-lt-03", "q": "What was the Antikythera mechanism used for?", "category": "long_tail", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-fu-01", "q": "Why did he build it?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-fu-02", "q": "Why isn't it Sydney?", "category": "explanation", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
+{"id": "seed-fu-03", "q": "And what went wrong at Chernobyl?", "category": "multihop", "source": "0xPD33/commonplace eval/queries.jsonl (Apache-2.0)"}
