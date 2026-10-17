@@ -36,11 +36,11 @@ The files reach the phone by one of these routes:
 
 ```sh
 git clone https://github.com/Phineas1500/AndroidLM && cd AndroidLM
-# the signed app from the v1.8.2 release (or build it yourself: app-android/README.md)
-curl -L -o androidlm-1.8.2.apk \
-  https://github.com/Phineas1500/AndroidLM/releases/download/v1.8.2/androidlm-1.8.2.apk
-shasum -a 256 androidlm-1.8.2.apk   # 7da87eb4c654cd9d95ac02a568612b18e9acd755d01dd150714115c55152f072
-scripts/install.sh --apk androidlm-1.8.2.apk
+# the signed app from the v1.8.3 release (or build it yourself: app-android/README.md)
+curl -L -o androidlm-1.8.3.apk \
+  https://github.com/Phineas1500/AndroidLM/releases/download/v1.8.3/androidlm-1.8.3.apk
+shasum -a 256 androidlm-1.8.3.apk   # 82d9bdbc7dc0c3721a369f093efa0f02f78758a0ab52778ad8b18de81c508403
+scripts/install.sh --apk androidlm-1.8.3.apk
 ```
 
 The APK carries the Ethereum and cryptography library (19MB) and sets it up on first use.
@@ -115,7 +115,7 @@ adb shell mkdir -p /data/local/tmp/bmoe/corpus
 adb push Qwen3.6-35B-A3B-UD-Q2_K_XL.gguf /data/local/tmp/bmoe/
 adb push wiki.db wiki_df.db voyage.db places.db /data/local/tmp/bmoe/corpus/
 adb shell 'chmod 755 /data/local/tmp/bmoe /data/local/tmp/bmoe/corpus; chmod 644 /data/local/tmp/bmoe/*.gguf /data/local/tmp/bmoe/corpus/*.db'
-adb install -r androidlm-1.8.2.apk
+adb install -r androidlm-1.8.3.apk
 ```
 
 `/data/local/tmp` is used because the app can open files there in place, without a storage
@@ -123,15 +123,15 @@ permission and with direct I/O, which the streaming engine needs for speed. File
 `/sdcard` also work for the model but are slower, and the corpus cannot be opened from a file
 picker location at all.
 
-## Updating from 1.8.0 or 1.8.1
+## Updating from 1.8.0, 1.8.1 or 1.8.2
 
-1.8.2 reads the same files as 1.8.0. Install the 1.8.2 APK over the old one (the offline one over
+1.8.3 reads the same files as 1.8.0. Install the 1.8.3 APK over the old one (the offline one over
 the offline build); nothing else needs downloading.
 
 ## Updating from 1.7.x
 
 1.8.0 reads a new `places.db` (3.5GB, the old one 2.9GB). It adds shops by kind and places to go
-out. The other files stay as they are. Install the 1.8.2 APK over the old one (the offline one
+out. The other files stay as they are. Install the 1.8.3 APK over the old one (the offline one
 over the offline build), then:
 
 - **Files downloaded or imported in the app:** the **Set up** card says "Update available". Until
@@ -140,7 +140,7 @@ over the offline build), then:
   old file is replaced once the new one has passed its SHA-256 check.
   - With the offline build, **Update** next to the places file downloads it in the browser. Then
     use **Import files…** as in the first setup.
-- **Files pushed with adb:** run `scripts/install.sh --apk androidlm-1.8.2.apk` again. It
+- **Files pushed with adb:** run `scripts/install.sh --apk androidlm-1.8.3.apk` again. It
   downloads and pushes only `places.db`.
 
 ## Updating from 1.6.1 or earlier
@@ -160,7 +160,7 @@ they are. Install the new APK over the old one, then:
   - With the offline build, **Update** next to each file downloads it in the browser; then
     **Import files…** as in the first setup. An import deletes the older version itself when the
     new one needs its room.
-- **Files pushed with adb:** run `scripts/install.sh --apk androidlm-1.8.2.apk` again. It pushes
+- **Files pushed with adb:** run `scripts/install.sh --apk androidlm-1.8.3.apk` again. It pushes
   only the files that changed.
 
 ## Optional: the larger model
