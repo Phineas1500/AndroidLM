@@ -417,6 +417,7 @@ class City:
     population: int
     capital: int = 0
     country_name: str = ""
+    for_country: str = ""  # "the capital" or "the largest city", for a question that names only the country
 
     @property
     def radius_km(self):
@@ -427,7 +428,7 @@ class City:
         if self.admin1 and self.country in ("US", "CA", "AU", "IN", "BR", "MX") and self.admin1 != self.name:
             parts.append(self.admin1)
         parts.append(self.country_name or self.country)
-        return ", ".join(parts)
+        return ", ".join(parts) + (f" ({self.for_country})" if self.for_country else "")
 
 
 PRIMARY_WEIGHT = 3  # a city whose own name is the one asked for counts as three times its size
@@ -447,9 +448,13 @@ def locate(db, ask):
     A bare capitalised run may start with question words ("Does Lisbon have..."), which are skipped.
     A country after "in/near/around" with no city of 100,000 or more or capital by its name is not
     one of its villages ("in the US": not Us in France), and then no bare capitalised run is the
-    place either ("Do you tip in restaurants in Japan?": Do is a name of Jahrom)."""
+    place either ("Do you tip in restaurants in Japan?": Do is a name of Jahrom), nor a word of its
+    name ("South Korea": not the South Region of Cameroon). When no city is named, a question that
+    asks for places in the country ("Do you have any vegan restaurants in Japan?") gets those of its
+    capital or largest city (_country_city), labelled so; one that asks about the country ("How
+    hard is it to be vegan in Japan?") gets none."""
     cuisine = norm_key(sub_word(ask.sub)) if ask.sub else None
-    country_named = False
+    country_named = None
     for text, anchored in place_candidates(ask.question):
         if country_named and not anchored:
             break  # the bare runs come after every anchored candidate
@@ -477,10 +482,11 @@ def locate(db, ask):
                 region, people = _region_city(db, key)
                 if region is not None and people > weight:
                     best = region
-                if not (best and (best.population >= 100_000 or best.capital)) and db.execute(
-                        "select 1 from region_names where key = ? and admin1 = ''", (key,)).fetchone():
-                    country_named = True
-                    continue
+                country = None if best and (best.population >= 100_000 or best.capital) else db.execute(
+                    "select country from region_names where key = ? and admin1 = '' order by country", (key,)).fetchone()
+                if country:
+                    country_named = country_named or country[0]
+                    break  # nor a shorter part of its name ("South" of "South Korea")
             if best is None:
                 continue
             if not ((anchored and capital) or best.population >= 100_000):
@@ -488,7 +494,30 @@ def locate(db, ask):
             row = db.execute("select name from countries where code = ?", (best.country,)).fetchone()
             best.country_name = row[0] if row else ""
             return best
+    low = ask.question.lower()
+    if country_named and (REQUEST.search(low) or PLACE_NOUNS.search(low)):
+        return _country_city(db, country_named)
     return None
+
+
+COUNTRY_CITY_FACTOR = 2  # a city this many times the capital's size stands for its country instead
+
+
+def _country_city(db, country):
+    """The city whose places answer a question that names only [country] (a code): its capital
+    (Tokyo, Amsterdam), or its largest city when that is more than twice the capital's size
+    (Sydney, not Canberra; New York, not Washington). None when it has no capital (Israel)."""
+    cols = "id, name, country, admin1, lat, lon, population, capital"
+    cap = db.execute(f"select {cols} from cities where country = ? and capital = 1 order by population desc, id limit 1",
+                     (country,)).fetchone()
+    if cap is None:
+        return None
+    big = db.execute(f"select {cols} from cities where country = ? order by population desc, id limit 1", (country,)).fetchone()
+    row = db.execute("select name from countries where code = ?", (country,)).fetchone()
+    name = row[0] if row else ""
+    if big[6] > COUNTRY_CITY_FACTOR * cap[6]:
+        return City(*big, country_name=name, for_country="the largest city")
+    return City(*cap, country_name=name, for_country="the capital")
 
 
 def _weight(c, key):

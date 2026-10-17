@@ -86,6 +86,12 @@ QUESTIONS = [
     "Does London have vegan restaurants?",
     "Has London got good vegan cafes?",
     "vegan restaurants in London in England",
+    "Vegan restaurants in Argentina",
+    "Best vegetarian cafes in the UK",
+    "Are there kosher restaurants in Canada?",
+    "Vegan restaurants in South Korea",
+    "How hard is it to be vegan in Japan?",
+    "vegan restaurants in Israel",
     # shops by kind and places to go for fun
     "Video game shops in London",
     "Where are the arcades in Buenos Aires?",

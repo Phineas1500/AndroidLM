@@ -47,6 +47,8 @@ data class City(
     /** 1 for a national capital (GeoNames PPLC). */
     val capital: Int = 0,
     val countryName: String = "",
+    /** "the capital" or "the largest city", for a question that names only the country (places.py `_country_city`). */
+    val forCountry: String = "",
 ) {
     val radiusKm: Double get() = PlacesText.cityRadiusKm(population)
 
@@ -54,7 +56,7 @@ data class City(
         val parts = mutableListOf(name)
         if (!admin1.isNullOrEmpty() && country in LABEL_REGION && admin1 != name) parts.add(admin1)
         parts.add(countryName.ifEmpty { country })
-        return parts.joinToString(", ")
+        return parts.joinToString(", ") + (if (forCountry.isNotEmpty()) " ($forCountry)" else "")
     }
 
     private companion object {
@@ -790,6 +792,9 @@ object PlacesText {
         return best
     }
 
+    /** The question (lower case) asks for places (places.py `locate`'s REQUEST or PLACE_NOUNS), not about a country. */
+    fun asksForPlaces(low: String): Boolean = REQUEST.containsMatchIn(low) || PLACE_NOUNS.containsMatchIn(low)
+
     /** places.py `parse`. [cuisines]: places.db's category names, in id order. */
     fun parse(question: String, cuisines: List<String>): PlaceAsk? {
         val q = Py.strip(question)
@@ -1225,9 +1230,9 @@ class Places(private val db: SqlDatabase) {
         // the word the question names its cuisine by is not a place ("thank you in Thai")
         val cuisine = ask.sub?.let { PlacesText.normKey(PlacesText.subWord(it)) }
         // a country after "in" with no city of its name: no bare capitalised run is the place either
-        var countryNamed = false
+        var countryNamed: String? = null
         for ((text, anchored) in PlacesText.placeCandidates(ask.question)) {
-            if (countryNamed && !anchored) break  // the bare runs come after every anchored candidate
+            if (countryNamed != null && !anchored) break  // the bare runs come after every anchored candidate
             val key0 = PlacesText.normKey(text)
             val words = if (key0.isEmpty()) emptyList() else key0.split(" ")
             val capital = text.isNotEmpty() && Character.isUpperCase(text.codePointAt(0))
@@ -1254,11 +1259,12 @@ class Places(private val db: SqlDatabase) {
                     val (region, people) = regionCity(key)
                     if (region != null && people > w) best = region
                     // "in the US", "in Japan": the country, not a village of its name (Us in France)
-                    if (!(best != null && (best.population >= 100_000 || best.capital != 0)) &&
-                        db.query("select 1 from region_names where key = ? and admin1 = ''", key).isNotEmpty()
-                    ) {
-                        countryNamed = true
-                        continue
+                    val country = if (best != null && (best.population >= 100_000 || best.capital != 0)) null
+                    else db.query("select country from region_names where key = ? and admin1 = '' order by country", key)
+                        .firstOrNull()?.get(0) as String?
+                    if (country != null) {
+                        countryNamed = countryNamed ?: country
+                        break  // nor a shorter part of its name ("South" of "South Korea")
                     }
                 }
                 if (best == null) continue
@@ -1267,7 +1273,27 @@ class Places(private val db: SqlDatabase) {
                 return best.copy(countryName = cn ?: "")
             }
         }
+        // only a country: its capital's or largest city's places, for a question that asks for places
+        // ("Do you have any vegan restaurants in Japan?"), not about the country ("How hard is it to be vegan in Japan?")
+        val low = ask.question.lowercase(Locale.ROOT)
+        if (countryNamed != null && PlacesText.asksForPlaces(low)) return countryCity(countryNamed)
         return null
+    }
+
+    /**
+     * places.py `_country_city`: the capital of [country] (a code), or its largest city when that is
+     * more than COUNTRY_CITY_FACTOR times the capital's size (Sydney, not Canberra); null when it has
+     * no capital.
+     */
+    private fun countryCity(country: String): City? {
+        val cols = "id, name, country, admin1, lat, lon, population, capital"
+        val cap = db.query("select $cols from cities where country = ? and capital = 1 order by population desc, id limit 1", country)
+            .firstOrNull()?.let { city(it) } ?: return null
+        val big = db.query("select $cols from cities where country = ? order by population desc, id limit 1", country)
+            .first().let { city(it) }
+        val name = db.query("select name from countries where code = ?", country).firstOrNull()?.get(0) as String? ?: ""
+        return if (big.population > COUNTRY_CITY_FACTOR * cap.population) big.copy(countryName = name, forCountry = "the largest city")
+        else cap.copy(countryName = name, forCountry = "the capital")
     }
 
     /**
@@ -1458,6 +1484,8 @@ class Places(private val db: SqlDatabase) {
         const val PRIMARY_WEIGHT = 3L
         /** places.py `CAPITAL_WEIGHT`: a national capital by its own name counts five times again. */
         const val CAPITAL_WEIGHT = 5L
+        /** places.py `COUNTRY_CITY_FACTOR`: a city this many times the capital's size stands for its country instead. */
+        const val COUNTRY_CITY_FACTOR = 2L
         const val MIN_HERE = 5
         val CITY_WIDEN = listOf(1.0, 2.0, 4.0)
         const val MAX_RADIUS_KM = 50.0
