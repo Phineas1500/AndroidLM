@@ -259,6 +259,14 @@ TRIP = re.compile(r"\b(what (should|can|to) (i|we) (see|do|visit)|things to (do|
 # the travel guide and Wikipedia answer it, not a list of places. Only at the start, so that "vegan
 # restaurants in Lima, and how much should I tip?" still asks for places
 PRICE = re.compile(r"^(how much|what('s| is| are| does)( the| a)? (price|cost|fare)s?)\b")
+# a question about a custom (tipping, etiquette, a dress code) that names a kind of place only to say
+# where: the travel guide and the model answer it, not a list of places ("Do you tip in restaurants in
+# Japan?"). It is a request for places when it says so or names a diet or a cuisine ("vegan
+# restaurants in Lima, and how much should I tip?", "where should I eat in Tokyo, and do I tip?")
+CUSTOM = re.compile(r"\b(tip|tips|tipping|tipped|gratuit(y|ies)|service charges?|etiquette|customs|customary|"
+                    r"manners|rude|polite|impolite|dress code)\b")
+REQUEST = re.compile(r"\b(best|good|great|top|recommend\w*|suggest\w*|where|find|list|options?|places?|spots?|"
+                     r"cheap|affordable|nice|popular|favou?rite|near|nearby)\b")
 # words that name places to go to: with a city, a request for places even without "best" or "where"
 PLACE_NOUNS = re.compile(r"\b(restaurants?|cafes?|caf\u00e9s?|coffee shops?|bars?|pubs?|hotels?|hostels?|bakery|bakeries|"
                          r"eatery|eateries|guest ?houses?|bistros?|brewery|breweries|pharmacy|pharmacies|chemists?|"
@@ -349,6 +357,8 @@ def parse(question, cuisines=()):
                         and (" " in stem or stem in words):
                     sub = cat
                     break
+    if CUSTOM.search(low) and not (diet or sub) and not REQUEST.search(low):
+        return None
     if group is None and diet is None and sub is None:
         return None
     if group is None:
@@ -371,10 +381,14 @@ def parse(question, cuisines=()):
 
 CAPITALISED = re.compile(r"[A-Z][\w'\u2019.-]*(?:\s+(?:[A-Z][\w'\u2019.-]*|de|da|do|del|la|le|el|of|upon|am|sur|an|on|y|i)(?=\s+[A-Z]))*(?:\s+[A-Z][\w'\u2019.-]*)?")
 CLAUSE_END = re.compile(r"[?!;:()\[\]]|\s(?:that|which|with|for|open|serving|where|who|to|and|or|but|if|while|when|because|so|I)\s")
-# capitalised words that start questions and are also names of small towns
+# capitalised words that start questions and are also names of towns ("Do" is a name of Jahrom,
+# "Has" of Ha'il, "For" of Fortaleza, "Can" of Guangzhou)
 NOT_PLACES = {"best", "tell", "where", "what", "which", "who", "how", "can", "could", "should", "would",
               "any", "list", "give", "show", "find", "recommend", "suggest", "please", "i", "is", "are",
-              "top", "good", "great", "cheap", "vegan", "vegetarian", "halal", "kosher", "some", "the"}
+              "top", "good", "great", "cheap", "vegan", "vegetarian", "halal", "kosher", "some", "the",
+              "do", "does", "did", "has", "have", "had", "was", "were", "will", "may", "why", "when",
+              "for", "in", "at", "on", "if", "and", "but", "so", "also", "ok", "okay", "hey", "hi", "hello",
+              "we", "you", "my", "our", "it", "there", "this", "that", "name", "tip", "tips"}
 
 
 def place_candidates(q):
@@ -429,20 +443,30 @@ def locate(db, ask):
     stands for its largest city ("Bali": Denpasar, not Bāli in West Bengal). National capitals count
     five times their size ("Washington"). A candidate after "in/near/around" is taken when it is capitalised or
     a city of 100,000 or more; a bare capitalised run only in the latter case. The word the question
-    names its cuisine by is not a place ("thank you in Thai": Thai is also a name of Alor Setar)."""
+    names its cuisine by is not a place ("thank you in Thai": Thai is also a name of Alor Setar).
+    A bare capitalised run may start with question words ("Does Lisbon have..."), which are skipped.
+    A country after "in/near/around" with no city of 100,000 or more or capital by its name is not
+    one of its villages ("in the US": not Us in France), and then no bare capitalised run is the
+    place either ("Do you tip in restaurants in Japan?": Do is a name of Jahrom)."""
     cuisine = norm_key(sub_word(ask.sub)) if ask.sub else None
+    country_named = False
     for text, anchored in place_candidates(ask.question):
+        if country_named and not anchored:
+            break  # the bare runs come after every anchored candidate
         words = norm_key(text).split()
         capital = text[:1].isupper()
-        for n in range(min(len(words), 5), 0, -1):
-            key = " ".join(words[:n])
+        starts = [0]
+        while not anchored and starts[-1] < len(words) - 1 and words[starts[-1]] in NOT_PLACES:
+            starts.append(starts[-1] + 1)
+        for s, n in [(s, n) for s in starts for n in range(min(len(words) - s, 5), 0, -1)]:
+            key = " ".join(words[s:s + n])
             if (not anchored and key in NOT_PLACES) or key == cuisine:
                 continue
             ids = [r[0] for r in db.execute("select city from city_names where key = ?", (key,))]
             cities = [City(*r) for r in db.execute(
                 f"select id, name, country, admin1, lat, lon, population, capital from cities where id in ({','.join('?' * len(ids))})",
                 ids)] if ids else []
-            rest = words[n:]
+            rest = words[s + n:]
             if rest and cities:
                 hinted = _hinted(db, cities, rest)
                 if hinted:
@@ -453,6 +477,10 @@ def locate(db, ask):
                 region, people = _region_city(db, key)
                 if region is not None and people > weight:
                     best = region
+                if not (best and (best.population >= 100_000 or best.capital)) and db.execute(
+                        "select 1 from region_names where key = ? and admin1 = ''", (key,)).fetchone():
+                    country_named = True
+                    continue
             if best is None:
                 continue
             if not ((anchored and capital) or best.population >= 100_000):

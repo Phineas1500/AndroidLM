@@ -75,6 +75,17 @@ QUESTIONS = [
     "Where can I exchange money in Buenos Aires?",
     "Which vegan restaurants in Buenos Aires are open on Sunday?",
     "Best vegan restaurants in Buenos Aires, and how much should I tip?",
+    # customs, countries and question words ("Do" is a name of Jahrom)
+    "Do you tip in restaurants in Japan?",
+    "Is tipping expected in restaurants in the US?",
+    "Is it rude to tip in cafes in London?",
+    "What's the dress code for restaurants in Buenos Aires?",
+    "Where should I eat in Buenos Aires, and do I need to tip?",
+    "Do you have any vegan restaurants in Japan?",
+    "Are there vegan restaurants in the US?",
+    "Does London have vegan restaurants?",
+    "Has London got good vegan cafes?",
+    "vegan restaurants in London in England",
     # shops by kind and places to go for fun
     "Video game shops in London",
     "Where are the arcades in Buenos Aires?",

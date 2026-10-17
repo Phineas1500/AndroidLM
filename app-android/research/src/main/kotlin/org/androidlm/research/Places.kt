@@ -696,6 +696,14 @@ object PlacesText {
     private val CRYPTO = Regex(U + "\\b(bitcoin|crypto|btc)", setOf(RegexOption.IGNORE_CASE))
     // places.py PRICE: a question that starts by asking what something costs is not a request for places
     private val PRICE = Regex(U + "^(how much|what('s| is| are| does)( the| a)? (price|cost|fare)s?)\\b")
+    // places.py CUSTOM and REQUEST: a question about tipping, etiquette or a dress code that names a
+    // kind of place only to say where is not a request for places, unless it says so or names a diet
+    // or a cuisine ("Do you tip in restaurants in Japan?" against "vegan restaurants in Lima, and how
+    // much should I tip?")
+    private val CUSTOM = Regex(U + "\\b(tip|tips|tipping|tipped|gratuit(y|ies)|service charges?|etiquette|customs|customary|" +
+        "manners|rude|polite|impolite|dress code)\\b")
+    private val REQUEST = Regex(U + "\\b(best|good|great|top|recommend\\w*|suggest\\w*|where|find|list|options?|places?|spots?|" +
+        "cheap|affordable|nice|popular|favou?rite|near|nearby)\\b")
     private val TRIP = Regex(U + "\\b(what (should|can|to) (i|we) (see|do|visit)|things to (do|see)|sights|sightseeing|get(ting)? around|" +
         "itinerary|how (do|can|should) (i|we) get|\\d+ days|(two|three|four|five|six|seven|few) days|a week in|weekend in)\\b")
     private val GENERAL = Regex(U + "\\b(what('s| is| are) (the )?\\w+( \\w+)? (like|scene)|typical|traditional|cuisine of|dishes|known for|famous for|specialit(y|ies)|must[- ]try)\\b")
@@ -711,10 +719,13 @@ object PlacesText {
     private const val STRIP = " .,'\""
     private val WORDS = Regex("[a-z]+")
 
-    /** Capitalised words that start questions and are also names of small towns. */
+    /** Capitalised words that start questions and are also names of towns ("Do" is a name of Jahrom). */
     val NOT_PLACES = setOf("best", "tell", "where", "what", "which", "who", "how", "can", "could", "should", "would",
         "any", "list", "give", "show", "find", "recommend", "suggest", "please", "i", "is", "are",
-        "top", "good", "great", "cheap", "vegan", "vegetarian", "halal", "kosher", "some", "the")
+        "top", "good", "great", "cheap", "vegan", "vegetarian", "halal", "kosher", "some", "the",
+        "do", "does", "did", "has", "have", "had", "was", "were", "will", "may", "why", "when",
+        "for", "in", "at", "on", "if", "and", "but", "so", "also", "ok", "okay", "hey", "hi", "hello",
+        "we", "you", "my", "our", "it", "there", "this", "that", "name", "tip", "tips")
 
     const val MIN_SUB = 3
     /** Rows read for a lookup without a diet, by the static rank (build_places.py). */
@@ -804,6 +815,7 @@ object PlacesText {
                 }
             }
         }
+        if (CUSTOM.containsMatchIn(low) && diet == null && sub == null && !REQUEST.containsMatchIn(low)) return null
         if (group == null && diet == null && sub == null) return null
         if (group == null) group = "eat"
         val asks = RECOMMEND.containsMatchIn(low) || PLACE_NOUNS.containsMatchIn(low)
@@ -1212,19 +1224,25 @@ class Places(private val db: SqlDatabase) {
     fun locate(ask: PlaceAsk): City? {
         // the word the question names its cuisine by is not a place ("thank you in Thai")
         val cuisine = ask.sub?.let { PlacesText.normKey(PlacesText.subWord(it)) }
+        // a country after "in" with no city of its name: no bare capitalised run is the place either
+        var countryNamed = false
         for ((text, anchored) in PlacesText.placeCandidates(ask.question)) {
+            if (countryNamed && !anchored) break  // the bare runs come after every anchored candidate
             val key0 = PlacesText.normKey(text)
             val words = if (key0.isEmpty()) emptyList() else key0.split(" ")
             val capital = text.isNotEmpty() && Character.isUpperCase(text.codePointAt(0))
-            for (n in min(words.size, 5) downTo 1) {
-                val key = words.subList(0, n).joinToString(" ")
+            // a bare run may start with question words ("Does Lisbon have...")
+            val starts = mutableListOf(0)
+            while (!anchored && starts.last() < words.size - 1 && words[starts.last()] in PlacesText.NOT_PLACES) starts.add(starts.last() + 1)
+            for ((s, n) in starts.flatMap { s -> (min(words.size - s, 5) downTo 1).map { s to it } }) {
+                val key = words.subList(s, s + n).joinToString(" ")
                 if ((!anchored && key in PlacesText.NOT_PLACES) || key == cuisine) continue
                 val ids = db.query("select city from city_names where key = ?", key).map { it[0] as Long }
                 var cities = if (ids.isEmpty()) emptyList() else db.query(
                     "select id, name, country, admin1, lat, lon, population, capital from cities where id in (" +
                         ids.joinToString(",") { "?" } + ")", *ids.toTypedArray(),
                 ).map { city(it) }
-                val rest = words.subList(n, words.size)
+                val rest = words.subList(s + n, words.size)
                 if (rest.isNotEmpty() && cities.isNotEmpty()) hinted(cities, rest)?.let { cities = it }
                 // an alternate name counts the city's people once (Hong Kong was once "Victoria")
                 fun weight(c: City) =
@@ -1235,6 +1253,13 @@ class Places(private val db: SqlDatabase) {
                 if (anchored) {
                     val (region, people) = regionCity(key)
                     if (region != null && people > w) best = region
+                    // "in the US", "in Japan": the country, not a village of its name (Us in France)
+                    if (!(best != null && (best.population >= 100_000 || best.capital != 0)) &&
+                        db.query("select 1 from region_names where key = ? and admin1 = ''", key).isNotEmpty()
+                    ) {
+                        countryNamed = true
+                        continue
+                    }
                 }
                 if (best == null) continue
                 if (!((anchored && capital) || best.population >= 100_000)) continue

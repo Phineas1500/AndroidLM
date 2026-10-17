@@ -88,7 +88,13 @@ Commonplace's 19 wins, by what went wrong in AndroidLM's answer:
   as the RBMK moderator, a ten-year rule for Canberra.
 - **A places search where none was asked for** (1): "Do you tip in restaurants in Japan?" went to
   the places route, and the answer listed a chicken restaurant and an internet cafe in Jahrom,
-  Iran, under its correct text.
+  Iran, under its correct text. Japan names no city, so the search fell back to the question's
+  capitalised words, and "Do" is another name of Jahrom (141,000 people). Fixed since: a question
+  about tipping, etiquette or a dress code that asks for no places is not a places question, a
+  country after "in" is never taken for a village of its name or another word of the question,
+  and the words that start questions ("Do", "Has", "For") are not place names. Of the 325
+  questions in `eval/`, only this one and "Is tipping expected in restaurants in Portugal?"
+  (which found no city before either) change route.
 - **A newer Wikipedia** (1): Commonplace's (snapshot 2026-09-01) knows that Spain won the 2026
   World Cup; AndroidLM said Argentina, 2022.
 - **Others** (6): the Roman Empire answer that contradicts itself in its first sentence, the
