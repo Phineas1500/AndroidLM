@@ -1,0 +1,1082 @@
+{
+ "cry-001": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 1
+  },
+  "errors": {
+   "A": [
+    "confusing sentence implies SPHINCS+ is an exception to quantum resistance"
+   ],
+   "B": [],
+   "C": [
+    "ElGamal, Schnorr, Rabin and Pointcheval-Stern listed as quantum resistant (all broken by Shor; Pointcheval-Stern is a proof technique)",
+    "Dilithium described as Ring-LWE (it is Module-LWE)",
+    "Dilithium said to have among the smallest keys/signatures (Falcon is smaller)"
+   ]
+  },
+  "best": "B",
+  "reason": "B lists all NIST standards incl. XMSS/LMS with correct sizes and status, and what is not quantum resistant; A is correct but partial; C names classical schemes as quantum resistant.",
+  "grader": 1
+ },
+ "cry-002": {
+  "scores": {
+   "A": 6,
+   "B": 4,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "says SLH-DSA relies on hash collision resistance (SPHINCS+ is designed not to need it)"
+   ],
+   "B": [
+    "says they differ in standardization status (both are final NIST FIPS of Aug 2024)",
+    "irrelevant IPsec claim"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives correct basis, exact key/signature sizes, speed and use cases; A is accurate on basis but omits the size/speed trade-off; B is thin.",
+  "grader": 2
+ },
+ "cry-003": {
+  "scores": {
+   "A": 10,
+   "B": 4,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A explains Shor's period finding vs Grover's quadratic speedup, collisions and current resource estimates, all accurate (Gidney 2025, Google March 2026 ECDLP paper). C is correct but thinner; B asserts the result without explaining why.",
+  "grader": 3
+ },
+ "cry-004": {
+  "scores": {
+   "A": 10,
+   "B": 2,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "blobs up to 32 MB (they are 128 KiB)",
+    "contradictory: 'stored off-chain' and 'stored on the blockchain'",
+    "omits ~18-day pruning, KZG, separate fee market"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A is accurate and complete (size, type-3 tx, KZG, blob gas, 18-day retention, later blob-limit increases); C is correct but lighter; B gets the size badly wrong.",
+  "grader": 1
+ },
+ "cry-005": {
+  "scores": {
+   "A": 10,
+   "B": 5,
+   "C": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "checkpoint described as block at end of epoch (it is the first slot)",
+    "finalization described as being 'justified again' rather than the next checkpoint being justified with it as source",
+    "garbled 51%/66% attack statement"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A explains Gasper, justification/finalization, ~13-15 min timing, 1/3 slashing and inactivity leak correctly; B is vague with errors; C is minimal.",
+  "grader": 2
+ },
+ "cry-006": {
+  "scores": {
+   "A": 1,
+   "B": 7,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "claims the question mixes up unrelated topics; gives no answer"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C covers fraud vs validity proofs, the ~7-day window, trust models, costs and examples accurately. B is correct but omits the 7-day figure; A refuses.",
+  "grader": 3
+ },
+ "cry-007": {
+  "scores": {
+   "A": 4,
+   "B": 10,
+   "C": 3
+  },
+  "errors": {
+   "A": [
+    "says validators bundle UserOperations (bundlers do)"
+   ],
+   "B": [],
+   "C": [
+    "'overdraft protection' and 'rather than relying solely on user or contract accounts' are muddled/unsupported"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains UserOps, alt mempool, bundlers, EntryPoint, paymasters and EIP-7702 correctly; A is thin with a role error; C is vague and names none of the components.",
+  "grader": 1
+ },
+ "cry-008": {
+  "scores": {
+   "A": 7,
+   "B": 10,
+   "C": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "ties BLS use to Layer 2 scaling (irrelevant to consensus layer)",
+    "frames aggregation as processing transactions rather than validator attestations"
+   ]
+  },
+  "best": "B",
+  "reason": "B is precise on BLS12-381, sizes, aggregation, sync committees, RANDAO and quantum risk; A is correct but generic; C is shallow and partly off-target.",
+  "grader": 2
+ },
+ "cry-009": {
+  "scores": {
+   "A": 5,
+   "B": 1,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "says SNARK proving/verification scales linearly and STARKs are faster because quasilinear (inverted; SNARK verification is constant-time)"
+   ],
+   "B": [
+    "says the sources do not cover the topic; no answer"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives accurate setup, cryptography, proof-size and verification trade-offs with nuances. A gets setup and quantum resistance right but garbles scalability and omits proof size.",
+  "grader": 3
+ },
+ "cry-010": {
+  "scores": {
+   "A": 1,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "garbled: 'validators do not need to trust builders to withhold blocks'",
+    "no mention that PBS runs today via MEV-Boost relays"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C covers MEV sources, roles, MEV-Boost relays and ePBS status accurately; B gives a partial, partly garbled definition; A declines.",
+  "grader": 1
+ },
+ "cry-011": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "never says the base fee is burned (the key point)"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C covers the burn, tip, 1/8 per-block adjustment toward the half-limit target and fee fields; A has only the burn, B only the adjustment.",
+  "grader": 2
+ },
+ "cry-012": {
+  "scores": {
+   "A": 10,
+   "B": 0,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "describes EIP-155 as IP-spoofing protection; entirely wrong"
+   ],
+   "C": [
+    "claims EIP-712 applications rely on EIP-155 protection (EIP-712 has its own chainId domain separator)"
+   ]
+  },
+  "best": "A",
+  "reason": "A is exact: chain ID in the signed fields, v = {0,1}+2*chainId+35, Spurious Dragon block 2,675,000, ETC replay context and limits. C gets the gist; B is wrong.",
+  "grader": 3
+ },
+ "cry-013": {
+  "scores": {
+   "A": 10,
+   "B": 8,
+   "C": 1
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A gives the 0x04 tx, authorization tuple, 0xef0100 delegation indicator, uses and caveats correctly; B is correct but shorter; C says the sources lack the information.",
+  "grader": 1
+ },
+ "cry-014": {
+  "scores": {
+   "A": 10,
+   "B": 0,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "claims cap of 100,000,000 ETH (it is 2,048 ETH)"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A and C both give 2,048 ETH; A adds correct detail on 0x02 credentials, consolidation and the 32 ETH minimum; B is wrong.",
+  "grader": 2
+ },
+ "cry-015": {
+  "scores": {
+   "A": 6,
+   "B": 1,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "calls the pushed withdrawals 'withdrawal transactions' (EIP-4895 defines them as non-transaction system operations)"
+   ],
+   "B": [
+    "says EIP-4895 lets any account send ETH to a validator to increase its stake (that describes deposits)",
+    "does not explain the withdrawal mechanism"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C correctly explains the system-level push: sweep, 16 per payload, withdrawals list/root, Gwei amounts, no gas, cannot fail, Shapella 12 Apr 2023. A is roughly right but thin; B is wrong.",
+  "grader": 3
+ },
+ "cry-016": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "mischaracterises ERC-1046 (it adds tokenURI interoperability for ERC-20/721/1155)"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "All get fungible vs non-fungible right; A adds accurate interfaces, state model, authors and ERC-1155; B is correct apart from a garbled ERC-1046 aside; C is correct but brief.",
+  "grader": 1
+ },
+ "cry-017": {
+  "scores": {
+   "A": 2,
+   "B": 10,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B and C are correct; B adds the interface, real uses and risks like the inflation attack; A honestly says it has no information.",
+  "grader": 2
+ },
+ "cry-018": {
+  "scores": {
+   "A": 7,
+   "B": 6,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All three answer correctly; C adds accurate FIPS 203 date, parameter sets, sizes, deployments and the signature standards. A names the signature schemes; B is brief.",
+  "grader": 3
+ },
+ "cry-019": {
+  "scores": {
+   "A": 7,
+   "B": 10,
+   "C": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "state described as an 'internal hash sum accumulated during signing' (it is the index of used one-time keys)",
+    "frames the risk as an attacker reusing a signature rather than the signer reusing a one-time key"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains OTS + Merkle tree, the leaf counter, why reuse enables forgery, SP 800-208 and CNSA 2.0 correctly; A is correct but brief; C misdefines the state.",
+  "grader": 1
+ },
+ "cry-020": {
+  "scores": {
+   "A": 6,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C covers TTD, block numbers, removal of block/ommer rewards, header changes and dates correctly; A has TTD and PREVRANDAO but misses rewards; B is brief and omits TTD.",
+  "grader": 2
+ },
+ "dng-001": {
+  "scores": {
+   "A": 10,
+   "B": 4,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A covers every key do and don't (immobilise, remove rings, mark swelling, no tourniquet/cutting/ice/NSAIDs) plus evacuation logic and regional pressure-bandage note. C is good but misses NSAIDs and swelling marking; B omits most first aid.",
+  "grader": 3
+ },
+ "dng-002": {
+  "scores": {
+   "A": 10,
+   "B": 5,
+   "C": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "calls a still-shivering patient 'severe' and lists 'shivering cessation' as part of the presented triad",
+    "garbled 'umbles' list",
+    "contradictory heat advice and says not to rewarm in the field (field guidance is to actively warm the trunk)"
+   ],
+   "C": [
+    "only says to seek emergency help 'if symptoms worsen' although confusion already warrants it"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives complete, correct field treatment (call help, insulate, gentle handling, core warming, drinks only if alert, CPR caveats); B has useful steps but several errors; C is too thin.",
+  "grader": 1
+ },
+ "dng-003": {
+  "scores": {
+   "A": 6,
+   "B": 8,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C matches first-aid guidance (20 min running water, cling film, no creams/ice, child always checked, red flags); B is good but over-triages to ER; A is short and omits covering and getting the burn checked.",
+  "grader": 2
+ },
+ "dng-004": {
+  "scores": {
+   "A": 7,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "after-shaking advice 'stay put if the building is damaged' is confused and unsafe"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives correct Drop-Cover-Hold On, no doorways/running, aftershocks, shoes, leaving damaged buildings by stairs, tsunami and texting advice. A is mostly right but has a muddled line; B is thin.",
+  "grader": 3
+ },
+ "dng-005": {
+  "scores": {
+   "A": 10,
+   "B": 5,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "NSF/ANSI 53/58 cited as pathogen-reduction filter standards (they are chemical/RO standards)",
+    "says boiling works even if water is cloudy, contradicting its own settle-first advice",
+    "bleach recommended with no dose"
+   ]
+  },
+  "best": "A",
+  "reason": "A matches CDC guidance (boil 1/3 min, bleach 2 drops/L and 30 min, filtering, chemical caveats); B is correct but thin; C has a few errors and irrelevant detail.",
+  "grader": 1
+ },
+ "food-001": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 1
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "St. Bess is a vegetarian (no meat) pizzeria, not clearly fully vegan"
+   ],
+   "C": [
+    "Lucky Star at Friedrichstrasse 127 appears to be a Chinese restaurant (Peking duck, hot pot), not a vegan German one"
+   ]
+  },
+  "best": "A",
+  "reason": "A lists real, verified vegan places across styles with addresses and flags FREA's closure; B lists real places with addresses but less context; C names one apparently non-vegan place.",
+  "grader": 2
+ },
+ "food-002": {
+  "scores": {
+   "A": 7,
+   "B": 9,
+   "C": 1
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "A Avo Tinha is not a Michelin-starred Berasategui restaurant (his is Fifty Seconds)",
+    "none of the three places is a vegan restaurant"
+   ]
+  },
+  "best": "B",
+  "reason": "B names real, fully vegan Lisbon places (Kong, O Gambuzino, Ao 26, Organi, A Minha Avo, Al Sanpietrino, Vegan Nata) with addresses and useful descriptions. A's places are real and vegan but descriptions are generic; C is wrong.",
+  "grader": 3
+ },
+ "food-003": {
+  "scores": {
+   "A": 7,
+   "B": 1,
+   "C": 8
+  },
+  "errors": {
+   "A": [
+    "Veganius address outdated (moved from Bonpland 2444 to Godoy Cruz 2341)",
+    "Spika Lion is a vegan shop, called a restaurant"
+   ],
+   "B": [
+    "Parrilla Bar Polo (steakhouse) given as best vegan restaurant",
+    "Circolo Italiano is not vegan"
+   ],
+   "C": [
+    "Craft Vegan Bakery reported in 2026 to no longer be fully vegan"
+   ]
+  },
+  "best": "C",
+  "reason": "A and C name real vegan places; C adds well-chosen, accurately described picks (Gioia, Donnet, La Reverde, Gordo Vegano) and useful tips; B recommends a steakhouse.",
+  "grader": 1
+ },
+ "food-004": {
+  "scores": {
+   "A": 5,
+   "B": 2,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "Saravana Bhavan and Annalakshmi are Indian vegetarian (use dairy), labelled vegan"
+   ],
+   "B": [
+    "VeganBurg described as 'vegetarian fast food chain' (it is vegan burgers)"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C names real, well-known places with correct addresses and useful vegan caveats; A mixes vegetarian places labelled vegan and thin entries; B names almost nothing.",
+  "grader": 2
+ },
+ "food-005": {
+  "scores": {
+   "A": 4,
+   "B": 9,
+   "C": 7
+  },
+  "errors": {
+   "A": [
+    "calls Tien Sieng 100% vegan though some items contain egg",
+    "includes lacto-ovo vegetarian Anchan as a vegan restaurant"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B lists real vegan places (Reform Kafe, Goodsouls, Rad Rabbit, Asa, Vegan Society, Alchemy, May Kaidee, Free Bird) with accurate locations and helpful context. C lists mostly the same real places with little description; A is sparse with labelling errors.",
+  "grader": 3
+ },
+ "food-006": {
+  "scores": {
+   "A": 2,
+   "B": 8,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "Kujiraya in Shibuya is a whale-meat restaurant",
+    "Botejyu is an okonomiyaki chain, not Okinawan and not vegan"
+   ],
+   "B": [
+    "Tsuminaki Mapo Tofu is in Roppongi/Mita, not Nishi-Shinbashi"
+   ],
+   "C": [
+    "Tokyo Jangara ecute Ueno presented as vegan (it is a tonkotsu ramen chain)",
+    "'Plant Based Tokyo' in Yoyogi not verifiable as a restaurant",
+    "marbre vegan is a cake café, described as international vegan restaurant"
+   ]
+  },
+  "best": "B",
+  "reason": "B lists well-known real vegan places (T's Tantan, Saido, Vegan Gyoza Yu, Masaka, Ballon, Fucha Bon) with useful dashi tips; C has some real picks but at least one non-vegan; A recommends a whale restaurant.",
+  "grader": 1
+ },
+ "food-007": {
+  "scores": {
+   "A": 3,
+   "B": 9,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "Queen of Curry is not a vegan restaurant",
+    "first entry is an unnamed Silom cafe"
+   ],
+   "B": [],
+   "C": [
+    "May Veggie Home address on Ratchadaphisek is outdated (now Sukhumvit 101 / Soi 23 Express)"
+   ]
+  },
+  "best": "B",
+  "reason": "B's places (Vegan Mahanakhon, Vegan Pranakhon, Kem-Kon, May Veggie Home, Broccoli Revolution, Veganerie) check out with addresses; C lists real places with one outdated address; A includes a non-vegan pick.",
+  "grader": 2
+ },
+ "food-008": {
+  "scores": {
+   "A": 0,
+   "B": 9,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "lists Carluccio's, Obica, Brewmark, Tickerdaze etc., which are not Istanbul vegan restaurants"
+   ],
+   "B": [],
+   "C": [
+    "Veganarsist Bostanci is a takeaway-only branch"
+   ]
+  },
+  "best": "B",
+  "reason": "B names real fully vegan places on both sides (Vegan Dukkan Lokanta, Vegan Istanbul, Vegan Community Kitchen, Vegan Masa, Veganarsist, Kumin, Ethique, Ayrisim) with addresses and descriptions. C's list is real but bare; A is invented/irrelevant.",
+  "grader": 3
+ },
+ "food-009": {
+  "scores": {
+   "A": 6,
+   "B": 3,
+   "C": 8
+  },
+  "errors": {
+   "A": [
+    "Forever reported closed on HappyCow (Oct 2024)",
+    "Paxil described as crepes (it is vegan seafood-style tacos/tostadas)"
+   ],
+   "B": [
+    "recommends non-vegan places (Mendl deli, Pujol, Quintonil) to a vegan question"
+   ],
+   "C": [
+    "VEGuerrero address appears to belong to a different taquería (Taco Vegan)",
+    "Yug is ovo-lacto vegetarian, not 'without meat or dairy'"
+   ]
+  },
+  "best": "C",
+  "reason": "C gives a well-curated set of real vegan places with neighbourhoods and practical tips; A lists real places from map data with thin descriptions and one likely closure; B names only one vegan place.",
+  "grader": 1
+ },
+ "food-010": {
+  "scores": {
+   "A": 2,
+   "B": 9,
+   "C": 5
+  },
+  "errors": {
+   "A": [
+    "Blossom Rena Vegan Cafe reported closed (2021)",
+    "Kiki is a Sichuan restaurant, not vegan",
+    "text duplicated",
+    "Original Vegan is in Xindian, New Taipei"
+   ],
+   "B": [],
+   "C": [
+    "Soul R. Vegan Cafe (first pick) reported closed Oct 2023",
+    "list shows MOS Burger as a vegan restaurant"
+   ]
+  },
+  "best": "B",
+  "reason": "B's picks (Yang Shin, Laixin, Mukuchi, Chao, Vege Creek, Sunami, Green Room) verify and it explains 全素 labels; C's list has a closed top pick; A has closed and non-vegan places.",
+  "grader": 2
+ },
+ "food-011": {
+  "scores": {
+   "A": 9,
+   "B": 2,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Analog Garden serves meat; not a vegan restaurant",
+    "implies vegetarian kimchi is found everywhere (kimchi usually contains fish sauce)"
+   ],
+   "C": [
+    "Huggers is listed in guides as closed/temporarily closed"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives real vegan places (Osegye Hyang, Vegan Insa, Maru Jayeonsik Kimbap, Vegan Kitchen, Plant, ByTOFU, Blu Seoul, Camouflage) with areas and the fish-sauce tip. C is a bare address list with one likely closed place; B is thin and partly wrong.",
+  "grader": 3
+ },
+ "food-012": {
+  "scores": {
+   "A": 8,
+   "B": 7,
+   "C": 1
+  },
+  "errors": {
+   "A": [
+    "Forky's Prague closed (2024), and it was in Letná, not near Staroměstská"
+   ],
+   "B": [
+    "contradictory duplicate Wed-Fri hours for Střecha"
+   ],
+   "C": [
+    "Ambi group, Third Coast Pizza, U Agamy, V Kolkovně and Kavárna Obecní dům are not vegan restaurants",
+    "'Edeni Vegan' not found"
+   ]
+  },
+  "best": "A",
+  "reason": "A and B both list real vegan places; A's are better described and curated (one closed); B is accurate but thin; C mostly lists non-vegan places.",
+  "grader": 1
+ },
+ "food-013": {
+  "scores": {
+   "A": 2,
+   "B": 7,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "Dzveli Sakhli is a general Georgian restaurant, not vegetarian",
+    "Good Mood Food and Cafe Flowers unverified as vegetarian places"
+   ],
+   "B": [
+    "Black Cup could not be verified as a vegan cafe"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C lists verified vegan/vegetarian places (Lutra Lutra, Stricha, Shpana, Muhudo, Kiwi) plus Georgian veg dishes; B has mostly real places with addresses; A's three are weak or not vegetarian.",
+  "grader": 2
+ },
+ "food-014": {
+  "scores": {
+   "A": 3,
+   "B": 9,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "Fuka is a nama-fu shop, not a restaurant serving other dishes",
+    "Shishin Samurai is a bar reported closed; no Thai curry found"
+   ],
+   "B": [
+    "Falafel Garden serves meat, not a vegetarian restaurant"
+   ],
+   "C": [
+    "describes Veg Out as Thai cuisine (it is a vegan cafe)"
+   ]
+  },
+  "best": "B",
+  "reason": "B covers real shojin ryori (Shigetsu, Izusen, Ajiro, Yoshuji) and vegan cafes (Ain Soph, Mumokuteki, Choice, Veg Out, UZU) plus the dashi warning. C lists real places with few details; A is thin.",
+  "grader": 3
+ },
+ "food-015": {
+  "scores": {
+   "A": 7,
+   "B": 8,
+   "C": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "'Paloma' in El Poblado could not be verified",
+    "Verdeo's current status unconfirmed (no reports after 2019)"
+   ],
+   "C": [
+    "attributes 'basic Argentinean fare' to Restaurante Vegetariano and Lenteja Espress (Wikivoyage says that of a different restaurant)",
+    "whole answer duplicated",
+    "old Wikivoyage listings with stale phone numbers"
+   ]
+  },
+  "best": "B",
+  "reason": "B gives real, well-described places grouped by area (Helecho, Coraje, Café Zorba, Las Veganas, Shottas); A lists real places from map data with little description; C is garbled and duplicated.",
+  "grader": 1
+ },
+ "food-016": {
+  "scores": {
+   "A": 6,
+   "B": 1,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "The Kind Kitchen 'address' is a phone number",
+    "Erth and D-Core could not be verified"
+   ],
+   "B": [
+    "The Charles (Malay/African) is not a vegan restaurant",
+    "ASH / Riverine Rabbit is not a vegan restaurant"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C's places (Plant Cafe, Conscious Kitchen, Grumpy & Runt, Romeo and Vero, Okja, Sunshine Food) verify with context; A is a mostly real list with a data glitch; B names non-vegan restaurants.",
+  "grader": 2
+ },
+ "food-017": {
+  "scores": {
+   "A": 1,
+   "B": 6,
+   "C": 7
+  },
+  "errors": {
+   "A": [
+    "answers in English with no restaurants"
+   ],
+   "B": [
+    "York Grill and Shawarma could not be verified as a vegan restaurant"
+   ],
+   "C": [
+    "Banana Verde is vegetarian, not vegan",
+    "Futuro Refeitorio is not fully plant-based (vegan section only)"
+   ]
+  },
+  "best": "C",
+  "reason": "C, in Portuguese, names mostly real vegan places (Sushimar, Pop Vegan, Pratada, Salad Days, Padoca Vegan) with areas and context, but labels two vegetarian places as vegan. B's list is real but bare; A refuses.",
+  "grader": 3
+ },
+ "mth-001": {
+  "scores": {
+   "A": 2,
+   "B": 9,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "answer of ~30 mpg is wrong (31.36)",
+    "'3.9 liters per 100 miles' is wrong"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "B and C both give 31.36 mpg correctly; C also shows the unit working and the UK-gallon figure; A is wrong.",
+  "grader": 1
+ },
+ "mth-002": {
+  "scores": {
+   "A": 10,
+   "B": 2,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "states 2 h 12 min, then 4.8 h (1,200 m as 1.2 units of 2,000 m), then 5.6 h, then 5.5-6 h; self-contradictory"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A and C correctly get 5.6 h; A adds sensible caveats; B is contradictory.",
+  "grader": 2
+ },
+ "mth-003": {
+  "scores": {
+   "A": 10,
+   "B": 8,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "total $73.83 from rounded intermediate; exact is $73.84"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A and C get $67.12 and $73.84; A adds accurate Thai service-charge and tipping context. B is off by one cent.",
+  "grader": 3
+ },
+ "mth-004": {
+  "scores": {
+   "A": 8,
+   "B": 9,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All correct (18 L, ~18 kg); C adds pounds, per-person load and sensible hydration notes; A is terse.",
+  "grader": 1
+ },
+ "mth-005": {
+  "scores": {
+   "A": 7,
+   "B": 7,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All get 19.25 Wh and yes; C explicitly says carry-on only, never checked, plus the 100/160 Wh tiers; A and B omit the checked-bag ban.",
+  "grader": 2
+ },
+ "mth-006": {
+  "scores": {
+   "A": 4,
+   "B": 8,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "cites cold-weather clothing advice as the reason heat is dangerous"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All convert to 40 C correctly; C adds accurate NWS danger level, precautions and heat-exhaustion/heat-stroke signs. B is solid; A gives almost no useful safety content.",
+  "grader": 3
+ },
+ "trv-001": {
+  "scores": {
+   "A": 8,
+   "B": 10,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "claims 112 is often routed to emergency services in Thailand (not supported by official sources)"
+   ]
+  },
+  "best": "B",
+  "reason": "All give 191/1669/199/1155 correctly; B adds the TAT 1672 line and practical tips; C adds a dubious 112 claim.",
+  "grader": 1
+ },
+ "trv-002": {
+  "scores": {
+   "A": 8,
+   "B": 7,
+   "C": 3
+  },
+  "errors": {
+   "A": [
+    "lists Salvador as mostly 220 V (it is 127 V)"
+   ],
+   "B": [],
+   "C": [
+    "gives 127 V (and 110 V) without mentioning the widespread 220 V"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives Type N/C, 127/220 V by state, 60 Hz and device advice, with one city error; B is correct but less specific; C omits 220 V.",
+  "grader": 2
+ },
+ "trv-003": {
+  "scores": {
+   "A": 10,
+   "B": 5,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A clearly says no, explains why (pipes, tinacos), and gives practical garrafon, ice and boiling advice. C is correct but less practical; B hedges and frames the risk as limited to poorer zones.",
+  "grader": 3
+ },
+ "trv-004": {
+  "scores": {
+   "A": 2,
+   "B": 10,
+   "C": 4
+  },
+  "errors": {
+   "A": [
+    "red line does not reach Baixa-Chiado or Terreiro do Paço (transfer needed)",
+    "Aerobus has been discontinued",
+    "no CP train runs from the airport to Rossio",
+    "taxis are metered, not a fixed zone rate",
+    "metro fare outdated (€1.90 in 2026)",
+    "answer cut off mid-section"
+   ],
+   "B": [],
+   "C": [
+    "omits the metro, the main option",
+    "bus numbers 22, 44, 83 are pre-renumbering (now 722, 744, 783)"
+   ]
+  },
+  "best": "B",
+  "reason": "B is accurate and current (red line with transfers, 2026 fares, buses, taxi, ride-hail, Aerobus gone); C omits the metro; A has many factual errors.",
+  "grader": 1
+ },
+ "trv-005": {
+  "scores": {
+   "A": 7,
+   "B": 10,
+   "C": 3
+  },
+  "errors": {
+   "A": [
+    "claims card surcharges are common in Georgia (dubious)",
+    "irrelevant 'Lari village in Pisa' source note"
+   ],
+   "B": [],
+   "C": [
+    "card answer trails into unrelated exchange-kiosk spread detail"
+   ]
+  },
+  "best": "B",
+  "reason": "B is accurate and practical (lari, near-universal card/contactless use, metro taps, when cash is needed, DCC tip); A is mostly right but padded; C barely answers the card question.",
+  "grader": 2
+ },
+ "trv-006": {
+  "scores": {
+   "A": 10,
+   "B": 5,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A gives left-side driving, home licence plus IDP (UK 1968 IDP confirmed), motorcycle-category and insurance caveats, and safety. B and C get the side right but omit the IDP requirement.",
+  "grader": 3
+ },
+ "trv-007": {
+  "scores": {
+   "A": 10,
+   "B": 9,
+   "C": 2
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "gives 'khop khun ka' for men (should be khrap)",
+    "labels ครับ as 'ka'"
+   ]
+  },
+  "best": "A",
+  "reason": "A and B are correct on khop khun khrap/kha; A adds useful variants; C gives the wrong particle for men.",
+  "grader": 1
+ },
+ "trv-008": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "labels the May-Oct rainy season a 'shoulder season'",
+    "15-25 C understates cool-season daytime highs (~28-30 C)"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives Nov-early Feb, smoke Feb-Apr (worst March), hot and rainy seasons and festivals accurately; C is good with minor slips; B is correct but brief.",
+  "grader": 2
+ },
+ "trv-009": {
+  "scores": {
+   "A": 7,
+   "B": 10,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "says a service charge is often included in Portuguese bills (it is uncommon)",
+    "says a tip is generally expected"
+   ]
+  },
+  "best": "B",
+  "reason": "B accurately says tipping is appreciated, not expected, with 5-10% norms, cash tips and the couvert tip. A is correct but brief; C contradicts itself and misstates service charges.",
+  "grader": 3
+ },
+ "trv-010": {
+  "scores": {
+   "A": 5,
+   "B": 10,
+   "C": 4
+  },
+  "errors": {
+   "A": [
+    "garbled tip that choosing a destination 300-500 m away drops the fare from 400 to 40 baht",
+    "garbled advice mixing street-taxi hailing into ride-hailing tips",
+    "inconsistent MuvMi coverage (9 areas vs 12 neighbourhoods)"
+   ],
+   "B": [],
+   "C": [
+    "suggests Bolt's presence in Bangkok is minor (it is the main Grab rival there)"
+   ]
+  },
+  "best": "B",
+  "reason": "B gives accurate, practical advice (Grab vs Bolt, surge timing, Suvarnabhumi Gate 4 pickup, meters, tuk-tuks); A has some real facts mixed with garbled tips; C is mostly irrelevant background.",
+  "grader": 1
+ }
+}

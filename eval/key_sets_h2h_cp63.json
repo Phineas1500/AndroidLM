@@ -1,0 +1,317 @@
+{
+ "seed-cmp-01": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "seed-cmp-02": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-cmp-03": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-cmp-04": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-cmp-05": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "seed-cmp-06": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "seed-cmp-07": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "seed-cmp-08": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "seed-exp-01": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-exp-02": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "seed-exp-03": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "seed-exp-04": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-exp-05": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "seed-exp-06": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-exp-07": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-exp-08": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "seed-exp-09": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "seed-fac-01": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-fac-02": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "seed-fac-03": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-fac-04": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-fac-05": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "seed-fu-01": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "seed-fu-02": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-fu-03": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-how-01": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "seed-how-02": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "seed-how-03": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-how-04": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-how-05": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "seed-how-06": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "seed-how-07": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "seed-lt-01": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "seed-lt-02": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-lt-03": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "seed-mh-01": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-mh-02": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "seed-mh-03": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "seed-mh-04": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "seed-mh-05": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "seed-mh-06": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-mh-07": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "seed-mh-08": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "seed-mh-09": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-mh-10": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-num-01": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "seed-num-02": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "seed-num-03": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "seed-num-04": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "seed-num-05": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "seed-ooc-01": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-ooc-02": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "seed-ooc-03": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "seed-ooc-04": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-trv-01": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-trv-02": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-trv-03": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "seed-trv-04": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "seed-trv-05": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-trv-06": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-trv-07": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "seed-trv-08": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "seed-trv-09": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ }
+}

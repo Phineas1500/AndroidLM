@@ -1,0 +1,1171 @@
+{
+ "seed-cmp-01": {
+  "scores": {
+   "A": 6,
+   "B": 9,
+   "C": 5
+  },
+  "errors": {
+   "A": [
+    "says eight crocodile species (about 14 Crocodylus, 18 true crocodiles)",
+    "claims dark colour helps alligators absorb heat in fresh water (speculative, unsupported)"
+   ],
+   "B": [],
+   "C": [
+    "says all of an alligator's teeth are hidden when its mouth is closed (the upper teeth stay visible)"
+   ]
+  },
+  "best": "B",
+  "reason": "B covers snout, teeth, salt glands, range and colour accurately and clearly; A has a wrong species count and C is thin, with a tooth error.",
+  "grader": 1
+ },
+ "seed-cmp-02": {
+  "scores": {
+   "A": 8,
+   "B": 4,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "jaguar range given as only Central and South America (also Mexico/SW US)",
+    "cheetah claws are semi-retractable, not non-retractable"
+   ],
+   "B": [
+    "cream fur, large blotchy spots and three stripes neck-to-tail describe the rare king cheetah, not the normal cheetah",
+    "gestation/lifespan comparison with leopard and jaguar is doubtful and irrelevant",
+    "misses the key cues (dots inside jaguar rosettes, cheetah tear lines)"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives all the practical cues (coat, tear lines, build, range, black panthers) correctly and clearly; A is close but slightly less precise; B describes a king cheetah and misses the main cues.",
+  "grader": 2
+ },
+ "seed-cmp-03": {
+  "scores": {
+   "A": 8,
+   "B": 5,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "tie",
+  "reason": "A and C both cover self, God/Brahman, Vedas, caste and liberation accurately; C is fuller, A more compact. B is short and thin on the actual differences.",
+  "grader": 3
+ },
+ "seed-cmp-04": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "says the dry acid in baking powder is usually cream of tartar (commercial powders mostly use phosphates and sodium aluminium sulfate)"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains the acid difference, double-acting powder and when recipes use both, all correctly; B is correct but brief, C has a wrong claim about the usual acid.",
+  "grader": 1
+ },
+ "seed-cmp-05": {
+  "scores": {
+   "A": 9,
+   "B": 3,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "opens by saying the Roman Empire was larger in total land area, contradicting its own conclusion",
+    "garbled claim that the Mongol Empire was not entirely contiguous"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A gives correct areas, dates, ratio and context; C is right but bare; B contradicts itself in its first sentence.",
+  "grader": 2
+ },
+ "seed-cmp-06": {
+  "scores": {
+   "A": 7,
+   "B": 8,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "attributes 65 mg per 30 ml espresso to the Caffeine article, which gives 80-100 mg per shot",
+    "mixes inconsistent drip figures (95 mg/240 ml vs 100-125 mg/120 ml) without reconciling them"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All three reach the right per-ounce vs per-serving conclusion; C gives the clearest numbers, including the double shot comparison.",
+  "grader": 3
+ },
+ "seed-cmp-07": {
+  "scores": {
+   "A": 8,
+   "B": 9,
+   "C": 5
+  },
+  "errors": {
+   "A": [
+    "source note describes CRISPR as RNA interference (loose and off-topic)"
+   ],
+   "B": [],
+   "C": [
+    "says a virus is only alive inside a host cell (oversimplified, stated as fact)"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains both the difference and why antibiotics fail, plus what does work and why misuse matters; A is also good but wordier, C is minimal.",
+  "grader": 1
+ },
+ "seed-cmp-08": {
+  "scores": {
+   "A": 6,
+   "B": 9,
+   "C": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "AGDLP is an Active Directory group-nesting practice, not how Windows file permissions work",
+    "never mentions NTFS ACLs, the actual Windows model",
+    "'static allocation' and hidden-file points are garbled/tangential"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains both models accurately (rwx/setuid/sticky vs ACL entries, deny, inheritance, null vs empty DACL); A is correct but vague; C misdescribes Windows.",
+  "grader": 2
+ },
+ "seed-exp-01": {
+  "scores": {
+   "A": 7,
+   "B": 3,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "overstates 'redistribution of land and wealth' as a key revolutionary objective"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C explains how the goals shifted from limiting privilege to republic, with accurate milestones. B describes the revolution but barely states its goals.",
+  "grader": 3
+ },
+ "seed-exp-02": {
+  "scores": {
+   "A": 6,
+   "B": 7,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "names Volta as the single most foundational figure (debatable; Gilbert usually credited with the start)"
+   ],
+   "B": [
+    "says Gilbert coined the term 'electricity' (he coined 'electricus'; the English word is Thomas Browne's, 1646)",
+    "source note: Maxwell 'treatise in 1864' (the paper was 1864-65; the Treatise was 1873)",
+    "source note credits Ampere with showing changing electric fields make magnetic fields (that was Maxwell)"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C answers the 'who' directly (Gilbert, with the right nuance on 'electricus') and gives an accurate, dated sequence of contributors; B is broad but has small factual slips, A picks Volta and omits key figures.",
+  "grader": 1
+ },
+ "seed-exp-03": {
+  "scores": {
+   "A": 5,
+   "B": 8,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "ozone absorbing violet is doubtful (ozone absorbs mainly UV and orange-red)"
+   ],
+   "C": [
+    "ozone absorbing violet is doubtful (ozone absorbs mainly UV and orange-red)"
+   ]
+  },
+  "best": "C",
+  "reason": "C directly explains why the mix looks blue rather than green or violet (spectrum plus cone response); B is thorough but wordier; A barely addresses 'not green'.",
+  "grader": 2
+ },
+ "seed-exp-04": {
+  "scores": {
+   "A": 9,
+   "B": 3,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "throws in an irrelevant and muddled description of an engine governor 'adjusting the current'"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A clearly explains Lorentz force, commutator, brushless and induction motors and flags the combustion-engine reading. C is accurate but less concrete; B is fragmentary.",
+  "grader": 3
+ },
+ "seed-exp-05": {
+  "scores": {
+   "A": 9,
+   "B": 8,
+   "C": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "claims printers deposit within micrometer tolerances (overstated for FDM)"
+   ],
+   "C": [
+    "non sequitur that 3D printers are faster and cheaper than 'other additive fabrication technologies'",
+    "does not explain any printing method"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains the workflow and the main methods accurately and concisely; B is thorough but slightly overstated, C barely explains how printing works.",
+  "grader": 1
+ },
+ "seed-exp-06": {
+  "scores": {
+   "A": 9,
+   "B": 3,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "no real explanation; off-topic point about controls getting stiffer"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A covers thrust vs drag, lift, thin air at cruise altitude, real cruise speeds and why not faster; C is generic and misses altitude; B says almost nothing.",
+  "grader": 2
+ },
+ "seed-exp-07": {
+  "scores": {
+   "A": 6,
+   "B": 5,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "says NTP found 'some evidence' of heart tumors (it reported 'clear evidence' of heart schwannomas)",
+    "says the rat findings were not replicated (the Ramazzini Institute reported similar schwannomas in 2018)",
+    "answer cuts off mid-sentence; irrelevant sunburn statistic in source check"
+   ],
+   "B": [
+    "irrelevant point about WiFi bandwidth vs wired networks"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C explains where the worry comes from (IARC 2B, NTP rats, the January 2026 HHS/FDA moves, all verified) and what the stronger evidence (2024 WHO-commissioned review, EHS provocation studies) shows. A is solid but has errors and is truncated; B is thin.",
+  "grader": 3
+ },
+ "seed-exp-08": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 2
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "dates Sumer, Egypt and the Indus Valley governments together at 3000-4000 BCE (Indus civilization later)"
+   ],
+   "C": [
+    "says the concept of government was developed by Enlightenment thinkers (government predates them by millennia)",
+    "says Hobbes created the social contract idea (it has earlier roots)"
+   ]
+  },
+  "best": "A",
+  "reason": "A correctly says no one created government, sketches its origins and then covers early theorists accurately; C gives a wrong answer.",
+  "grader": 1
+ },
+ "seed-exp-09": {
+  "scores": {
+   "A": 3,
+   "B": 9,
+   "C": 4
+  },
+  "errors": {
+   "A": [
+    "calls the microwave the most common type of oven",
+    "padding about the plug and power socket"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B explains elements, gas burners, thermostat cycling, heat transfer and convection fans accurately; A and C are vague and A centres on microwaves.",
+  "grader": 2
+ },
+ "seed-fac-01": {
+  "scores": {
+   "A": 8,
+   "B": 7,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All correct; C adds the signing date, Treaty of Paris, Constitution adoption, ratification and 1789 start, giving the fullest accurate picture.",
+  "grader": 3
+ },
+ "seed-fac-02": {
+  "scores": {
+   "A": 9,
+   "B": 9,
+   "C": 0
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "says Donald Trump was president in 2016 (Barack Obama was; Trump took office in January 2017)"
+   ]
+  },
+  "best": "tie",
+  "reason": "A and B both correctly give Obama with accurate dates; C is wrong.",
+  "grader": 1
+ },
+ "seed-fac-03": {
+  "scores": {
+   "A": 7,
+   "B": 3,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "opens with ~1,500 years but then calls the ~500-year Western span the most common standard (inconsistent)"
+   ],
+   "B": [
+    "gives no length or start date",
+    "calls the adoption of Christianity in AD 380 an end date of the classical empire (garbled)"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the start, both end points with durations, and the longer Roman-state view clearly; A is right but muddled; B never answers how long.",
+  "grader": 2
+ },
+ "seed-fac-04": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "calls Strauss 'credited as the architect' (Irving Morrow was the architect)"
+   ],
+   "C": [
+    "invents 'chief architect Charles E. Seele' as a main contributor",
+    "omits Ellis and Moisseiff from the main answer"
+   ]
+  },
+  "best": "A",
+  "reason": "A accurately credits Strauss, Moisseiff, Ellis (fired 1931, recognised 2007), Morrow and Paine. C names a non-existent contributor.",
+  "grader": 3
+ },
+ "seed-fac-05": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "says the Ming dynasty developed fire arrows in the 14th century (rocket fire arrows go back to the Song)",
+    "calls Goddard's 1926 rocket capable of controlled flight (overstated)"
+   ],
+   "C": [
+    "calls Rocket Ship Galileo (1947) the first fictional rocket ship (many earlier ones)",
+    "omits Goddard and the first liquid-fuel rocket entirely"
+   ]
+  },
+  "best": "A",
+  "reason": "A handles the ambiguity well with correct facts for each meaning (Goddard 1926, V-2 to space, Vostok 1); B is good with small errors, C wanders into fiction and misses Goddard.",
+  "grader": 1
+ },
+ "seed-fu-01": {
+  "scores": {
+   "A": 5,
+   "B": 8,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "Mumtaz Mahal died in 1631, not 1632",
+    "construction dates garbled (began 1631, 'completed between 1632 and 1653')"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the reason with correct dates and context concisely; B is also correct; A has the wrong death year and garbled dates.",
+  "grader": 2
+ },
+ "seed-fu-02": {
+  "scores": {
+   "A": 5,
+   "B": 6,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "claims Victoria had to host Parliament for at least ten years (the Constitution set no such term)",
+    "says Canberra was chosen in the NSW/Victoria border region (it is not near that border)"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the Sydney-Melbourne rivalry, section 125's 100-mile rule, the 1908 site choice and the 1927 move, all accurate. B is correct but omits the 100-mile rule; A has two factual errors.",
+  "grader": 3
+ },
+ "seed-fu-03": {
+  "scores": {
+   "A": 9,
+   "B": 6,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "says water acts as moderator in the Chernobyl reactor (RBMK is graphite-moderated; it contradicts itself later)",
+    "spends half the answer repeating the previous question"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains the test, the positive void coefficient, the control-rod flaw and the outcome accurately; B is correct but shallow, C repeats the earlier answer and has a moderator error.",
+  "grader": 1
+ },
+ "seed-how-01": {
+  "scores": {
+   "A": 9,
+   "B": 8,
+   "C": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "misses the toxic foods (avocado, chocolate, onion) and says the sources do not list what to avoid",
+    "odd items such as 'flour' as bird food"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives sensible wild-bird foods and a well-explained avoid list; B is similar and broad but its source check is irrelevant; C is thin.",
+  "grader": 2
+ },
+ "seed-how-02": {
+  "scores": {
+   "A": 7,
+   "B": 9,
+   "C": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "cites an irrelevant cabinet-hinge wikibook",
+    "suggests removing the door rather than just the pin"
+   ]
+  },
+  "best": "B",
+  "reason": "B gives the quick spray fix and the proper pin-out, clean, lubricate method with the one-hinge-at-a-time safety tip. A is fine but shallower; C is muddled.",
+  "grader": 3
+ },
+ "seed-how-03": {
+  "scores": {
+   "A": 7,
+   "B": 4,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "5-7 days is optimistic for a new starter"
+   ],
+   "B": [
+    "says the starter is ready to bake with on day three (usually 1-2 weeks)",
+    "says bubbles should appear within an hour or two (not for a wild starter)",
+    "mixes incompatible methods"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives a realistic timeline, a clear feeding schedule and the day-3 lull warning; A is usable but optimistic, B is a confusing mix.",
+  "grader": 1
+ },
+ "seed-how-04": {
+  "scores": {
+   "A": 7,
+   "B": 5,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "suggests 'ss -tlnp' to see all active connections, but -l shows only listening sockets",
+    "says sudo is needed for ports below 1024 (it is needed to see other users' processes)"
+   ],
+   "B": [
+    "ps/pgrep do not show which process holds a port",
+    "no command syntax given"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives correct, ready-to-run ss, lsof and fuser commands with the sudo caveat; A is mostly right with a flag mistake; B is vague.",
+  "grader": 2
+ },
+ "seed-how-05": {
+  "scores": {
+   "A": 4,
+   "B": 9,
+   "C": 8
+  },
+  "errors": {
+   "A": [
+    "garbled closing step ('rotate the wheel to a convenient valve position')",
+    "omits checking the tyre for the cause and refitting properly"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B is a clear roadside procedure (spare tube first, find the cause, avoid pinching) plus a kit list. C is also correct but more repetitive with an off-topic source check; A is incomplete.",
+  "grader": 3
+ },
+ "seed-how-06": {
+  "scores": {
+   "A": 3,
+   "B": 9,
+   "C": 8
+  },
+  "errors": {
+   "A": [
+    "ignores prevention, so does not answer 'for good'"
+   ],
+   "B": [],
+   "C": [
+    "says bathroom black mould is often Stachybotrys (usually Cladosporium, Aspergillus and similar)"
+   ]
+  },
+  "best": "B",
+  "reason": "B is accurate to EPA guidance on cleaning, sealant replacement, humidity and ventilation; C is similar but has a questionable species claim, A gives only cleaning.",
+  "grader": 1
+ },
+ "seed-how-07": {
+  "scores": {
+   "A": 4,
+   "B": 9,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "worked example wrong: (y-5)^2 = 16, not 36 (36 would give y = 11 or -1)",
+    "starts from ax^2+bx+c but never says to divide by a"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "tie",
+  "reason": "B and C both give correct steps and a correct worked example; A's example contains an arithmetic error.",
+  "grader": 2
+ },
+ "seed-lt-01": {
+  "scores": {
+   "A": 4,
+   "B": 9,
+   "C": 5
+  },
+  "errors": {
+   "A": [
+    "attributes the smell to butane-1-thiol, not among the compounds sources name (propionic, butyric, acetic acid, hydrogen sulfide)",
+    "presents bulging cans as dangerous (bulging is normal for surströmming)"
+   ],
+   "B": [],
+   "C": [
+    "says canning halts fermentation (fermentation continues in the can)"
+   ]
+  },
+  "best": "B",
+  "reason": "B accurately covers production, the August premiere, Halanaerobium and the specific odor compounds. C has a key process error; A names a wrong compound.",
+  "grader": 3
+ },
+ "seed-lt-02": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "start date July 13 (usually given as July 14)",
+    "says about 40 women joined within a week (sources say more than 30 people)",
+    "states deaths as fact (contemporary records do not mention any)",
+    "summary reverses the order of the musicians and the pilgrimage"
+   ],
+   "B": [
+    "states hospitalizations and deaths as fact (deaths disputed)"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C is accurate and complete: the spread, the council's responses, the St Vitus shrine, the disputed deaths and Waller's explanation; A has several small errors, B is thin.",
+  "grader": 1
+ },
+ "seed-lt-03": {
+  "scores": {
+   "A": 6,
+   "B": 9,
+   "C": 7
+  },
+  "errors": {
+   "A": [
+    "differential gear is Price's outdated hypothesis, rejected by the 2006 research"
+   ],
+   "B": [],
+   "C": [
+    "the Olympiad/games dial is on the back, not the front"
+   ]
+  },
+  "best": "B",
+  "reason": "B is accurate and complete (positions, phase, Saros and Metonic dials, games dial, uncertainty about use); C is detailed with one dial error; A is short with an outdated claim.",
+  "grader": 2
+ },
+ "seed-mh-01": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "credits the Peace of Westphalia with establishing cuius regio, eius religio (that was the Peace of Augsburg, 1555)"
+   ]
+  },
+  "best": "A",
+  "reason": "A concisely and accurately covers Luther's reform aim, sola fide, excommunication, Worms, the split and the Bible translation. C is broader but has an error and speculative claims; B is accurate but thinner.",
+  "grader": 3
+ },
+ "seed-mh-02": {
+  "scores": {
+   "A": 9,
+   "B": 5,
+   "C": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "calls the Turing Test the technology that founded AI and the UK its primary origin (Dartmouth 1956 is the standard answer)"
+   ],
+   "C": [
+    "circular answer: says the technology behind AI is artificial intelligence"
+   ]
+  },
+  "best": "A",
+  "reason": "A answers both parts correctly (the digital computer; Dartmouth 1956, with organizers and Logic Theorist); B frames the Turing Test as the technology, C is circular.",
+  "grader": 1
+ },
+ "seed-mh-03": {
+  "scores": {
+   "A": 8,
+   "B": 9,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "tie",
+  "reason": "All three are correct; B and C add accurate context (source, Buda/Pest, delta), A is bare.",
+  "grader": 2
+ },
+ "seed-mh-04": {
+  "scores": {
+   "A": 2,
+   "B": 9,
+   "C": 8
+  },
+  "errors": {
+   "A": [
+    "says Quechua is the primary language of Peru today (Spanish is, ~83% first language)"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B answers Spanish with correct shares and notes Quechua and Aymara. C is correct but less specific; A gets the main answer wrong.",
+  "grader": 3
+ },
+ "seed-mh-05": {
+  "scores": {
+   "A": 9,
+   "B": 10,
+   "C": 0
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "says Edward VII was the monarch in 1889 (it was Queen Victoria; Edward reigned from 1901)"
+   ]
+  },
+  "best": "B",
+  "reason": "A and B both give Queen Victoria correctly; B adds the exact completion date and context; C is wrong.",
+  "grader": 1
+ },
+ "seed-mh-06": {
+  "scores": {
+   "A": 2,
+   "B": 6,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Oriel College is wrong; he studied at The Queen's College, Oxford",
+    "invented master's degree in computer science",
+    "contradicts its own source check"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C is correct and specific (Queen's College, Oxford, 1973-76, first in physics); B names Queen's but never says Oxford; A names the wrong college and invents a degree.",
+  "grader": 2
+ },
+ "seed-mh-07": {
+  "scores": {
+   "A": 7,
+   "B": 9,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "tie",
+  "reason": "All correct (Japan, Mount Fuji); B and C give the elevation and context, A is bare.",
+  "grader": 3
+ },
+ "seed-mh-08": {
+  "scores": {
+   "A": 6,
+   "B": 9,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "tie",
+  "reason": "B and C both give the riel plus the practical point that US dollars are widely used, with the right rate; A is correct but minimal.",
+  "grader": 1
+ },
+ "seed-mh-09": {
+  "scores": {
+   "A": 9,
+   "B": 6,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "says the rapid change 'gave the movement its name' (the name came from the 1529 Protestation at Speyer)"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A is concrete (theses spread in weeks, edition counts, Flugschriften, reading aloud, the economic evidence and its caveat); C is correct but generic; B is thin.",
+  "grader": 2
+ },
+ "seed-mh-10": {
+  "scores": {
+   "A": 9,
+   "B": 4,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "lists the Moonlight Sonata (1801) and Sonata No. 21 (1804) as works after he became deaf, contradicting its own 'almost totally deaf by 1814'"
+   ],
+   "C": [
+    "says he was entirely deaf by 1823 (he never became completely deaf)",
+    "states the rod-to-jaw story as fact",
+    "garbled claim that Beethoven 'conducted the final performance by gesturing' (Umlauf conducted alongside him)"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains inner hearing, sketchbooks and conversation books, flags the rod story as unverified and lists the works correctly by period. C is detailed but overstates legends; B has misleading work attributions.",
+  "grader": 3
+ },
+ "seed-num-01": {
+  "scores": {
+   "A": 0,
+   "B": 8,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "gives France's total area as 6.4 million km² (it is about 0.64 million)",
+    "answer of 2.67 times is wrong (about 26.5)"
+   ],
+   "B": [
+    "uses an older Russian area figure (17,075,400 rather than 17,098,246 km²)"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives correct figures for both mainland France (about 31x) and France with overseas regions (about 26-27x); B is right for total France only; A is off by tenfold.",
+  "grader": 1
+ },
+ "seed-num-02": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 9
+  },
+  "errors": {
+   "A": [
+    "480/km2 for the Netherlands matches neither the land-area (~540) nor total-area (~430) figure"
+   ],
+   "B": [
+    "41,500 km2 is the total area including water, not land area",
+    "population 17.5 million is outdated (~18 million)"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives current figures on both land and total area and the resulting 2.25x vs 1.8x; A and B each have a figure problem.",
+  "grader": 2
+ },
+ "seed-num-03": {
+  "scores": {
+   "A": 8,
+   "B": 8,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All give the correct ~1.3 million; C also explains the cube of 109 and the packing caveat (~960,000).",
+  "grader": 3
+ },
+ "seed-num-04": {
+  "scores": {
+   "A": 7,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B computes correctly for both the full 21,196 km and the Ming wall, and gives realistic 8-hour-day figures; A is correct but brief, C stops at hours.",
+  "grader": 1
+ },
+ "seed-num-05": {
+  "scores": {
+   "A": 9,
+   "B": 1,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "cites an unconfirmed 4,807.3 m '2025' figure (the next official survey was Sept 2026, 4,807.47 m)"
+   ],
+   "B": [
+    "subtraction wrong: 8,848.86 - 4,804.23 = 4,044.63, not 5,814.63",
+    "Mont Blanc's 2021 measurement was 4,807.81 m, not 4,804.23 m"
+   ],
+   "C": [
+    "states ~4,043 m after computing 4,041.56 m",
+    "4,807.3 m is not an official survey figure"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives the right difference from official figures and explains the ice-cap variation; C is close but inconsistent; B's arithmetic is off by 1,770 m.",
+  "grader": 2
+ },
+ "seed-ooc-01": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 2
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "says Argentina (2022) won the most recent World Cup; Spain won the 2026 final on 19 July 2026"
+   ]
+  },
+  "best": "A",
+  "reason": "A correctly reports Spain's 1-0 extra-time win over Argentina with the verified scorer and venue. B is right but bare; C is out of date.",
+  "grader": 3
+ },
+ "seed-ooc-02": {
+  "scores": {
+   "A": 5,
+   "B": 9,
+   "C": 3
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "quotes 1.5465 dollars per euro, an old figure that could be taken as current"
+   ]
+  },
+  "best": "B",
+  "reason": "B gives a dated rate (1.135 on 29 Sep 2026, which matches market data) with context and a markup caveat; A honestly declines, C gives a misleading old number.",
+  "grader": 1
+ },
+ "seed-ooc-03": {
+  "scores": {
+   "A": 5,
+   "B": 8,
+   "C": 5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B gives a sourced forecast with caveats that matched the actual weather well (Sat ~28.5C, Sun ~26C); A and C honestly decline and point to IPMA.",
+  "grader": 2
+ },
+ "seed-ooc-04": {
+  "scores": {
+   "A": 9,
+   "B": 2,
+   "C": 1
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "treats iPhone 17 as the latest (iPhone 18 Pro and iPhone Duo were announced September 2026)",
+    "attributes iPhone 16 features (Camera Control) to iPhone 17 and repeats the iPhone 16 launch"
+   ],
+   "C": [
+    "treats iPhone 16 as the latest, two generations out of date",
+    "says iPhone 16 Plus has a 6.9-inch display (6.7)",
+    "says base models retain Lightning in some regions (all use USB-C)",
+    "calls the 5x tetraprism a first on the 16 Pro Max (it debuted on the 15 Pro Max)",
+    "answer is truncated"
+   ]
+  },
+  "best": "A",
+  "reason": "A covers the September 2026 iPhone 18 Pro and iPhone Duo with details matching press coverage. B and C describe older models and contain errors.",
+  "grader": 3
+ },
+ "seed-trv-01": {
+  "scores": {
+   "A": 9,
+   "B": 4,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "hedged and vague, mostly talks about its sources"
+   ],
+   "C": [
+    "says the supply is not treated to drinking standards but also that it is treated at the source (contradictory; contamination happens in distribution)"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives the clear answer with the CDC quote and the right reason (distribution, tinacos, garrafones); C gives sound advice with a muddled claim, B is weak.",
+  "grader": 1
+ },
+ "seed-trv-02": {
+  "scores": {
+   "A": 9,
+   "B": 7,
+   "C": 4
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "garbled: staff return tips because they think the diner forgot the money"
+   ],
+   "C": [
+    "lists an unrelated chicken restaurant and internet cafe in Jahrom, Iran as sources"
+   ]
+  },
+  "best": "A",
+  "reason": "A is correct and useful (service charges, otoshi, how to thank); B is correct but brief; C's answer is right but followed by irrelevant Iranian places.",
+  "grader": 2
+ },
+ "seed-trv-03": {
+  "scores": {
+   "A": 5,
+   "B": 9,
+   "C": 7
+  },
+  "errors": {
+   "A": [
+    "odd claim about drowning 'from a severe allergic reaction'",
+    "omits hot-water immersion for pain",
+    "garbled final sentence"
+   ],
+   "B": [],
+   "C": [
+    "recommends vinegar first without qualifying that it can worsen Portuguese man o' war stings (only noted in the source check)",
+    "says avoid ice, then recommends a cold pack"
+   ]
+  },
+  "best": "B",
+  "reason": "B gives seawater rinse, tentacle removal, hot-water soak, the species caveat for vinegar and emergency signs. C is sound but less careful about vinegar; A is incomplete.",
+  "grader": 3
+ },
+ "seed-trv-04": {
+  "scores": {
+   "A": 8,
+   "B": 9,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "calls the vowel in 'khop' short (it is long in Thai, kʰɔ̀ɔp)"
+   ],
+   "C": [
+    "says the particle's tone changes with gender (the particle itself changes)",
+    "describes 'ka' (ค่ะ) as high-pitched (it is a falling tone)"
+   ]
+  },
+  "best": "B",
+  "reason": "All three give the right phrases and particles; B adds useful usage and pronunciation notes with only a small slip, C has pronunciation errors.",
+  "grader": 1
+ },
+ "seed-trv-05": {
+  "scores": {
+   "A": 9,
+   "B": 4,
+   "C": 8
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "omits headache, the main symptom, and lists cerebral edema as an ordinary sign",
+    "advice to stay at 3,000 m for at least a week is unsupported",
+    "irrelevant advice about off-trail hiking in vegetation"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A covers symptoms, danger signs, Peru-specific altitudes and practical prevention accurately; C is also good but less Peru-specific; B misses the core symptom.",
+  "grader": 2
+ },
+ "seed-trv-06": {
+  "scores": {
+   "A": 9,
+   "B": 4,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "lists Berneray in the Outer Hebrides (Scotland) as a viewing spot in an Iceland answer",
+    "says winter nights are when clear skies are most likely (cloud is the main obstacle in Icelandic winter)"
+   ],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A gives the season, the equinox months, viewing hours and practical tips (forecast, moon, darkness). C is correct but thin; B has an irrelevant location and a dubious claim.",
+  "grader": 3
+ },
+ "seed-trv-07": {
+  "scores": {
+   "A": 9,
+   "B": 3,
+   "C": 9
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "vague: no main sights named, and says Higashiyama 'includes the Sanjo Bridge'",
+    "festivals are irrelevant to a two-day plan"
+   ],
+   "C": []
+  },
+  "best": "tie",
+  "reason": "A and C both give sensible two-day plans by area covering the main sights with useful crowd tips; B is vague.",
+  "grader": 1
+ },
+ "seed-trv-08": {
+  "scores": {
+   "A": 7,
+   "B": 9,
+   "C": 4
+  },
+  "errors": {
+   "A": [
+    "polio booster is not on CDC's Kenya list (polio only as routine)"
+   ],
+   "B": [],
+   "C": [
+    "misses yellow fever (entry rule and CDC recommendation) and typhoid",
+    "garbled HPV point"
+   ]
+  },
+  "best": "B",
+  "reason": "B matches CDC's Kenya page closely (YF rule and exceptions, hep A/typhoid, hep B, situational shots, malaria below 2,500 m); A is broadly right but generic; C misses yellow fever.",
+  "grader": 2
+ },
+ "seed-trv-09": {
+  "scores": {
+   "A": 8,
+   "B": 5,
+   "C": 7
+  },
+  "errors": {
+   "A": [
+    "speaks in the first person as if it lives in Scotland; the 2-3 nights guidance is written in the Access Code, not unwritten"
+   ],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A starts with legality (Scotland, England/Wales, Dartmoor 2025 ruling, all verified) and covers Leave No Trace with correct distances. C is solid on wildlife and fire but skips legality; B is generic.",
+  "grader": 3
+ }
+}

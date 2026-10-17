@@ -1,0 +1,292 @@
+{
+ "cry-001": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "cry-002": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "cry-003": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "cry-004": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "cry-005": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "cry-006": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "cry-007": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "cry-008": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "cry-009": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "cry-010": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "cry-011": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "cry-012": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "cry-013": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "cry-014": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "cry-015": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "cry-016": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "cry-017": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "cry-018": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "cry-019": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "cry-020": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "dng-001": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "dng-002": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "dng-003": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "dng-004": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "dng-005": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "food-001": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "food-002": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "food-003": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "food-004": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "food-005": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "food-006": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "food-007": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "food-008": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "food-009": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "food-010": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "food-011": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "food-012": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "food-013": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "food-014": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "food-015": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "food-016": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "food-017": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "mth-001": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "mth-002": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "mth-003": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "mth-004": {
+  "A": "androidlm",
+  "B": "commonplace",
+  "C": "web"
+ },
+ "mth-005": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "mth-006": {
+  "A": "commonplace",
+  "B": "androidlm",
+  "C": "web"
+ },
+ "trv-001": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "trv-002": {
+  "A": "web",
+  "B": "androidlm",
+  "C": "commonplace"
+ },
+ "trv-003": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "trv-004": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "trv-005": {
+  "A": "androidlm",
+  "B": "web",
+  "C": "commonplace"
+ },
+ "trv-006": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "trv-007": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "trv-008": {
+  "A": "web",
+  "B": "commonplace",
+  "C": "androidlm"
+ },
+ "trv-009": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ },
+ "trv-010": {
+  "A": "commonplace",
+  "B": "web",
+  "C": "androidlm"
+ }
+}
