@@ -8,10 +8,10 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
 
 - **Phone:** arm64, 12GB of RAM (8GB works, at about half the speed), Android 10 or newer, 47GB
   free. Developed on a Pixel 8 Pro, under stock Android 16 and under GrapheneOS.
-- **Setup, about an hour and a half:** install `androidlm-1.8.3.apk` from the
+- **Setup, about an hour and a half:** install `androidlm-1.8.4.apk` from the
   [latest release](https://github.com/Phineas1500/AndroidLM/releases/latest), open it, and on
   Wi-Fi tap **Download all missing** in its **Set up** card (46GB, 75-100 minutes).
-- **Then take its network away:** install `androidlm-1.8.3-offline.apk` over it. It keeps the
+- **Then take its network away:** install `androidlm-1.8.4-offline.apk` over it. It keeps the
   downloaded files and declares no network permission at all, so Android itself blocks any
   network access (`aapt2 dump permissions` on the APK lists no INTERNET). The offline APK can also be set up on its
   own: the phone's browser downloads the files and the app imports them
@@ -182,7 +182,7 @@ cores, RAM, GPU and TPU help, and by how much).
 
 ## Install
 
-The signed APK is in the [v1.8.3 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.8.3) (`androidlm-1.8.3.apk`, or `androidlm-1.8.3-offline.apk` without the network permission).
+The signed APK is in the [v1.8.4 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.8.4) (`androidlm-1.8.4.apk`, or `androidlm-1.8.4-offline.apk` without the network permission).
 [`INSTALL.md`](INSTALL.md) has two routes:
 - **On the phone alone:** install the APK, download the five files with the phone's browser from
   the app's Set up card, then import them. The app checks each file's SHA-256 as it copies it
