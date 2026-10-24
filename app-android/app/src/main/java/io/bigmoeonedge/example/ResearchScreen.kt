@@ -1,6 +1,9 @@
 package io.bigmoeonedge.example
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -94,6 +97,7 @@ fun UserBubble(text: String) {
  * Copy and the details: how it was answered, the sources and the timings. Citations like [1] open
  * the passage. [key] identifies the turn in its chat, for what stays open across scrolling.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AssistantTurn(r: ResearchUi, key: String, loading: Boolean, prefill: Prefill?, telemetry: Telemetry, generating: Boolean) {
     var openSource by remember(key) { mutableStateOf<ResearchSource?>(null) }
@@ -142,42 +146,47 @@ fun AssistantTurn(r: ResearchUi, key: String, loading: Boolean, prefill: Prefill
             Text(r.error, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.error)
         }
 
+        // the button and what it opens, brought into view together (revealOnOpen)
         if (!r.running) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                if (r.answer.isNotEmpty()) CopyButton(r)
-                val n = r.sources?.size ?: 0
-                TextButton(onClick = { details = !details }, contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) {
-                    Text(
-                        (if (!places && n > 0) "Sources ($n) · how it was answered" else "How it was answered") +
-                            if (details) " ▾" else " ▸",
-                        fontSize = 13.sp,
-                    )
-                }
-            }
-        }
-        if (details && !r.running) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                if (r.route != null) Text(routeText(r), fontSize = 13.sp)
-                if (r.titles != null && !places) {
-                    Text(
-                        if (r.titles.isEmpty()) "No Wikipedia article was planned."
-                        else "Articles looked up: " + r.titles.joinToString(" · "),
-                        fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                if (r.sources != null && !places) {
-                    if (r.sources.isEmpty()) {
-                        Hint(
-                            if (r.route?.route == Route.ANSWER_FIRST) "Nothing relevant in the offline Wikipedia, so the answer was not checked."
-                            else "Nothing relevant in the offline Wikipedia: answered from the model's own knowledge."
+            var opens by remember(key) { mutableIntStateOf(0) }
+            Column(Modifier.bringIntoViewRequester(revealOnOpen(opens)), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    if (r.answer.isNotEmpty()) CopyButton(r)
+                    val n = r.sources?.size ?: 0
+                    TextButton(onClick = { details = !details; if (details) opens++ },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)) {
+                        Text(
+                            (if (!places && n > 0) "Sources ($n) · how it was answered" else "How it was answered") +
+                                if (details) " ▾" else " ▸",
+                            fontSize = 13.sp,
                         )
                     }
-                    // keyed by turn and number, so an expanded passage never carries over to another turn
-                    r.sources.forEach { s -> key(key, s.number) { SourceRow(s) } }
-                    if (r.sourcesDropped > 0) Hint("${r.sourcesDropped} more passages were found but did not fit.")
                 }
-                if (r.timings.isNotEmpty()) {
-                    Text(timingSummary(r), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (details) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        if (r.route != null) Text(routeText(r), fontSize = 13.sp)
+                        if (r.titles != null && !places) {
+                            Text(
+                                if (r.titles.isEmpty()) "No Wikipedia article was planned."
+                                else "Articles looked up: " + r.titles.joinToString(" · "),
+                                fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        if (r.sources != null && !places) {
+                            if (r.sources.isEmpty()) {
+                                Hint(
+                                    if (r.route?.route == Route.ANSWER_FIRST) "Nothing relevant in the offline Wikipedia, so the answer was not checked."
+                                    else "Nothing relevant in the offline Wikipedia: answered from the model's own knowledge."
+                                )
+                            }
+                            // keyed by turn and number, so an expanded passage never carries over to another turn
+                            r.sources.forEach { s -> key(key, s.number) { SourceRow(s) } }
+                            if (r.sourcesDropped > 0) Hint("${r.sourcesDropped} more passages were found but did not fit.")
+                        }
+                        if (r.timings.isNotEmpty()) {
+                            Text(timingSummary(r), fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
                 }
             }
         }
@@ -414,16 +423,39 @@ private fun duration(ms: Long): String {
     return if (mins > 0) String.format(Locale.US, "%d min %02d s", mins, (s % 60).toInt()) else String.format(Locale.US, "%.0f s", s)
 }
 
+/**
+ * What a tap opened under the last answer must come into view: the list does not move when an item
+ * grows, so the new text stayed below the screen, with nothing to say it was there. Each time
+ * [opens] goes up (a tap that opened the section), once the new content is laid out the list
+ * scrolls just enough to show the element the returned requester is attached to: its bottom, or
+ * its top when it is taller than the screen. A section that is already open when its item scrolls
+ * back into view does not move the list ([opens] starts at 0 again).
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun revealOnOpen(opens: Int): BringIntoViewRequester {
+    val requester = remember { BringIntoViewRequester() }
+    LaunchedEffect(opens) {
+        if (opens > 0) {
+            withFrameNanos { } // the frame that lays out the opened content
+            requester.bringIntoView()
+        }
+    }
+    return requester
+}
+
 /** A numbered source; tapping it shows the passage the model was given. */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SourceRow(s: ResearchSource) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    var opens by remember { mutableIntStateOf(0) }
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().bringIntoViewRequester(revealOnOpen(opens)),
     ) {
-        Column(Modifier.clickable { expanded = !expanded }.padding(horizontal = 10.dp, vertical = 6.dp)) {
+        Column(Modifier.clickable { expanded = !expanded; if (expanded) opens++ }.padding(horizontal = 10.dp, vertical = 6.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("[${s.number}]", fontSize = 13.sp, fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -451,15 +483,17 @@ private const val PLACES_CREDIT =
         "No ratings: check a place is open before going."
 
 /** A place of the list: its name and what it is; tapping it shows the details and a map link. */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PlaceRow(s: ResearchSource) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    var opens by remember { mutableIntStateOf(0) }
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().bringIntoViewRequester(revealOnOpen(opens)),
     ) {
-        Column(Modifier.clickable { expanded = !expanded }.padding(horizontal = 10.dp, vertical = 6.dp)) {
+        Column(Modifier.clickable { expanded = !expanded; if (expanded) opens++ }.padding(horizontal = 10.dp, vertical = 6.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("[${s.number}]", fontSize = 13.sp, fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
