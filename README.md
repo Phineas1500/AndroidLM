@@ -8,15 +8,16 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
 
 - **Phone:** arm64, 12GB of RAM (8GB works, at about half the speed), Android 10 or newer, 47GB
   free. Developed on a Pixel 8 Pro, under stock Android 16 and under GrapheneOS.
-- **Setup, about an hour and a half:** install `androidlm-1.8.4.apk` from the
+- **Setup, about an hour and a half:** install `androidlm-1.8.5.apk` from the
   [latest release](https://github.com/Phineas1500/AndroidLM/releases/latest), open it, and on
   Wi-Fi tap **Download all missing** in its **Set up** card (46GB, 75-100 minutes).
-- **Then take its network away:** install `androidlm-1.8.4-offline.apk` over it. It keeps the
+- **Then take its network away:** install `androidlm-1.8.5-offline.apk` over it. It keeps the
   downloaded files and declares no network permission at all, so Android itself blocks any
   network access (`aapt2 dump permissions` on the APK lists no INTERNET). The offline APK can also be set up on its
   own: the phone's browser downloads the files and the app imports them
   ([`INSTALL.md`](INSTALL.md)).
-- **How long an answer takes:** the first question loads the model, about 30 s. On a cool phone
+- **How long an answer takes:** opening the app loads the model, about 30 s, then reads its fixed
+  instructions ahead in about 11 s, so the first question starts as fast as later ones. On a cool phone
   a question is done in about 2 minutes (median 111 s over 10 questions on GrapheneOS, first
   words after 50 s): the answer, then a check against its sources. A places question shows its
   list of real places at once, then the model's recommendations from it. A follow-up adds 12-27 s,
@@ -101,7 +102,7 @@ that phone under Android 16:
 | Prompt reading | 32-36 tokens/s in the app from a cool start, lower when hot (a 1,000-token source prompt in about 31 s, against 37 s on 1.3.0: [`notes/2026-10-02-dense-prompts.md`](notes/2026-10-02-dense-prompts.md)) |
 | Model load | about 28 s on app start on 1.4.0; the engine's own load then fell from 22-30 s to 10-12 s, as it stopped reading the whole 11.4GB file ([`notes/2026-10-08-memory-presets.md`](notes/2026-10-08-memory-presets.md)) |
 | A typical question, now | done after a median of 111 s, first words after 50 s (10 timing questions of all kinds on GrapheneOS, a cool phone: [`notes/2026-10-09-grapheneos.md`](notes/2026-10-09-grapheneos.md)); 152 s over 68 questions asked back to back in one session, the phone warm ([`notes/2026-10-14-long-session.md`](notes/2026-10-14-long-session.md)). By route, from earlier releases: |
-| Answer-first question | first words after about 15 s, and after about 4 s from the second question of a session on (the engine keeps its fixed instructions read: [`notes/2026-09-30-speed.md`](notes/2026-09-30-speed.md)); the answer is done after about 50 s and the cited source check after 103 s (medians over 6 questions; a new question may be asked as soon as the answer is done) |
+| Answer-first question | first words after about 4 s (the engine keeps its fixed instructions read: [`notes/2026-09-30-speed.md`](notes/2026-09-30-speed.md)); since 1.8.5 also on the first question, as the app reads them when it opens (4.3 s instead of 13.7 s: [`notes/2026-10-24-heat.md`](notes/2026-10-24-heat.md)); the answer is done after about 50 s and the cited source check after 103 s (medians over 6 questions; a new question may be asked as soon as the answer is done) |
 | Retrieval-first question | cited answer in about 1.6 min (median 98 s over 19 questions; first words after 44-70 s; on 1.3.1 one such question's came after 41 s instead of 48 s) |
 | Places question ("best vegan restaurants in Lisbon") | list of places on screen after 0.2 s; the model's recommendations from it (six to eight places) start after 26 s and are done after 119 s (medians over 20 questions; 88-190 s). On 1.3.1 the Lisbon question's recommendations start after 21.5 s, against 25-26 s on 1.3.0 |
 
@@ -182,7 +183,7 @@ cores, RAM, GPU and TPU help, and by how much).
 
 ## Install
 
-The signed APK is in the [v1.8.4 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.8.4) (`androidlm-1.8.4.apk`, or `androidlm-1.8.4-offline.apk` without the network permission).
+The signed APK is in the [v1.8.5 release](https://github.com/Phineas1500/AndroidLM/releases/tag/v1.8.5) (`androidlm-1.8.5.apk`, or `androidlm-1.8.5-offline.apk` without the network permission).
 [`INSTALL.md`](INSTALL.md) has two routes:
 - **On the phone alone:** install the APK, download the five files with the phone's browser from
   the app's Set up card, then import them. The app checks each file's SHA-256 as it copies it
