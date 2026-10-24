@@ -49,10 +49,13 @@ from the SDK manager. `ANDROID_HOME` must point at the SDK.
 
    ```sh
    git clone https://github.com/Helldez/BigMoeOnEdge
+   git -C BigMoeOnEdge checkout 74ba18f            # the commit our patches are made against
+   git -C BigMoeOnEdge submodule update --init     # its llama.cpp, at 0e8c83e
    ../scripts/build-android-engine.sh BigMoeOnEdge app/src/main/jniLibs/arm64-v8a
    ```
 
-   This cross-compiles `bmoe-cli` and the llama.cpp libraries for arm64 and copies them in as
+   Our patches (`../patches/`) are applied by the script; they are made against these commits
+   and do not apply to later upstream ones. This cross-compiles `bmoe-cli` and the llama.cpp libraries for arm64 and copies them in as
    `libbmoe-cli.so`, `libllama.so`, `libggml*.so`. The CLI is shipped under a `lib*.so` name
    because that is the only kind of file Android extracts and lets an app execute; the app runs
    it as a subprocess from a foreground service (no JNI).
