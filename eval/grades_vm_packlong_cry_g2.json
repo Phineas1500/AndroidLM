@@ -1,0 +1,335 @@
+{
+ "cry-001": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Lists Rainbow as a quantum-resistant signature algorithm, but it was broken by a classical key-recovery attack in 2022"
+   ]
+  },
+  "best": "B",
+  "reason": "B covers all NIST signature standards (ML-DSA, SLH-DSA, FN-DSA, XMSS/LMS), says plainly which schemes are not quantum resistant, and adds current status. A leaves out the stateful schemes, and C wrongly includes the broken Rainbow scheme."
+ },
+ "cry-002": {
+  "scores": {
+   "A": 5,
+   "B": 4.5,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives exact sizes, speeds, parameter sets and when to use each scheme. A and B give only the math basis plus side trivia and miss the practical trade-off in size and speed."
+ },
+ "cry-003": {
+  "scores": {
+   "A": 10,
+   "B": 6,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Claims SHA-256 collision resistance drops to 64-bit quantum security; the best quantum collision attack (BHT) costs about 2^85 and gives no real advantage over classical search"
+   ],
+   "C": [
+    "Claims SHA-256 collision resistance drops to 64-bit quantum security; the best quantum collision attack (BHT) costs about 2^85 and gives no real advantage over classical search"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains clearly why Shor's algorithm works on RSA's structure and why hashes only face Grover's search, and gets collision security right. B and C halve collision security by mistake and spend space on source meta-commentary."
+ },
+ "cry-004": {
+  "scores": {
+   "A": 10,
+   "B": 5.5,
+   "C": 5.5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A covers blob size, the 0x03 transaction type, KZG commitments, the separate blob fee market, 18-day retention and later capacity changes, all accurately. B and C are correct but leave out blob size and KZG."
+ },
+ "cry-005": {
+  "scores": {
+   "A": 10,
+   "B": 2,
+   "C": 2
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says Ethereum PoS has probabilistic finality; Casper FFG gives explicit economic finality of checkpoints",
+    "Lists Shapella as part of the Merge; it was a separate upgrade in April 2023",
+    "Frames finality reversion as a 66%/'nothing-at-stake' attack instead of the accountable-safety guarantee (conflicting finality needs at least 1/3 of stake slashed)"
+   ],
+   "C": [
+    "Says Ethereum PoS has probabilistic finality; Casper FFG gives explicit economic finality of checkpoints",
+    "Lists Shapella as part of the Merge; it was a separate upgrade in April 2023",
+    "Frames finality reversion as a 66%/'nothing-at-stake' attack instead of the accountable-safety guarantee (conflicting finality needs at least 1/3 of stake slashed)"
+   ]
+  },
+  "best": "A",
+  "reason": "A correctly explains Gasper, justification and finalization by 2/3 of stake, roughly 2-epoch finality, slashing and the inactivity leak. B and C get the basic mechanism wrong."
+ },
+ "cry-006": {
+  "scores": {
+   "A": 5.5,
+   "B": 6,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Says ZK rollups give instant withdrawals without delay; withdrawals still wait for the proof to be generated and verified on L1"
+   ],
+   "B": [
+    "Says ZK rollups give immediate finality; L1 finality comes only after the validity proof is generated and verified"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the 7-day challenge window, how fault proofs work, the trust models, withdrawal times and examples. A and B have the right idea but give no numbers and overstate how fast ZK rollups finalize."
+ },
+ "cry-007": {
+  "scores": {
+   "A": 3.5,
+   "B": 10,
+   "C": 3.5
+  },
+  "errors": {
+   "A": [
+    "Says validators bundle UserOperations; bundlers do this, not validators"
+   ],
+   "B": [],
+   "C": [
+    "Says validators bundle UserOperations; bundlers do this, not validators"
+   ]
+  },
+  "best": "B",
+  "reason": "B covers UserOperations, the alternative mempool, bundlers, EntryPoint, paymasters, EIP-7702 and native AA, all accurately. A and C misname who bundles operations and leave out paymasters and the mempool."
+ },
+ "cry-008": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "Says signatures are in G1 and public keys in G2; in Ethereum's BLS12-381 scheme public keys are in G1 (48 bytes) and signatures in G2 (96 bytes)"
+   ],
+   "B": [],
+   "C": [
+    "Says signatures are in G1 and public keys in G2; in Ethereum's BLS12-381 scheme public keys are in G1 (48 bytes) and signatures in G2 (96 bytes)"
+   ]
+  },
+  "best": "B",
+  "reason": "B names BLS12-381, gives key and signature sizes, and explains aggregation, proof of possession, sync committees and quantum vulnerability. A and C are thinner and swap the groups for Ethereum."
+ },
+ "cry-009": {
+  "scores": {
+   "A": 5,
+   "B": 5.5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Says STARK proving and verification are quasilinear while SNARKs are linear, so STARKs are faster; SNARK verification is constant-time and quasilinear is not better than linear"
+   ],
+   "B": [
+    "Says STARK proving and verification are quasilinear while SNARKs are linear, so STARKs are faster; SNARK verification is constant-time and quasilinear is not better than linear"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C correctly compares setup, assumptions, proof sizes, verification cost and prover speed, and covers wrapping STARKs in SNARKs. A and B repeat a wrong scaling claim, and A leaves out proof size."
+ },
+ "cry-010": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C explains where MEV comes from (including sandwiches), today's MEV-Boost relay setup and its weaknesses, and the status of ePBS (EIP-7732). A and B describe PBS abstractly and never say it currently runs out of protocol through relays."
+ },
+ "cry-011": {
+  "scores": {
+   "A": 4,
+   "B": 5.5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Says users pay the higher of the base fee or their max fee; they pay the base fee plus a tip capped so the total never exceeds maxFeePerGas"
+   ],
+   "B": [
+    "Says users pay the higher of the base fee or their max fee; they pay the base fee plus a tip capped so the total never exceeds maxFeePerGas"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C states the burn, the tip, the target of half the gas limit, the 1/8-per-block cap and the fee formula correctly. A never mentions the burn, and both A and B get the payment rule wrong."
+ },
+ "cry-012": {
+  "scores": {
+   "A": 10,
+   "B": 5,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Calls EIP-712 a Layer 2 scheme; it is a typed-data signing standard"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains cross-chain replay after the ETH/ETC split, the 9-field signing hash, the v = {0,1} + CHAIN_ID*2 + 35 formula and its limits. B and C are correct but shallow and give no encoding."
+ },
+ "cry-013": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 6.5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Says the EOA permanently sets its code, which contradicts its own (correct) statement that the delegation can be changed",
+    "Calls the delegation indicator 'opcode 0xef'; it is the 0xef0100||address designator"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives the authorization tuple, the 0xef0100||address indicator, how to clear a delegation, what it enables, the caveats and the gas cost. B and C are correct in outline but less precise."
+ },
+ "cry-014": {
+  "scores": {
+   "A": 10,
+   "B": 6.5,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A gives 2,048 ETH, says the 32 ETH minimum stays, and explains the opt-in 0x02 credentials, consolidation and related changes. B and C give only the bare number."
+ },
+ "cry-015": {
+  "scores": {
+   "A": 5.5,
+   "B": 5.5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Calls withdrawals 'withdrawal transactions'; EIP-4895 makes them system operations, not transactions",
+    "Mixes EIP-7002 execution-layer-triggered partial withdrawals (Pectra) into EIP-4895"
+   ],
+   "B": [
+    "Calls withdrawals 'withdrawal transactions'; EIP-4895 makes them system operations, not transactions",
+    "Mixes EIP-7002 execution-layer-triggered partial withdrawals (Pectra) into EIP-4895"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C precisely explains the sweep, the 16-per-payload limit, the withdrawals list and root, and that the balance credit costs no gas and cannot fail. A and B are vaguer and mix in EIP-7002."
+ },
+ "cry-016": {
+  "scores": {
+   "A": 10,
+   "B": 6.5,
+   "C": 6.5
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A gives fungible balances vs. unique tokenIds, both interfaces, safeTransferFrom/ERC-165, metadata and examples. B and C are correct but generic."
+ },
+ "cry-017": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B explains shares against an underlying asset, the full interface, typical uses and pitfalls such as rounding and inflation attacks. A and C are correct but brief and never mention shares."
+ },
+ "cry-018": {
+  "scores": {
+   "A": 7,
+   "B": 7,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C says no, explains the KEM, cites FIPS 203 and Kyber, and gives parameter sets, sizes, deployments and the real signature standards. A and B are correct but less complete."
+ },
+ "cry-019": {
+  "scores": {
+   "A": 5.5,
+   "B": 10,
+   "C": 5.5
+  },
+  "errors": {
+   "A": [
+    "Says the schemes are 'designed to be used only once per key instance'; each one-time leaf key signs once, while the key pair signs many messages"
+   ],
+   "B": [],
+   "C": [
+    "Says the schemes are 'designed to be used only once per key instance'; each one-time leaf key signs once, while the key pair signs many messages"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains one-time keys in a Merkle tree, why reusing a leaf allows forgery, the operational risks, SP 800-208 and CNSA 2.0. A and C are vague and muddle the one-time-use point."
+ },
+ "cry-020": {
+  "scores": {
+   "A": 5.5,
+   "B": 5.5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Gives a malformed terminal total difficulty (58,75000000000000000000), inconsistent with its later correct value"
+   ],
+   "B": [
+    "Gives a malformed terminal total difficulty (58,75000000000000000000), inconsistent with its later correct value"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the date, TTD, block numbers, header changes, removal of block and ommer rewards, and the client split. A and B leave out the date and the reward removal, and garble the TTD once."
+ }
+}

@@ -1,0 +1,330 @@
+{
+ "cry-001": {
+  "scores": {
+   "A": 5,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Lists Rainbow as a notable quantum-resistant signature algorithm; Rainbow was broken by a classical key-recovery attack in 2022"
+   ]
+  },
+  "best": "B",
+  "reason": "B covers ML-DSA, SLH-DSA, FN-DSA, XMSS/LMS, the on-ramp candidates and the non-resistant schemes accurately; A omits FN-DSA by name and XMSS/LMS, and C recommends the broken Rainbow."
+ },
+ "cry-002": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the math basis, exact key and signature sizes, speed and use cases; A and B explain only the hardness assumptions and pre-hash modes, with no sizes or speed."
+ },
+ "cry-003": {
+  "scores": {
+   "A": 10,
+   "B": 6,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Claims SHA-256 collision resistance drops to 64-bit quantum security; the best quantum collision attack (BHT) is about 2^85 and offers no real advantage over classical"
+   ],
+   "C": [
+    "Claims SHA-256 collision resistance drops to 64-bit quantum security; the best quantum collision attack (BHT) is about 2^85 and offers no real advantage over classical"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains Shor's period finding against Grover's generic search accurately, with current resource estimates; B and C get the core idea but misstate the quantum collision bound."
+ },
+ "cry-004": {
+  "scores": {
+   "A": 10,
+   "B": 6,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A covers blob size, type-3 transactions, KZG commitments, blob gas, the 18-day retention and later capacity increases accurately; B and C are correct but omit size, KZG and blob-gas details."
+ },
+ "cry-005": {
+  "scores": {
+   "A": 10,
+   "B": 2,
+   "C": 2
+  },
+  "errors": {
+   "A": [],
+   "B": [
+    "Says Ethereum PoS uses probabilistic rather than absolute finality; Casper FFG gives economic finality to justified/finalized checkpoints",
+    "Lists Shapella as part of The Merge; Shapella was April 2023"
+   ],
+   "C": [
+    "Says Ethereum PoS uses probabilistic rather than absolute finality; Casper FFG gives economic finality to justified/finalized checkpoints",
+    "Lists Shapella as part of The Merge; Shapella was April 2023"
+   ]
+  },
+  "best": "A",
+  "reason": "A explains Gasper, checkpoints, the 2/3 justification, finalization in about 2 epochs and the 1/3 slashing bound; B and C get the basic model wrong and never describe the mechanism."
+ },
+ "cry-006": {
+  "scores": {
+   "A": 6,
+   "B": 6,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Claims ZK rollups give immediate finality and instant withdrawals; withdrawals wait for proof generation and verification (minutes to hours)"
+   ],
+   "B": [
+    "Claims ZK rollups give immediate finality; L1 finality waits for proof generation and verification"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the 7-day window, the fault-proof mechanics, realistic ZK withdrawal times, trade-offs and examples; A and B omit the 7-day figure and overstate ZK finality."
+ },
+ "cry-007": {
+  "scores": {
+   "A": 4,
+   "B": 10,
+   "C": 4
+  },
+  "errors": {
+   "A": [
+    "Says validators bundle UserOperations; ERC-4337 uses bundlers",
+    "Describes EIP-7702/Pectra as scheduled for May 7, 2025, although it already shipped"
+   ],
+   "B": [],
+   "C": [
+    "Says validators bundle UserOperations; ERC-4337 uses bundlers",
+    "Describes EIP-7702/Pectra as scheduled for May 7, 2025, although it already shipped"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains UserOperations, the alt mempool, bundlers, EntryPoint, paymasters, EIP-7702 and native AA accurately; A and C misname bundlers and omit paymasters and the alt mempool."
+ },
+ "cry-008": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "Says signatures are in G1 and public keys in G2; Ethereum uses 48-byte G1 public keys and 96-byte G2 signatures"
+   ],
+   "B": [],
+   "C": [
+    "Says signatures are in G1 and public keys in G2; Ethereum uses 48-byte G1 public keys and 96-byte G2 signatures"
+   ]
+  },
+  "best": "B",
+  "reason": "B covers BLS12-381, sizes, aggregation, proof-of-possession, sync committees and quantum vulnerability accurately; A and C swap the groups and never name the curve."
+ },
+ "cry-009": {
+  "scores": {
+   "A": 4,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Claims SNARK proving scales linearly and STARK quasilinearly, making STARKs faster; this is contradictory (quasilinear is worse than linear) and misstates the comparison"
+   ],
+   "B": [
+    "Claims SNARK proving scales linearly and STARK quasilinearly, making STARKs faster; this is contradictory (quasilinear is worse than linear) and misstates the comparison"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C correctly covers setup, cryptographic assumptions, proof sizes, verification cost and hybrid wrapping; A omits proof size, and both A and B carry a garbled scalability claim."
+ },
+ "cry-010": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C covers MEV sources including sandwiching, MEV-Boost relays as today's PBS, and ePBS/EIP-7732 status; A and B give a generic PBS description with no MEV-Boost and no ePBS status."
+ },
+ "cry-011": {
+  "scores": {
+   "A": 3,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Says users pay the higher of the base fee or their max fee; they pay base fee plus tip, capped at maxFeePerGas"
+   ],
+   "B": [
+    "Says users pay the higher of the base fee or their max fee; they pay base fee plus tip, capped at maxFeePerGas"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C explains the burn, tip, target of half the gas limit and the 1/8 per-block adjustment exactly; A never says the base fee is burned, and A and B both misstate what users pay."
+ },
+ "cry-012": {
+  "scores": {
+   "A": 10,
+   "B": 5,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A explains the ETH/ETC replay context, the 9-field signing hash and the v = {0,1} + CHAIN_ID*2 + 35 encoding; B and C are correct but give no v formula or mechanism detail."
+ },
+ "cry-013": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": [
+    "Says the EOA permanently sets its code; the delegation persists only until it is changed or cleared, as the answer itself later says"
+   ]
+  },
+  "best": "A",
+  "reason": "A gives the type 0x04 transaction, authorization tuple, 0xef0100||address indicator, uses and caveats; B is correct but thinner, and C contradicts itself on permanence."
+ },
+ "cry-014": {
+  "scores": {
+   "A": 10,
+   "B": 7,
+   "C": 7
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "All three give 2048 ETH correctly; A adds the 32 ETH minimum, 0x02 credentials, consolidation and the rationale."
+ },
+ "cry-015": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Calls them pushed withdrawal transactions; EIP-4895 withdrawals are system-level operations, not transactions"
+   ],
+   "B": [
+    "Calls them pushed withdrawal transactions; EIP-4895 withdrawals are system-level operations, not transactions"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C explains the sweep, the 16-per-payload limit, the withdrawals list and root, Gwei amounts, and that crediting needs no gas and cannot fail; A and B are vaguer and mislabel withdrawals as transactions."
+ },
+ "cry-016": {
+  "scores": {
+   "A": 10,
+   "B": 6,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "A",
+  "reason": "A contrasts balances against tokenIds and lists the interfaces, ERC-165, safeTransferFrom and metadata; B and C state the fungibility difference correctly but stay generic."
+ },
+ "cry-017": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "B",
+  "reason": "B explains share issuance against an underlying ERC-20, the full interface, uses and pitfalls; A and C are correct but never mention shares or the deposit/redeem functions."
+ },
+ "cry-018": {
+  "scores": {
+   "A": 7,
+   "B": 7,
+   "C": 10
+  },
+  "errors": {
+   "A": [],
+   "B": [],
+   "C": []
+  },
+  "best": "C",
+  "reason": "All three correctly say it is a KEM; C adds the Kyber origin, the FIPS 203 date, parameter sets, sizes and deployments."
+ },
+ "cry-019": {
+  "scores": {
+   "A": 6,
+   "B": 10,
+   "C": 6
+  },
+  "errors": {
+   "A": [
+    "Says the schemes are used only once per key instance; it is each one-time leaf key that is single-use, while the key pair signs up to 2^h messages"
+   ],
+   "B": [],
+   "C": [
+    "Says the schemes are used only once per key instance; it is each one-time leaf key that is single-use, while the key pair signs up to 2^h messages"
+   ]
+  },
+  "best": "B",
+  "reason": "B explains the one-time signatures, the Merkle tree, the leaf counter, reuse failure modes and SP 800-208/CNSA guidance; A and C are shallow and muddle what is single-use."
+ },
+ "cry-020": {
+  "scores": {
+   "A": 5,
+   "B": 5,
+   "C": 10
+  },
+  "errors": {
+   "A": [
+    "Gives the terminal total difficulty first as 58,75000000000000000000, a malformed figure ten times too small"
+   ],
+   "B": [
+    "Gives the terminal total difficulty first as 58,75000000000000000000, a malformed figure ten times too small"
+   ],
+   "C": []
+  },
+  "best": "C",
+  "reason": "C gives the date, TTD, Paris/Bellatrix, header changes, removal of block/ommer rewards and the client split; A and B omit the date and the reward removal and garble the TTD once."
+ }
+}
