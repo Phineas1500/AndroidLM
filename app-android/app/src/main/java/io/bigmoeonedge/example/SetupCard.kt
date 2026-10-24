@@ -144,7 +144,8 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit, essentialOnly: Boolean 
                         missing.isNotEmpty() -> "Not on this phone yet: " + missing.joinToString(", ") { it.file.label }
                         updates.isNotEmpty() -> "Update available: " + updates.joinToString(", ") { it.file.label } +
                             " (${sizeLabel(updates.sumOf { it.file.bytes - it.partBytes })})"
-                        else -> "Optional: a larger model, slower and more thorough (${ModelManager.gbLabel(extras.sumOf { it.file.bytes })})"
+                        else -> "Everything the app needs is on this phone. Optional, not needed: a larger model, " +
+                            "slower and more thorough (${ModelManager.gbLabel(extras.sumOf { it.file.bytes })})"
                     },
                 )
                 return@Column
@@ -198,7 +199,9 @@ fun SetupCard(scanning: Boolean, onImported: () -> Unit, essentialOnly: Boolean 
             if (extras.isNotEmpty()) {
                 Text("Optional: a larger model", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 Hint(
-                    "Qwen3.8-Flash-Next, in two parts of ${ModelManager.gbLabel(extras.sumOf { it.file.bytes })} " +
+                    "Not needed: the app's setup is the main model and the libraries above, " +
+                        "${ModelManager.gbLabel(st.sumOf { it.file.bytes })} in all, within 50 GB. " +
+                        "Qwen3.8-Flash-Next, in two parts of ${ModelManager.gbLabel(extras.sumOf { it.file.bytes })} " +
                         "together. On 61 research questions (restaurants, crypto, travel, emergencies) its " +
                         "answers scored 67% of a web search + frontier AI answer, against 63% for the main " +
                         "model, but each takes about 3 to 4 times as long (first words after about 2 minutes, " +

@@ -146,6 +146,11 @@ fun AssistantTurn(r: ResearchUi, key: String, loading: Boolean, prefill: Prefill
             Text(r.error, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.error)
         }
 
+        // how long it took, in sight: speed is judged as the time to a complete answer
+        if (!r.running && r.phase != ResearchPhase.CANCELLED && r.error == null && r.answer.isNotEmpty()) {
+            doneLine(r)?.let { Hint(it) }
+        }
+
         // the button and what it opens, brought into view together (revealOnOpen)
         if (!r.running) {
             var opens by remember(key) { mutableIntStateOf(0) }
@@ -415,6 +420,27 @@ private fun timingSummary(r: ResearchUi): String {
 private fun answeredMs(r: ResearchUi): Long? {
     if (r.route?.route != Route.ANSWER_FIRST || r.timings.none { it.phase == ResearchPhase.DRAFTING }) return null
     return r.timings.takeWhile { it.phase != ResearchPhase.CHECKING }.sumOf { it.wallMs }
+}
+
+/**
+ * The line under a finished answer: how long it took, without opening the details. An answer-first
+ * answer is complete before its source check is, so both times are given; a places answer's list
+ * is on screen long before its recommendations.
+ */
+private fun doneLine(r: ResearchUi): String? {
+    if (r.timings.isEmpty()) return null
+    val total = r.timings.sumOf { it.wallMs }
+    val answered = answeredMs(r)
+    return when {
+        answered != null && r.timings.any { it.phase == ResearchPhase.CHECKING } ->
+            "Answered in " + duration(answered) + ", checked by " + duration(total)
+        r.route?.route == Route.PLACES -> {
+            val found = r.timings.firstOrNull { it.phase == ResearchPhase.SEARCHING }?.wallMs
+            (if (found != null) String.format(Locale.US, "Places listed in %.1f s, ", found / 1000.0) else "") +
+                "recommendations done in " + duration(total)
+        }
+        else -> "Answered in " + duration(total)
+    }
 }
 
 private fun duration(ms: Long): String {

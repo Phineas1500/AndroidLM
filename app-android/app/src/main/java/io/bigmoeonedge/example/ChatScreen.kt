@@ -42,12 +42,17 @@ import org.androidlm.research.android.AndroidLocator
 import org.androidlm.research.android.CorpusFiles
 import java.io.File
 
-/** Questions a new chat offers, one per kind of thing the app knows well. */
+/**
+ * Questions a new chat offers, one per kind of thing the app knows well: places, an explanation
+ * that compares, an emergency, a calculation, travel (from eval/questions_vitalik.jsonl; in the
+ * long-session test each scored 7 to 9 of 10, the web reference 9 or 10).
+ */
 private val SUGGESTIONS = listOf(
-    "Best vegan restaurants in Lisbon",
-    "What is EIP-4844 and what are blobs in Ethereum?",
+    "Best vegan restaurants in Berlin",
+    "Why is RSA broken by quantum computers but SHA-256 is not?",
     "I just got bitten by a snake while hiking, two hours from the nearest road. What do I do right now?",
-    "How do I get from Lisbon airport to the city center?",
+    "A hike is 18 km with 1,200 m of total climbing. Using Naismith's rule, about how long will it take?",
+    "Is tap water safe to drink in Mexico City?",
 )
 
 /**
@@ -455,9 +460,15 @@ private fun Welcome(
                     Text(q, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp))
                 }
             }
+            // an 8 GB phone reads the model in smaller pieces with a smaller cache, at about half the
+            // speed (notes/2026-10-08-memory-presets.md): say so, so a long answer is not taken for a hang
+            val context = LocalContext.current
+            val small = remember { MemoryPreset.forRam(MemoryPreset.totalGib(context)) == MemoryPreset.PHONE_8 }
             Text(
-                "An answer takes about 2 minutes, longer when the phone is warm. Follow-up questions " +
-                    "(\"What about Porto?\") are read with the previous answer.",
+                (if (small) "An answer takes about 4 minutes on this phone (8 GB; about 2 on a 12 GB phone)"
+                else "An answer takes about 2 minutes") +
+                    ", longer when the phone is warm. Follow-up questions (\"What about Hamburg?\") " +
+                    "are read with the previous answer.",
                 fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
