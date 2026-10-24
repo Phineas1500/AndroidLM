@@ -36,6 +36,7 @@ import org.androidlm.research.Engine
 import org.androidlm.research.Exchange
 import org.androidlm.research.Generation
 import org.androidlm.research.PlacesAnswer
+import org.androidlm.research.Prompts
 import org.androidlm.research.ResearchConfig
 import org.androidlm.research.ResearchEvent
 import org.androidlm.research.ResearchListener
@@ -126,6 +127,10 @@ class RunService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     @Volatile private var researchJob: Job? = null
     private val researchRuns = AtomicInteger(0)
+
+    // Reads the first steps' fixed instructions into the engine's prefix cache after a load ahead
+    // of the first question (see warmPrefixes).
+    @Volatile private var warmJob: Job? = null
 
     // A question supplied with START_SESSION starts its research run at READY (cf. [pending]).
     @Volatile private var pendingResearch: String? = null
@@ -231,6 +236,7 @@ class RunService : Service() {
     /** Loads [model] in a new engine process (replacing the running one), then runs [question] or [req] on it. */
     private fun loadSession(model: String, argv: ArrayList<String>, sig: String?, req: Req?, question: String?) {
         researchJob?.cancel() // a run on the session being replaced
+        warmJob?.cancel()
         // Different model/settings (or nothing running): tear down and start fresh. A fresh session
         // has an empty KV, so its first turn always clears; and the conversation starts over.
         // Supersede any old session FIRST (bump epoch before detaching its process), so the old
@@ -306,14 +312,7 @@ class RunService : Service() {
     private fun devEngineEnv(): Map<String, String> = devEnv().filterKeys { it.startsWith("BMOE_") }
 
     /** KEY=VALUE lines of [DEV_ENGINE_ENV], if the file exists and is readable; empty otherwise. */
-    private fun devEnv(): Map<String, String> = try {
-        File(DEV_ENGINE_ENV).takeIf { it.canRead() }?.readLines().orEmpty()
-            .map { it.trim() }
-            .filter { '=' in it && !it.startsWith("#") }
-            .associate { it.substringBefore('=') to it.substringAfter('=') }
-    } catch (e: Exception) {
-        emptyMap()
-    }
+    private fun devEnv(): Map<String, String> = DevEnv.read()
 
     private fun runSession(argv: ArrayList<String>, model: String, myEpoch: Int, dying: Process?) {
         try {
@@ -439,8 +438,14 @@ class RunService : Service() {
                 val question = pendingResearch
                 pendingResearch = null
                 if (question != null) startResearch(question)
-                else pending?.let { p -> pending = null; sendGenerate(p) } ?: scheduleIdleUnload()
+                else pending?.let { p -> pending = null; sendGenerate(p) } ?: warmPrefixes()
             }
+            t.startsWith("BMOE_BEGIN ") && inflight?.warm == true -> {
+                // a warm-up is not shown: the app stays ready for a question
+                telemetry.reset()
+                main.removeCallbacks(idleUnload)
+            }
+            t.startsWith("BMOE_PREFILL ") && inflight?.warm == true -> {}
             t.startsWith("BMOE_BEGIN ") -> {
                 telemetry.reset()
                 acquireWake()
@@ -457,7 +462,9 @@ class RunService : Service() {
                 // the first token ends the prompt reading
                 if (RunBus.state.value.prefill != null) RunBus.update { it.copy(prefill = null) }
                 val call = inflight
-                if (call != null) {
+                if (call?.warm == true) {
+                    // a warm-up: nothing on screen
+                } else if (call != null) {
                     // A research generation: the telemetry panel stays live, but the text belongs
                     // to the pipeline (a plan is not an answer), which places it through its events.
                     // Screen updates are throttled (UI_FRAME_MS): every update recomposes the screen
@@ -610,7 +617,7 @@ class RunService : Service() {
                 mtpDraftSPerTok = mtpDraftSTok, loopOverheadSPerTok = loopOverheadSTok,
             )
             if (call != null) {
-                RunBus.update { it.copy(telemetry = tel, summary = summary) }
+                if (!call.warm) RunBus.update { it.copy(telemetry = tel, summary = summary) }
                 val wallS = (System.nanoTime() - call.startNanos) / 1e9
                 // An engine-side cancel (not ours: ours has abandoned the call) ends the run too.
                 if (cancelled && !call.abandoned) call.done.completeExceptionally(CancellationException("generation cancelled"))
@@ -768,7 +775,7 @@ class RunService : Service() {
     // ── AndroidLM research mode ──
 
     /** One generate request of the research pipeline, completed by the BMOE_* lines that answer it. */
-    private class EngineCall(val id: Int, val onToken: (String) -> Unit) {
+    private class EngineCall(val id: Int, val onToken: (String) -> Unit, val warm: Boolean = false) {
         val done = CompletableDeferred<Generation>()
         val startNanos = System.nanoTime()
 
@@ -789,31 +796,36 @@ class RunService : Service() {
     private val engine = object : Engine {
         override suspend fun generate(
             prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean, cachePrefix: Int,
-        ): Generation =
-            engineLock.withLock {
-                val call = EngineCall(nextId.getAndIncrement(), onToken)
-                inflight = call
-                try {
-                    // clear_kv=false continues the engine-held conversation: it re-renders the chat
-                    // template over the whole history and prefills only what is new
-                    if (!send(generateJson(call.id, Req(prompt, nPredict, think = false, clearKv = !continueChat, cachePrefix = cachePrefix)))) {
-                        throw IllegalStateException("the engine session is not running")
-                    }
-                    call.done.await()
-                } catch (e: CancellationException) {
-                    call.abandoned = true
-                    if (!call.done.isCompleted) {
-                        send(CANCEL_JSON)
-                        withContext(NonCancellable) { withTimeoutOrNull(CANCEL_DRAIN_MS) { call.done.join() } }
-                        // Still running (a prefill batch is not interruptible): disown its output.
-                        if (!call.done.isCompleted) staleId = call.id
-                    }
-                    throw e
-                } finally {
-                    inflight = null
-                }
-            }
+        ): Generation = engineCall(prompt, nPredict, onToken, continueChat, cachePrefix, warm = false)
     }
+
+    /** [engine]'s generate; a [warm] call (warmPrefixes) puts nothing on screen. */
+    private suspend fun engineCall(
+        prompt: String, nPredict: Int, onToken: (String) -> Unit, continueChat: Boolean, cachePrefix: Int, warm: Boolean,
+    ): Generation =
+        engineLock.withLock {
+            val call = EngineCall(nextId.getAndIncrement(), onToken, warm)
+            inflight = call
+            try {
+                // clear_kv=false continues the engine-held conversation: it re-renders the chat
+                // template over the whole history and prefills only what is new
+                if (!send(generateJson(call.id, Req(prompt, nPredict, think = false, clearKv = !continueChat, cachePrefix = cachePrefix)))) {
+                    throw IllegalStateException("the engine session is not running")
+                }
+                call.done.await()
+            } catch (e: CancellationException) {
+                call.abandoned = true
+                if (!call.done.isCompleted) {
+                    send(CANCEL_JSON)
+                    withContext(NonCancellable) { withTimeoutOrNull(CANCEL_DRAIN_MS) { call.done.join() } }
+                    // Still running (a prefill batch is not interruptible): disown its output.
+                    if (!call.done.isCompleted) staleId = call.id
+                }
+                throw e
+            } finally {
+                inflight = null
+            }
+        }
 
     private fun failInflight(msg: String) {
         inflight?.done?.completeExceptionally(IllegalStateException(msg))
@@ -905,6 +917,38 @@ class RunService : Service() {
     private fun corporaFor(files: CorpusFiles): AndroidCorpora {
         corpora?.let { if (corporaFiles == files) return it else it.close() }
         return AndroidCorpora(files).also { corpora = it; corporaFiles = files }
+    }
+
+    /**
+     * After a load ahead of the first question (the app was opened): the planner's and the draft's
+     * fixed instructions are read into the engine's prefix cache (patch 0007), one token each,
+     * while the user types. The first question then reads only itself, as every later one does
+     * (planning 9.6 -> 2.9 s, first words 14.6 -> 3.7 s on a Pixel 8 Pro). A question asked
+     * meanwhile waits for the request being read (the same text it would read itself) and the rest
+     * are skipped. Nothing is shown and the app stays ready.
+     */
+    private fun warmPrefixes() {
+        // (ANDROIDLM_WARM=0 in DEV_ENGINE_ENV turns it off, for A/B timing runs)
+        if (devEnv()["ANDROIDLM_WARM"] == "0") { scheduleIdleUnload(); return }
+        warmJob = scope.launch {
+            try {
+                for (system in WARM_SYSTEMS) {
+                    if (researchJob != null || shuttingDown) break
+                    val head = system + "\n\n"
+                    val t0 = SystemClock.elapsedRealtime()
+                    val res = engineCall(head + WARM_USER, 1, {}, continueChat = false,
+                        cachePrefix = head.toByteArray(Charsets.UTF_8).size, warm = true)
+                    Log.i(LOG_TAG, "warm prefix=${head.length} chars prompt_tokens=${res.promptTokens} " +
+                        "in ${SystemClock.elapsedRealtime() - t0}ms")
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (t: Throwable) {
+                Log.w(LOG_TAG, "warm-up failed", t)
+            } finally {
+                if (researchJob == null && proc != null && !shuttingDown) main.post { scheduleIdleUnload() }
+            }
+        }
     }
 
     private fun onResearchEnded(job: Job) {
@@ -1181,6 +1225,13 @@ class RunService : Service() {
         const val ENGINE_REPACK = true
         /** Minimum interval between screen updates while a research generation streams. */
         const val UI_FRAME_MS = 250L
+        /**
+         * The instructions warmPrefixes reads into the prefix cache, in the order a question needs
+         * them: the plan's, then the draft's (the two cache slots, AppSettings.PREFIX_CACHE).
+         */
+        val WARM_SYSTEMS = listOf(Prompts.PLAN_SYSTEM, Prompts.CLOSED_SYSTEM)
+        /** The question of a warm-up request: anything short (only the instructions before it are kept). */
+        const val WARM_USER = "Hello"
         /** Dev builds: optional extra engine environment (BMOE_* KEY=VALUE lines). */
         const val DEV_ENGINE_ENV = "/data/local/tmp/androidlm-engine.env"
 

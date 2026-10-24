@@ -300,7 +300,8 @@ private fun StatusLine(r: ResearchUi, loading: Boolean, prefill: Prefill?, telem
     }
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+            if (DevEnv.flag("ANDROIDLM_SPINNER")) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+            else TickingRing()
             Text(text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
         }
@@ -317,6 +318,25 @@ private fun StatusLine(r: ResearchUi, loading: Boolean, prefill: Prefill?, telem
             Hint(String.format(Locale.US, "%.1f tokens/s", 1000.0 / telemetry.wallMs))
         }
     }
+}
+
+/**
+ * The status line's "working" mark: a ring that fills by an eighth every half second. A spinning
+ * (indeterminate) indicator is an endless animation, and it kept the whole screen redrawing at the
+ * display's full rate (up to 120 frames a second on a Pixel 8 Pro) for all of an answer, whose text
+ * changes four times a second (RunService.UI_FRAME_MS): about a quarter of a core and the GPU, next
+ * to the engine, in a phone whose speed is limited by its heat. This draws two frames a second.
+ */
+@Composable
+private fun TickingRing() {
+    var step by remember { mutableIntStateOf(0) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            kotlinx.coroutines.delay(500)
+            step = (step + 1) % 8
+        }
+    }
+    CircularProgressIndicator(progress = { (step + 1) / 8f }, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
 }
 
 private fun routeText(r: ResearchUi): String {
