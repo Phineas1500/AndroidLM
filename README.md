@@ -21,11 +21,19 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
   a question is done in about 2 minutes (median 111 s over 10 questions on GrapheneOS, first
   words after 50 s): the answer, then a check against its sources. A places question shows its
   list of real places at once, then the model's recommendations from it. A follow-up adds 12-27 s,
-  while the app rewrites it as a question that stands on its own.
+  while the app rewrites it as a question that stands on its own. On an 8GB phone everything takes
+  about twice as long (about 4 minutes a question), and the app says so on a new chat. Under each
+  answer, "Answered in … , checked by …" gives both times: the answer is complete before its source
+  check is.
 - **Chats:** the app works like a chat app. Each chat is saved on the phone as it goes; the menu
   (☰, top left) lists them to reopen or delete, and starts a new one. A follow-up is read with the
   last answer of the open chat, and "Understood as:" shows how. Under each answer, Copy, and the
   sources and how it was answered.
+- **Checking an answer:** a citation like [2] opens the passage it came from; the "Source check"
+  box lists what the sources say that the answer leaves out or states differently; "Sources ·
+  how it was answered" shows the route taken, the articles looked up, every passage the model
+  read and the timings. A places answer's places open with their details and a map link (to an
+  offline map app, if one is installed).
 - **Long sessions:** after about ten questions the phone is hot and writes at about 60% of its cool
   speed; a phone on a charger runs hotter. 68 questions asked back to back in one session took a
   median of 2.5 minutes each, with no crash, steady memory, and answers as good at the end as at
@@ -33,8 +41,10 @@ Android"](https://poidh.xyz/mainnet/bounty/31).
 - **Questions to try:**
   - "Tell me the best vegan restaurants in Lisbon", then "Which of those are open late?";
     "Video game shops in Santiago, Chile"; "a pharmacy near me" (GPS, still no network).
-  - "What is EIP-4844 and what are blobs in Ethereum?", then "How long are they kept?"; "What is
-    the difference between ML-DSA and SLH-DSA?"
+  - "Why is RSA broken by quantum computers but SHA-256 is not?"; "What does EIP-7702 let a
+    regular Ethereum account (EOA) do?"
+  - "A hike is 18 km with 1,200 m of total climbing. Using Naismith's rule, about how long will it
+    take?"; "Is tap water safe to drink in Mexico City?"
   - "I just got bitten by a snake while hiking, two hours from the nearest road. What do I do
     right now?", then "What should I avoid doing?"
   - "My dinner bill is 2,450 Thai baht and 1 US dollar is 36.5 baht. How much is that in dollars,
@@ -193,7 +203,8 @@ The signed APK is in the [v1.8.5 release](https://github.com/Phineas1500/Android
   pushes them to the phone over USB and installs the APK.
 
 An optional larger model, Qwen3.8-Flash-Next (75.8 GB), can be added from the Set up card or with
-`scripts/install.sh --flash-next`. On the 61 research questions it scored 67% of a web search +
+`scripts/install.sh --flash-next`. It is not part of the app's setup, which is the 46.2GB above,
+within the bounty's 50GB; with it the app takes far more. On the 61 research questions it scored 67% of a web search +
 frontier AI answer against 63% for the main model, but each answer takes about 3 to 4 times as
 long, and both models together need more than a 128 GB phone. See [`INSTALL.md`](INSTALL.md#optional-the-larger-model)
 and [`notes/2026-10-04-flash-next.md`](notes/2026-10-04-flash-next.md).

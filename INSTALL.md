@@ -166,7 +166,8 @@ they are. Install the new APK over the old one, then:
 ## Optional: the larger model
 
 A second, larger model, Qwen3.8-Flash-Next (the IQ3_XXS build by ISTA-DASLab), can sit next to the
-main one.
+main one. It is not needed and not part of the app's setup, which is the five files above (46.2GB,
+within the bounty's 50GB).
 - **What it gives:** on the 61 research questions of
   [`notes/2026-10-04-flash-next.md`](notes/2026-10-04-flash-next.md), its answers scored 67% of a
   web search + frontier AI answer, against 63% for the main model.
